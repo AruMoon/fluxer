@@ -124,16 +124,6 @@ jobs:
           path: app-dist-output/dist/assets-manifest.txt
           if-no-files-found: error
 
-      - name: upload assets to S3 static bucket
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          S3_ENDPOINT: https://ewr1.vultrobjects.com
-          STATIC_BUCKET: fluxer-static
-        run: >-
-          cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- build-app-proxy
-          --step upload_assets
-
   build-arm64:
     name: build app-proxy (arm64)
     needs: meta
