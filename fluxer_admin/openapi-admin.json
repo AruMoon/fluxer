@@ -12642,7 +12642,9 @@
 											"secure": {"nullable": true, "type": "boolean"}
 										},
 										"required": ["host", "port", "username", "password_set", "secure"]
-									}
+									},
+									"disable_new_ip_authorization": {"type": "boolean"},
+									"effective_disable_new_ip_authorization": {"type": "boolean"}
 								},
 								"required": [
 									"enabled",
@@ -12651,7 +12653,9 @@
 									"effective_provider",
 									"from_email",
 									"from_name",
-									"smtp"
+									"smtp",
+									"disable_new_ip_authorization",
+									"effective_disable_new_ip_authorization"
 								]
 							},
 							"bluesky": {
@@ -13014,7 +13018,8 @@
 											"password": {"nullable": true, "type": "string", "maxLength": 4096},
 											"secure": {"nullable": true, "type": "boolean"}
 										}
-									}
+									},
+									"disable_new_ip_authorization": {"nullable": true, "type": "boolean"}
 								}
 							},
 							"bluesky": {
