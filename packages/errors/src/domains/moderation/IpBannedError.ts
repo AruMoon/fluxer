@@ -11,7 +11,7 @@ interface IpBannedErrorOptions {
 	expiresAt?: Date | null;
 }
 
-const SUPPORT_EMAIL = 'support@fluxer.app';
+const SUPPORT_EMAIL = 'support@workbench.network';
 
 export class IpBannedError extends ForbiddenError {
 	constructor(options: IpBannedErrorOptions) {

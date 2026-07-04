@@ -10,9 +10,9 @@ import type {EmailTemplate, EmailTemplateKey} from '@pkgs/email/src/email_i18n/E
 
 const DEFAULT_LOCALE = 'en-US';
 const DEFAULT_EMAIL_TEMPLATE_VARIABLES = {
-	product_name: 'Fluxer',
-	appeals_email: 'appeals@fluxer.app',
-	safety_email: 'safety@fluxer.app',
+	product_name: 'Workbench Fluxer',
+	appeals_email: 'appeals@workbench.network',
+	safety_email: 'safety@workbench.network',
 } satisfies Record<string, string>;
 const emailI18n = createStaticI18n<EmailTemplateKey, EmailTemplate, Record<string, unknown>>(
 	{
