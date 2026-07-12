@@ -452,7 +452,7 @@ jobs:
       - matrix
       - build
       - check_signing
-    runs-on: blacksmith-32vcpu-windows-2025
+    runs-on: windows-2025
     environment: desktop-releases
     timeout-minutes: 25
     env:
