@@ -71,7 +71,7 @@ function getDesktopDownloadArch(arch: NodeJS.Architecture): DesktopDownloadArch 
 }
 
 const DESKTOP_DOWNLOAD_ARCH = getDesktopDownloadArch(process.arch);
-const UPDATE_API_ENDPOINT = BUILD_CHANNEL === 'canary' ? 'https://api.canary.fluxer.app' : 'https://api.fluxer.app';
+const UPDATE_API_ENDPOINT = BUILD_CHANNEL === 'canary' ? 'https://fluxer.workbench.network/api' : 'https://fluxer.workbench.network/api';
 const UPDATE_VARIANT_SEGMENT =
 	process.platform === 'win32' && DESKTOP_BUILD_VARIANT !== 'default' ? `/${DESKTOP_BUILD_VARIANT}` : '';
 const UPDATE_BASE_URL = `${UPDATE_API_ENDPOINT}/dl/desktop/${BUILD_CHANNEL}/${process.platform}/${DESKTOP_DOWNLOAD_ARCH}${UPDATE_VARIANT_SEGMENT}`;
