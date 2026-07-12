@@ -21,6 +21,7 @@ COPY --chown=65532:65532 fluxer_static/emoji /srv/fluxer-static/emoji
 COPY --chown=65532:65532 fluxer_static/fonts /srv/fluxer-static/fonts
 COPY --chown=65532:65532 fluxer_static/libs /srv/fluxer-static/libs
 COPY --chown=65532:65532 fluxer_static/web /srv/fluxer-static/web
+COPY --chown=65532:65532 fluxer_static/marketing /srv/fluxer-static/marketing
 
 RUN mkdir -p /config/caddy /data/caddy \
 	&& chown -R 65532:65532 /config /data /srv/fluxer-static
