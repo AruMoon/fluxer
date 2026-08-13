@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{
-    config::MarketingConfig,
+    config::{DOWNLOAD_RELEASE_CHANNEL, MarketingConfig},
     content::{
         BLOG_POSTS, BlogBookmarkAsset, BlogPost, HELP_ARTICLES, HELP_CATEGORIES, JOBS, POLICIES,
         blog_tag_label, blog_tag_slug, get_blog_post, get_help_article, get_job, get_policy,
@@ -10,7 +10,7 @@ use crate::{
     downloads::fetch_latest_desktop_versions_cached,
     geoip::resolver_from_marketing_config,
     i18n::{Locale, MarketingI18n, descriptors::*},
-    request_context::{AppState, RequestContext, create_locale_cookie},
+    request_context::{AppState, CANARY_WEB_APP_ENDPOINT, RequestContext, create_locale_cookie},
     swish::SwishQrCache,
     templates,
 };
@@ -35,7 +35,13 @@ use time::{
     OffsetDateTime,
     format_description::well_known::{Rfc2822, Rfc3339},
 };
-use tower_http::{compression::CompressionLayer, trace::TraceLayer};
+use tower_http::{
+    compression::{
+        CompressionLayer,
+        predicate::{DefaultPredicate, NotForContentType, Predicate},
+    },
+    trace::TraceLayer,
+};
 
 const APP_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/static/app.css"));
 const HTMX_JS: &str = include_str!("../static/htmx.min.js");
@@ -57,6 +63,7 @@ const STRICT_TRANSPORT_SECURITY_VALUE: &str = "max-age=31536000; includeSubDomai
 const REFERRER_POLICY_VALUE: &str = "strict-origin-when-cross-origin";
 const PERMISSIONS_POLICY_VALUE: &str = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
 const X_FRAME_OPTIONS_VALUE: &str = "DENY";
+const IMMUTABLE_CACHE_CONTROL: &str = "public, max-age=31536000, immutable";
 
 #[derive(Deserialize)]
 struct LocaleForm {
@@ -162,12 +169,14 @@ pub fn build_router(config: MarketingConfig) -> Router {
         .route("/_donations/checkout", post(donation_checkout))
         .route("/_donations/request-link", post(donation_request_link))
         .route("/static/app.css", get(app_css))
+        .route("/static/fonts/{file_name}", get(font_asset))
         .route("/static/htmx.min.js", get(htmx_js))
         .route("/static/world-map-equirectangular.svg", get(world_map_svg))
         .route(
             "/static/voice-region-flags/{flag_file}",
             get(voice_region_flag_svg),
         )
+        .route("/favicon.ico", get(favicon_ico))
         .route("/robots.txt", get(robots))
         .route("/security.txt", get(security_txt))
         .route("/sitemap.xml", get(sitemap))
@@ -238,7 +247,10 @@ pub fn build_router(config: MarketingConfig) -> Router {
             state.clone(),
             security_headers_middleware,
         ))
-        .layer(CompressionLayer::new())
+        .layer(
+            CompressionLayer::new()
+                .compress_when(DefaultPredicate::new().and(NotForContentType::const_new("font/"))),
+        )
         .layer(TraceLayer::new_for_http())
         .with_state(state)
 }
@@ -294,9 +306,9 @@ fn build_marketing_content_security_policy(config: &MarketingConfig) -> String {
     [
         "default-src 'self'".to_owned(),
         format!("script-src 'self' {}", inline_script_csp_source()),
-        format!("style-src 'self' 'unsafe-inline' {static_cdn}"),
+        "style-src 'self' 'unsafe-inline'".to_owned(),
         format!("img-src 'self' data: blob: {static_cdn}"),
-        format!("font-src 'self' data: {static_cdn}"),
+        "font-src 'self'".to_owned(),
         format!("media-src 'self' {static_cdn}"),
         "connect-src 'self'".to_owned(),
         "frame-src 'none'".to_owned(),
@@ -345,20 +357,14 @@ async fn canonical_host_redirect_middleware(
             return Redirect::permanent(&target).into_response();
         }
         Some("fluxer.gg") => {
-            let target = append_uri(
-                &format!("{}/invite", state.config.app_endpoint),
-                request.uri(),
-            );
+            let target = append_uri(&format!("{CANARY_WEB_APP_ENDPOINT}/invite"), request.uri());
             return Redirect::temporary(&target).into_response();
         }
         Some("fluxer.gift") => {
             let target = if request.uri().path() == "/" {
                 state.config.base_url()
             } else {
-                append_uri(
-                    &format!("{}/gift", state.config.app_endpoint),
-                    request.uri(),
-                )
+                append_uri(&format!("{CANARY_WEB_APP_ENDPOINT}/gift"), request.uri())
             };
             return Redirect::temporary(&target).into_response();
         }
@@ -406,7 +412,7 @@ fn request_host(headers: &HeaderMap) -> Option<String> {
 fn legacy_marketing_redirect(config: &MarketingConfig, uri: &Uri) -> Option<Response> {
     match uri.path().trim_end_matches('/') {
         "/channels" => {
-            let target = append_uri(&config.app_endpoint, uri);
+            let target = append_uri(CANARY_WEB_APP_ENDPOINT, uri);
             Some(Redirect::temporary(&target).into_response())
         }
         "/delete-my-account" => Some(Redirect::temporary("/help/delete-account").into_response()),
@@ -418,7 +424,7 @@ fn legacy_marketing_redirect(config: &MarketingConfig, uri: &Uri) -> Option<Resp
             Some(Redirect::permanent(&target).into_response())
         }
         _ if uri.path().starts_with("/channels/") => {
-            let target = append_uri(&config.app_endpoint, uri);
+            let target = append_uri(CANARY_WEB_APP_ENDPOINT, uri);
             Some(Redirect::temporary(&target).into_response())
         }
         _ => None,
@@ -605,7 +611,7 @@ async fn download(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -
         &state.latest_versions_cache,
         &state.http_client,
         &state.config.api_endpoint,
-        state.config.release_channel.segment(),
+        DOWNLOAD_RELEASE_CHANNEL.segment(),
     )
     .await;
     let mut response =
@@ -1007,6 +1013,20 @@ async fn app_css() -> impl IntoResponse {
     ([(header::CONTENT_TYPE, "text/css; charset=utf-8")], APP_CSS)
 }
 
+async fn font_asset(Path(file_name): Path<String>) -> Response {
+    match crate::fonts::asset(&file_name) {
+        Some((content_type, bytes)) => (
+            [
+                (header::CONTENT_TYPE, content_type),
+                (header::CACHE_CONTROL, IMMUTABLE_CACHE_CONTROL),
+            ],
+            bytes,
+        )
+            .into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
 async fn htmx_js() -> impl IntoResponse {
     (
         [(
@@ -1059,6 +1079,11 @@ async fn voice_region_flag_svg(Path(flag_file): Path<String>) -> Response {
             .into_response(),
         None => StatusCode::NOT_FOUND.into_response(),
     }
+}
+
+async fn favicon_ico(State(state): State<AppState>) -> impl IntoResponse {
+    let cdn = state.config.static_cdn_endpoint.trim_end_matches('/');
+    Redirect::permanent(&format!("{cdn}/web/favicon.ico"))
 }
 
 async fn robots(State(state): State<AppState>) -> impl IntoResponse {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{
+    config::DOWNLOAD_RELEASE_CHANNEL,
     content::{
         HELP_ARTICLES, HELP_CATEGORIES, HeadingEntry, HelpArticle, HelpCategory, JOBS, JobListing,
         POLICIES, Policy, get_help_category, render_markdown_with_copy_label,
@@ -987,13 +988,10 @@ fn base_document(
                 }
                 title { (page_title.as_str()) }
                 link rel="preconnect" href=(cdn);
-                link rel="stylesheet" href=(format!("{cdn}/fonts/ibm-plex.css?v=3"));
-                link rel="stylesheet" href=(format!("{cdn}/fonts/bricolage.css?v=3"));
+                link rel="stylesheet" href=(format!("{}/static/fonts/{}", ctx.base_path, crate::fonts::STYLESHEET_FILE_NAME));
                 link rel="stylesheet" href=(format!("{}/static/app.css?v={}", ctx.base_path, ctx.asset_version));
-                link rel="icon" type="image/x-icon" href=(format!("{cdn}/web/favicon.ico"));
+                link rel="icon" type="image/x-icon" sizes="256x256" href=(format!("{cdn}/web/favicon.ico"));
                 link rel="apple-touch-icon" href=(format!("{cdn}/web/apple-touch-icon.png"));
-                link rel="icon" type="image/png" sizes="32x32" href=(format!("{cdn}/web/favicon-32x32.png"));
-                link rel="icon" type="image/png" sizes="16x16" href=(format!("{cdn}/web/favicon-16x16.png"));
                 @if meta.enable_htmx {
                     script src=(format!("{}/static/htmx.min.js?v={}", ctx.base_path, ctx.asset_version)) defer {}
                 }
@@ -1656,7 +1654,7 @@ fn alternate_builds(
                 desktop_url(ctx, "win32", other_arch, "setup"),
                 false,
             )];
-            if ctx.release_channel.is_canary() {
+            if DOWNLOAD_RELEASE_CHANNEL.is_canary() {
                 builds.push(alt(
                     tr(i18n, ctx, PLATFORM_SUPPORT_PLATFORMS_PORTABLE_DESCRIPTOR),
                     desktop_url(ctx, "win32", arch, "portable"),
@@ -1682,31 +1680,29 @@ fn alternate_builds(
             )]
         }
         Platform::Linux => {
-            let mut builds = Vec::new();
-            if !ctx.release_channel.is_canary() {
-                builds.push(alt("Flatpak".to_owned(), FLATPAK_URL.to_owned(), true));
-            }
-            builds.push(alt(
-                "DEB".to_owned(),
-                desktop_url(ctx, "linux", arch, "deb"),
-                false,
-            ));
-            builds.push(alt(
-                "RPM".to_owned(),
-                desktop_url(ctx, "linux", arch, "rpm"),
-                false,
-            ));
-            builds.push(alt(
-                "tar.gz".to_owned(),
-                desktop_url(ctx, "linux", arch, "tar_gz"),
-                false,
-            ));
-            builds.push(alt(
-                other_arch.to_owned(),
-                desktop_url(ctx, "linux", other_arch, "appimage"),
-                false,
-            ));
-            builds
+            vec![
+                alt("Flatpak".to_owned(), FLATPAK_URL.to_owned(), true),
+                alt(
+                    "DEB".to_owned(),
+                    desktop_url(ctx, "linux", arch, "deb"),
+                    false,
+                ),
+                alt(
+                    "RPM".to_owned(),
+                    desktop_url(ctx, "linux", arch, "rpm"),
+                    false,
+                ),
+                alt(
+                    "tar.gz".to_owned(),
+                    desktop_url(ctx, "linux", arch, "tar_gz"),
+                    false,
+                ),
+                alt(
+                    other_arch.to_owned(),
+                    desktop_url(ctx, "linux", other_arch, "appimage"),
+                    false,
+                ),
+            ]
         }
         _ => Vec::new(),
     }
@@ -1735,19 +1731,10 @@ fn download_strip(
         DOWNLOAD_DOWNLOAD_FOR_PLATFORM_DESCRIPTOR,
         &[("platform", &name)],
     );
-    let description = if platform == Platform::Windows && ctx.release_channel.is_canary() {
-        let warning = i18n.template(
-            ctx.locale,
-            PLATFORM_SUPPORT_DESKTOP_CANARY_WINDOWS_WARNING_DESCRIPTOR,
-        );
+    let description = if platform == Platform::Linux {
         html! {
-            p class="body-sm mt-2 max-w-xl text-amber-800" {
-                (message_with_links(&warning, &[LinkReplacement {
-                    variable: "issue_link",
-                    text: "#1393",
-                    href: "https://github.com/fluxerapp/fluxer/issues/1393",
-                    class: "font-medium underline decoration-amber-400 underline-offset-2 hover:text-amber-950",
-                }]))
+            p class="body-sm mt-2 max-w-xl text-gray-500" {
+                (tr(i18n, ctx, PLATFORM_SUPPORT_DESKTOP_FLATPAK_OUTDATED_DESCRIPTOR))
             }
         }
     } else {
@@ -1922,7 +1909,7 @@ fn platform_icon(platform: Platform) -> Icon {
 }
 
 fn desktop_url(ctx: &RequestContext, platform: &str, arch: &str, format: &str) -> String {
-    let channel = ctx.release_channel.segment();
+    let channel = DOWNLOAD_RELEASE_CHANNEL.segment();
     let path = format!("/dl/desktop/{channel}/{platform}/{arch}/latest/{format}");
     let final_path = desktop_path_with_query(path, ctx.test_build);
     ctx.api_url(&final_path)

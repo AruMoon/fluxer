@@ -150,13 +150,13 @@ export const BaseAvatar = React.forwardRef<HTMLDivElement, BaseAvatarProps>(
 		const animatedMediaPlaybackAllowed = useAnimatedMediaPlaybackAllowed({enabled: animatedMediaPlaybackEnabled});
 		const normalizedStatus = status == null ? null : normalizeStatus(status);
 		const renderableStatus = resolveRenderableStatus(normalizedStatus);
-		const layout = getAvatarStatusLayout(size, isMobileStatus);
+		const isMobileOnline = isMobileStatus && renderableStatus === StatusTypes.ONLINE && !isTyping;
+		const layout = getAvatarStatusLayout(size, isMobileOnline);
 		const rawDynamicMaskId = useId();
 		const dynamicAvatarMaskId = useMemo(
 			() => `svg-mask-avatar-dynamic-${rawDynamicMaskId.replace(/[^A-Za-z0-9_-]/g, '_')}`,
 			[rawDynamicMaskId],
 		);
-		const isMobileOnline = isMobileStatus && renderableStatus === StatusTypes.ONLINE && !isTyping;
 		const hasCustomStatusBadge = customStatusBadge != null;
 		const shouldShowPresenceStatus =
 			isTyping || (normalizedStatus != null && (showOffline || renderableStatus !== StatusTypes.OFFLINE));
@@ -191,7 +191,9 @@ export const BaseAvatar = React.forwardRef<HTMLDivElement, BaseAvatarProps>(
 		const statusMaskId = shouldShowCustomStatusBadge
 			? (customStatusBadgeMaskId ?? 'svg-mask-status-online')
 			: isMobileOnline
-				? `svg-mask-status-online-mobile-${size}`
+				? STATIC_AVATAR_MASK_SIZES.has(size)
+					? `svg-mask-status-online-mobile-${size}`
+					: 'svg-mask-status-online-mobile'
 				: `svg-mask-status-${renderableStatus}`;
 		const avatarViewBox = getAvatarViewBox(size);
 		const statusColor = shouldShowCustomStatusBadge

@@ -618,7 +618,7 @@ msgid "{defaultDeviceLabel} ({endpointLabel})"
 msgstr "{defaultDeviceLabel} ({endpointLabel})"
 
 #. Client info desktop build identifier line. Example: "Canary Desktop 2026.419.3". Preserve placeholders.
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:38
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:37
 msgid "{desktopChannel} Desktop {desktopVersion}"
 msgstr "Máy tính để bàn {desktopChannel} {desktopVersion}"
 
@@ -1089,12 +1089,12 @@ msgid "{productName} Community Team"
 msgstr "Nhóm cộng đồng {productName}"
 
 #. Modal body shown when a user-initiated update check fails. productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:104
+#: src/features/updater/commands/UpdaterModalCommands.tsx:108
 msgid "{productName} could not reach the update service. Check your connection and try again."
 msgstr "Không thể kết nối đến dịch vụ cập nhật của {productName}. Vui lòng kiểm tra kết nối và thử lại."
 
 #. Modal body shown when starting installation of a downloaded desktop update fails. productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:121
+#: src/features/updater/commands/UpdaterModalCommands.tsx:125
 msgid "{productName} could not restart into the downloaded update. Try again from the update button."
 msgstr "Không thể khởi động lại {productName} để cài đặt bản cập nhật đã tải xuống. Hãy thử lại từ nút cập nhật."
 
@@ -1210,8 +1210,8 @@ msgstr "nhãn hiệu {productName}"
 
 #. Client info web build identifier line. Example: "Canary Web 2026.518.0". Preserve placeholders.
 #. Client info web build identifier shown after the desktop build when the web and desktop channels differ. Example: "Stable Web 2026.518.0". Preserve placeholders.
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:24
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:33
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:23
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:32
 msgid "{releaseChannel} Web {buildVersion}"
 msgstr "Web {releaseChannel} {buildVersion}"
 
@@ -1242,7 +1242,7 @@ msgid "{renderedPresenceCount} online"
 msgstr "{renderedPresenceCount} đang hoạt động"
 
 #. Short label in the channel display name state. Keep it concise. Preserve {resolvedName}; it is inserted by code.
-#: src/features/channel/state/ChannelDisplayName.ts:12
+#: src/features/channel/state/ChannelDisplayName.ts:13
 msgid "{resolvedName}'s group"
 msgstr "Nhóm của {resolvedName}"
 
@@ -1302,11 +1302,6 @@ msgstr "Màn hình của {streamerDisplayName}"
 #: src/features/app/config/TimeWindowPresets.ts:6
 msgid "{tenSeconds} seconds"
 msgstr "{tenSeconds} giây"
-
-#. Label in the channel and chat canary tester dm item. Preserve {testersCommunityName} and {canaryReleaseName}; they are inserted by code.
-#: src/features/channel/components/direct_message/CanaryTesterDmItem.tsx:33
-msgid "{testersCommunityName} is a community for {canaryReleaseName} users to share bug reports and feedback that helps shape upcoming releases. Join to chat with the team and other testers."
-msgstr "{testersCommunityName} là cộng đồng dành cho người dùng {canaryReleaseName} để chia sẻ báo cáo lỗi và phản hồi giúp định hình các bản phát hành sắp tới. Tham gia để trò chuyện với nhóm và những người thử nghiệm khác."
 
 #. Template preview summary listing how many text channels, voice channels, categories, and roles will be imported.
 #: src/features/guild/components/modals/add_guild_modal/TemplateImportForm.tsx:147
@@ -1961,7 +1956,7 @@ msgid "a hostname, e.g. {exampleDomain}"
 msgstr "tên máy chủ, ví dụ: {exampleDomain}"
 
 #. Linux desktop updater modal body shown before version details and package format selector. productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:126
+#: src/features/updater/commands/UpdaterModalCommands.tsx:130
 msgid "A Linux desktop update is available. Choose the package format for this system and {productName} will save it locally."
 msgstr "Một bản cập nhật cho máy tính để bàn Linux đã có. Chọn định dạng gói cho hệ thống này và {productName} sẽ lưu nó cục bộ."
 
@@ -1990,7 +1985,7 @@ msgstr "một cuộc thăm dò"
 msgid "A redirect_uri is required when the bot scope is not the only scope."
 msgstr "Cần có redirect_uri khi phạm vi bot không phải là phạm vi duy nhất."
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:342
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:341
 msgid "A reusable component for empty states, errors, and status messages."
 msgstr "Một thành phần có thể tái sử dụng cho các trạng thái trống, lỗi và thông báo trạng thái."
 
@@ -2557,7 +2552,7 @@ msgstr "Thêm tệp từ máy tính của bạn để tham chiếu chúng trong 
 msgid "Add friend"
 msgstr "Thêm bạn bè"
 
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:311
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:307
 msgid "Add friends"
 msgstr "Thêm bạn bè"
 
@@ -3891,7 +3886,7 @@ msgstr "Ứng dụng"
 msgid "Arabic"
 msgstr "Tiếng Ả Rập"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:227
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:226
 msgid "Archive"
 msgstr "Lưu trữ"
 
@@ -3914,7 +3909,7 @@ msgid "Are you sure you want to delete <0>{0}</0>? This cannot be undone."
 msgstr "Bạn có chắc chắn muốn xoá <0>{0}</0> không? Thao tác này không thể hoàn tác."
 
 #. Body of the destructive purge-personal-notes confirmation alert. Keep tone serious and explicit about irreversibility.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:72
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:68
 msgid "Are you sure you want to delete every message in your personal notes? This will permanently remove all messages and their attachments. This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa tất cả tin nhắn trong ghi chú cá nhân không? Thao tác này sẽ xóa vĩnh viễn tất cả tin nhắn và tệp đính kèm. Bạn không thể hoàn tác hành động này."
 
@@ -4667,7 +4662,7 @@ msgid "Autoscrolling"
 msgstr "Tự động cuộn"
 
 #. Label for the available desktop version in the Linux update modal.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:136
+#: src/features/updater/commands/UpdaterModalCommands.tsx:140
 msgid "Available"
 msgstr "Khả dụng"
 
@@ -5243,26 +5238,6 @@ msgstr "Làm mờ"
 msgid "Blur strength"
 msgstr "Độ mạnh của hiệu ứng làm mờ nền"
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:82
-msgid "Body"
-msgstr "Nội dung"
-
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:66
-msgid "Bold"
-msgstr "In đậm"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:134
-msgid "Bold heading"
-msgstr "Tiêu đề in đậm"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:142
-msgid "Bold title"
-msgstr "Tiêu đề in đậm"
-
 #. Folder icon option in the community-folder settings modal: a bookmark shape. Refers to the bookmark icon glyph, not the saved-message bookmarks feature.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the buttons tab. Keep it concise.
@@ -5590,7 +5565,7 @@ msgstr "Các kiểu nút"
 msgid "Button with context menu"
 msgstr "Nút có menu ngữ cảnh"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:252
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:251
 msgid "Buttons"
 msgstr "Nút"
 
@@ -5814,11 +5789,6 @@ msgstr "Không thể dán ảnh vào đây"
 msgid "Can't upload files here"
 msgstr "Không thể tải tệp lên đây"
 
-#. Developer / debug surface — keep terse and technical. Label in the developer Nagbar controls panel for the canary-tester CTA banner.
-#: src/features/devtools/components/NagbarControls.ts:27
-msgid "Canary tester CTA nagbar"
-msgstr "Thanh thông báo CTA người thử nghiệm Canary"
-
 #. Action label for dismissing a mass-mention warning.
 #. Button label on a scheduled message row that cancels (deletes) the scheduled send.
 #. Button label that closes the emoji rename popout without saving.
@@ -5988,11 +5958,6 @@ msgstr "Không thể cài đặt gói sticker"
 #: src/features/auth/components/CaptchaInterceptor.tsx:14
 msgid "Captcha verification failed. Try again."
 msgstr "Xác minh mã bảo mật không thành công. Vui lòng thử lại."
-
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:74
-msgid "Caption"
-msgstr "Chú thích"
 
 #. Section header in the Linux audio source picker. Lists capture-target options (entire system / specific apps).
 #: src/features/voice/components/AudioSourcePickerLinux.tsx:48
@@ -7179,7 +7144,7 @@ msgstr "Xóa tất cả các ghi đè đang hoạt động"
 msgid "Clear all attachment mocks"
 msgstr "Xóa tất cả bản nháp đính kèm"
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:378
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:384
 msgid "Clear all token overrides"
 msgstr "Xóa tất cả ghi đè token"
 
@@ -7215,7 +7180,7 @@ msgstr "Xóa mô phỏng cho tệp đính kèm này"
 msgid "Clear nickname"
 msgstr "Xóa biệt danh"
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:401
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:407
 msgid "Clear overrides"
 msgstr "Xóa ghi đè"
 
@@ -7299,7 +7264,7 @@ msgstr "Đã xoá chủ đề."
 msgid "Clearing trusted domains..."
 msgstr "Đang xóa các miền đáng tin cậy..."
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:359
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:365
 msgid "Clears quick CSS, imported themes, uploaded assets, and local file references on this device."
 msgstr "Xóa CSS nhanh, chủ đề đã nhập, nội dung đã tải lên và tham chiếu tệp cục bộ trên thiết bị này."
 
@@ -7341,7 +7306,7 @@ msgid "Click to claim your gift!"
 msgstr "Nhấn để nhận quà!"
 
 #. Short label in the settings dialog client info.
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:46
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:45
 msgid "Click to copy"
 msgstr "Nhấn để sao chép"
 
@@ -7933,7 +7898,7 @@ msgid "Community message notifications"
 msgstr "Thông báo tin nhắn cộng đồng"
 
 #. Developer control label for the community MFA requirement banner.
-#: src/features/devtools/components/NagbarControls.ts:76
+#: src/features/devtools/components/NagbarControls.ts:71
 msgid "Community MFA requirement nagbar"
 msgstr "Thanh thông báo yêu cầu MFA của cộng đồng"
 
@@ -8825,7 +8790,7 @@ msgstr "Sao chép URL lời mời"
 #. Generic action label that copies a URL to the clipboard.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:739
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:310
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:146
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:145
 msgid "Copy link"
 msgstr "Sao chép liên kết"
 
@@ -8980,16 +8945,6 @@ msgstr "Thanh thông báo lỗi cài đặt"
 msgid "Could not decode this audio file."
 msgstr "Không thể giải mã tệp âm thanh này."
 
-#. Title of the error modal shown when joining the canary testers community fails. Preserve {testersCommunityName}; it is inserted by code.
-#: src/features/channel/components/direct_message/CanaryTesterDmItem.tsx:44
-msgid "Could not join {testersCommunityName}"
-msgstr "Không thể tham gia {testersCommunityName}"
-
-#. Description text in the channel and chat canary tester dm item. Preserve {testersCommunityName}; it is inserted by code.
-#: src/features/channel/components/direct_message/CanaryTesterDmItem.tsx:39
-msgid "Could not join {testersCommunityName}. Try again later."
-msgstr "Không thể tham gia {testersCommunityName}. Vui lòng thử lại sau."
-
 #. Error shown when the setup wizard fails to load the instance configuration.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:91
 msgid "Could not load the instance configuration. Try reloading the page."
@@ -9065,7 +9020,7 @@ msgid "Couldn't change your billing cycle"
 msgstr "Không thể thay đổi chu kỳ thanh toán của bạn"
 
 #. Modal title shown when a user-initiated update check fails.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:100
+#: src/features/updater/commands/UpdaterModalCommands.tsx:104
 msgid "Couldn't check for updates"
 msgstr "Không thể kiểm tra bản cập nhật"
 
@@ -9172,7 +9127,7 @@ msgid "Couldn't delete your messages"
 msgstr "Không thể xóa tin nhắn của bạn"
 
 #. Modal title shown when a desktop update download fails.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:108
+#: src/features/updater/commands/UpdaterModalCommands.tsx:112
 msgid "Couldn't download the desktop update"
 msgstr "Không thể tải bản cập nhật cho máy tính để bàn"
 
@@ -9210,11 +9165,6 @@ msgstr "Không thể cài đặt gói biểu tượng cảm xúc này. Vui lòng
 #: src/features/invite/commands/InviteCommands.tsx:111
 msgid "Couldn't install this sticker pack. Try again later."
 msgstr "Không thể cài đặt gói sticker này. Vui lòng thử lại sau."
-
-#. Title of the generic fallback error modal shown when joining the canary testers community fails.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:56
-msgid "Couldn't join {testersCommunityName}"
-msgstr "Không thể tham gia {testersCommunityName}"
 
 #. Error modal title shown when accepting a community invite fails.
 #: src/features/invite/components/alerts/InviteAcceptFailedModal.tsx:9
@@ -9426,7 +9376,7 @@ msgid "Couldn't start the connection"
 msgstr "Không thể bắt đầu kết nối"
 
 #. Modal title shown when starting installation of a downloaded desktop update fails.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:117
+#: src/features/updater/commands/UpdaterModalCommands.tsx:121
 msgid "Couldn't start the desktop update"
 msgstr "Không thể bắt đầu cập nhật ứng dụng máy tính"
 
@@ -9662,7 +9612,7 @@ msgstr "Tạo biểu mẫu cộng đồng"
 
 #. Accessible label for the create-DM trigger in the DM list header.
 #. Button or menu action label in the create dm modal utils helper. Keep it concise.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:98
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:94
 #: src/features/channel/utils/CreateDMModalUtils.tsx:35
 msgid "Create DM"
 msgstr "Tạo tin nhắn riêng tư"
@@ -9988,12 +9938,12 @@ msgid "Current uses:"
 msgstr "Đang dùng:"
 
 #. Developer nagbar status: the banner is dismissed in the current real state.
-#: src/features/devtools/components/NagbarControls.ts:109
+#: src/features/devtools/components/NagbarControls.ts:104
 msgid "Currently dismissed"
 msgstr "Hiện đang bị bỏ qua"
 
 #. Developer nagbar status: the banner is showing in the current real state.
-#: src/features/devtools/components/NagbarControls.ts:113
+#: src/features/devtools/components/NagbarControls.ts:108
 msgid "Currently showing"
 msgstr "Đang hiển thị"
 
@@ -10302,7 +10252,7 @@ msgid "Danger button clicked."
 msgstr "Đã nhấp vào nút nguy hiểm."
 
 #. Short label in the account security tab. Keep it concise. Keep the tone plain and specific.
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:350
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:356
 #: src/features/user/components/modals/tabs/account_security_tab/AccountSecuritySections.tsx:39
 #: src/features/user/components/modals/tabs/applications_tab/ApplicationDetail.tsx:697
 msgid "Danger zone"
@@ -10669,7 +10619,7 @@ msgstr "Mặc định tắt trên di động để tiết kiệm pin và dữ li
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx:399
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:116
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:272
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:239
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:238
 #: src/features/user/components/modals/tabs/ExpressionPacksTab.tsx:49
 #: src/features/user/components/settings_utils/search_index/AccountSecurityIndex.ts:154
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:190
@@ -10964,11 +10914,6 @@ msgstr "Đã xóa tin nhắn của bạn."
 msgid "Deleted."
 msgstr "Đã xóa."
 
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:14
-msgid "Delicate and light typography"
-msgstr "Kiểu chữ thanh lịch và nhẹ nhàng"
-
 #. Status chip for a denied macOS permission.
 #: src/features/permissions/system/components/modals/MacPermissionsModal.tsx:59
 msgid "Denied"
@@ -11116,7 +11061,7 @@ msgid "Desktop inactivity before mobile push"
 msgstr "Không hoạt động trên máy tính để bàn trong thời gian dài trước khi gửi thông báo đẩy."
 
 #. Developer control label for the desktop-notification banner.
-#: src/features/devtools/components/NagbarControls.ts:40
+#: src/features/devtools/components/NagbarControls.ts:35
 msgid "Desktop notification nagbar"
 msgstr "Thanh thông báo trên máy tính"
 
@@ -11145,12 +11090,12 @@ msgid "Desktop update available. Choose a Linux package."
 msgstr "Có bản cập nhật ứng dụng. Chọn gói Linux."
 
 #. Modal title shown when a desktop app update has finished downloading.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:83
+#: src/features/updater/commands/UpdaterModalCommands.tsx:87
 msgid "Desktop update ready"
 msgstr "Bản cập nhật cho máy tính để bàn đã sẵn sàng"
 
 #. Desktop updater modal body. The version placeholder is the downloaded app version; productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:87
+#: src/features/updater/commands/UpdaterModalCommands.tsx:91
 msgid "Desktop version {version} has been downloaded. Restart {productName} to finish installing."
 msgstr "Phiên bản dành cho máy tính để bàn {version} đã được tải xuống. Khởi động lại {productName} để hoàn tất quá trình cài đặt."
 
@@ -11384,7 +11329,7 @@ msgstr "Xem trước tin nhắn trực tiếp"
 #. Generic section heading / label for the direct messages area.
 #. Summary row label for the direct messages choice in the setup wizard.
 #: src/features/app/components/setup/SetupWizardSteps.tsx:347
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:598
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:592
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:218
 #: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:255
 msgid "Direct messages"
@@ -11753,11 +11698,9 @@ msgstr "Bỏ qua nhắc đến"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the chat settings tab. Keep it concise.
 #. Short label in the inline. Keep it concise.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx:175
 #: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInline.tsx:14
 #: src/features/user/components/modals/tabs/ChatSettingsTab.tsx:14
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:102
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:154
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:116
 msgid "Display"
@@ -12305,7 +12248,7 @@ msgid "Due to mature content laws in {regionName}, this media is not available f
 msgstr "Do luật về nội dung nhạy cảm ở {regionName}, nội dung đa phương tiện này không khả dụng ở khu vực hiện tại của bạn."
 
 #: src/features/theme_studio/sections/LibrarySection.tsx:503
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:221
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:220
 msgid "Duplicate"
 msgstr "Tạo bản sao"
 
@@ -12590,7 +12533,7 @@ msgid "Edit your profile bio"
 msgstr "Chỉnh sửa tiểu sử"
 
 #. Button or menu action label in the index. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:40
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:39
 msgid "Editable text"
 msgstr "Văn bản có thể chỉnh sửa"
 
@@ -12693,7 +12636,7 @@ msgid "Email update required"
 msgstr "Cần cập nhật email"
 
 #. Developer control label for the email-verification banner.
-#: src/features/devtools/components/NagbarControls.ts:36
+#: src/features/devtools/components/NagbarControls.ts:31
 msgid "Email verification nagbar"
 msgstr "Thanh thông báo xác minh email"
 
@@ -13001,7 +12944,7 @@ msgstr "Bật tính năng hết hạn tệp đính kèm"
 msgid "Enable audio"
 msgstr "Bật âm thanh"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:172
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:171
 msgid "Enable beta feature"
 msgstr "Bật tính năng thử nghiệm"
 
@@ -13038,7 +12981,7 @@ msgstr "Bật chế độ nhà phát triển"
 msgid "Enable email delivery"
 msgstr "Bật giao email"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:158
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:157
 msgid "Enable extra option"
 msgstr "Bật tùy chọn bổ sung"
 
@@ -13660,7 +13603,7 @@ msgstr "Lỗi"
 msgid "error code {code}"
 msgstr "mã lỗi {code}"
 
-#: src/features/messaging/components/markdown/index.tsx:39
+#: src/features/messaging/components/markdown/index.tsx:40
 msgid "Error rendering content"
 msgstr "Lỗi hiển thị nội dung"
 
@@ -14094,11 +14037,6 @@ msgstr "Liên kết bên ngoài có thể nguy hiểm. Hãy cẩn trọng."
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx:57
 msgid "Extra large"
 msgstr "Cực lớn"
-
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:18
-msgid "Extra light"
-msgstr "Cực mỏng"
 
 #. Report category label for a community organized around extremist content or ideology.
 #: src/features/moderation/components/report/OptionDescriptors.ts:90
@@ -14791,7 +14729,7 @@ msgstr "Lần nhấp đầu tiên"
 msgid "First click pass-through when unfocused"
 msgstr "Nhấp chuột xuyên qua khi không được lấy nét"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:112
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:111
 msgid "First option"
 msgstr "Tùy chọn đầu tiên"
 
@@ -14917,10 +14855,6 @@ msgstr "Theo cài đặt chung • {effectiveValue}%"
 msgid "Font"
 msgstr "Phông chữ"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:344
-msgid "Font weights"
-msgstr "Độ đậm phông chữ"
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:9
 msgid "Fonts"
@@ -14995,12 +14929,12 @@ msgid "For your security, please confirm it's you to continue."
 msgstr "Để bảo mật tài khoản, vui lòng xác nhận bạn là chính chủ để tiếp tục."
 
 #. Developer nagbar override status: the banner is forced to hide.
-#: src/features/devtools/components/NagbarControls.ts:97
+#: src/features/devtools/components/NagbarControls.ts:92
 msgid "Force disabled"
 msgstr "Buộc tắt"
 
 #. Developer nagbar override status: the banner is forced to show.
-#: src/features/devtools/components/NagbarControls.ts:93
+#: src/features/devtools/components/NagbarControls.ts:88
 msgid "Force enabled"
 msgstr "Buộc bật"
 
@@ -15277,7 +15211,7 @@ msgstr "Bot thân thiện"
 #. Profile timezone privacy option label. Allows friends to see local time.
 #. Quick switcher tab label that lists friends.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:523
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:518
 #: src/features/connection/components/modals/EditConnectionModal.tsx:86
 #: src/features/search/utils/QuickSwitcherModalUtils.tsx:47
 #: src/features/user/components/modals/tabs/my_profile_tab/TimezoneProfileSettings.tsx:63
@@ -15364,7 +15298,7 @@ msgid "From {start}"
 msgstr "Từ {start}"
 
 #. placeholder {0}: sourceGuild.name
-#: src/features/channel/components/emoji_picker/EmojiPickerInspector.tsx:104
+#: src/features/channel/components/emoji_picker/EmojiPickerInspector.tsx:102
 msgid "from <0>{0}</0>"
 msgstr "từ <0>{0}</0>"
 
@@ -15460,7 +15394,7 @@ msgstr "GDPR"
 msgid "General"
 msgstr "Chung"
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:325
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:331
 msgid "Generate a shareable link or copy your combined custom CSS."
 msgstr "Tạo liên kết có thể chia sẻ hoặc sao chép CSS tùy chỉnh kết hợp của bạn."
 
@@ -15480,11 +15414,6 @@ msgstr "Tạo mã mới"
 #: src/features/auth/flow/HandoffCodeDisplay.tsx:70
 msgid "Generating code…"
 msgstr "Đang tạo mã…"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:22
-msgid "Gentle and airy text display"
-msgstr "Hiển thị văn bản nhẹ nhàng và thoáng đãng"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:209
@@ -15671,7 +15600,7 @@ msgid "Gift inventory flow"
 msgstr "Luồng kho quà tặng"
 
 #. Developer control label for the gift-inventory banner.
-#: src/features/devtools/components/NagbarControls.ts:56
+#: src/features/devtools/components/NagbarControls.ts:51
 msgid "Gift inventory nagbar"
 msgstr "Thanh thông báo kho quà tặng"
 
@@ -16265,11 +16194,6 @@ msgstr "Anh ấy"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:45
 msgid "Header"
-msgstr "Tiêu đề"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:94
-msgid "Heading"
 msgstr "Tiêu đề"
 
 #. Title in the markdown tab. Keep it concise.
@@ -17429,7 +17353,7 @@ msgstr "Đang lập chỉ mục kênh"
 msgid "Indicator"
 msgstr "Chỉ báo"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:334
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:333
 msgid "Indicators & status"
 msgstr "Chỉ báo & trạng thái"
 
@@ -17557,7 +17481,7 @@ msgstr "Trạng thái nhập"
 msgid "Input volume"
 msgstr "Âm lượng đầu vào"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:260
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:259
 msgid "Inputs & text"
 msgstr "Nhập liệu & văn bản"
 
@@ -17590,7 +17514,7 @@ msgid "Install sticker pack"
 msgstr "Cài gói sticker"
 
 #. Label for the installed desktop version in the Linux update modal.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:132
+#: src/features/updater/commands/UpdaterModalCommands.tsx:136
 msgid "Installed"
 msgstr "Đã cài đặt"
 
@@ -18018,7 +17942,7 @@ msgid "Invites disabled"
 msgstr "Đã tắt lời mời"
 
 #. Developer control label for the invites-disabled banner.
-#: src/features/devtools/components/NagbarControls.ts:72
+#: src/features/devtools/components/NagbarControls.ts:67
 msgid "Invites disabled nagbar"
 msgstr "Thanh thông báo lời mời bị tắt"
 
@@ -18094,15 +18018,6 @@ msgstr "Hiện tại khá yên tĩnh..."
 msgid "Italian"
 msgstr "Tiếng Ý"
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:114
-msgid "Italic"
-msgstr "Nghiêng"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:392
-msgid "Italic style demonstration"
-msgstr "Ví dụ kiểu chữ nghiêng"
-
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts:167
 msgid "Italy"
@@ -18141,13 +18056,6 @@ msgstr "Tham gia {communityName}"
 #: src/features/app/components/layout/app_layout/nagbars/GuildMembershipCtaNagbar.tsx:24
 msgid "Join {communityName} to chat with the team and stay up to date."
 msgstr "Tham gia {communityName} để trò chuyện với đội ngũ và cập nhật thông tin mới nhất."
-
-#. Button or menu action label in the channel and chat canary tester dm item. Keep it concise. Preserve {testersCommunityName}; it is inserted by code.
-#. CTA button label for joining the canary testers community. testersCommunityName is a community name.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:98
-#: src/features/channel/components/direct_message/CanaryTesterDmItem.tsx:28
-msgid "Join {testersCommunityName}"
-msgstr "Tham gia {testersCommunityName}"
 
 #. Action button label in the add community modal. Starts the join-by-invite-code flow.
 #: src/features/guild/components/modals/add_guild_modal/shared.ts:101
@@ -18532,10 +18440,6 @@ msgstr "Ngôn ngữ"
 msgid "Language settings"
 msgstr "Cài đặt ngôn ngữ"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:285
-msgid "Language support"
-msgstr "Hỗ trợ ngôn ngữ"
-
 #. Submenu label in the textarea spellcheck submenu listing manual language overrides.
 #. Subsection title for spellcheck language settings. Keep it concise.
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:86
@@ -18544,9 +18448,7 @@ msgid "Languages"
 msgstr "Ngôn ngữ"
 
 #. Short label in the selections tab. Keep it concise.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx:53
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:86
 msgid "Large"
 msgstr "Lớn"
 
@@ -18822,9 +18724,7 @@ msgid "Lifetime {premiumProductName}"
 msgstr "Trọn đời {premiumProductName}"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/expressions/components/modals/sticker_form/StickerPreview.tsx:48
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:26
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:54
 msgid "Light"
 msgstr "Sáng"
@@ -19012,7 +18912,7 @@ msgid "Linux default"
 msgstr "Mặc định của Linux"
 
 #. Select label for choosing the Linux desktop package format to download.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:148
+#: src/features/updater/commands/UpdaterModalCommands.tsx:152
 msgid "Linux package"
 msgstr "Gói Linux"
 
@@ -19613,7 +19513,7 @@ msgid "Mark top inbox channel as read"
 msgstr "Đánh dấu kênh hộp thư đến trên cùng là đã đọc"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:372
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:364
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:122
 msgid "Markdown"
 msgstr "Định dạng Markdown"
@@ -19945,10 +19845,8 @@ msgstr "Kích thước file phương tiện"
 
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
 #. Short label in the selections tab. Keep it concise.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:65
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx:49
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:50
 msgid "Medium"
 msgstr "Trung bình"
 
@@ -20455,7 +20353,7 @@ msgstr "Tin nhắn: {0}."
 #. Short label in the inline. Keep it concise.
 #. Short label in the keybinds tab. Keep it concise.
 #: src/features/channel/components/ChannelChatLayout.tsx:16
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:280
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:276
 #: src/features/input/components/modals/KeyboardShortcutsCheatsheetModal.tsx:28
 #: src/features/user/components/modals/tabs/appearance_tab/AppearanceTabInline.tsx:31
 #: src/features/user/components/modals/tabs/AppearanceTab.tsx:39
@@ -20820,7 +20718,7 @@ msgstr "Thêm"
 
 #. Short label in the index. Keep it concise.
 #. Short label in the user profile modal. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:48
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:47
 #: src/features/user/components/modals/UserProfileModal.tsx:114
 msgid "More actions"
 msgstr "Thêm tuỳ chọn"
@@ -20992,10 +20890,6 @@ msgstr "Xác thực đa yếu tố"
 #: src/features/user/components/modals/tabs/component_gallery_tab/MarkdownTab.tsx:57
 msgid "Multi-line"
 msgstr "Multi-line"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:497
-msgid "Multilingual content"
-msgstr "Nội dung đa ngôn ngữ"
 
 #. Discovery category dropdown option in the community Discovery settings tab.
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx:79
@@ -21606,7 +21500,7 @@ msgstr "Nhóm mới"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Tooltip on the new message button at the top of the DM list.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:94
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:90
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts:159
 msgid "New message"
 msgstr "Tin nhắn mới"
@@ -21653,7 +21547,7 @@ msgid "New users can't join right now. You can still create an account or sign i
 msgstr "Người dùng mới hiện chưa thể tham gia. Bạn vẫn có thể tạo tài khoản hoặc đăng nhập, sau đó thử lại liên kết này sau."
 
 #. Fallback version label when the available desktop version is unknown.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:144
+#: src/features/updater/commands/UpdaterModalCommands.tsx:148
 msgid "New version"
 msgstr "Phiên bản mới"
 
@@ -21921,7 +21815,7 @@ msgid "No emojis found matching your search."
 msgstr "Không tìm thấy biểu tượng cảm xúc nào khớp với tìm kiếm của bạn."
 
 #. Empty-state text in the channel and chat emoji picker.
-#: src/features/channel/components/EmojiPicker.tsx:43
+#: src/features/channel/components/EmojiPicker.tsx:41
 msgid "No emojis match that search"
 msgstr "Không có biểu tượng cảm xúc nào khớp với tìm kiếm đó"
 
@@ -22363,11 +22257,6 @@ msgstr "Không"
 msgid "None (normal behavior)"
 msgstr "Không (hành vi bình thường)"
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:106
-msgid "Normal"
-msgstr "Thường"
-
 #. Short label in the language and locale names. Keep it concise.
 #: src/features/user/utils/LocaleUtils.ts:100
 msgid "Norwegian"
@@ -22792,7 +22681,7 @@ msgid "Only you can see this message. <0>Dismiss</0>"
 msgstr "Chỉ bạn mới thấy tin nhắn này. <0>Bỏ qua</0>"
 
 #. Short label in the index. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:44
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:43
 msgid "Opacity"
 msgstr "Độ mờ"
 
@@ -22970,7 +22859,7 @@ msgid "Open date picker"
 msgstr "Mở bộ chọn ngày"
 
 #. Button label that opens the Fluxer desktop downloads page in a browser.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:79
+#: src/features/updater/commands/UpdaterModalCommands.tsx:83
 msgid "Open desktop downloads"
 msgstr "Mở trang tải xuống cho máy tính"
 
@@ -23154,7 +23043,7 @@ msgid "Open profile for {nickname}"
 msgstr "Mở hồ sơ của {nickname}"
 
 #. Accessible label and tooltip for the search field at the top of the DM list. Opens the quick switcher.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:90
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:86
 msgid "Open quick switcher"
 msgstr "Mở bộ chuyển đổi nhanh"
 
@@ -23164,6 +23053,11 @@ msgstr "Mở bộ chuyển đổi nhanh"
 #: src/features/permissions/system/components/modals/MacPermissionsModal.tsx:75
 msgid "Open settings"
 msgstr "Mở cài đặt"
+
+#. Button label that opens the software center via appstream protocol.
+#: src/features/updater/commands/UpdaterModalCommands.tsx:79
+msgid "Open software center"
+msgstr "Mở trung tâm phần mềm"
 
 #. Action that opens the sticker URL in an external browser.
 #: src/features/ui/action_menu/items/StickerContextMenuItems.tsx:40
@@ -23310,11 +23204,6 @@ msgstr "Hệ điều hành"
 #: src/features/user/components/settings_utils/search_index/AdvancedSettingsIndex.ts:26
 msgid "Opt into experimental per-community and per-channel unread badge controls"
 msgstr "Cho phép sử dụng tính năng thử nghiệm để kiểm soát số lượng thông báo chưa đọc cho từng cộng đồng và kênh"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:46
-msgid "Optimized for longer reading passages"
-msgstr "Tối ưu cho các đoạn văn dài"
 
 #: src/features/voice/components/modals/CameraPreviewModal.tsx:906
 msgid "Optimizing camera..."
@@ -23483,7 +23372,7 @@ msgstr "Ngoài thời gian hoàn tiền"
 msgid "Overlapping avatar groups showing multiple users with automatic overflow counts."
 msgstr "Nhóm ảnh đại diện chồng chéo hiển thị nhiều người dùng với số lượng tràn tự động."
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:327
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:326
 msgid "Overlays & menus"
 msgstr "Lớp phủ & menu"
 
@@ -23886,11 +23775,6 @@ msgstr "Âm lượng từng âm thanh"
 msgid "Per-window audio isn't available on this build of macOS."
 msgstr "Tính năng âm thanh từng cửa sổ không khả dụng trên phiên bản macOS này."
 
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:38
-msgid "Perfect for everyday content"
-msgstr "Hoàn hảo cho nội dung hàng ngày"
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts:86
 msgid "Performance"
@@ -23965,7 +23849,7 @@ msgid "Personal notes"
 msgstr "Ghi chú cá nhân"
 
 #. Toast shown when triggering the purge personal notes flow on an already empty self-DM.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:86
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:82
 msgid "Personal notes were already empty"
 msgstr "Ghi chú cá nhân đã trống"
 
@@ -24417,11 +24301,6 @@ msgstr "Vị trí"
 msgid "Power saving"
 msgstr "Tiết kiệm pin"
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:70
-msgid "Powerful and attention-grabbing"
-msgstr "Mạnh mẽ và thu hút"
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:111
 msgid "Pre-upload attachments"
@@ -24484,12 +24363,12 @@ msgid "Premium badge"
 msgstr "Huy hiệu Premium"
 
 #. Developer control label for the premium-expired banner.
-#: src/features/devtools/components/NagbarControls.ts:48
+#: src/features/devtools/components/NagbarControls.ts:43
 msgid "Premium expired nagbar"
 msgstr "Thanh thông báo hết hạn gói Premium"
 
 #. Developer control label for the premium grace-period banner.
-#: src/features/devtools/components/NagbarControls.ts:44
+#: src/features/devtools/components/NagbarControls.ts:39
 msgid "Premium grace period nagbar"
 msgstr "Thanh thông báo thời gian gia hạn Premium"
 
@@ -24499,7 +24378,7 @@ msgid "Premium model"
 msgstr "Mô hình cao cấp"
 
 #. Developer control label for the premium-onboarding banner.
-#: src/features/devtools/components/NagbarControls.ts:52
+#: src/features/devtools/components/NagbarControls.ts:47
 msgid "Premium onboarding nagbar"
 msgstr "Thanh thông báo giới thiệu gói Premium"
 
@@ -24691,7 +24570,7 @@ msgstr "Chính (đã tắt)"
 msgid "Primary accent color"
 msgstr "Màu nhấn chính"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:351
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:350
 msgid "Primary action"
 msgstr "Hành động chính"
 
@@ -25055,7 +24934,7 @@ msgstr "Tính năng mua hàng không khả dụng"
 
 #. Confirm button label on the purge-personal-notes destructive alert.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:78
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:74
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:248
 msgid "Purge"
 msgstr "Xóa tin nhắn"
@@ -25066,7 +24945,7 @@ msgid "Purge messages"
 msgstr "Xóa tin nhắn"
 
 #. Title of the destructive confirmation alert when wiping the personal notes self-DM. Keep tone serious.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:68
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:64
 #: src/features/ui/action_menu/PersonalNotesContextMenu.tsx:26
 msgid "Purge personal notes"
 msgstr "Xóa ghi chú cá nhân"
@@ -25082,7 +24961,7 @@ msgid "Purge this sticker from storage and CDN"
 msgstr "Xóa nhãn dán này khỏi bộ nhớ và CDN"
 
 #. Toast confirmation after wiping personal notes. deletedCount is the number of messages removed.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:82
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:78
 msgid "Purged {deletedCount} messages from personal notes"
 msgstr "Đã xoá {deletedCount} tin nhắn khỏi ghi chú cá nhân"
 
@@ -25218,7 +25097,7 @@ msgstr "Biểu cảm nhanh"
 
 #. Accessible label for the desktop quick switcher modal.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/channel/components/direct_message/DirectMessageList.tsx:484
+#: src/features/channel/components/direct_message/DirectMessageList.tsx:479
 #: src/features/search/components/quick_switcher/QuickSwitcherModal.tsx:77
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:50
 msgid "Quick switcher"
@@ -25724,11 +25603,6 @@ msgstr "Đăng ký"
 msgid "Registration is currently closed. Use a registration link from an admin to create an account."
 msgstr "Hiện tại đăng ký đang đóng. Hãy dùng liên kết đăng ký từ quản trị viên để tạo tài khoản."
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:34
-msgid "Regular"
-msgstr "Thường"
-
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:226
 msgid "Regular button"
 msgstr "Nút thông thường"
@@ -26198,7 +26072,7 @@ msgstr "Đã xóa giới hạn người dùng."
 msgid "Removed timeout from {0}"
 msgstr "Đã gỡ thời gian chờ của {0}"
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:381
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:387
 msgid "Removes every per-variable override but keeps your library and assets intact."
 msgstr "Xóa mọi tùy chỉnh theo biến nhưng giữ nguyên thư viện và tài sản của bạn."
 
@@ -26703,7 +26577,7 @@ msgstr "Đặt lại dữ liệu ứng dụng"
 msgid "Reset app data and restart"
 msgstr "Đặt lại dữ liệu ứng dụng và khởi động lại"
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:356
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:362
 msgid "Reset custom theme data"
 msgstr "Đặt lại dữ liệu chủ đề tùy chỉnh"
 
@@ -26714,7 +26588,7 @@ msgstr "Đặt lại dữ liệu chủ đề tùy chỉnh?"
 
 #. Button or menu action label in the theme studio settings section. Keep it concise.
 #: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:76
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:371
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:377
 msgid "Reset data"
 msgstr "Đặt lại dữ liệu"
 
@@ -26854,7 +26728,7 @@ msgid "Restart {appName}"
 msgstr "Khởi động lại {appName}"
 
 #. Button label that restarts the app to apply a desktop update. productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:96
+#: src/features/updater/commands/UpdaterModalCommands.tsx:100
 msgid "Restart {productName}"
 msgstr "Khởi động lại {productName}"
 
@@ -28030,7 +27904,7 @@ msgstr "Đang tìm kiếm"
 msgid "Searching people..."
 msgstr "Đang tìm người..."
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:113
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:112
 msgid "Second option"
 msgstr "Tùy chọn thứ hai"
 
@@ -28047,7 +27921,7 @@ msgstr "Thứ cấp (đã tắt)"
 msgid "Secondary accent color"
 msgstr "Màu nhấn phụ"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:355
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:354
 msgid "Secondary action"
 msgstr "Hành động phụ"
 
@@ -28339,7 +28213,7 @@ msgstr "Đã chọn: {0}"
 msgid "Selection: {0} (max {1})"
 msgstr "Đã chọn: {0} (tối đa {1})"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:293
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:292
 msgid "Selections"
 msgstr "Lựa chọn"
 
@@ -28368,16 +28242,6 @@ msgstr "Ghi đè chế độ tự lưu trữ"
 #: src/features/app/components/dialogs/components/PurchaseDisclaimer.tsx:36
 msgid "Self-serve refunds available within 3 days of payment, once every 30 days. Refunding a subscription cancels it. EU/EEA buyers waive the 14-day right of withdrawal at checkout to access content immediately. Use the in-app refund button instead of a chargeback. Chargebacks can permanently restrict your account. Stripe handles payment securely. We never see your full card number."
 msgstr "Bạn có thể tự hoàn tiền trong vòng 3 ngày kể từ khi thanh toán, mỗi 30 ngày một lần. Hoàn tiền gói đăng ký sẽ hủy gói đó. Người mua ở EU/EEA từ bỏ quyền rút tiền trong 14 ngày khi thanh toán để truy cập nội dung ngay lập tức. Hãy dùng nút hoàn tiền trong ứng dụng thay vì yêu cầu bồi hoàn. Yêu cầu bồi hoàn có thể hạn chế vĩnh viễn tài khoản của bạn. Stripe xử lý thanh toán an toàn. Chúng tôi không bao giờ thấy số thẻ đầy đủ của bạn."
-
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:58
-msgid "Semi bold"
-msgstr "Nét đậm vừa"
-
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:126
-msgid "Semi-bold large"
-msgstr "Đậm vừa, cỡ lớn"
 
 #. Button or menu action label in the share theme modal. Keep it concise.
 #. Send-message button label in the voice message composer modal.
@@ -28951,7 +28815,7 @@ msgstr "Đặt mức âm lượng cho mọi hiệu ứng âm thanh. Các tùy ch
 #. Generic action label / section header that opens settings.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:262
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:264
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:126
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:125
 msgid "Settings"
 msgstr "Cài đặt"
 
@@ -28991,9 +28855,9 @@ msgid "Several people are typing..."
 msgstr "Một vài người đang nhập..."
 
 #: src/features/theme_studio/sections/QuickCssSection.tsx:225
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:316
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:322
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:279
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:133
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:132
 msgid "Share"
 msgstr "Chia sẻ"
 
@@ -29002,7 +28866,7 @@ msgstr "Chia sẻ"
 msgid "Share action."
 msgstr "Hành động chia sẻ."
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:322
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:328
 msgid "Share active custom theme"
 msgstr "Chia sẻ chủ đề tùy chỉnh đang hoạt động"
 
@@ -29035,7 +28899,7 @@ msgstr "Nguồn chia sẻ"
 msgid "Share the {premiumProductName} experience with your friends by purchasing a gift subscription."
 msgstr "Chia sẻ trải nghiệm {premiumProductName} với bạn bè bằng cách mua gói đăng ký quà tặng."
 
-#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:341
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:347
 msgid "Share theme"
 msgstr "Chia sẻ chủ đề"
 
@@ -29963,11 +29827,6 @@ msgstr "Thanh trượt có giá trị bước"
 msgid "Sliders"
 msgstr "Thanh trượt"
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:54
-msgid "Slightly bolder emphasis"
-msgstr "Nhấn mạnh hơn một chút"
-
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts:203
 msgid "Slovakia"
@@ -30076,9 +29935,7 @@ msgid "Slurs, dehumanizing language, or attacks on protected groups."
 msgstr "Lời lẽ xúc phạm, phi nhân tính hoặc công kích các nhóm được bảo vệ."
 
 #. Short label in the selections tab. Keep it concise.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx:45
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:78
 msgid "Small"
 msgstr "Nhỏ"
 
@@ -30160,11 +30017,6 @@ msgstr "Làm tròn đến bội số của 5."
 #: src/features/user/components/settings_utils/search_index/LinkedAccountsIndex.ts:40
 msgid "Social"
 msgstr "Mạng xã hội"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:30
-msgid "Soft and easy reading experience"
-msgstr "Trải nghiệm đọc mềm mại và dễ chịu"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/VoiceVideoIndex.ts:148
@@ -30315,10 +30167,8 @@ msgstr "Đã xảy ra lỗi."
 #. Body of the generic fallback error modal shown when deleting a custom emoji fails.
 #. Body of the generic fallback error modal shown when generating a shareable theme link fails.
 #. Body of the generic fallback error modal shown when joining a discovery community fails.
-#. Body of the generic fallback error modal shown when joining the canary testers community fails.
 #. Generic fallback body shown in an error modal when an action fails for an unexpected reason.
 #: src/features/app/components/alerts/CommonErrorModalDescriptors.ts:5
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:60
 #: src/features/discovery/discovery/DiscoveryGuildCard.tsx:36
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:128
 #: src/features/theme/components/modals/ShareThemeModal.tsx:50
@@ -30877,7 +30727,7 @@ msgstr "Trạng thái hoạt động"
 msgid "Status page"
 msgstr "Trạng thái hệ thống"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:341
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:340
 msgid "Status slate"
 msgstr "Trạng thái"
 
@@ -31291,15 +31141,6 @@ msgstr "Stripe báo cáo thẻ được phát hành ở {countryName}. Để tha
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
 msgstr "Chất lượng tốt với chi phí CPU vừa phải. Dự phòng Chromium tốt cho chia sẻ màn hình."
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:62
-msgid "Strong visual hierarchy"
-msgstr "Phân cấp hình ảnh rõ ràng"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:458
-msgid "Style variations"
-msgstr "Các kiểu biến thể"
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:130
 msgid "Styling"
@@ -31345,11 +31186,6 @@ msgstr "Các trường hợp đăng ký"
 #: src/features/user/components/modals/tabs/component_gallery_tab/MarkdownTab.tsx:81
 msgid "Subtext"
 msgstr "Văn bản phụ"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:90
-msgid "Subtitle"
-msgstr "Phụ đề"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/OptionPresets.ts:71
@@ -31904,7 +31740,7 @@ msgid "Temporary membership"
 msgstr "Tư cách thành viên tạm thời"
 
 #. Developer control label for the terms-acceptance banner.
-#: src/features/devtools/components/NagbarControls.ts:64
+#: src/features/devtools/components/NagbarControls.ts:59
 msgid "Terms acceptance nagbar"
 msgstr "Thanh thông báo chấp nhận điều khoản"
 
@@ -31935,10 +31771,8 @@ msgstr "Kiểm tra URL unfurl và nhúng đã hiển thị"
 
 #. Channel type chip label for a text channel.
 #. Option label for a WebRTC content hint select.
-#. Short label in the typography tab. Keep it concise.
 #: src/features/channel/utils/ChannelUtils.tsx:51
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:150
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:42
 msgid "Text"
 msgstr "Văn bản"
 
@@ -31972,6 +31806,10 @@ msgstr "Kênh văn bản"
 #: src/features/user/components/modals/tabs/component_gallery_tab/MarkdownTab.tsx:21
 msgid "Text formatting"
 msgstr "Định dạng văn bản"
+
+#: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:308
+msgid "Text is rendered with grayscale antialiasing instead of ClearType while transparency is enabled, so it will look softer."
+msgstr "Chữ sẽ được hiển thị với khử răng cưa thang độ xám thay vì ClearType khi bật trong suốt, vì vậy chữ sẽ trông mềm mại hơn."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
@@ -32161,17 +31999,17 @@ msgid "The community you're looking for may have been deleted or you may not hav
 msgstr "Cộng đồng bạn tìm kiếm có thể đã bị xóa hoặc bạn không có quyền truy cập."
 
 #. Modal body shown when a desktop update download fails.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:112
+#: src/features/updater/commands/UpdaterModalCommands.tsx:116
 msgid "The desktop update could not be downloaded. Try again from the update button when your connection is stable."
 msgstr "Không thể tải bản cập nhật cho máy tính. Hãy thử lại bằng nút cập nhật khi kết nối của bạn ổn định."
 
 #. Desktop updater modal body when the downloaded version is unknown. productName is the app name.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:92
+#: src/features/updater/commands/UpdaterModalCommands.tsx:96
 msgid "The desktop update has been downloaded. Restart {productName} to finish installing."
 msgstr "Bản cập nhật cho máy tính đã được tải xuống. Khởi động lại {productName} để hoàn tất quá trình cài đặt."
 
 #. Help text below the Linux package format selector in the desktop updater modal.
-#: src/features/updater/commands/UpdaterModalCommands.tsx:152
+#: src/features/updater/commands/UpdaterModalCommands.tsx:156
 msgid "The downloaded file is saved to your computer. Install it with your normal package manager."
 msgstr "Tệp đã tải xuống được lưu vào máy tính của bạn. Cài đặt bằng trình quản lý gói thông thường của bạn."
 
@@ -32442,12 +32280,7 @@ msgstr "Họ có thể không chấp nhận tin nhắn từ bạn hoặc hai b�
 msgid "They're not accepting friend requests right now."
 msgstr "Họ không chấp nhận lời mời kết bạn vào lúc này."
 
-#. Short label in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:10
-msgid "Thin"
-msgstr "Mỏng"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:114
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:113
 msgid "Third option"
 msgstr "Tùy chọn thứ ba"
 
@@ -32460,11 +32293,6 @@ msgstr "Bên thứ ba"
 #: src/features/relationship/components/alerts/RelationshipErrorModalUtils.tsx:89
 msgid "This account can't be blocked."
 msgstr "Không thể chặn tài khoản này."
-
-#. Body of the error modal shown when a too-new account tries to join the canary testers community.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:42
-msgid "This account is too new to join {testersCommunityName} yet. Try again in a little while."
-msgstr "Tài khoản này còn quá mới để tham gia {testersCommunityName}. Vui lòng thử lại sau một thời gian nữa."
 
 #: src/features/user/components/modals/tabs/applications_tab/ApplicationDetail.tsx:415
 msgid "This action cannot be undone. All associated data, including the bot user, will be permanently deleted."
@@ -32870,19 +32698,19 @@ msgid "This is one heavy message. Some reactions need to be removed before you c
 msgstr "Tin nhắn này nặng quá. Bạn cần gỡ bớt một số cảm xúc trước khi có thể thêm nữa."
 
 #. Description text in the index.
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:36
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:35
 msgid "This is some example text in the textarea."
 msgstr "Đây là một số văn bản ví dụ trong vùng văn bản."
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:112
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:111
 msgid "This is the first option description"
 msgstr "Đây là mô tả của lựa chọn đầu tiên"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:113
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:112
 msgid "This is the second option description"
 msgstr "Đây là mô tả của lựa chọn thứ hai"
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:114
+#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:113
 msgid "This is the third option description"
 msgstr "Đây là mô tả của lựa chọn thứ ba"
 
@@ -33035,8 +32863,8 @@ msgid "This removes every custom shortcut and re-enables all built-in shortcuts.
 msgstr "Thao tác này sẽ xóa mọi phím tắt tùy chỉnh và bật lại tất cả phím tắt tích hợp. Không thể hoàn tác thao tác này."
 
 #: src/features/auth/components/pages/ResetPasswordPage.tsx:114
-msgid "This reset link has expired. Reset links last 24 hours. Request a new one."
-msgstr "Liên kết đặt lại này đã hết hạn. Liên kết đặt lại có hiệu lực trong 24 giờ. Vui lòng yêu cầu một liên kết mới."
+msgid "This reset link has expired. Reset links last 1 hour. Please request a new one."
+msgstr "Liên kết đặt lại này đã hết hạn. Liên kết đặt lại có hiệu lực trong 1 giờ. Vui lòng yêu cầu một liên kết mới."
 
 #. Fallback role name in a mass-mention warning title.
 #: src/features/channel/components/MentionEveryonePopout.tsx:14
@@ -33062,36 +32890,6 @@ msgstr "Công tắc này đã bị tắt và không thể bật/tắt"
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx:93
 msgid "This switch is disabled in the checked state"
 msgstr "Công tắc này bị tắt khi đang ở trạng thái đã chọn"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:138
-msgid "This text demonstrates bold heading styling"
-msgstr "Đây là ví dụ về kiểu chữ in đậm cho tiêu đề"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:146
-msgid "This text demonstrates bold title styling"
-msgstr "Đây là văn bản minh họa kiểu chữ in đậm cho tiêu đề"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:118
-msgid "This text demonstrates italic styling"
-msgstr "Đây là văn bản minh họa kiểu chữ in nghiêng"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:130
-msgid "This text demonstrates large semi-bold styling"
-msgstr "Đây là văn bản minh họa kiểu chữ lớn, in đậm vừa"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:110
-msgid "This text demonstrates normal styling"
-msgstr "Đây là văn bản minh họa kiểu chữ thông thường"
-
-#. Label in the typography tab.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:122
-msgid "This text demonstrates semi-bold styling"
-msgstr "Đây là văn bản minh họa kiểu chữ bán đậm"
 
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:299
 msgid "This textarea auto-expands between 4 and 12 rows as you type."
@@ -33416,11 +33214,6 @@ msgstr "Múi giờ"
 #: src/features/messaging/utils/markdown/Plaintext.ts:56
 msgid "Tip"
 msgstr "Mẹo"
-
-#. Title in the typography tab. Keep it concise.
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:98
-msgid "Title"
-msgstr "Tiêu đề"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts:178
@@ -34116,10 +33909,6 @@ msgstr "Nhập màu (hệ thập lục phân, rgb(), hsl hoặc tên) hoặc dù
 msgid "Type a color (hex, rgb(), hsl(), or name) or use the picker."
 msgstr "Nhập màu (hệ thập lục phân, rgb(), hsl() hoặc tên) hoặc dùng công cụ chọn màu."
 
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:403
-msgid "Type scale"
-msgstr "Cỡ chữ"
-
 #. Label in the inputs tab.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:89
 msgid "Type your message here…"
@@ -34167,14 +33956,6 @@ msgstr "Chỉ báo đang nhập"
 #: src/features/user/components/modals/tabs/component_gallery_tab/IndicatorsTab.tsx:251
 msgid "Typing state"
 msgstr "Trạng thái đang nhập"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:365
-msgid "Typography"
-msgstr "Kiểu chữ"
-
-#: src/features/user/components/modals/tabs/component_gallery_tab/TypographyTab.tsx:447
-msgid "Typography scale demonstration"
-msgstr "Thử nghiệm các kiểu chữ"
 
 #. Developer options group for forcing UI component states.
 #: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:57
@@ -34344,7 +34125,7 @@ msgid "Unclaimed account"
 msgstr "Tài khoản chưa nhận"
 
 #. Developer control label for the unclaimed-account banner.
-#: src/features/devtools/components/NagbarControls.ts:32
+#: src/features/devtools/components/NagbarControls.ts:27
 msgid "Unclaimed account nagbar"
 msgstr "Thanh thông báo tài khoản chưa xác nhận"
 
@@ -34494,7 +34275,7 @@ msgstr "Dự phòng chung. Chất lượng thấp nhất nhưng dùng được �
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:755
 #: src/features/invite/components/InviteListItem.tsx:34
 #: src/features/moderation/components/modals/BanDetailsModal.tsx:114
-#: src/features/updater/commands/UpdaterModalCommands.tsx:140
+#: src/features/updater/commands/UpdaterModalCommands.tsx:144
 msgid "Unknown"
 msgstr "Không rõ"
 
@@ -34649,8 +34430,8 @@ msgstr "Biểu tượng cảm xúc không giới hạn"
 msgid "Unlimited stickers"
 msgstr "Sticker không giới hạn"
 
-#: src/features/channel/components/EmojiPicker.tsx:163
-#: src/features/channel/components/MobileEmojiPicker.tsx:208
+#: src/features/channel/components/EmojiPicker.tsx:150
+#: src/features/channel/components/MobileEmojiPicker.tsx:195
 msgid "Unlock {lockedEmojiCount, plural, one {# custom emoji} other {# custom emojis}} from {communityCount, plural, one {# community} other {# communities}} with {PREMIUM_PRODUCT_NAME}."
 msgstr "Mở khóa {lockedEmojiCount, plural, one {# biểu tượng cảm xúc tùy chỉnh} other {# biểu tượng cảm xúc tùy chỉnh}} từ {communityCount, plural, one {# cộng đồng} other {# cộng đồng}} bằng {PREMIUM_PRODUCT_NAME}."
 
@@ -34796,7 +34577,7 @@ msgstr "Kênh không tên"
 #. Fallback title in an invite embed for a group DM with no name set.
 #. Short label in the channel display name state. Keep it concise.
 #: src/features/channel/components/InviteEmbed.tsx:72
-#: src/features/channel/state/ChannelDisplayName.ts:17
+#: src/features/channel/state/ChannelDisplayName.ts:18
 #: src/features/channel/utils/ChannelUtils.tsx:59
 msgid "Unnamed group"
 msgstr "Nhóm chưa đặt tên"
@@ -35962,27 +35743,27 @@ msgid "Uses:"
 msgstr "Sử dụng:"
 
 #. Developer nagbar status: banner follows real account state.
-#: src/features/devtools/components/NagbarControls.ts:101
+#: src/features/devtools/components/NagbarControls.ts:96
 msgid "Using actual account state"
 msgstr "Đang sử dụng trạng thái tài khoản thực"
 
 #. Developer nagbar status: banner follows real gift inventory state.
-#: src/features/devtools/components/NagbarControls.ts:121
+#: src/features/devtools/components/NagbarControls.ts:116
 msgid "Using actual gift inventory state"
 msgstr "Đang sử dụng trạng thái kho quà tặng thực tế"
 
 #. Developer nagbar status: banner follows real premium subscription state.
-#: src/features/devtools/components/NagbarControls.ts:117
+#: src/features/devtools/components/NagbarControls.ts:112
 msgid "Using actual premium state"
 msgstr "Đang sử dụng trạng thái cao cấp thực tế"
 
 #. Developer nagbar status: banner follows the real app state.
-#: src/features/devtools/components/NagbarControls.ts:125
+#: src/features/devtools/components/NagbarControls.ts:120
 msgid "Using actual state"
 msgstr "Đang sử dụng trạng thái thực tế"
 
 #. Developer nagbar status: banner follows real email verification state.
-#: src/features/devtools/components/NagbarControls.ts:105
+#: src/features/devtools/components/NagbarControls.ts:100
 msgid "Using actual verification state"
 msgstr "Đang sử dụng trạng thái xác minh thực tế"
 
@@ -36251,10 +36032,8 @@ msgstr "Xác minh email trước khi chỉnh sửa hồ sơ. Bạn vẫn có th�
 msgid "Verify your email before sending friend requests."
 msgstr "Xác minh email của bạn trước khi gửi lời mời kết bạn."
 
-#. Title of the error modal shown when an unverified account tries to join the canary testers community.
 #. Title of the error modal shown when an unverified account tries to purchase Plutonium.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:106
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:30
 msgid "Verify your email first"
 msgstr "Vui lòng xác minh email của bạn trước"
 
@@ -36717,7 +36496,7 @@ msgid "Visionary (lifetime {premiumProductName})"
 msgstr "Visionary (trọn đời {premiumProductName})"
 
 #. Developer control label for the Visionary two-factor-authentication banner.
-#: src/features/devtools/components/NagbarControls.ts:60
+#: src/features/devtools/components/NagbarControls.ts:55
 msgid "Visionary 2FA nagbar"
 msgstr "Thanh thông báo 2FA Visionary"
 
@@ -36980,7 +36759,7 @@ msgid "Voice region"
 msgstr "Vùng thoại"
 
 #. Developer control label for the voice-session-restore banner.
-#: src/features/devtools/components/NagbarControls.ts:68
+#: src/features/devtools/components/NagbarControls.ts:63
 msgid "Voice session restore nagbar"
 msgstr "Thanh thông báo khôi phục phiên thoại"
 
@@ -37127,11 +36906,6 @@ msgstr "xdg-desktop-portal của Wayland sở hữu bộ chọn và hiển thị
 #: src/features/voice/components/modals/screen_share_picker_modal/useNativePickerCopy.ts:33
 msgid "Wayland's xdg-desktop-portal owns the picker and shows every window and display together. There is no flag that filters it to windows only. Press open system picker, then choose a window there to get per-app audio."
 msgstr "xdg-desktop-portal của Wayland sở hữu trình chọn và hiển thị tất cả cửa sổ và màn hình cùng lúc. Không có cờ nào lọc nó chỉ hiển thị cửa sổ. Nhấn mở trình chọn hệ thống, sau đó chọn một cửa sổ ở đó để có âm thanh riêng cho từng ứng dụng."
-
-#. Title of the error modal shown when a flagged account is blocked from joining the canary testers community.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:46
-msgid "We can't add you right now"
-msgstr "Chúng tôi không thể thêm bạn ngay bây giờ"
 
 #. Premium checkout error shown when card verification fails unexpectedly. productName is the app name.
 #: src/features/premium/components/pages/PremiumCallbackPage.tsx:44
@@ -37333,7 +37107,7 @@ msgid "We've updated our policies. Review and accept them to continue."
 msgstr "Chúng tôi đã cập nhật chính sách. Vui lòng xem lại và chấp nhận để tiếp tục."
 
 #. Client info web build identifier shown after the desktop build when both are present. Example: "Web 2026.518.0". Preserve placeholder.
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:28
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:27
 msgid "Web {buildVersion}"
 msgstr "Web {buildVersion}"
 
@@ -37917,7 +37691,7 @@ msgid "You are editing your per-community profile. This profile will only be vis
 msgstr "Bạn đang chỉnh sửa hồ sơ riêng cho cộng đồng này. Hồ sơ này sẽ chỉ hiển thị trong cộng đồng này và sẽ ghi đè lên hồ sơ chung của bạn."
 
 #. Body text in the settings dialog client info.
-#: src/features/app/components/dialogs/components/ClientInfo.tsx:42
+#: src/features/app/components/dialogs/components/ClientInfo.tsx:41
 msgid "You are now a developer!"
 msgstr "Bạn đã trở thành nhà phát triển!"
 
@@ -38316,12 +38090,6 @@ msgstr "Bạn chưa chặn ai."
 msgid "You haven't created any packs yet."
 msgstr "Bạn chưa tạo gói nào."
 
-#. Toast success shown after joining the canary testers community. {testersCommunityName} is the community name and {canaryReleaseName} is the release channel name.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:25
-#: src/features/channel/components/direct_message/CanaryTesterDmItem.tsx:69
-msgid "You joined {testersCommunityName}. Thanks for testing {canaryReleaseName}!"
-msgstr "Bạn đã tham gia {testersCommunityName}. Cảm ơn bạn đã thử nghiệm {canaryReleaseName}!"
-
 #. Intro copy in the keyboard navigation modal. {productName} is the app name.
 #: src/features/input/components/modals/KeyboardModeIntroModal.tsx:26
 msgid "You just pressed Tab. Keyboard mode is now on so you can navigate {productName} without a mouse."
@@ -38456,11 +38224,6 @@ msgstr "Bạn cần xác minh địa chỉ email trước khi gửi lời mời 
 #: src/features/app/components/alerts/DmActionErrorModal.tsx:44
 msgid "You need to verify your email address before you can start a direct message."
 msgstr "Bạn cần xác minh địa chỉ email trước khi có thể bắt đầu tin nhắn trực tiếp."
-
-#. Body of the error modal shown when an unverified account tries to join the canary testers community.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:34
-msgid "You need to verify your email before you can join {testersCommunityName}."
-msgstr "Bạn cần xác minh email trước khi tham gia {testersCommunityName}."
 
 #. Body of the error modal shown when the account email is unverified and the user tries to purchase Plutonium. Product name is interpolated.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:110
@@ -38656,11 +38419,6 @@ msgstr "Bạn đã tham gia số lượng cộng đồng tối đa. Hãy rời k
 msgid "You're in the voice channel"
 msgstr "Bạn đang trong kênh thoại"
 
-#. Nagbar body inviting canary release users to join the testers community. {canaryReleaseName} is the release channel name and {testersCommunityName} is the community name.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:102
-msgid "You're on {canaryReleaseName}. Join {testersCommunityName} to submit bug reports and feedback about upcoming builds."
-msgstr "Bạn đang dùng {canaryReleaseName}. Tham gia {testersCommunityName} để gửi báo cáo lỗi và phản hồi về các bản dựng sắp tới."
-
 #. Plutonium subscription card tooltip shown when the user is on a grandfathered price that is no longer offered.
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:37
 msgid "You're on a legacy rate no longer available to new subscribers."
@@ -38803,11 +38561,6 @@ msgstr "Phiên {productName} của bạn đã hết hạn. Vui lòng đăng nh�
 msgid "Your account"
 msgstr "Tài khoản của bạn"
 
-#. Body of the error modal shown when a flagged account is blocked from joining the canary testers community.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:51
-msgid "Your account can't join {testersCommunityName} at the moment. Contact support if you think this is a mistake."
-msgstr "Tài khoản của bạn không thể tham gia {testersCommunityName} vào lúc này. Liên hệ bộ phận hỗ trợ nếu bạn cho rằng đây là lỗi."
-
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:29
 msgid "Your account has been linked successfully. You can now close this tab and return to the app."
 msgstr "Tài khoản của bạn đã được liên kết thành công. Bây giờ bạn có thể đóng tab này và quay lại ứng dụng."
@@ -38815,11 +38568,6 @@ msgstr "Tài khoản của bạn đã được liên kết thành công. Bây gi
 #: src/features/app/components/dialogs/components/UnclaimedAccountAlert.tsx:26
 msgid "Your account is not yet claimed. Without an email and password, you won't be able to sign in from other devices and you could lose access to your account. Claim your account now to secure it."
 msgstr "Tài khoản của bạn chưa được xác nhận. Nếu không có email và mật khẩu, bạn sẽ không thể đăng nhập từ các thiết bị khác và có thể mất quyền truy cập vào tài khoản của mình. Hãy xác nhận tài khoản ngay để bảo mật tài khoản."
-
-#. Title of the error modal shown when a too-new account tries to join the canary testers community.
-#: src/features/app/components/layout/app_layout/nagbars/CanaryTesterCtaNagbar.tsx:38
-msgid "Your account is too new"
-msgstr "Tài khoản của bạn còn quá mới"
 
 #: src/features/channel/components/barriers/BarrierComponents.tsx:195
 msgid "Your account is too new to send messages in this community."
