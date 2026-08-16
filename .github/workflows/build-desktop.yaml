@@ -130,7 +130,7 @@ jobs:
       SOURCE_SHA: ${{ needs.meta.outputs.source_sha }}
       S3_DESKTOP_PREFIX: ${{ needs.meta.outputs.s3_prefix }}
       DESKTOP_HANDOFF_PREFIX: _handoff/desktop/${{ needs.meta.outputs.build_channel }}/${{ needs.meta.outputs.version }}/${{ needs.meta.outputs.source_sha }}
-      S3_ENDPOINT: https://gateway.storjshare.io
+      S3_ENDPOINT: https://ewr1.vultrobjects.com
       S3_BUCKET: fluxer-downloads
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -515,7 +515,7 @@ jobs:
       SOURCE_SHA: ${{ needs.meta.outputs.source_sha }}
       S3_DESKTOP_PREFIX: ${{ needs.meta.outputs.s3_prefix }}
       DESKTOP_HANDOFF_PREFIX: _handoff/desktop/${{ needs.meta.outputs.build_channel }}/${{ needs.meta.outputs.version }}/${{ needs.meta.outputs.source_sha }}
-      S3_ENDPOINT: https://gateway.storjshare.io
+      S3_ENDPOINT: https://ewr1.vultrobjects.com
       S3_BUCKET: fluxer-downloads
       PUBLIC_DL_BASE: https://api.fluxer.app/dl
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

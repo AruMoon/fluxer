@@ -104,13 +104,6 @@ jobs:
           cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- build-app-proxy
           --step generate_asset_manifest
 
-      - name: Upload asset manifest handoff
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: app-proxy-assets-manifest
-          path: app-dist-output/dist/assets-manifest.txt
-          if-no-files-found: error
-
   build-arm64:
     name: build app-proxy (arm64)
     needs: meta
