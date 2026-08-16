@@ -276,6 +276,9 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			ipinfoApiKey: master.integrations.risk_integration.ipinfo_api_key || undefined,
 			accountPolicyDsl: master.integrations.risk_integration.account_policy_dsl,
 		},
+		blocklistFeeds: {
+			enabled: master.integrations.blocklist_feeds.enabled ?? !master.instance.self_hosted,
+		},
 		captcha: {
 			enabled: master.integrations.captcha.enabled,
 			provider: master.integrations.captcha.provider,
@@ -361,6 +364,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		auth: {
 			sudoModeSecret: master.auth.sudo_mode_secret,
 			connectionInitiationSecret: master.auth.connection_initiation_secret,
+			ssoAllowPrivateAddresses: master.auth.sso_allow_private_addresses,
 			passkeys: {
 				rpName: master.auth.passkeys.rp_name,
 				rpId: master.auth.passkeys.rp_id,

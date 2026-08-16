@@ -149,6 +149,7 @@ function defaultConfig(): MasterConfig {
 		auth: {
 			sudo_mode_secret: '',
 			connection_initiation_secret: '',
+			sso_allow_private_addresses: false,
 			passkeys: {
 				rp_name: 'Fluxer',
 				rp_id: 'fluxer.app',
@@ -231,6 +232,7 @@ function defaultConfig(): MasterConfig {
 				api_key: '',
 				pull_zone_id: 0,
 			},
+			blocklist_feeds: {},
 			risk_integration: {
 				enabled: false,
 				ipinfo_api_key: '',

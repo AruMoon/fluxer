@@ -3,7 +3,9 @@
 import {domainToASCII} from 'node:url';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
+import type {RequestUrlPolicy} from '@pkgs/http_client/src/HttpClientTypes';
 import {createPublicInternetRequestUrlPolicy} from '@pkgs/http_client/src/PublicInternetRequestUrlPolicy';
+import {Config} from '../Config';
 
 interface SsoConfigValidationInput {
 	enabled: boolean;
@@ -21,7 +23,16 @@ interface NormalizedSsoConfigValidationResult extends SsoConfigValidationInput {
 	ready: boolean;
 }
 
-const SSO_REQUEST_URL_POLICY = createPublicInternetRequestUrlPolicy();
+let ssoRequestUrlPolicy: RequestUrlPolicy | null = null;
+
+export function getSsoRequestUrlPolicy(): RequestUrlPolicy {
+	if (ssoRequestUrlPolicy === null) {
+		ssoRequestUrlPolicy = createPublicInternetRequestUrlPolicy({
+			allowPrivateAddresses: Config.auth.ssoAllowPrivateAddresses,
+		});
+	}
+	return ssoRequestUrlPolicy;
+}
 const DOMAIN_LABEL_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
 function normalizeOptionalSsoString(value: string | null): string | null {
@@ -97,12 +108,12 @@ export async function validateSsoPublicOutboundUrl(rawUrl: string, fieldName: st
 		throw InputValidationError.fromCode(fieldName, ValidationErrorCodes.INVALID_URL_FORMAT);
 	}
 	try {
-		await SSO_REQUEST_URL_POLICY.validate(parsedUrl, {
+		await getSsoRequestUrlPolicy().validate(parsedUrl, {
 			phase: 'initial',
 			redirectCount: 0,
 		});
 	} catch {
-		throw InputValidationError.fromCode(fieldName, ValidationErrorCodes.INVALID_URL_FORMAT);
+		throw InputValidationError.fromCode(fieldName, ValidationErrorCodes.URL_NOT_PUBLICLY_ROUTABLE);
 	}
 	// Return the caller's exact input rather than parsedUrl.toString(), which would normalize
 	// the URL (e.g. appending a trailing slash) and break exact-match comparisons such as the

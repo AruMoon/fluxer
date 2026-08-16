@@ -19,7 +19,11 @@
 }
 
 .guildsLayoutReserveSpace {
-	--layout-user-area-overlay-height: calc(var(--layout-user-area-height) + var(--layout-voice-connection-height, 0px));
+	--layout-user-area-overlay-height: calc(
+		var(--layout-user-area-height) +
+		var(--user-area-box-inset-block-end) +
+		var(--layout-voice-connection-height, 0px)
+	);
 }
 
 .guildsLayoutReserveMobileBottomNav {
@@ -181,7 +185,8 @@
 	width: calc(var(--layout-guild-list-width) + var(--layout-sidebar-width) + 0.0625rem);
 	display: flex;
 	align-items: flex-end;
-	padding: 0;
+	padding: 0 var(--footer-box-inset-inline) var(--user-area-box-inset-block-end);
+	background-color: var(--background-secondary);
 	pointer-events: none;
 	z-index: var(--z-index-elevated-1);
 }
@@ -450,11 +455,11 @@
 	}
 }
 
-.addGuildButton {
+.createGuildButton {
 	composes: guildListItem;
 }
 
-.addGuildButtonIcon {
+.createGuildButtonIcon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -473,11 +478,11 @@
 
 @media (hover: hover) and (pointer: fine) {
 	:global(:where(html.window-focused, html.unfocused-fully-interactive):not(.window-focus-activation-guard))
-		.addGuildButton:hover
-		.addGuildButtonIcon,
+		.createGuildButton:hover
+		.createGuildButtonIcon,
 	:global(:where(html.window-focused, html.unfocused-fully-interactive):not(.window-focus-activation-guard))
-		.addGuildButtonIcon:hover,
-	.addGuildButton.contextMenuHover .addGuildButtonIcon {
+		.createGuildButtonIcon:hover,
+	.createGuildButton.contextMenuHover .createGuildButtonIcon {
 		border-color: var(--text-primary);
 	}
 }
@@ -584,9 +589,8 @@
 
 .guildTooltipName {
 	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	white-space: normal;
+	overflow-wrap: anywhere;
 	font-size: 1rem;
 	line-height: 1.4;
 	font-weight: 600;

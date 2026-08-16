@@ -178,6 +178,9 @@ export interface APIConfig {
 		ipinfoApiKey?: string;
 		accountPolicyDsl?: unknown;
 	};
+	blocklistFeeds: {
+		enabled: boolean;
+	};
 	captcha: {
 		enabled: boolean;
 		provider: 'hcaptcha' | 'turnstile' | 'none';
@@ -256,6 +259,7 @@ export interface APIConfig {
 	auth: {
 		sudoModeSecret: string;
 		connectionInitiationSecret: string;
+		ssoAllowPrivateAddresses: boolean;
 		passkeys: {
 			rpName: string;
 			rpId: string;
