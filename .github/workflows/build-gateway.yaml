@@ -29,7 +29,6 @@ jobs:
   image:
     needs: approve
     uses: ./.github/workflows/_build-image.yaml
-    secrets: inherit
     with:
       image: fluxer-gateway
       dockerfile: fluxer_gateway/Dockerfile
