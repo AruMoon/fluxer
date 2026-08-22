@@ -1,0 +1,128 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: release all builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-version:
+        description: "Explicit Fluxer CalVer build version (YYYY.MDD.MICRO, UTC HHMMSS without leading zeroes) to use instead of automatic UTC clock allocation"
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  actions: read
+  contents: write
+  packages: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: release-all-${{ inputs['build-version'] || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  meta:
+    name: resolve metadata
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      build_version: ${{ steps.vars.outputs.build_version }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        env:
+          GIT_CONFIG_GLOBAL: ${{ runner.temp }}/gitconfig
+      - name: Set up Rust toolchain (CI helpers)
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
+        with:
+          toolchain: "1.93.0"
+      - name: set variables
+        id: vars
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FLUXER_BUILD_VERSION: ${{ inputs['build-version'] }}
+        run: >-
+          cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- resolve-calver
+          --github-output
+
+  build_admin:
+    needs: meta
+    uses: ./.github/workflows/build-admin.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_api:
+    needs: meta
+    uses: ./.github/workflows/build-api.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_app_proxy_self_hosted:
+    needs: meta
+    uses: ./.github/workflows/build-app-proxy-self-hosted.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_gateway:
+    needs: meta
+    uses: ./.github/workflows/build-gateway.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_gifs:
+    needs: meta
+    uses: ./.github/workflows/build-gifs.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_media_proxy:
+    needs: meta
+    uses: ./.github/workflows/build-media-proxy.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_messages:
+    needs: meta
+    uses: ./.github/workflows/build-messages.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_snowflakes:
+    needs: meta
+    uses: ./.github/workflows/build-snowflakes.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_static:
+    needs: meta
+    uses: ./.github/workflows/build-static.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_unfurl:
+    needs: meta
+    uses: ./.github/workflows/build-unfurl.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_users:
+    needs: meta
+    uses: ./.github/workflows/build-users.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
