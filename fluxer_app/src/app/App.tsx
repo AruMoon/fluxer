@@ -19,11 +19,8 @@ import {useNativePlatform} from '@app/features/app/hooks/useNativePlatform';
 import {usePlatformClasses} from '@app/features/app/hooks/usePlatformClasses';
 import {useServiceWorkerBadge} from '@app/features/app/hooks/useServiceWorkerBadge';
 import {useTabKeyFocusGuard} from '@app/features/app/hooks/useTabKeyFocusGuard';
-import Initialization from '@app/features/app/state/Initialization';
 import {type LayoutVariant, LayoutVariantProvider} from '@app/features/app/state/LayoutVariantContext';
 import RuntimeCrash from '@app/features/app/state/RuntimeCrash';
-import Authentication from '@app/features/auth/state/Authentication';
-import DeveloperOptions from '@app/features/devtools/state/DeveloperOptions';
 import {showMyselfTypingHelper} from '@app/features/devtools/utils/ShowMyselfTypingHelper';
 import GatewayConnection from '@app/features/gateway/transport/GatewayConnection';
 import MemberSidebar from '@app/features/member/state/MemberSidebar';
@@ -35,6 +32,7 @@ import {startDesktopLocaleBridge} from '@app/features/platform/utils/DesktopLoca
 import {PremiumCheckoutReturnWatcher} from '@app/features/premium/components/PremiumCheckoutReturnWatcher';
 import {QUICK_SWITCHER_PORTAL_ID} from '@app/features/search/components/quick_switcher/QuickSwitcherConstants';
 import {useCustomThemeStyle} from '@app/features/theme/hooks/useCustomThemeStyle';
+import {useRemScaleTracking} from '@app/features/theme/hooks/useRemScaleTracking';
 import {useThemeCssVariables} from '@app/features/theme/hooks/useThemeCssVariables';
 import Theme from '@app/features/theme/state/Theme';
 import ThemeLibrary from '@app/features/theme/state/ThemeLibrary';
@@ -47,15 +45,9 @@ import {getActivePortalHost, setActivePortalHost} from '@app/features/ui/overlay
 import MobileLayout from '@app/features/ui/state/MobileLayout';
 import Modal from '@app/features/ui/state/Modal';
 import Popout from '@app/features/ui/state/Popout';
-import {
-	getDesktopWindowBehaviorSettings,
-	setDesktopWindowBehaviorSettings,
-} from '@app/features/ui/utils/DesktopWindowBehaviorUtils';
+import {getDesktopWindowBehaviorSettings} from '@app/features/ui/utils/DesktopWindowBehaviorUtils';
 import {attachExternalLinkInterceptor, isDesktop} from '@app/features/ui/utils/NativeUtils';
-import {
-	FIRST_CLICK_PASSTHROUGH_WHEN_UNFOCUSED_CLASS,
-	UNFOCUSED_FULLY_INTERACTIVE_CLASS,
-} from '@app/features/ui/utils/WindowFocusInteractionGuard';
+import {UNFOCUSED_FULLY_INTERACTIVE_CLASS} from '@app/features/ui/utils/WindowFocusInteractionGuard';
 import UserSettings from '@app/features/user/state/UserSettings';
 import {IncomingCallManager} from '@app/features/voice/components/IncomingCallManager';
 import {VoiceLiveKitRoot} from '@app/features/voice/components/VoiceLiveKitRoot';
@@ -88,7 +80,6 @@ export const AppWrapper = observer(({children}: AppWrapperProps) => {
 	const {i18n} = useLingui();
 	const reducedMotion = Accessibility.useReducedMotion;
 	const stayInteractiveWhenUnfocused = Accessibility.stayInteractiveWhenUnfocused;
-	const firstClickPassThroughWhenUnfocused = Accessibility.firstClickPassThroughWhenUnfocused;
 	const {platform, isNative} = useNativePlatform();
 	const useSystemTitleBar = useNativeTitleBar();
 	const messageDisplayCompact = UserSettings.getMessageDisplayCompact();
@@ -127,12 +118,7 @@ export const AppWrapper = observer(({children}: AppWrapperProps) => {
 		}, []),
 	);
 	const handleSkipLinkFocus = useTabKeyFocusGuard();
-	const isSplashScreenActive =
-		Authentication.isAuthenticated &&
-		!DeveloperOptions.bypassSplashScreen &&
-		(GatewayConnection.isConnectionInterrupted || !Initialization.canNavigateToProtectedRoutes);
 	useInertBackground(ringsContainerRef, hasBlockingModal || topPopoutRequiresBackdrop);
-	useInertBackground(overlayScopeRef, isSplashScreenActive);
 	useEffect(() => {
 		showMyselfTypingHelper.start();
 		return () => showMyselfTypingHelper.stop();
@@ -170,13 +156,9 @@ export const AppWrapper = observer(({children}: AppWrapperProps) => {
 	useDocumentClassToggle('reduced-motion', reducedMotion);
 	useDocumentClassToggle('mobile-layout', MobileLayout.platformMobileDetected || MobileLayout.enabled);
 	useDocumentClassToggle(UNFOCUSED_FULLY_INTERACTIVE_CLASS, stayInteractiveWhenUnfocused);
-	useDocumentClassToggle(FIRST_CLICK_PASSTHROUGH_WHEN_UNFOCUSED_CLASS, firstClickPassThroughWhenUnfocused);
-	useEffect(() => {
-		if (!isNative) return;
-		void setDesktopWindowBehaviorSettings({firstClickPassThroughWhenUnfocused});
-	}, [isNative, firstClickPassThroughWhenUnfocused]);
 	useDesktopAllowTransparency(isNative);
 	useWindowEventListeners({preventDocumentScroll: !isNative});
+	useRemScaleTracking();
 	usePlatformClasses(platform, isNative);
 	useThemeCssVariables({
 		effectiveTheme: Theme.effectiveTheme,

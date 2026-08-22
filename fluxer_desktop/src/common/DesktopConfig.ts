@@ -14,7 +14,6 @@ const MINIMIZE_TO_TRAY_STORAGE_KEY_V2 = 'minimizeToTrayV2';
 const CLOSE_TO_TRAY_STORAGE_KEY_V2 = 'closeToTrayV2';
 
 interface DesktopConfig extends Record<string, unknown> {
-	app_url?: string;
 	chromiumSwitches?: ChromiumSwitchesSetting;
 	window_behavior?: PersistedDesktopWindowBehaviorSettings;
 	troubleshooting?: PersistedDesktopTroubleshootingSettings;
@@ -32,7 +31,6 @@ interface PersistedDesktopWindowBehaviorSettings {
 	allowTransparency?: boolean;
 	smoothScrolling?: boolean;
 	middleClickAutoscroll?: boolean;
-	firstClickPassThroughWhenUnfocused?: boolean;
 }
 
 interface PersistedDesktopTroubleshootingSettings {
@@ -63,7 +61,6 @@ function getDefaultDesktopWindowBehaviorSettings(): DesktopWindowBehaviorSetting
 		activeSmoothScrolling: true,
 		middleClickAutoscroll: false,
 		activeMiddleClickAutoscroll: false,
-		firstClickPassThroughWhenUnfocused: false,
 	};
 }
 
@@ -95,9 +92,6 @@ function sanitizePersistedDesktopWindowBehaviorSettings(
 	}
 	if (typeof value.middleClickAutoscroll === 'boolean') {
 		settings.middleClickAutoscroll = value.middleClickAutoscroll;
-	}
-	if (typeof value.firstClickPassThroughWhenUnfocused === 'boolean') {
-		settings.firstClickPassThroughWhenUnfocused = value.firstClickPassThroughWhenUnfocused;
 	}
 	const minimizeToTrayV2 = value[MINIMIZE_TO_TRAY_STORAGE_KEY_V2];
 	if (typeof minimizeToTrayV2 === 'boolean') {
@@ -144,11 +138,7 @@ function sanitizeDesktopConfig(value: unknown): DesktopConfig {
 		return {};
 	}
 	const nextConfig: DesktopConfig = {...value};
-	if (typeof value.app_url === 'string') {
-		nextConfig.app_url = value.app_url;
-	} else {
-		delete nextConfig.app_url;
-	}
+	delete nextConfig.app_url;
 	const chromiumSwitches = sanitizeChromiumSwitchesSetting(value.chromiumSwitches);
 	if (chromiumSwitches) {
 		nextConfig.chromiumSwitches = chromiumSwitches;
@@ -243,10 +233,6 @@ function normalizeDesktopWindowBehaviorSettings(
 				: typeof normalizedSettings?.middleClickAutoscroll === 'boolean'
 					? normalizedSettings.middleClickAutoscroll
 					: defaults.middleClickAutoscroll,
-		firstClickPassThroughWhenUnfocused:
-			typeof normalizedSettings?.firstClickPassThroughWhenUnfocused === 'boolean'
-				? normalizedSettings.firstClickPassThroughWhenUnfocused
-				: defaults.firstClickPassThroughWhenUnfocused,
 	};
 	if (!normalized.showTrayIcon) {
 		normalized.minimizeToTray = false;
@@ -265,7 +251,6 @@ function serializeDesktopWindowBehaviorSettings(
 		allowTransparency: settings.allowTransparency,
 		smoothScrolling: settings.smoothScrolling,
 		middleClickAutoscroll: settings.middleClickAutoscroll,
-		firstClickPassThroughWhenUnfocused: settings.firstClickPassThroughWhenUnfocused,
 		[MINIMIZE_TO_TRAY_STORAGE_KEY_V2]: settings.minimizeToTray,
 		[CLOSE_TO_TRAY_STORAGE_KEY_V2]: settings.closeToTray,
 	};
@@ -300,7 +285,7 @@ function saveDesktopConfig(): void {
 	try {
 		fs.writeFileSync(tempPath, JSON.stringify(config, null, 2), 'utf-8');
 		fs.renameSync(tempPath, configPath);
-		log.debug('Saved desktop config to', configPath, {app_url: config.app_url ?? '(default)'});
+		log.debug('Saved desktop config to', configPath);
 	} catch (error) {
 		log.error('Failed to save desktop config:', error);
 		try {
@@ -315,7 +300,7 @@ export function loadDesktopConfig(userDataPath: string): void {
 		if (fs.existsSync(configPath)) {
 			const data = fs.readFileSync(configPath, 'utf-8');
 			config = sanitizeDesktopConfig(JSON.parse(data));
-			log.info('Loaded desktop config from', configPath, {app_url: config.app_url ?? '(default)'});
+			log.info('Loaded desktop config from', configPath);
 		}
 	} catch (error) {
 		log.error('Failed to load desktop config:', error);
@@ -326,27 +311,15 @@ export function getAppUrl(): string {
 	if (runtimeAppUrlOverride) {
 		return runtimeAppUrlOverride;
 	}
-	if (config.app_url) {
-		return config.app_url;
-	}
 	return BUILD_CHANNEL === 'canary' ? CANARY_APP_URL : STABLE_APP_URL;
 }
 
 export function getCustomAppUrl(): string | null {
-	return runtimeAppUrlOverride ?? config.app_url ?? null;
+	return runtimeAppUrlOverride;
 }
 
 export function setRuntimeAppUrlOverride(appUrl: string | null): void {
 	runtimeAppUrlOverride = appUrl;
-}
-
-export function setCustomAppUrl(appUrl: string | null): void {
-	if (appUrl) {
-		config.app_url = appUrl;
-	} else {
-		delete config.app_url;
-	}
-	saveDesktopConfig();
 }
 
 export function getConfiguredChromiumSwitches(): ChromiumSwitchesSetting | undefined {

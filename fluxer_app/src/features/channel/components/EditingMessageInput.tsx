@@ -16,9 +16,8 @@ import {
 	EDIT_MESSAGE_DESCRIPTOR,
 	EMOJIS_DESCRIPTOR,
 } from '@app/features/i18n/utils/CommonMessageDescriptors';
-import Keybind from '@app/features/input/state/InputKeybind';
 import {LexicalRichInput, type LexicalRichInputHandle} from '@app/features/lexical/composer/LexicalRichInput';
-import {doesEventMatchShortcut, useMarkdownKeybinds} from '@app/features/messaging/hooks/useMarkdownKeybinds';
+import {useMarkdownKeybinds} from '@app/features/messaging/hooks/useMarkdownKeybinds';
 import type {Message} from '@app/features/messaging/models/MessagingMessage';
 import MessageEdit from '@app/features/messaging/state/MessageEdit';
 import {applyMarkdownSegments} from '@app/features/messaging/utils/MarkdownToSegmentUtils';
@@ -155,16 +154,6 @@ export const EditingMessageInput = observer(
 				if (event.defaultPrevented) {
 					return;
 				}
-				const composer = composerRef.current;
-				const selection = composer == null ? null : composer.getSelection();
-				const hasSelectionRange = selection != null && selection.start !== selection.end;
-				const inboxCombo = Keybind.getByAction('chat_toggle_inbox').combo;
-				if (doesEventMatchShortcut(event, inboxCombo) && !hasSelectionRange && actualContent.trim().length === 0) {
-					event.preventDefault();
-					event.stopPropagation();
-					ComponentDispatch.dispatch('INBOX_OPEN');
-					return;
-				}
 				if (event.key === 'Escape' && !event.shiftKey && !event.defaultPrevented && !event.nativeEvent.isComposing) {
 					event.preventDefault();
 					event.stopPropagation();
@@ -244,6 +233,7 @@ export const EditingMessageInput = observer(
 							onEmojiSelect={handleEmojiSelect}
 							onClose={onClose}
 							visibleTabs={['emojis']}
+							data-flx="channel.editing-message-input.handle-expression-picker-toggle.expression-picker-popout"
 						/>
 					),
 					position: 'top-end',
@@ -311,6 +301,7 @@ export const EditingMessageInput = observer(
 									onFocus={() => setIsFocused(true)}
 									onBlur={() => setIsFocused(false)}
 									i18n={i18n}
+									data-flx="channel.editing-message-input.lexical-rich-input.submit"
 								/>
 							</div>
 							<div
@@ -345,7 +336,13 @@ export const EditingMessageInput = observer(
 						<Trans>
 							escape to{' '}
 							<FocusRing offset={-2} data-flx="channel.editing-message-input.focus-ring--2">
-								<button type="button" className={editingStyles.footerLink} onClick={onCancel} key="cancel">
+								<button
+									type="button"
+									className={editingStyles.footerLink}
+									onClick={onCancel}
+									key="cancel"
+									data-flx="channel.editing-message-input.button.cancel"
+								>
 									cancel
 								</button>
 							</FocusRing>
@@ -364,6 +361,7 @@ export const EditingMessageInput = observer(
 									onClick={handleSubmit}
 									disabled={editingDisabled}
 									key="save"
+									data-flx="channel.editing-message-input.button.submit"
 								>
 									save
 								</button>

@@ -3,8 +3,15 @@
 import {LRUCache} from 'lru-cache';
 
 interface ImageCacheEntry {
-	image: HTMLImageElement;
 	src: string;
+	naturalWidth: number;
+	naturalHeight: number;
+	pin: HTMLImageElement;
+}
+
+export interface CachedImageSize {
+	width: number;
+	height: number;
 }
 
 interface PendingImageSubscriber {
@@ -17,6 +24,9 @@ interface PendingImageLoad {
 	subscribers: Set<PendingImageSubscriber>;
 	active: boolean;
 	timeoutId: number;
+	failedAttempts: number;
+	retryTimeoutId: number;
+	connectivityListener: (() => void) | null;
 }
 
 const MAX_CACHE_ENTRIES = 500;
@@ -30,10 +40,11 @@ const MAX_PENDING_IMAGE_CALLBACKS_PER_LOAD = 256;
 const MAX_IMAGE_SOURCE_LENGTH = 16 * 1024;
 const IMAGE_LOAD_TIMEOUT_MS = 30_000;
 const IMAGE_LOAD_ACTIVATION_TIMEOUT_MS = 10_000;
+const IMAGE_RETRY_ATTEMPT_LIMIT = 5;
+const IMAGE_RETRY_INITIAL_DELAY_MS = 500;
+const IMAGE_RETRY_MAX_DELAY_MS = 15_000;
 
-const getImageByteSize = (image: HTMLImageElement): number | null => {
-	const width = image.naturalWidth;
-	const height = image.naturalHeight;
+const getDimensionByteSize = (width: number, height: number): number | null => {
 	if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0) {
 		return null;
 	}
@@ -42,10 +53,21 @@ const getImageByteSize = (image: HTMLImageElement): number | null => {
 	return byteSize;
 };
 
+const getImageByteSize = (image: HTMLImageElement): number | null =>
+	getDimensionByteSize(image.naturalWidth, image.naturalHeight);
+
 const estimateImageBytes = (entry: ImageCacheEntry): number => {
-	const byteSize = getImageByteSize(entry.image);
+	const byteSize = getDimensionByteSize(entry.naturalWidth, entry.naturalHeight);
 	if (byteSize == null) return MAX_CACHE_ENTRY_BYTES + FALLBACK_IMAGE_BYTES;
 	return byteSize;
+};
+
+const createImagePin = (src: string, image: HTMLImageElement): HTMLImageElement => {
+	if (image.parentNode == null) return image;
+	const pin = new Image();
+	pin.decoding = 'async';
+	pin.src = src;
+	return pin;
 };
 
 const imageCache = new LRUCache<string, ImageCacheEntry>({
@@ -91,7 +113,7 @@ const isCached = (src: string | null): boolean => {
 	if (!acceptsImageSource(src)) return false;
 	const entry = imageCache.get(src);
 	if (!entry) return false;
-	if (entry.src === src && imageHasSource(entry.image, src) && isLoadedImage(entry.image)) return true;
+	if (entry.src === src && entry.naturalWidth > 0 && entry.naturalHeight > 0) return true;
 	imageCache.delete(src);
 	return false;
 };
@@ -100,12 +122,13 @@ export function hasImage(src: string | null): boolean {
 	return isCached(src);
 }
 
-export function getImage(src: string | null): HTMLImageElement | undefined {
+export function getImageSize(src: string | null): CachedImageSize | undefined {
 	if (!acceptsImageSource(src)) return undefined;
 	const entry = imageCache.get(src);
 	if (!entry) return undefined;
-	const image = entry.image;
-	if (entry.src === src && imageHasSource(image, src) && isLoadedImage(image)) return image;
+	if (entry.src === src && entry.naturalWidth > 0 && entry.naturalHeight > 0) {
+		return {width: entry.naturalWidth, height: entry.naturalHeight};
+	}
 	imageCache.delete(src);
 	return undefined;
 }
@@ -118,7 +141,14 @@ export function rememberImage(src: string | null, image: HTMLImageElement): void
 		}
 		return;
 	}
-	if (isCacheableImage(image)) imageCache.set(src, {image, src});
+	if (isCacheableImage(image)) {
+		imageCache.set(src, {
+			src,
+			naturalWidth: image.naturalWidth,
+			naturalHeight: image.naturalHeight,
+			pin: createImagePin(src, image),
+		});
+	}
 	if (!currentPendingLoad) return;
 	settlePendingImageLoad(src, currentPendingLoad, true, image);
 }
@@ -145,10 +175,57 @@ function releaseActiveImageLoad(): void {
 	if (activeImageLoadCount < 0) throw new Error('Active image load count became negative');
 }
 
+function clearRetryState(pendingLoad: PendingImageLoad): void {
+	window.clearTimeout(pendingLoad.retryTimeoutId);
+	pendingLoad.retryTimeoutId = 0;
+	if (pendingLoad.connectivityListener != null) {
+		window.removeEventListener('online', pendingLoad.connectivityListener);
+		pendingLoad.connectivityListener = null;
+	}
+}
+
+function retryDelayForAttempt(failedAttempts: number): number {
+	return Math.min(IMAGE_RETRY_INITIAL_DELAY_MS * 2 ** (failedAttempts - 1), IMAGE_RETRY_MAX_DELAY_MS);
+}
+
+function scheduleImageLoadRetry(src: string, pendingLoad: PendingImageLoad): boolean {
+	if (pendingLoad.failedAttempts >= IMAGE_RETRY_ATTEMPT_LIMIT) return false;
+	pendingLoad.failedAttempts += 1;
+	window.clearTimeout(pendingLoad.timeoutId);
+	pendingLoad.timeoutId = 0;
+	if (pendingLoad.image != null) {
+		pendingLoad.image.onload = null;
+		pendingLoad.image.onerror = null;
+		pendingLoad.image.src = 'data:,';
+		pendingLoad.image = null;
+	}
+	if (pendingLoad.active) {
+		pendingLoad.active = false;
+		releaseActiveImageLoad();
+	}
+	const resume = (): void => {
+		clearRetryState(pendingLoad);
+		if (pendingImageLoads.get(src) !== pendingLoad) return;
+		pendingLoad.timeoutId = window.setTimeout(() => {
+			settlePendingImageLoad(src, pendingLoad, false, null);
+		}, IMAGE_LOAD_ACTIVATION_TIMEOUT_MS);
+		pumpPendingImageLoads();
+	};
+	if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+		pendingLoad.connectivityListener = resume;
+		window.addEventListener('online', resume, {once: true});
+	} else {
+		pendingLoad.retryTimeoutId = window.setTimeout(resume, retryDelayForAttempt(pendingLoad.failedAttempts));
+	}
+	pumpPendingImageLoads();
+	return true;
+}
+
 function detachPendingImageLoad(src: string, pendingLoad: PendingImageLoad): boolean {
 	if (pendingImageLoads.get(src) !== pendingLoad) return false;
 	pendingImageLoads.delete(src);
 	window.clearTimeout(pendingLoad.timeoutId);
+	clearRetryState(pendingLoad);
 	if (pendingLoad.image != null) {
 		pendingLoad.image.onload = null;
 		pendingLoad.image.onerror = null;
@@ -216,6 +293,7 @@ function activatePendingImageLoad(src: string, pendingLoad: PendingImageLoad): v
 	image.onerror = () => {
 		if (pendingImageLoads.get(src) !== pendingLoad) return;
 		imageCache.delete(src);
+		if (scheduleImageLoadRetry(src, pendingLoad)) return;
 		settlePendingImageLoad(src, pendingLoad, false, null);
 	};
 	image.src = src;
@@ -235,6 +313,9 @@ function createPendingImageLoad(src: string): PendingImageLoad {
 		subscribers: new Set(),
 		active: false,
 		timeoutId: 0,
+		failedAttempts: 0,
+		retryTimeoutId: 0,
+		connectivityListener: null,
 	};
 	pendingLoad.timeoutId = window.setTimeout(() => {
 		settlePendingImageLoad(src, pendingLoad, false, null);

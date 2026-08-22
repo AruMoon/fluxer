@@ -6,6 +6,7 @@ import {
 	getMessageGroupSpacingForDisplayMode,
 	migrateLegacyMessageGroupSpacing,
 } from '@app/features/accessibility/state/MessageGroupSpacing';
+import {DEFAULT_MESSAGE_GUTTER_PX} from '@app/features/accessibility/state/MessagePresentationDefaults';
 import type {AnimatedMediaKind} from '@app/features/accessibility/state/MotionPreferencesMachine';
 import {
 	AuthSessionStorageKey,
@@ -599,7 +600,6 @@ export interface AccessibilitySettings {
 	hdrDisplayMode: HdrDisplayMode;
 	preserveEditDraft: boolean;
 	stayInteractiveWhenUnfocused: boolean;
-	firstClickPassThroughWhenUnfocused: boolean;
 	scrollToBottomOnMessageSend: boolean;
 	sequentialFileSend: boolean;
 	showNeko: boolean;
@@ -667,7 +667,7 @@ class Accessibility {
 	keepStickerAnimationUnderReducedMotion = false;
 	messageGroupSpacing = COMFY_MESSAGE_GROUP_SPACING_DEFAULT;
 	compactMessageGroupSpacing = COMPACT_MESSAGE_GROUP_SPACING_DEFAULT;
-	messageGutter = 16;
+	messageGutter = DEFAULT_MESSAGE_GUTTER_PX;
 	fontSize = 16;
 	showUserAvatarsInCompactMode = false;
 	mobileStickerAnimationOverridden = false;
@@ -717,7 +717,6 @@ class Accessibility {
 	hdrDisplayMode = HdrDisplayMode.FULL;
 	preserveEditDraft = false;
 	stayInteractiveWhenUnfocused = false;
-	firstClickPassThroughWhenUnfocused = false;
 	scrollToBottomOnMessageSend = true;
 	sequentialFileSend = false;
 	showNeko = false;
@@ -828,7 +827,6 @@ class Accessibility {
 				'hdrDisplayMode',
 				'preserveEditDraft',
 				'stayInteractiveWhenUnfocused',
-				'firstClickPassThroughWhenUnfocused',
 				'scrollToBottomOnMessageSend',
 				'sequentialFileSend',
 			],
@@ -889,7 +887,6 @@ class Accessibility {
 				hdrDisplayMode: HDR_TO_PROTO[s.hdrDisplayMode],
 				preserveEditDraft: s.preserveEditDraft,
 				stayInteractiveWhenUnfocused: s.stayInteractiveWhenUnfocused,
-				firstClickPassThroughWhenUnfocused: s.firstClickPassThroughWhenUnfocused,
 				scrollToBottomOnMessageSend: s.scrollToBottomOnMessageSend,
 				sequentialFileSend: s.sequentialFileSend,
 			}),
@@ -979,8 +976,6 @@ class Accessibility {
 				if (m.preserveEditDraft !== undefined) s.preserveEditDraft = m.preserveEditDraft;
 				if (m.stayInteractiveWhenUnfocused !== undefined)
 					s.stayInteractiveWhenUnfocused = m.stayInteractiveWhenUnfocused;
-				if (m.firstClickPassThroughWhenUnfocused !== undefined)
-					s.firstClickPassThroughWhenUnfocused = m.firstClickPassThroughWhenUnfocused;
 				if (m.scrollToBottomOnMessageSend !== undefined) s.scrollToBottomOnMessageSend = m.scrollToBottomOnMessageSend;
 				if (m.sequentialFileSend !== undefined) s.sequentialFileSend = m.sequentialFileSend;
 			},
@@ -1315,8 +1310,6 @@ class Accessibility {
 		if (validated.preserveEditDraft !== undefined) this.preserveEditDraft = validated.preserveEditDraft;
 		if (validated.stayInteractiveWhenUnfocused !== undefined)
 			this.stayInteractiveWhenUnfocused = validated.stayInteractiveWhenUnfocused;
-		if (validated.firstClickPassThroughWhenUnfocused !== undefined)
-			this.firstClickPassThroughWhenUnfocused = validated.firstClickPassThroughWhenUnfocused;
 		if (validated.scrollToBottomOnMessageSend !== undefined)
 			this.scrollToBottomOnMessageSend = validated.scrollToBottomOnMessageSend;
 		if (validated.sequentialFileSend !== undefined) this.sequentialFileSend = validated.sequentialFileSend;
@@ -1417,8 +1410,6 @@ class Accessibility {
 			hdrDisplayMode: data.hdrDisplayMode ?? this.hdrDisplayMode,
 			preserveEditDraft: data.preserveEditDraft ?? this.preserveEditDraft,
 			stayInteractiveWhenUnfocused: data.stayInteractiveWhenUnfocused ?? this.stayInteractiveWhenUnfocused,
-			firstClickPassThroughWhenUnfocused:
-				data.firstClickPassThroughWhenUnfocused ?? this.firstClickPassThroughWhenUnfocused,
 			scrollToBottomOnMessageSend: data.scrollToBottomOnMessageSend ?? this.scrollToBottomOnMessageSend,
 			sequentialFileSend: data.sequentialFileSend ?? this.sequentialFileSend,
 			showNeko: data.showNeko ?? this.showNeko,

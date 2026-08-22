@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type {ResolvedDownloadsProvider} from '@fluxer/config/src/S3DownloadsProvider';
 import type {WorkerTaskName} from '../worker/WorkerLaneConfig';
 
 export type APIWorkerMode = 'all_lanes' | 'single_lane' | 'single_task';
@@ -150,6 +151,7 @@ export interface APIConfig {
 			static: string;
 		};
 	};
+	s3Downloads: ResolvedDownloadsProvider;
 	email: {
 		enabled: boolean;
 		provider: 'smtp' | 'none';
@@ -327,6 +329,7 @@ export interface APIConfig {
 		testHarnessToken?: string;
 	};
 	presignedAttachmentUploadsEnabled: boolean;
+	presignedDownloadsEnabled: boolean;
 	attachmentDecayEnabled: boolean;
 	deletionGracePeriodHours: number;
 	inactivityDeletionThresholdDays?: number;
@@ -358,6 +361,14 @@ export interface APIConfig {
 		taskName?: WorkerTaskName;
 		enableCronScheduler?: boolean;
 		enableVoiceReconciliation: boolean;
+		voiceReconciliation: {
+			intervalMs: number | undefined;
+			staggerDelayMs: number | undefined;
+			lockTtlSeconds: number | undefined;
+			cadenceTtlSeconds: number | undefined;
+			gatewayOnlyGraceMs: number | undefined;
+			liveKitOnlyGraceMs: number | undefined;
+		};
 		laneConcurrencyOverrides: {
 			realtime?: number;
 			unfurl?: number;

@@ -2,7 +2,15 @@
 
 import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
-import {SuspiciousActivityFlags, UserFlags} from '@fluxer/constants/src/UserConstants';
+import {
+	ADMIN_PHONE_TOGGLE_CLEARABLE_FLAGS,
+	ALL_SUSPICIOUS_ACTIVITY_FLAGS,
+	DEFERRABLE_PHONE_FLAGS,
+	DEFERRED_PHONE_ON_COMMUNITY_JOIN,
+	imposePhoneRequirements,
+	SuspiciousActivityFlags,
+	UserFlags,
+} from '@fluxer/constants/src/UserConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {AccessDeniedError} from '@fluxer/errors/src/domains/core/AccessDeniedError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
@@ -31,11 +39,13 @@ import * as AuthMfa from '../../auth/AuthMfa';
 import * as AuthSession from '../../auth/AuthSession';
 import * as AuthUtility from '../../auth/AuthUtility';
 import {createPasswordResetToken, createUserID, type UserID} from '../../BrandedTypes';
+import type {UserRow} from '../../database/types/UserTypes';
 import {Logger} from '../../Logger';
+import {getInstanceConfigRepository} from '../../middleware/ServiceSingletons';
 import type {IRiskHistoryRepository} from '../../risk/HistoricalOutcomeRepository';
 import type {HistoricalOutcomeCode} from '../../risk/RiskHistoryTypes';
 import {getIpAddressReverse, getLocationLabelFromIp} from '../../utils/IpUtils';
-import {resolveSessionClientInfo} from '../../utils/UserAgentUtils';
+import {resolveSessionClientInfo} from '../../utils/SessionClientIdentity';
 import {mapUserToAdminResponse} from '../models/UserTypes';
 import type {AdminAuditService} from './AdminAuditService';
 import type {AdminUserUpdatePropagator} from './AdminUserUpdatePropagator';
@@ -406,11 +416,14 @@ export class AdminUserSecurityService {
 		if (!user) {
 			throw new UnknownUserError();
 		}
-		const updatedUser = await userRepository.patchUpsert(
-			userId,
-			{has_verified_phone: data.has_verified_phone},
-			user.toRow(),
-		);
+		const phonePatch: Partial<UserRow> = {has_verified_phone: data.has_verified_phone};
+		if (data.has_verified_phone) {
+			const clearedFlags = (user.suspiciousActivityFlags ?? 0) & ~ADMIN_PHONE_TOGGLE_CLEARABLE_FLAGS;
+			if (clearedFlags !== (user.suspiciousActivityFlags ?? 0)) {
+				phonePatch.suspicious_activity_flags = clearedFlags;
+			}
+		}
+		const updatedUser = await userRepository.patchUpsert(userId, phonePatch, user.toRow());
 		await updatePropagator.propagateUserUpdate({userId, oldUser: user, updatedUser});
 		await auditService.createAuditLog({
 			adminUserId,
@@ -418,7 +431,15 @@ export class AdminUserSecurityService {
 			targetId: BigInt(userId),
 			action: 'update_has_verified_phone',
 			auditLogReason,
-			metadata: new Map([['has_verified_phone', String(data.has_verified_phone)]]),
+			metadata: new Map(
+				phonePatch.suspicious_activity_flags === undefined
+					? [['has_verified_phone', String(data.has_verified_phone)]]
+					: [
+							['has_verified_phone', String(data.has_verified_phone)],
+							['suspicious_activity_flags_before', String(user.suspiciousActivityFlags ?? 0)],
+							['suspicious_activity_flags_after', String(phonePatch.suspicious_activity_flags)],
+						],
+			),
 		});
 		return {
 			user: await mapUserToAdminResponse(updatedUser, cacheService, acls),
@@ -438,15 +459,24 @@ export class AdminUserSecurityService {
 		if (!user) {
 			throw new UnknownUserError();
 		}
+		const currentFlags = user.suspiciousActivityFlags ?? 0;
+		const keepsDeferral =
+			(currentFlags & DEFERRED_PHONE_ON_COMMUNITY_JOIN) !== 0 &&
+			(data.flags & DEFERRABLE_PHONE_FLAGS) !== 0 &&
+			(data.flags & DEFERRABLE_PHONE_FLAGS) === (currentFlags & DEFERRABLE_PHONE_FLAGS);
+		const newFlags = keepsDeferral ? data.flags | DEFERRED_PHONE_ON_COMMUNITY_JOIN : data.flags;
 		const updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
-				suspicious_activity_flags: data.flags,
+				suspicious_activity_flags: newFlags,
 			},
 			user.toRow(),
 		);
 		await updatePropagator.propagateUserUpdate({userId, oldUser: user, updatedUser: updatedUser});
-		if ((user.suspiciousActivityFlags ?? 0) !== data.flags && data.flags !== 0) {
+		if (
+			(currentFlags & ALL_SUSPICIOUS_ACTIVITY_FLAGS) !== (newFlags & ALL_SUSPICIOUS_ACTIVITY_FLAGS) &&
+			(newFlags & ALL_SUSPICIOUS_ACTIVITY_FLAGS) !== 0
+		) {
 			await this.recordRiskOutcomes(userId, ['challenged'], 'admin_update_suspicious_activity_flags');
 		}
 		await auditService.createAuditLog({
@@ -600,7 +630,7 @@ export class AdminUserSecurityService {
 					throw new UnknownUserError();
 				}
 				const currentFlags = user.suspiciousActivityFlags ?? 0;
-				const newFlags = (currentFlags | addMask) & ~removeMask;
+				const newFlags = imposePhoneRequirements(currentFlags, addMask) & ~removeMask;
 				const updatedUser = await userRepository.patchUpsert(
 					userId,
 					{suspicious_activity_flags: newFlags},
@@ -720,7 +750,7 @@ export class AdminUserSecurityService {
 			approximateLastUsedAt: Date;
 			clientIp: string;
 			clientUserAgent: string | null;
-			clientIsDesktop: boolean | null;
+			clientOs: string | null;
 			deletedAt: Date | null;
 		}> = [
 			...activeSessions.map((s) => ({
@@ -729,7 +759,7 @@ export class AdminUserSecurityService {
 				approximateLastUsedAt: s.approximateLastUsedAt,
 				clientIp: s.clientIp,
 				clientUserAgent: s.clientUserAgent,
-				clientIsDesktop: s.clientIsDesktop,
+				clientOs: s.clientOs ?? null,
 				deletedAt: null as Date | null,
 			})),
 			...tombstones.map((t) => ({
@@ -738,7 +768,7 @@ export class AdminUserSecurityService {
 				approximateLastUsedAt: t.approximateLastUsedAt,
 				clientIp: t.clientIp,
 				clientUserAgent: t.clientUserAgent,
-				clientIsDesktop: t.clientIsDesktop,
+				clientOs: t.clientOs ?? null,
 				deletedAt: t.deletedAt,
 			})),
 		];
@@ -747,6 +777,8 @@ export class AdminUserSecurityService {
 			if (a.deletedAt !== null && b.deletedAt === null) return 1;
 			return b.createdAt.getTime() - a.createdAt.getTime();
 		});
+		const {branding} = await getInstanceConfigRepository().getAppPublicConfig();
+		const productName = branding.product_name;
 		const canViewIp = acls.has(AdminACLs.USER_VIEW_IP) || acls.has(AdminACLs.WILDCARD);
 		if (!canViewIp) {
 			await auditService.createAuditLog({
@@ -759,9 +791,10 @@ export class AdminUserSecurityService {
 			});
 			return {
 				sessions: entries.map((entry) => {
-					const {clientOs, clientPlatform} = resolveSessionClientInfo({
+					const clientInfo = resolveSessionClientInfo({
 						userAgent: entry.clientUserAgent,
-						isDesktopClient: entry.clientIsDesktop,
+						reportedOs: entry.clientOs,
+						productName,
 					});
 					return {
 						session_id_hash: entry.sessionIdHash.toString('base64url'),
@@ -769,8 +802,8 @@ export class AdminUserSecurityService {
 						approx_last_used_at: entry.approximateLastUsedAt.toISOString(),
 						client_ip: '[redacted]',
 						client_ip_reverse: null,
-						client_os: clientOs,
-						client_platform: clientPlatform,
+						client_os: clientInfo.os,
+						client_platform: clientInfo.platform,
 						client_location: null,
 						deleted_at: entry.deletedAt?.toISOString() ?? null,
 					};
@@ -807,9 +840,10 @@ export class AdminUserSecurityService {
 				const clientLocation = locationResult.status === 'fulfilled' ? locationResult.value : null;
 				const reverseDnsResult = reverseDnsResults[index];
 				const clientIpReverse = reverseDnsResult?.status === 'fulfilled' ? reverseDnsResult.value : null;
-				const {clientOs, clientPlatform} = resolveSessionClientInfo({
+				const clientInfo = resolveSessionClientInfo({
 					userAgent: entry.clientUserAgent,
-					isDesktopClient: entry.clientIsDesktop,
+					reportedOs: entry.clientOs,
+					productName,
 				});
 				return {
 					session_id_hash: entry.sessionIdHash.toString('base64url'),
@@ -817,8 +851,8 @@ export class AdminUserSecurityService {
 					approx_last_used_at: entry.approximateLastUsedAt.toISOString(),
 					client_ip: entry.clientIp,
 					client_ip_reverse: clientIpReverse,
-					client_os: clientOs,
-					client_platform: clientPlatform,
+					client_os: clientInfo.os,
+					client_platform: clientInfo.platform,
 					client_location: clientLocation,
 					deleted_at: entry.deletedAt?.toISOString() ?? null,
 				};

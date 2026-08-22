@@ -28,15 +28,11 @@ import {
 } from '@app/features/platform/utils/ClientInfo';
 import {loadLazyModule} from '@app/features/platform/utils/LazyModuleLoader';
 import {scheduleNonLatinScriptFaces} from '@app/features/theme/fonts/ScriptFontLoader';
-import {initializeNativeVoiceEngineSelectionForStartup} from '@app/features/voice/engine/native_voice_engine/NativeVoiceEngineSelection';
 import {i18n} from '@lingui/core';
 import {I18nProvider} from '@lingui/react';
 import {configure} from 'mobx';
 import type {ReactNode} from 'react';
 import ReactDOM from 'react-dom/client';
-
-type AuthenticationCommandsModule = typeof import('@app/features/auth/commands/AuthenticationCommands');
-type NativeUtilsModule = typeof import('@app/features/ui/utils/NativeUtils');
 
 const logger = new Logger('index');
 
@@ -84,41 +80,6 @@ async function logClientInfo(): Promise<void> {
 	}
 }
 
-async function resumePendingDesktopHandoffLogin(
-	getElectronAPI: NativeUtilsModule['getElectronAPI'],
-	authenticationCommands: AuthenticationCommandsModule,
-): Promise<void> {
-	const electronApi = getElectronAPI();
-	if (!electronApi || typeof electronApi.consumeDesktopHandoffCode !== 'function') {
-		return;
-	}
-	let handoffCode: string | null = null;
-	try {
-		handoffCode = await electronApi.consumeDesktopHandoffCode();
-	} catch (error) {
-		logger.warn('Failed to consume pending desktop handoff code:', error);
-		return;
-	}
-	if (!handoffCode) {
-		return;
-	}
-	try {
-		const result = await authenticationCommands.pollDesktopHandoffStatus(handoffCode);
-		if (result.status === 'completed' && result.token && result.user_id) {
-			const userData = authenticationCommands.authResponseUserToUserData(result.user);
-			await authenticationCommands.completeLogin({
-				token: result.token,
-				userId: result.user_id,
-				...(userData ? {userData} : {}),
-			});
-		} else {
-			logger.warn('Pending desktop handoff not completed:', {status: result.status});
-		}
-	} catch (error) {
-		logger.warn('Failed to resume pending desktop handoff login:', error);
-	}
-}
-
 async function bootstrapThemeStudio(): Promise<void> {
 	const [{ThemeStudioStandaloneApp}, {setupHttp}, {default: AccountManager}] = await Promise.all([
 		loadLazyModule(() => import('@app/features/theme_studio/ThemeStudioStandaloneApp')),
@@ -136,10 +97,8 @@ async function bootstrapThemeStudio(): Promise<void> {
 }
 
 async function bootstrapApp(): Promise<void> {
-	await initializeNativeVoiceEngineSelectionForStartup();
 	const [
 		{App},
-		authenticationCommands,
 		{setupHttp},
 		{default: CaptchaInterceptor},
 		{initializeEmojiParser},
@@ -153,10 +112,8 @@ async function bootstrapApp(): Promise<void> {
 		{default: QuickSwitcher},
 		_runtimeConfig,
 		{default: StatusPage},
-		{getElectronAPI},
 	] = await Promise.all([
 		loadLazyModule(() => import('@app/app/App')),
-		loadLazyModule(() => import('@app/features/auth/commands/AuthenticationCommands')),
 		loadLazyModule(() => import('@app/app/SetupHttp')),
 		loadLazyModule(() => import('@app/features/auth/components/CaptchaInterceptor')),
 		loadLazyModule(() => import('@app/features/messaging/utils/markdown/EmojiProviderSetup')),
@@ -170,7 +127,6 @@ async function bootstrapApp(): Promise<void> {
 		loadLazyModule(() => import('@app/features/search/state/QuickSwitcher')),
 		loadLazyModule(() => import('@app/features/app/state/RuntimeConfig')),
 		loadLazyModule(() => import('@app/features/user/state/StatusPage')),
-		loadLazyModule(() => import('@app/features/ui/utils/NativeUtils')),
 	]);
 	void preloadClientInfo();
 	QuickSwitcher.setI18n(reactiveI18n);
@@ -184,7 +140,6 @@ async function bootstrapApp(): Promise<void> {
 	await AccountManager.bootstrap();
 	setupHttp();
 	initializeEmojiParser();
-	await resumePendingDesktopHandoffLogin(getElectronAPI, authenticationCommands);
 	mountRoot(<App data-flx="index.bootstrap.app" />, 'index.bootstrap');
 	QuickSwitcher.preloadModal();
 	registerServiceWorker();

@@ -109,7 +109,6 @@ const SpoileredUrlEmbed = observer(function SpoileredUrlEmbed({
 			hidden={hidden}
 			onReveal={reveal}
 			className={styles.urlEmbedSpoiler}
-			style={{width: '100%', maxWidth: 360}}
 			data-flx="channel.message-attachments.spoilered-url-embed"
 		>
 			{children}
@@ -574,9 +573,10 @@ const StickerItem = observer(
 	},
 );
 export const MessageAttachments = observer(() => {
-	const {channel, message, handleDelete, previewContext, onPopoutToggle, readonlyPreview} = useMessageViewContext();
+	const {channel, message, handleDelete, previewContext, onPopoutToggle, suppressMessageActions} =
+		useMessageViewContext();
 	const isPreview = Boolean(previewContext);
-	const reactionsIsPreview = isPreview || Boolean(readonlyPreview);
+	const reactionsIsPreview = isPreview || Boolean(suppressMessageActions);
 	const reactions = useMessageReactionsSnapshot(message.id);
 	const {shouldAnimate, interactionHandlers} = useStickerAnimation();
 	const spoileredUrlEmbeds = useMemo(() => {

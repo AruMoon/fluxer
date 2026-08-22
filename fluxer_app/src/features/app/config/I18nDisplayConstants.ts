@@ -6,7 +6,6 @@ import {THE_OTHER_PLATFORM} from '@fluxer/constants/src/ExternalPlatformConstant
 import {PREMIUM_PRODUCT_FULL_NAME, PREMIUM_PRODUCT_NAME, PRODUCT_NAME} from './ProductConstants';
 
 export {PREMIUM_PRODUCT_FULL_NAME, PREMIUM_PRODUCT_NAME, PRODUCT_NAME};
-export const DESKTOP_PRODUCT_NAME = `${PRODUCT_NAME} Desktop`;
 export const PRODUCT_API_NAME = `${PRODUCT_NAME} API`;
 export const PRODUCT_HQ_COMMUNITY_NAME = `${PRODUCT_NAME} HQ`;
 export const CANARY_RELEASE_CHANNEL_NAME = `${PRODUCT_NAME} Canary`;
@@ -29,6 +28,8 @@ export const SUPPORT_EMAIL = 'support@fluxer.app';
 export const SUPPORT_EMAIL_MAILTO = `mailto:${SUPPORT_EMAIL}`;
 export const I18N_EMAIL = 'i18n@fluxer.app';
 export const I18N_EMAIL_MAILTO = `mailto:${I18N_EMAIL}`;
+export const I18N_WEBLATE_DOMAIN = 'weblate.fluxer.tools';
+export const I18N_WEBLATE_URL = `https://${I18N_WEBLATE_DOMAIN}`;
 export const EXAMPLE_DOMAIN = 'example.com';
 export const EXAMPLE_URL = `https://${EXAMPLE_DOMAIN}`;
 export const EXAMPLE_CALLBACK_URL = `${EXAMPLE_URL}/callback`;
@@ -51,7 +52,6 @@ export const VISIONARY_LIFETIME_BADGE_LABEL = 'Visionary #42';
 export const FLUXER_TAG_MIN_WITH_ZERO_LABEL = '#0000';
 export const FLUXER_TAG_MIN_STANDARD_LABEL = '#0001';
 export const FLUXER_TAG_MAX_LABEL = '#9999';
-export const EXAMPLE_INSTANCE_DOMAIN = 'fluxer.app';
 export const LINK_PREVIEW_EXAMPLE_URL = 'https://fluxer.app';
 export const EXAMPLE_MESSAGE_LINK = `${LINK_PREVIEW_EXAMPLE_URL}/channels/...`;
 export const EXAMPLE_GIF_URLS = `${EXAMPLE_URL}/gif1.gif\n${EXAMPLE_URL}/gif2.gif`;

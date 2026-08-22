@@ -13,7 +13,7 @@ import type {
 	SelfServeRefundResponse,
 } from '@fluxer/schema/src/domains/premium/PremiumSchemas';
 import type Stripe from 'stripe';
-import type {UserID} from '../../BrandedTypes';
+import {createUserID, type UserID} from '../../BrandedTypes';
 import {Config} from '../../Config';
 import {Logger} from '../../Logger';
 import {getBillingRepository} from '../../middleware/ServiceRegistry';
@@ -39,7 +39,6 @@ interface RefundTarget {
 
 type StripeInvoiceWithPayments = Stripe.Invoice & {
 	customer?: string | Stripe.Customer | null;
-	subscription?: string | Stripe.Subscription | null;
 	payments?: {
 		data?: Array<{
 			payment?: {
@@ -53,6 +52,10 @@ type StripeInvoiceWithPayments = Stripe.Invoice & {
 		}>;
 	} | null;
 };
+
+function resolveInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+	return extractId(invoice.parent?.subscription_details?.subscription ?? null);
+}
 
 function getInvoicePaymentRef(invoice: Stripe.Invoice): {
 	chargeId: string | null;
@@ -113,7 +116,7 @@ export class StripeRefundService {
 			const list = await this.stripe.invoices.list({
 				customer: user.stripeCustomerId,
 				limit: 5,
-				expand: ['data.payments.data.payment.payment_intent'],
+				expand: ['data.payments.data.payment'],
 			});
 			for (const invoice of list.data) {
 				if (!invoice.id || invoice.status !== 'paid' || invoice.amount_paid <= 0) {
@@ -132,7 +135,7 @@ export class StripeRefundService {
 					chargeId: ref.chargeId,
 					paymentIntentId: ref.paymentIntentId,
 					paidAt,
-					subscriptionId: extractId((invoice as StripeInvoiceWithPayments).subscription),
+					subscriptionId: resolveInvoiceSubscriptionId(invoice),
 				};
 			}
 		} catch (error) {
@@ -203,6 +206,51 @@ export class StripeRefundService {
 		};
 	}
 
+	private async countPriorTerminalFailures(invoiceId: string): Promise<number> {
+		const priorRefunds = await getBillingRepository().refunds.listByInvoice(invoiceId);
+		return priorRefunds.filter((r) => r.status === 'failed' || r.status === 'canceled').length;
+	}
+
+	private async finalizeIfSucceeded(refund: Stripe.Refund): Promise<void> {
+		if (refund.status !== 'succeeded' || refund.metadata?.refund_kind !== 'self_serve') {
+			return;
+		}
+		const userIdRaw = refund.metadata.user_id;
+		if (!userIdRaw) {
+			return;
+		}
+		let userId: UserID;
+		try {
+			userId = createUserID(BigInt(userIdRaw));
+		} catch {
+			return;
+		}
+		const user = await this.userRepository.findUnique(userId);
+		if (!user || user.firstRefundAt) {
+			return;
+		}
+		const subscriptionId = refund.metadata.subscription_id;
+		if (subscriptionId) {
+			try {
+				await this.subscriptionService.cancelSubscriptionImmediately(user.id, 'self_serve_refund');
+			} catch (error) {
+				Logger.warn(
+					{error, userId: user.id.toString(), subscriptionId},
+					'Self-serve refund confirmed but subscription cancellation failed; will reconcile via webhook',
+				);
+			}
+		}
+		await this.userRepository.patchUpsert(user.id, {first_refund_at: new Date()}, user.toRow());
+		Logger.info(
+			{userId: user.id.toString(), refundId: refund.id, subscriptionId: subscriptionId || null},
+			'Self-serve refund confirmed succeeded; cooldown and cancellation finalized',
+		);
+	}
+
+	async handleRefundWebhookEvent(refund: Stripe.Refund): Promise<void> {
+		await this.finalizeIfSucceeded(refund);
+	}
+
 	async refundLatestPurchase(userId: UserID): Promise<SelfServeRefundResponse> {
 		const stripe = this.ensureStripe();
 		const user = await this.getRequiredUser(userId);
@@ -217,6 +265,14 @@ export class StripeRefundService {
 		if (this.cooldownExpiresAt(user)) {
 			throw new StripeRefundCooldownActiveError();
 		}
+		const priorFailures = await this.countPriorTerminalFailures(target.invoiceId);
+		const idempotencyKey = [
+			'self-serve-refund',
+			user.id.toString(),
+			target.invoiceId,
+			target.paymentIntentId ?? target.chargeId,
+			...(priorFailures > 0 ? [`retry-${priorFailures}`] : []),
+		].join(':');
 		let refund: Stripe.Response<Stripe.Refund>;
 		try {
 			refund = await stripe.refunds.create(
@@ -229,11 +285,10 @@ export class StripeRefundService {
 						invoice_id: target.invoiceId,
 						refund_kind: 'self_serve',
 						refund_window_days: String(SELF_SERVE_REFUND_WINDOW_DAYS),
+						...(target.subscriptionId ? {subscription_id: target.subscriptionId} : {}),
 					},
 				},
-				{
-					idempotencyKey: `self-serve-refund:${user.id}:${target.invoiceId}:${target.paymentIntentId ?? target.chargeId}`,
-				},
+				{idempotencyKey},
 			);
 		} catch (error) {
 			Logger.warn(
@@ -251,36 +306,29 @@ export class StripeRefundService {
 		} catch (mirrorErr) {
 			Logger.error({mirrorErr, refundId: refund.id}, 'Mirror upsert failed after Stripe write; reconciler will heal');
 		}
-		if (target.subscriptionId) {
-			try {
-				await this.subscriptionService.cancelSubscriptionImmediately(user.id, 'self_serve_refund');
-			} catch (error) {
-				Logger.warn(
-					{error, userId: user.id.toString(), subscriptionId: target.subscriptionId},
-					'Self-serve refund issued but subscription cancellation failed; will reconcile via webhook',
-				);
-			}
-		}
-		await this.userRepository.patchUpsert(user.id, {first_refund_at: new Date()}, user.toRow());
+		await this.finalizeIfSucceeded(refund);
+		const succeeded = refund.status === 'succeeded';
 		Logger.info(
 			{
 				userId: user.id.toString(),
 				invoiceId: target.invoiceId,
 				refundId: refund.id,
+				status: refund.status,
 				amountCents: refund.amount,
 				subscriptionId: target.subscriptionId,
 			},
-			'Self-serve refund issued',
+			succeeded ? 'Self-serve refund issued' : 'Self-serve refund created; awaiting confirmation from provider',
 		);
 		return {
 			invoice_id: target.invoiceId,
 			payment_intent_id: target.paymentIntentId,
 			charge_id: target.chargeId,
 			refund_id: refund.id,
-			refunded_amount_cents: refund.amount,
+			refunded_amount_cents: succeeded ? refund.amount : 0,
 			invoice_amount_paid_cents: target.amountPaidCents,
 			currency: target.currency,
-			subscription_id: target.subscriptionId,
+			subscription_id: succeeded ? target.subscriptionId : null,
+			status: refund.status ?? 'pending',
 		};
 	}
 }

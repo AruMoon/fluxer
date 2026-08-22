@@ -61,6 +61,24 @@ function findSystemDesktopEntry(): string | null {
 	return null;
 }
 
+function findThirdPartyDesktopEntry(execPath: string): string | null {
+	const applicationsDir = getUserApplicationsDir();
+	let entries: Array<string>;
+	try {
+		entries = fs.readdirSync(applicationsDir);
+	} catch {
+		return null;
+	}
+	for (const entry of entries) {
+		if (!entry.endsWith('.desktop') || entry === DESKTOP_FILE_BASENAME) continue;
+		const candidate = path.join(applicationsDir, entry);
+		try {
+			if (fs.readFileSync(candidate, 'utf8').includes(execPath)) return candidate;
+		} catch {}
+	}
+	return null;
+}
+
 function escapeDesktopValue(value: string): string {
 	return value.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/\r/g, '\\r');
 }
@@ -105,7 +123,7 @@ function buildDesktopActionEntries(execPath: string): Array<string> {
 	return entries;
 }
 
-function buildDesktopFileContents(execPath: string): string {
+function buildDesktopFileContents(execPath: string, hidden: boolean): string {
 	const execLine = `${quoteExecArg(execPath)} %U`;
 	return [
 		'[Desktop Entry]',
@@ -124,9 +142,35 @@ function buildDesktopFileContents(execPath: string): string {
 		`StartupWMClass=${WM_CLASS}`,
 		'SingleMainWindow=true',
 		'StartupNotify=true',
+		...(hidden ? ['NoDisplay=true'] : []),
 		...buildDesktopActionEntries(execPath),
 		'',
 	].join('\n');
+}
+
+function readDesktopEntryValue(contents: string, key: string): string | null {
+	for (const line of contents.split('\n')) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith('[Desktop Action ')) break;
+		if (trimmed.startsWith(`${key}=`)) return trimmed.slice(key.length + 1).trim();
+	}
+	return null;
+}
+
+function isExecutableFile(candidate: string): boolean {
+	try {
+		if (!fs.statSync(candidate).isFile()) return false;
+		fs.accessSync(candidate, fs.constants.X_OK);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+function isStaleDesktopFile(contents: string): boolean {
+	const tryExec = readDesktopEntryValue(contents, 'TryExec');
+	if (tryExec === null || !tryExec.startsWith('/')) return false;
+	return !isExecutableFile(tryExec);
 }
 
 function readExistingDesktopFile(filePath: string): string | null {
@@ -171,9 +215,15 @@ export function ensureLinuxProtocolDesktopEntry(): void {
 	const applicationsDir = getUserApplicationsDir();
 	const filePath = getDesktopFilePath();
 	installHicolorIcons();
-	const desired = buildDesktopFileContents(execPath);
-	let needsWrite = true;
 	const existing = readExistingDesktopFile(filePath);
+	const thirdPartyEntry = findThirdPartyDesktopEntry(execPath);
+	if (thirdPartyEntry) {
+		logger.debug('Third-party .desktop entry manages the app menu entry; keeping ours hidden', {
+			thirdPartyEntry,
+		});
+	}
+	const desired = buildDesktopFileContents(execPath, thirdPartyEntry !== null);
+	let needsWrite = true;
 	if (existing === null) {
 		const systemEntry = findSystemDesktopEntry();
 		if (systemEntry) {
@@ -188,10 +238,29 @@ export function ensureLinuxProtocolDesktopEntry(): void {
 	}
 	if (existing !== null) {
 		if (!existing.includes(GENERATED_MARKER)) {
-			logger.debug('Linux .desktop entry was hand-edited; leaving untouched', {filePath});
-			return;
+			if (!isStaleDesktopFile(existing)) {
+				logger.debug('Linux .desktop entry was hand-edited; leaving untouched', {filePath});
+				return;
+			}
+			const systemEntry = findSystemDesktopEntry();
+			if (systemEntry) {
+				try {
+					fs.unlinkSync(filePath);
+					logger.info('Removed stale .desktop entry shadowing the system entry', {filePath, systemEntry});
+				} catch (error) {
+					logger.warn('Failed to remove stale .desktop entry', {filePath, error});
+				}
+				try {
+					app.setAsDefaultProtocolClient(APP_PROTOCOL);
+				} catch (error) {
+					logger.warn('Failed to register protocol client', {error});
+				}
+				return;
+			}
+			logger.info('Rewriting stale .desktop entry whose TryExec no longer resolves', {filePath});
+		} else {
+			needsWrite = existing !== desired;
 		}
-		needsWrite = existing !== desired;
 	}
 	if (!needsWrite) {
 		logger.debug('Linux .desktop entry already up to date', {filePath});

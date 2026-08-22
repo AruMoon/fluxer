@@ -33,6 +33,7 @@ import {
 	$wrapComposerSelection,
 } from '@app/features/lexical/composer/composerOffsets';
 import styles from '@app/features/lexical/composer/LexicalMessageComposer.module.css';
+import {DEFAULT_COMPOSER_MARKDOWN_FLAGS} from '@app/features/lexical/composer/markdownSpans';
 import {ComposerCommandNode} from '@app/features/lexical/composer/nodes/ComposerCommandNode';
 import {ComposerCustomEmojiNode} from '@app/features/lexical/composer/nodes/ComposerCustomEmojiNode';
 import {ComposerMentionNode} from '@app/features/lexical/composer/nodes/ComposerMentionNode';
@@ -190,9 +191,14 @@ export const LexicalComposerInput = observer((props: LexicalComposerInputProps) 
 		theme: THEME,
 	};
 	return (
-		<LexicalComposer initialConfig={config}>
+		<LexicalComposer initialConfig={config} data-flx="lexical.composer.lexical-composer-input.lexical-composer">
 			<ComposerMentionContext.Provider value={mentionContext}>
-				<ComposerInner {...props} plainText={plainText} selectionToolbar={selectionToolbar} />
+				<ComposerInner
+					data-flx="lexical.composer.lexical-composer-input.composer-inner"
+					{...props}
+					plainText={plainText}
+					selectionToolbar={selectionToolbar}
+				/>
 			</ComposerMentionContext.Provider>
 		</LexicalComposer>
 	);
@@ -258,6 +264,8 @@ const ComposerInner = ({
 	submitOnEnterRef.current = submitOnEnter;
 	const plainTextRef = useRef(plainText);
 	plainTextRef.current = plainText;
+	const markdownParserFlagsRef = useRef(markdownParserFlags ?? DEFAULT_COMPOSER_MARKDOWN_FLAGS);
+	markdownParserFlagsRef.current = markdownParserFlags ?? DEFAULT_COMPOSER_MARKDOWN_FLAGS;
 	const disabledRef = useRef(disabled);
 	disabledRef.current = disabled;
 	const onSlashCommandStateChangeRef = useRef(onSlashCommandStateChange);
@@ -602,6 +610,7 @@ const ComposerInner = ({
 			registerComposerClipboardCommands(editor, {
 				getPlainText: () => plainTextRef.current,
 				isEditable: () => !disabledRef.current && editor.isEditable(),
+				getMarkdownParserFlags: () => markdownParserFlagsRef.current,
 			}),
 		[editor],
 	);
@@ -716,7 +725,12 @@ const ComposerInner = ({
 		<>
 			<PlainTextPlugin
 				contentEditable={
-					<FocusRing offset={-2} ringTarget={focusRingTarget} enabled={focusRingEnabled}>
+					<FocusRing
+						offset={-2}
+						ringTarget={focusRingTarget}
+						enabled={focusRingEnabled}
+						data-flx="lexical.composer.lexical-composer-input.composer-inner.focus-ring"
+					>
 						<ContentEditable
 							className={clsx(styles.editable, className)}
 							id={id}
@@ -737,18 +751,23 @@ const ComposerInner = ({
 							aria-haspopup={autocompleteEnabled ? 'listbox' : undefined}
 							aria-placeholder={placeholder}
 							placeholder={
-								<flx-lexical-composer-input-placeholder className={flxElementClassName(styles.placeholder)}>
+								<flx-lexical-composer-input-placeholder
+									className={flxElementClassName(styles.placeholder)}
+									data-flx="lexical.composer.lexical-composer-input.composer-inner.placeholder"
+								>
 									{placeholder}
 								</flx-lexical-composer-input-placeholder>
 							}
 							data-channel-textarea
 							data-composer-render-mode={plainText ? 'plain' : 'rich'}
+							data-flx="lexical.composer.lexical-composer-input.composer-inner.editable"
 						/>
 					</FocusRing>
 				}
 				ErrorBoundary={LexicalErrorBoundary}
+				data-flx="lexical.composer.lexical-composer-input.composer-inner.plain-text-plugin"
 			/>
-			<HistoryPlugin />
+			<HistoryPlugin data-flx="lexical.composer.lexical-composer-input.composer-inner.history-plugin" />
 			<ComposerTypeaheadPlugin
 				options={autocompleteOptions}
 				type={autocompleteType}
@@ -758,6 +777,7 @@ const ComposerInner = ({
 				enabled={autocompleteEnabled && !slotMenuActive}
 				onSelect={onAutocompleteSelect}
 				activeRef={composerTypeaheadActiveRef}
+				data-flx="lexical.composer.lexical-composer-input.composer-inner.composer-typeahead-plugin.autocomplete-select"
 			/>
 			<SlashSlotAutocompletePlugin
 				options={autocompleteOptions}
@@ -768,8 +788,12 @@ const ComposerInner = ({
 				enabled={autocompleteEnabled && slotMenuActive}
 				onSelect={onAutocompleteSelect}
 				activeRef={slashSlotTypeaheadActiveRef}
+				data-flx="lexical.composer.lexical-composer-input.composer-inner.slash-slot-autocomplete-plugin.autocomplete-select"
 			/>
-			<SelectionFormattingToolbarPlugin enabled={selectionToolbar && !plainText} />
+			<SelectionFormattingToolbarPlugin
+				enabled={selectionToolbar && !plainText}
+				data-flx="lexical.composer.lexical-composer-input.composer-inner.selection-formatting-toolbar-plugin"
+			/>
 		</>
 	);
 };

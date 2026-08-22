@@ -83,7 +83,7 @@ export const AutocompleteMention = observer(function AutocompleteMention({
 	const routeParams = useParams() as {guildId?: string};
 	const guildId = routeParams.guildId;
 	const guild = Guilds.getGuild(guildId == null ? '' : guildId);
-	const nicknameGuildId = guild == null ? undefined : guild.id;
+	const nicknameGuildId = guild == null ? null : guild.id;
 	const members = options.filter(isMentionMember);
 	const users = options.filter(isMentionUser);
 	const roles = options.filter(isMentionRole);
@@ -166,7 +166,11 @@ export const AutocompleteMention = observer(function AutocompleteMention({
 			<AutocompleteItem
 				key={option.role.id}
 				id={resolveOptionId(getOptionId, currentIndex)}
-				name={<span style={{color: roleColor}}>@{option.role.name}</span>}
+				name={
+					<span style={{color: roleColor}} data-flx="channel.autocomplete-mention.render-role.span">
+						@{option.role.name}
+					</span>
+				}
 				description={i18n._(NOTIFY_USERS_WITH_THIS_ROLE_WHO_HAVE_PERMISSION_DESCRIPTOR)}
 				isKeyboardSelected={currentIndex === keyboardFocusIndex}
 				isHovered={currentIndex === hoverIndex}

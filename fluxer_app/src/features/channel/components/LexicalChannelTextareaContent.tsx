@@ -2,7 +2,9 @@
 
 import Accessibility from '@app/features/accessibility/state/Accessibility';
 import {ConfirmModal} from '@app/features/app/components/dialogs/ConfirmModal';
+import {reportSkeletonComposerLayout} from '@app/features/app/components/skeleton/SkeletonLayoutMemory';
 import {useContextMenuHoverState} from '@app/features/app/hooks/useContextMenuHoverState';
+import {useSkeletonLayoutReport} from '@app/features/app/hooks/useSkeletonLayoutMemoryCapture';
 import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import {Limits} from '@app/features/app/utils/UserLimits';
 import {fetchSlowmodeState} from '@app/features/channel/commands/ChannelCommands';
@@ -50,8 +52,7 @@ import type {FlatEmoji} from '@app/features/emoji/types/EmojiTypes';
 import {ExpressionPickerSheet} from '@app/features/expressions/components/modals/ExpressionPickerSheet';
 import GuildGuilds from '@app/features/guild/state/Guilds';
 import {CANCEL_DESCRIPTOR, CONTINUE_DESCRIPTOR} from '@app/features/i18n/utils/CommonMessageDescriptors';
-import Keybind from '@app/features/input/state/InputKeybind';
-import type {ComposerHandle, ComposerSelectionRange} from '@app/features/lexical/composer/ComposerHandle';
+import type {ComposerHandle} from '@app/features/lexical/composer/ComposerHandle';
 import {insertComposerEmoji} from '@app/features/lexical/composer/ComposerInsertion';
 import {LexicalComposerInput} from '@app/features/lexical/composer/LexicalComposerInput';
 import {
@@ -67,7 +68,7 @@ import {showAttachmentPermissionDeniedModal} from '@app/features/messaging/compo
 import {FileSizeTooLargeModal} from '@app/features/messaging/components/alerts/FileSizeTooLargeModal';
 import {TooManyAttachmentsModal} from '@app/features/messaging/components/alerts/TooManyAttachmentsModal';
 import {useTextareaAttachments} from '@app/features/messaging/hooks/useCloudUpload';
-import {doesEventMatchShortcut, useMarkdownKeybinds} from '@app/features/messaging/hooks/useMarkdownKeybinds';
+import {useMarkdownKeybinds} from '@app/features/messaging/hooks/useMarkdownKeybinds';
 import {type SendMessageFunction, useMessageSubmission} from '@app/features/messaging/hooks/useMessageSubmission';
 import {useTextareaDraftAndTyping} from '@app/features/messaging/hooks/useTextareaDraftAndTyping';
 import {useTextareaEditing} from '@app/features/messaging/hooks/useTextareaEditing';
@@ -233,6 +234,26 @@ export const LexicalChannelTextareaContent = observer(
 		const showStickersButton = Accessibility.showStickersButton;
 		const showEmojiButton = Accessibility.showEmojiButton;
 		const showMessageSendButton = Accessibility.showMessageSendButton;
+		const desktopComposerActionCount = [
+			showAllButtons && showGifButton,
+			showAllButtons && showMemesButton,
+			showAllButtons && showStickersButton,
+			showEmojiButton,
+			showMessageSendButton,
+		].filter(Boolean).length;
+		let mobileComposerActionCount = 1;
+		if (showEmojiButton) {
+			mobileComposerActionCount += 1;
+		}
+		useSkeletonLayoutReport(
+			() =>
+				reportSkeletonComposerLayout({
+					desktopActionCount: desktopComposerActionCount,
+					mobileActionCount: mobileComposerActionCount,
+					sendDividerVisible: showMessageSendButton,
+				}),
+			`${desktopComposerActionCount}|${mobileComposerActionCount}|${showMessageSendButton}`,
+		);
 		const mobileLayout = MobileLayout;
 		const replyingMessage = MessageReply.getReplyingMessage(channel.id);
 		const referencedMessage = MessageReply.getReferencedMessage(channel.id);
@@ -403,6 +424,7 @@ export const LexicalChannelTextareaContent = observer(
 							onSecondary={() => {
 								handleMentionCancel();
 							}}
+							data-flx="channel.lexical-channel-textarea-content.confirm-modal"
 						/>
 					)),
 					mentionModalKey,
@@ -431,6 +453,7 @@ export const LexicalChannelTextareaContent = observer(
 								handleMentionCancel();
 								onClose();
 							}}
+							data-flx="channel.lexical-channel-textarea-content.mention-everyone-popout"
 						/>
 					),
 					position: 'top-start',
@@ -544,9 +567,20 @@ export const LexicalChannelTextareaContent = observer(
 			);
 			if (!result.success) {
 				if (result.error === 'too_many_attachments') {
-					ModalCommands.push(modal(() => <TooManyAttachmentsModal />));
+					ModalCommands.push(
+						modal(() => (
+							<TooManyAttachmentsModal data-flx="channel.lexical-channel-textarea-content.handle-file-button-click.too-many-attachments-modal" />
+						)),
+					);
 				} else if (result.error === 'file_size_too_large') {
-					ModalCommands.push(modal(() => <FileSizeTooLargeModal oversizedFileCount={result.oversizedFileCount} />));
+					ModalCommands.push(
+						modal(() => (
+							<FileSizeTooLargeModal
+								oversizedFileCount={result.oversizedFileCount}
+								data-flx="channel.lexical-channel-textarea-content.handle-file-button-click.file-size-too-large-modal"
+							/>
+						)),
+					);
 				}
 				return;
 			}
@@ -573,9 +607,20 @@ export const LexicalChannelTextareaContent = observer(
 			);
 			if (!result.success) {
 				if (result.error === 'too_many_attachments') {
-					ModalCommands.push(modal(() => <TooManyAttachmentsModal />));
+					ModalCommands.push(
+						modal(() => (
+							<TooManyAttachmentsModal data-flx="channel.lexical-channel-textarea-content.handle-upload-message-as-file.too-many-attachments-modal" />
+						)),
+					);
 				} else if (result.error === 'file_size_too_large') {
-					ModalCommands.push(modal(() => <FileSizeTooLargeModal oversizedFileCount={result.oversizedFileCount} />));
+					ModalCommands.push(
+						modal(() => (
+							<FileSizeTooLargeModal
+								oversizedFileCount={result.oversizedFileCount}
+								data-flx="channel.lexical-channel-textarea-content.handle-upload-message-as-file.file-size-too-large-modal"
+							/>
+						)),
+					);
 				}
 				return;
 			}
@@ -802,22 +847,9 @@ export const LexicalChannelTextareaContent = observer(
 		}, [channel.guildId]);
 		const handleEditorKeyDown = useCallback(
 			(event: React.KeyboardEvent<HTMLElement>) => {
-				const handle = handleRef.current;
-				let selection: ComposerSelectionRange | null = null;
-				if (handle !== null) {
-					selection = handle.getSelection();
-				}
-				const hasSelectionRange = selection ? selection.start !== selection.end : false;
-				const inboxCombo = Keybind.getByAction('chat_toggle_inbox').combo;
-				if (doesEventMatchShortcut(event, inboxCombo) && !hasSelectionRange && value.trim().length === 0) {
-					event.preventDefault();
-					event.stopPropagation();
-					ComponentDispatch.dispatch('INBOX_OPEN');
-					return;
-				}
 				handleEscapeKey(event);
 			},
-			[handleEscapeKey, value],
+			[handleEscapeKey],
 		);
 		const handleSubmit = useCallback(() => {
 			if (!canSubmit) {
@@ -1065,6 +1097,7 @@ export const LexicalChannelTextareaContent = observer(
 											}
 										}
 							}
+							data-flx="channel.lexical-channel-textarea-content.open-plus-menu.textarea-plus-menu"
 						/>
 					),
 					{
@@ -1148,7 +1181,13 @@ export const LexicalChannelTextareaContent = observer(
 		}
 		let topBarContent: React.ReactNode = null;
 		if (isMobileEditBarVisible) {
-			topBarContent = <EditBar channel={channel} onCancel={handleCancelEdit} />;
+			topBarContent = (
+				<EditBar
+					channel={channel}
+					onCancel={handleCancelEdit}
+					data-flx="channel.lexical-channel-textarea-content.edit-bar"
+				/>
+			);
 		} else if (referencedMessage !== null) {
 			topBarContent = (
 				<ReplyBar
@@ -1156,11 +1195,15 @@ export const LexicalChannelTextareaContent = observer(
 					shouldReplyMention={shouldReplyMention}
 					setShouldReplyMention={(mentioning) => MessageCommands.setReplyMentioning(channel.id, mentioning)}
 					channel={channel}
+					data-flx="channel.lexical-channel-textarea-content.reply-bar"
 				/>
 			);
 		}
 		const renderSection = (content: React.ReactNode, sectionClassName?: string) => (
-			<flx-channel-textarea-section className={flxElementClassName(wrapperStyles.stackSection, sectionClassName)}>
+			<flx-channel-textarea-section
+				className={flxElementClassName(wrapperStyles.stackSection, sectionClassName)}
+				data-flx="channel.lexical-channel-textarea-content.render-section.flx-channel-textarea-section"
+			>
 				{content}
 			</flx-channel-textarea-section>
 		);
@@ -1178,21 +1221,40 @@ export const LexicalChannelTextareaContent = observer(
 						textareaInputDisabled && wrapperStyles.disabled,
 						!mobileLayout.enabled && styles.textareaOuterRow,
 					)}
+					data-flx="channel.lexical-channel-textarea-content.textarea-outer"
 				>
-					<flx-channel-textarea-status-rail className={flxElementClassName(wrapperStyles.statusRail)}>
-						<flx-channel-textarea-status-rail-left className={flxElementClassName(wrapperStyles.statusRailLeft)}>
+					<flx-channel-textarea-status-rail
+						className={flxElementClassName(wrapperStyles.statusRail)}
+						data-flx="channel.lexical-channel-textarea-content.flx-channel-textarea-status-rail"
+					>
+						<flx-channel-textarea-status-rail-left
+							className={flxElementClassName(wrapperStyles.statusRailLeft)}
+							data-flx="channel.lexical-channel-textarea-content.flx-channel-textarea-status-rail-left"
+						>
 							{isTypingStatusVisible && (
-								<flx-channel-textarea-typing-slot className={flxElementClassName(wrapperStyles.statusTypingSlot)}>
-									<TypingUsers channel={channel} withText={true} showAvatars={true} />
+								<flx-channel-textarea-typing-slot
+									className={flxElementClassName(wrapperStyles.statusTypingSlot)}
+									data-flx="channel.lexical-channel-textarea-content.flx-channel-textarea-typing-slot"
+								>
+									<TypingUsers
+										channel={channel}
+										withText={true}
+										showAvatars={true}
+										data-flx="channel.lexical-channel-textarea-content.typing-users"
+									/>
 								</flx-channel-textarea-typing-slot>
 							)}
 						</flx-channel-textarea-status-rail-left>
 						{isSlowmodeIndicatorVisible && (
-							<flx-channel-textarea-slowmode-slot className={flxElementClassName(wrapperStyles.statusSlowmodeSlot)}>
+							<flx-channel-textarea-slowmode-slot
+								className={flxElementClassName(wrapperStyles.statusSlowmodeSlot)}
+								data-flx="channel.lexical-channel-textarea-content.flx-channel-textarea-slowmode-slot"
+							>
 								<SlowmodeIndicator
 									slowmodeRemaining={slowmodeRemaining}
 									slowmodeDuration={channel.rateLimitPerUser * 1000}
 									isImmune={isSlowmodeImmune}
+									data-flx="channel.lexical-channel-textarea-content.slowmode-indicator"
 								/>
 							</flx-channel-textarea-slowmode-slot>
 						)}
@@ -1206,24 +1268,40 @@ export const LexicalChannelTextareaContent = observer(
 							)}
 							{slashCommandState.activeSlot !== null && (
 								<div className={wrapperStyles.composerActionRow} data-flx="channel.textarea.slash-command-action-row">
-									<SlashCommandParamBar activeSlot={slashCommandState.activeSlot} onClear={handleClearSlashCommand} />
+									<SlashCommandParamBar
+										activeSlot={slashCommandState.activeSlot}
+										onClear={handleClearSlashCommand}
+										data-flx="channel.lexical-channel-textarea-content.slash-command-param-bar"
+									/>
 								</div>
 							)}
 						</div>
 					)}
 					{showAttachments &&
-						renderSection(<ChannelAttachmentArea channelId={channel.id} />, styles.collapsibleSection)}
+						renderSection(
+							<ChannelAttachmentArea
+								channelId={channel.id}
+								data-flx="channel.lexical-channel-textarea-content.channel-attachment-area"
+							/>,
+							styles.collapsibleSection,
+						)}
 					{showStickers &&
 						renderSection(
-							<ChannelStickersArea channelId={channel.id} hasAttachments={hasAttachments} />,
+							<ChannelStickersArea
+								channelId={channel.id}
+								hasAttachments={hasAttachments}
+								data-flx="channel.lexical-channel-textarea-content.channel-stickers-area"
+							/>,
 							styles.collapsibleSection,
 						)}
 					{renderSection(
 						<flx-channel-textarea-box
 							className={flxElementClassName(styles.mainWrapperDense, textareaInputDisabled && wrapperStyles.disabled)}
+							data-flx="channel.lexical-channel-textarea-content.main-wrapper-dense"
 						>
 							<flx-channel-textarea-upload-column
 								className={flxElementClassName(styles.uploadButtonColumn, styles.sideButtonPadding)}
+								data-flx="channel.lexical-channel-textarea-content.upload-button-column"
 							>
 								<TextareaButton
 									iconProps={PLUS_ICON_PROPS}
@@ -1236,13 +1314,18 @@ export const LexicalChannelTextareaContent = observer(
 									forceHover={!slashCommandState.hasSlots && plusContextMenuOpen}
 									className={plusContextMenuOpen ? styles.plusButtonAboveBackdrop : undefined}
 									ref={plusButtonRef}
+									data-flx="channel.lexical-channel-textarea-content.plus-button-above-backdrop.clear-slash-command"
 								/>
 							</flx-channel-textarea-upload-column>
 							<flx-channel-textarea-content
 								ref={contentAreaRef}
 								className={flxElementClassName(styles.contentAreaDense)}
+								data-flx="channel.lexical-channel-textarea-content.content-area-dense"
 							>
-								<flx-channel-textarea-composer className={flxElementClassName(lexicalStyles.composerHost)}>
+								<flx-channel-textarea-composer
+									className={flxElementClassName(lexicalStyles.composerHost)}
+									data-flx="channel.lexical-channel-textarea-content.flx-channel-textarea-composer"
+								>
 									<LexicalComposerInput
 										placeholder={placeholderText}
 										disabled={textareaInputDisabled}
@@ -1280,6 +1363,7 @@ export const LexicalChannelTextareaContent = observer(
 											setIsInputAreaFocused(false);
 										}}
 										onSlashCommandStateChange={setSlashCommandState}
+										data-flx="channel.lexical-channel-textarea-content.lexical-composer-input.editor-change"
 									/>
 								</flx-channel-textarea-composer>
 							</flx-channel-textarea-content>
@@ -1291,7 +1375,10 @@ export const LexicalChannelTextareaContent = observer(
 								showStickersButton={showStickersButton}
 								showEmojiButton={showEmojiButton}
 								showMessageSendButton={showMessageSendButton}
-								showVoiceMessageButton={false}
+								canRecordVoice={canAttachFilesInChannel(channel)}
+								isEditingMessage={isEditingMessageInComposer || editingMessageId != null}
+								hasPendingSticker={hasPendingSticker}
+								voiceTooltipAnchorRef={contentAreaRef}
 								expressionPickerOpen={expressionPickerOpen}
 								selectedTab={selectedTab}
 								isMobile={mobileLayout.enabled}
@@ -1304,6 +1391,7 @@ export const LexicalChannelTextareaContent = observer(
 								onExpressionPickerToggle={handleExpressionPickerTabToggle}
 								onSubmit={handleSubmit}
 								channelId={channel.id}
+								data-flx="channel.lexical-channel-textarea-content.textarea-buttons.submit"
 							/>
 						</flx-channel-textarea-box>,
 						styles.inputSection,
@@ -1313,6 +1401,7 @@ export const LexicalChannelTextareaContent = observer(
 						maxLength={maxMessageLength}
 						canUpgrade={maxMessageLength < premiumMaxLength}
 						premiumMaxLength={premiumMaxLength}
+						data-flx="channel.lexical-channel-textarea-content.message-character-counter"
 					/>
 				</flx-channel-textarea>
 				{mobileLayout.enabled && (
@@ -1322,6 +1411,7 @@ export const LexicalChannelTextareaContent = observer(
 							onClose={() => setExpressionPickerOpen(false)}
 							channelId={channel.id}
 							onEmojiSelect={handleEmojiSelect}
+							data-flx="channel.lexical-channel-textarea-content.expression-picker-sheet"
 						/>
 						<MobileTextareaPlusBottomSheet
 							isOpen={mobilePlusSheetOpen}
@@ -1329,6 +1419,7 @@ export const LexicalChannelTextareaContent = observer(
 							onUploadFile={handleFileButtonClick}
 							textareaValue={value}
 							onUploadAsFile={handleUploadMessageAsFile}
+							data-flx="channel.lexical-channel-textarea-content.mobile-textarea-plus-bottom-sheet"
 						/>
 					</>
 				)}

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {VoiceEngineV2BridgeApi} from '@fluxer/voice_engine_v2/bridge';
+import type {VoiceEngineV2BridgeHardwareEncoderApi} from '@fluxer/voice_engine_v2/bridge';
 import type {
 	AuthenticationResponseJSON,
 	PublicKeyCredentialCreationOptionsJSON,
@@ -120,7 +120,6 @@ export interface DesktopWindowBehaviorSettings {
 	activeSmoothScrolling: boolean;
 	middleClickAutoscroll: boolean;
 	activeMiddleClickAutoscroll: boolean;
-	firstClickPassThroughWhenUnfocused: boolean;
 }
 
 export interface ThemeLocalFileReference {
@@ -249,11 +248,6 @@ export interface DownloadFileResult {
 	canceled?: boolean;
 	path?: string;
 	error?: string;
-}
-
-export interface SwitchInstanceUrlOptions {
-	instanceUrl: string;
-	desktopHandoffCode?: string | null;
 }
 
 export type MediaAccessType = 'microphone' | 'camera' | 'screen' | 'audio-capture';
@@ -780,12 +774,10 @@ export interface ElectronAPI {
 	passkeyIsSupported: () => Promise<boolean>;
 	passkeyAuthenticate: (options: PublicKeyCredentialRequestOptionsJSON) => Promise<AuthenticationResponseJSON>;
 	passkeyRegister: (options: PublicKeyCredentialCreationOptionsJSON) => Promise<RegistrationResponseJSON>;
-	switchInstanceUrl: (options: SwitchInstanceUrlOptions) => Promise<void>;
-	consumeDesktopHandoffCode: () => Promise<string | null>;
 	virtmic: VirtmicApi;
 	nativeAudio: NativeAudioApi;
 	nativeScreenCapture: NativeScreenCaptureApi;
-	voiceEngine: VoiceEngineV2BridgeApi;
+	voiceEngine: VoiceEngineV2BridgeHardwareEncoderApi;
 	getDesktopSources: (
 		types: Array<'screen' | 'window'>,
 		requestId?: string,

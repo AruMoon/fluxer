@@ -1381,6 +1381,9 @@
         "msgid": "File ordering"
       },
       {
+        "msgid": "Filtering by {language}"
+      },
+      {
         "msgid": "Finish"
       },
       {
@@ -1406,6 +1409,9 @@
       },
       {
         "msgid": "Granted"
+      },
+      {
+        "msgid": "Help translate {PRODUCT_NAME} into your language on <0>{I18N_WEBLATE_DOMAIN}</0>."
       },
       {
         "msgid": "How much of the member's recent message history to delete."
@@ -1742,6 +1748,12 @@
       },
       {
         "msgid": "online"
+      },
+      {
+        "msgid": "{PRODUCT_NAME} needs to restart for the title bar change to take effect."
+      },
+      {
+        "msgid": "{channelHeading}, {mentionCount, plural, one {# mention} other {# mentions}}"
       },
       {
         "msgid": "{count, plural, =0 {∞ No limit} one {# participant} other {# participants}}"
@@ -2751,6 +2763,9 @@
       },
       {
         "msgid": "spoiler"
+      },
+      {
+        "msgid": "{channelHeading}, {mentionCount, plural, one {# mention} other {# mentions}}"
       },
       {
         "msgid": "{channelHeading}, {mentionCount} mentions"

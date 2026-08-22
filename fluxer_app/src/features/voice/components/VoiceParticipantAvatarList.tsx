@@ -7,7 +7,7 @@ import {AvatarStack} from '@app/features/ui/avatars/AvatarStack';
 import {AvatarWithPresence} from '@app/features/ui/avatars/AvatarWithPresence';
 import * as ContextMenuCommands from '@app/features/ui/commands/ContextMenuCommands';
 import {Popout} from '@app/features/ui/popover/PopoverPopout';
-import {getAppZoomFactor} from '@app/features/ui/utils/AppZoomUtils';
+import {getAppRemScale} from '@app/features/ui/utils/AppZoomUtils';
 import {UserProfilePopout} from '@app/features/user/components/popouts/UserProfilePopout';
 import {useUserProfileHoverPreload} from '@app/features/user/hooks/useUserProfileHoverPreload';
 import type {User} from '@app/features/user/models/User';
@@ -262,7 +262,7 @@ interface VoiceParticipantPopoutRowProps {
 
 function VoiceParticipantPopoutRow({entry, guildId, channelId}: VoiceParticipantPopoutRowProps) {
 	const {i18n} = useLingui();
-	const displayName = NicknameUtils.getNickname(entry.user, guildId ?? undefined, channelId ?? undefined);
+	const displayName = NicknameUtils.getNickname(entry.user, guildId ?? null, channelId ?? undefined);
 	const participantName = displayName || i18n._(UNKNOWN_USER_DESCRIPTOR);
 	const {scheduleProfilePreload, cancelProfilePreload} = useUserProfileHoverPreload({
 		userId: entry.user.id,
@@ -405,7 +405,7 @@ export const VoiceParticipantSpeakingAvatarStack: React.FC<VoiceParticipantSpeak
 				event.stopPropagation();
 				const entry = sortedEntries[index];
 				if (!entry) return;
-				const displayName = NicknameUtils.getNickname(user, guildId ?? undefined, channelId ?? undefined);
+				const displayName = NicknameUtils.getNickname(user, guildId ?? null, channelId ?? undefined);
 				const participantName = displayName || i18n._(UNKNOWN_USER_DESCRIPTOR);
 				ContextMenuCommands.openFromEvent(event, ({onClose}) => (
 					<VoiceParticipantContextMenu
@@ -549,12 +549,12 @@ export const VoiceParticipantWrappedAvatarList: React.FC<VoiceParticipantWrapped
 			shouldAnimateAvatarChanges,
 		);
 		const gapPx = useResolvedWrappedAvatarGapPx(containerRef);
-		const slotSize = avatarSize * getAppZoomFactor() + gapPx;
+		const slotSize = avatarSize * getAppRemScale() + gapPx;
 		const handleContextMenu = useCallback(
 			(event: React.MouseEvent<HTMLElement>, entry: VoiceParticipantAvatarEntry) => {
 				event.preventDefault();
 				event.stopPropagation();
-				const displayName = NicknameUtils.getNickname(entry.user, guildId ?? undefined, channelId ?? undefined);
+				const displayName = NicknameUtils.getNickname(entry.user, guildId ?? null, channelId ?? undefined);
 				const participantName = displayName || i18n._(UNKNOWN_USER_DESCRIPTOR);
 				ContextMenuCommands.openFromEvent(event, ({onClose}) => (
 					<VoiceParticipantContextMenu

@@ -301,7 +301,10 @@ const SwitchAccountsMenu = observer(
 						const isCurrent = account.userId === currentAccountId;
 						const avatarUrl = getAccountAvatarUrl(account);
 						const displayName = getAccountDisplayName(account, '???');
-						const discriminator = account.userData?.discriminator ?? '0000';
+						const userData = account.userData;
+						const accountTag = userData
+							? NicknameUtils.formatTagForStreamerMode(`${userData.username}#${userData.discriminator}`)
+							: displayName;
 						return (
 							<FocusRing
 								key={account.userId}
@@ -344,7 +347,7 @@ const SwitchAccountsMenu = observer(
 												className={styles.accountMenuDiscriminator}
 												data-flx="app.floating.user-area-popout.switch-accounts-menu.account-menu-discriminator"
 											>
-												#{discriminator}
+												{accountTag}
 											</span>
 										</span>
 										{isCurrent && (
@@ -515,7 +518,7 @@ export const UserAreaPopout = observer(() => {
 	const accentColor = getUserAccentColor(currentUser, profileData?.accent_color);
 	const borderColor = accentColor;
 	const bannerColor = accentColor;
-	const displayName = currentUser ? NicknameUtils.getNickname(currentUser) : '';
+	const displayName = currentUser ? NicknameUtils.getNickname(currentUser, null) : '';
 	const customStatus = currentUserId ? Presence.getCustomStatus(currentUserId) : null;
 	const hasCustomStatus = Boolean(normalizeCustomStatus(customStatus));
 	const popoutContainerRef = useRef<HTMLDivElement | null>(null);

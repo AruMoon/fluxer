@@ -51,6 +51,7 @@ export interface LexicalRichInputProps {
 	richInputRef?: React.Ref<LexicalRichInputHandle>;
 	onChange?: (display: string, segments: Array<MentionSegment>, wire: string) => void;
 	onSubmit?: () => void;
+	submitOnEnter?: boolean;
 	onKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
 	onFocus?: () => void;
 	onBlur?: () => void;
@@ -85,6 +86,7 @@ export const LexicalRichInput = ({
 	richInputRef,
 	onChange,
 	onSubmit,
+	submitOnEnter,
 	onKeyDown,
 	onFocus,
 	onBlur,
@@ -207,6 +209,7 @@ export const LexicalRichInput = ({
 				size === 'form' && composerStyles.formSize,
 				className,
 			)}
+			data-flx="lexical.composer.lexical-rich-input.flx-lexical-rich-input"
 		>
 			<LexicalComposerInput
 				placeholder={placeholder}
@@ -225,7 +228,7 @@ export const LexicalRichInput = ({
 				emojiShortcodeResolver={emojiShortcodeResolver}
 				channelId={channel == null ? undefined : channel.id}
 				guildId={channel == null ? undefined : channel.guildId}
-				submitOnEnter={singleLine}
+				submitOnEnter={submitOnEnter ?? singleLine}
 				autocompleteOptions={autocompleteOptions}
 				autocompleteType={autocompleteType}
 				autocompleteQuery={autocompleteQuery}
@@ -241,6 +244,7 @@ export const LexicalRichInput = ({
 				onKeyDown={onKeyDown}
 				onFocus={onFocus}
 				onBlur={onBlur}
+				data-flx="lexical.composer.lexical-rich-input.lexical-composer-input.emit-change"
 			/>
 		</flx-lexical-rich-input>
 	);

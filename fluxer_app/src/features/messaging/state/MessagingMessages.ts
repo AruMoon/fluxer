@@ -11,6 +11,7 @@ import {ChannelMessages} from '@app/features/messaging/state/ChannelMessages';
 import type {ReactionEmoji} from '@app/features/messaging/utils/ReactionUtils';
 import SelectedChannel from '@app/features/navigation/state/SelectedChannel';
 import SelectedGuild from '@app/features/navigation/state/SelectedGuild';
+import type {UnreadJumpAnchor} from '@app/features/read_state/state/ReadStates';
 import Relationships from '@app/features/relationship/state/Relationships';
 import Dimension from '@app/features/ui/state/Dimension';
 import Users from '@app/features/user/state/Users';
@@ -209,13 +210,13 @@ class Messages {
 	}
 
 	@action
-	preloadLatestPage(channelId: string, guildId?: string | null): boolean {
+	preloadLatestPage(channelId: string, guildId?: string | null, unreadAnchor?: UnreadJumpAnchor | null): boolean {
 		if (!this.shouldPreloadLatestPage(channelId)) {
 			return false;
 		}
 		const channel = Channels.getChannel(channelId);
 		const resolvedGuildId = guildId ?? channel?.guildId ?? (channel?.isPrivate() ? ME : undefined);
-		this.handleChannelSelect({guildId: resolvedGuildId ?? undefined, channelId});
+		this.handleChannelSelect({guildId: resolvedGuildId ?? undefined, channelId, unreadAnchor});
 		return true;
 	}
 
@@ -292,7 +293,7 @@ class Messages {
 	}
 
 	@action
-	handleConnectionOpen(): boolean {
+	handleConnectionOpen(resolveUnreadAnchor: (channelId: string) => UnreadJumpAnchor | null): boolean {
 		const selectedChannelId = SelectedChannel.currentChannelId;
 		let didHydrateSelectedChannel = false;
 		if (selectedChannelId) {
@@ -306,7 +307,10 @@ class Messages {
 		}
 		ChannelMessages.forEach((messages) => {
 			if (messages.channelId === selectedChannelId && Channels.getChannel(messages.channelId) != null) {
-				this.startChannelHydration(messages.channelId, {forceScrollToBottom: this.pendingFullHydration});
+				this.startChannelHydration(messages.channelId, {
+					forceScrollToBottom: this.pendingFullHydration,
+					unreadAnchor: resolveUnreadAnchor(messages.channelId),
+				});
 				didHydrateSelectedChannel = true;
 			} else {
 				this.clearMessages(messages.channelId);
@@ -322,7 +326,18 @@ class Messages {
 			const messages = ChannelMessages.getOrCreate(selectedChannelId);
 			if (!messages.ready && !messages.loadingMore && messages.length === 0) {
 				this.commitMessages(messages.mutate({loadingMore: true}));
-				MessageCommands.fetchMessages(selectedChannelId, null, null, MAX_MESSAGES_PER_CHANNEL);
+				const unreadAnchor = resolveUnreadAnchor(selectedChannelId);
+				if (unreadAnchor != null) {
+					MessageCommands.jumpToMessage({
+						channelId: selectedChannelId,
+						messageId: unreadAnchor.messageId,
+						offset: unreadAnchor.offset,
+						flash: false,
+						jumpType: JumpTypes.INSTANT,
+					});
+				} else {
+					MessageCommands.fetchMessages(selectedChannelId, null, null, MAX_MESSAGES_PER_CHANNEL);
+				}
 				didHydrateSelectedChannel = true;
 			}
 		}
@@ -334,20 +349,38 @@ class Messages {
 		channelId: string,
 		options: {
 			forceScrollToBottom?: boolean;
+			unreadAnchor?: UnreadJumpAnchor | null;
 		} = {},
 	): void {
 		if (!Channels.getChannel(channelId)) return;
-		const {forceScrollToBottom = false} = options;
+		const {forceScrollToBottom = false, unreadAnchor = null} = options;
 		const messages = ChannelMessages.getOrCreate(channelId);
 		this.commitMessages(messages.mutate({loadingMore: true, ready: false, error: false}));
 		if (forceScrollToBottom) {
 			Dimension.updateChannelDimensions(channelId, 1, 1, 0);
+			MessageCommands.fetchMessages(channelId, null, null, MAX_MESSAGES_PER_CHANNEL);
+			return;
+		}
+		if (unreadAnchor != null) {
+			MessageCommands.jumpToMessage({
+				channelId,
+				messageId: unreadAnchor.messageId,
+				offset: unreadAnchor.offset,
+				flash: false,
+				jumpType: JumpTypes.INSTANT,
+			});
+			return;
 		}
 		MessageCommands.fetchMessages(channelId, null, null, MAX_MESSAGES_PER_CHANNEL);
 	}
 
 	@action
-	handleChannelSelect(action: {guildId?: string; channelId?: string | null; messageId?: string}): boolean {
+	handleChannelSelect(action: {
+		guildId?: string;
+		channelId?: string | null;
+		messageId?: string;
+		unreadAnchor?: UnreadJumpAnchor | null;
+	}): boolean {
 		const channelId = action.channelId ?? action.guildId;
 		if (channelId == null || channelId === ME) {
 			return false;
@@ -390,6 +423,17 @@ class Messages {
 		}
 		this.commitMessages(messages.mutate({loadingMore: true}));
 		this.notifyChange();
+		const unreadAnchor = action.unreadAnchor ?? null;
+		if (unreadAnchor != null) {
+			MessageCommands.jumpToMessage({
+				channelId,
+				messageId: unreadAnchor.messageId,
+				offset: unreadAnchor.offset,
+				flash: false,
+				jumpType: JumpTypes.INSTANT,
+			});
+			return false;
+		}
 		MessageCommands.fetchMessages(channelId, null, null, MAX_MESSAGES_PER_CHANNEL);
 		return false;
 	}

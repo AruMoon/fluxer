@@ -65,6 +65,12 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_S3_BUCKET_REPORTS: {path: ['s3', 'buckets', 'reports']},
 	FLUXER_S3_BUCKET_HARVESTS: {path: ['s3', 'buckets', 'harvests']},
 	FLUXER_S3_BUCKET_STATIC: {path: ['s3', 'buckets', 'static']},
+	FLUXER_S3_DOWNLOADS_ENDPOINT: {path: ['s3_downloads', 'endpoint']},
+	FLUXER_S3_DOWNLOADS_PUBLIC_ENDPOINT: {path: ['s3_downloads', 'presigned_url_base']},
+	FLUXER_S3_DOWNLOADS_FORCE_PATH_STYLE: {path: ['s3_downloads', 'force_path_style'], parse: parseEnvValue},
+	FLUXER_S3_DOWNLOADS_REGION: {path: ['s3_downloads', 'region']},
+	FLUXER_S3_DOWNLOADS_ACCESS_KEY_ID: {path: ['s3_downloads', 'access_key_id']},
+	FLUXER_S3_DOWNLOADS_SECRET_ACCESS_KEY: {path: ['s3_downloads', 'secret_access_key']},
 	FLUXER_NATS_URL: {path: ['services', 'nats', 'core_url']},
 	FLUXER_NATS_CORE_URL: {path: ['services', 'nats', 'core_url']},
 	FLUXER_NATS_JETSTREAM_URL: {path: ['services', 'nats', 'jetstream_url']},
@@ -73,6 +79,10 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_API_IP_BAN_EXEMPT_IPS: {path: ['services', 'api', 'ip_ban_exempt_ips'], parse: parseCsv},
 	FLUXER_API_PRESIGNED_ATTACHMENT_UPLOADS_ENABLED: {
 		path: ['services', 'api', 'presigned_attachment_uploads_enabled'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_PRESIGNED_DOWNLOADS_ENABLED: {
+		path: ['services', 'api', 'presigned_downloads_enabled'],
 		parse: parseEnvValue,
 	},
 	FLUXER_API_WORKER_MODE: {path: ['services', 'api', 'worker', 'mode']},
@@ -84,6 +94,30 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	},
 	FLUXER_API_WORKER_ENABLE_VOICE_RECONCILIATION: {
 		path: ['services', 'api', 'worker', 'enable_voice_reconciliation'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_INTERVAL_MS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'interval_ms'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_STAGGER_DELAY_MS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'stagger_delay_ms'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_LOCK_TTL_SECONDS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'lock_ttl_seconds'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_CADENCE_TTL_SECONDS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'cadence_ttl_seconds'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_GATEWAY_ONLY_GRACE_MS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'gateway_only_grace_ms'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_WORKER_VOICE_RECONCILIATION_LIVEKIT_ONLY_GRACE_MS: {
+		path: ['services', 'api', 'worker', 'voice_reconciliation', 'livekit_only_grace_ms'],
 		parse: parseEnvValue,
 	},
 	FLUXER_API_WORKER_LANE_CONCURRENCY_OVERRIDES: {

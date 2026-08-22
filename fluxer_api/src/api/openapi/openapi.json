@@ -26040,11 +26040,18 @@
 										"anyOf": [{"type": "string"}, {"type": "null"}],
 										"description": "The operating system of the requesting device"
 									},
+									"device": {
+										"enum": ["mobile", "desktop"],
+										"type": "string",
+										"x-enumNames": ["mobile", "desktop"],
+										"description": "Device class of the requesting device, decided by the server"
+									},
 									"location": {
 										"anyOf": [{"$ref": "#/components/schemas/AuthSessionLocation"}, {"type": "null"}],
 										"description": "The approximate location of the requesting device"
 									}
-								}
+								},
+								"required": ["device"]
 							},
 							{"type": "null"}
 						],
@@ -26288,11 +26295,18 @@
 										"anyOf": [{"type": "string"}, {"type": "null"}],
 										"description": "The browser reported by the client"
 									},
+									"device": {
+										"enum": ["mobile", "desktop"],
+										"type": "string",
+										"x-enumNames": ["mobile", "desktop"],
+										"description": "Device class of the session, decided by the server"
+									},
 									"location": {
 										"anyOf": [{"$ref": "#/components/schemas/AuthSessionLocation"}, {"type": "null"}],
 										"description": "The geolocation data sent by the client"
 									}
-								}
+								},
+								"required": ["device"]
 							},
 							{"type": "null"}
 						],
@@ -27388,9 +27402,9 @@
 								"limit": {
 									"type": "integer",
 									"minimum": 1,
-									"maximum": 25,
+									"maximum": 50,
 									"format": "int32",
-									"description": "Number of messages to return for this channel (1-25)"
+									"description": "Number of messages to return for this channel (1-50)"
 								},
 								"before": {"$ref": "#/components/schemas/SnowflakeType"},
 								"after": {"$ref": "#/components/schemas/SnowflakeType"},
@@ -29747,6 +29761,7 @@
 								"id": {"type": "string", "pattern": "^(0|[1-9][0-9]*)$", "description": "Guild ID"},
 								"name": {"type": "string", "description": "Guild name"},
 								"icon": {"anyOf": [{"type": "string"}, {"type": "null"}], "description": "Guild icon hash"},
+								"banner": {"anyOf": [{"type": "string"}, {"type": "null"}], "description": "Guild banner hash"},
 								"description": {
 									"anyOf": [{"type": "string"}, {"type": "null"}],
 									"description": "Discovery description"
@@ -29775,9 +29790,21 @@
 						},
 						"description": "Discovery guild results"
 					},
-					"total": {"type": "number", "description": "Total number of matching guilds"}
+					"total": {"type": "number", "description": "Total number of matching guilds"},
+					"category_counts": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"category_type": {"type": "number", "description": "Discovery category type"},
+								"count": {"type": "number", "description": "Number of matching guilds in this category"}
+							},
+							"required": ["category_type", "count"]
+						},
+						"description": "Match counts per category for the current filters, ignoring the category filter"
+					}
 				},
-				"required": ["guilds", "total"]
+				"required": ["guilds", "total", "category_counts"]
 			},
 			"DonationCheckoutResponse": {
 				"type": "object",
@@ -33226,12 +33253,20 @@
 					"payment_intent_id": {"anyOf": [{"type": "string"}, {"type": "null"}]},
 					"charge_id": {"anyOf": [{"type": "string"}, {"type": "null"}]},
 					"refund_id": {"anyOf": [{"type": "string"}, {"type": "null"}]},
-					"refunded_amount_cents": {"type": "integer", "format": "int53"},
+					"refunded_amount_cents": {
+						"type": "integer",
+						"format": "int53",
+						"description": "Amount actually refunded so far, in the currency minor unit; 0 until the provider confirms success"
+					},
 					"invoice_amount_paid_cents": {"type": "integer", "format": "int53"},
 					"currency": {"type": "string"},
 					"subscription_id": {
 						"anyOf": [{"type": "string"}, {"type": "null"}],
 						"description": "Subscription that was cancelled along with the refund, when applicable"
+					},
+					"status": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Provider status of the refund (e.g. pending, succeeded, failed); money only moved once succeeded"
 					}
 				},
 				"required": [
@@ -33242,7 +33277,8 @@
 					"refunded_amount_cents",
 					"invoice_amount_paid_cents",
 					"currency",
-					"subscription_id"
+					"subscription_id",
+					"status"
 				]
 			},
 			"ReadStateAckResponse": {

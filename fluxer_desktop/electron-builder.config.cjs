@@ -44,8 +44,7 @@ if (targetNativeArch === 'universal' && targetPlatform !== 'darwin') {
 	throw new Error(`ELECTRON_ARCH=universal is only supported for macOS builds, received platform ${targetPlatform}`);
 }
 
-const targetArchs =
-	electronArch && electronArch !== 'universal' ? [electronArch] : supportedTargetArchs;
+const targetArchs = electronArch && electronArch !== 'universal' ? [electronArch] : supportedTargetArchs;
 const macTargetArchs = targetNativeArch ? [targetNativeArch] : supportedTargetArchs;
 const winTargets = [
 	{
@@ -73,9 +72,9 @@ const fluxerNativePackages = [
 	'@fluxer/linux-evdev',
 	'@fluxer/linux-input-hook',
 	'@fluxer/system-hunspell',
+	'@fluxer/hardware-encoder',
 	'@fluxer/platform-info',
 	'@fluxer/webauthn',
-	'@fluxer/webrtc-sender',
 ];
 const fluxerNativePackagesByPlatform = {
 	darwin: [
@@ -87,7 +86,7 @@ const fluxerNativePackagesByPlatform = {
 		'@fluxer/macos-input-hook',
 		'@fluxer/platform-info',
 		'@fluxer/webauthn',
-		'@fluxer/webrtc-sender',
+		'@fluxer/hardware-encoder',
 	],
 	win32: [
 		'@fluxer/win-process-loopback',
@@ -98,7 +97,7 @@ const fluxerNativePackagesByPlatform = {
 		'@fluxer/windows-input-hook',
 		'@fluxer/platform-info',
 		'@fluxer/webauthn',
-		'@fluxer/webrtc-sender',
+		'@fluxer/hardware-encoder',
 	],
 	linux: [
 		'@fluxer/linux-audio-capture',
@@ -110,7 +109,7 @@ const fluxerNativePackagesByPlatform = {
 		'@fluxer/system-hunspell',
 		'@fluxer/platform-info',
 		'@fluxer/webauthn',
-		'@fluxer/webrtc-sender',
+		'@fluxer/hardware-encoder',
 	],
 };
 const velopackNativeFiles = [
@@ -217,10 +216,10 @@ const nativeRuntimeFilePatterns = [
 	'node_modules/@fluxer/webauthn/loader-diagnostics.cjs',
 	'node_modules/@fluxer/webauthn/*.node',
 	'node_modules/@fluxer/webauthn/*.so*',
-	'node_modules/@fluxer/webrtc-sender/package.json',
-	'node_modules/@fluxer/webrtc-sender/index.js',
-	'node_modules/@fluxer/webrtc-sender/index.d.ts',
-	'node_modules/@fluxer/webrtc-sender/*.node',
+	'node_modules/@fluxer/hardware-encoder/package.json',
+	'node_modules/@fluxer/hardware-encoder/index.js',
+	'node_modules/@fluxer/hardware-encoder/index.d.ts',
+	'node_modules/@fluxer/hardware-encoder/*.node',
 	'node_modules/.pnpm/@fluxer+*/node_modules/@fluxer/*/loader-diagnostics.cjs',
 	'node_modules/.pnpm/@fluxer+*/node_modules/@fluxer/*/pure.cjs',
 	'node_modules/.pnpm/@fluxer+win-process-loopback@*/node_modules/@fluxer/win-process-loopback/*.node',
@@ -250,7 +249,7 @@ const nativeRuntimeFilePatterns = [
 	'node_modules/.pnpm/@fluxer+platform-info@*/node_modules/@fluxer/platform-info/*.node',
 	'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.node',
 	'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.so*',
-	'node_modules/.pnpm/@fluxer+webrtc-sender@*/node_modules/@fluxer/webrtc-sender/*.node',
+	'node_modules/.pnpm/@fluxer+hardware-encoder@*/node_modules/@fluxer/hardware-encoder/*.node',
 ];
 const nativeBuildArtifactExcludes = [
 	'!node_modules/@fluxer/**/src/**/*',
@@ -440,8 +439,8 @@ function expectedNativeRuntimeArtifactsForArch(platform, arch) {
 		relativePath: `webauthn.${tag}.node`,
 	});
 	artifacts.push({
-		packageName: '@fluxer/webrtc-sender',
-		relativePath: `webrtc-sender.${tag}.node`,
+		packageName: '@fluxer/hardware-encoder',
+		relativePath: `hardware-encoder.${tag}.node`,
 	});
 	if (platform === 'darwin') {
 		artifacts.push({
@@ -1257,7 +1256,7 @@ module.exports = {
 		artifactName: '${productName}-${version}-portable-${os}-${arch}.${ext}',
 	},
 	linux: {
-		icon: `build_resources/${iconDir}/icon.png`,
+		icon: `build_resources/${iconDir}/1024x1024.png`,
 		category: 'Network;InstantMessaging;Chat;',
 		target: [
 			{

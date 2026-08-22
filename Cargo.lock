@@ -1625,6 +1625,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "encoding_rs"
+version = "0.8.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
 name = "entities"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1768,6 +1777,7 @@ dependencies = [
  "axum",
  "base64",
  "clap",
+ "fluxer_common",
  "hmac 0.13.0",
  "hyper 1.10.1",
  "hyper-util",
@@ -1791,6 +1801,7 @@ dependencies = [
  "anyhow",
  "base64",
  "fluxer-svc",
+ "fluxer_common",
  "hmac 0.13.0",
  "moka",
  "reqwest",
@@ -1827,6 +1838,7 @@ dependencies = [
  "cc",
  "clap",
  "criterion",
+ "fluxer_common",
  "hex",
  "hmac 0.13.0",
  "http 1.4.2",
@@ -1866,6 +1878,7 @@ dependencies = [
  "chrono",
  "criterion",
  "fluxer-svc",
+ "fluxer_common",
  "fluxer_markdown_parser",
  "futures",
  "hmac 0.13.0",
@@ -1931,8 +1944,10 @@ dependencies = [
  "anyhow",
  "base64",
  "chrono",
+ "encoding_rs",
  "entities",
  "fluxer-svc",
+ "fluxer_common",
  "hmac 0.13.0",
  "infer",
  "moka",
@@ -2028,10 +2043,14 @@ dependencies = [
  "aws-credential-types",
  "aws-sigv4",
  "axum",
+ "base64",
+ "hmac 0.13.0",
  "maxminddb",
  "moka",
  "reqwest",
  "serde_json",
+ "sha2 0.11.0",
+ "thiserror",
  "time",
  "tracing",
  "urlencoding",
