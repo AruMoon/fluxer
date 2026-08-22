@@ -151,20 +151,6 @@ jobs:
             "${IMAGE}:${VERSION}-arm64"
           docker buildx imagetools inspect "${IMAGE}:${VERSION}"
 
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SOURCE_SHA: ${{ github.sha }}
-          VERSION: ${{ needs.meta.outputs.build_version }}
-          RELEASE_BASELINE_SHA: ${{ vars.RELEASE_BASELINE_SHA }}
-        run: >-
-          cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- release
-          publish
-          --component "${{ inputs.image }}"
-          --build-version "${VERSION}"
-          --source-sha "${SOURCE_SHA}"
-          --previous-sha "${RELEASE_BASELINE_SHA}"
-
       - name: Advance moving image tags
         env:
           IMAGE: ghcr.io/${{ env.GHCR_OWNER }}/${{ inputs.image }}
