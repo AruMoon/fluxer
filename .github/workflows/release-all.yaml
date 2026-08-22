@@ -24,8 +24,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  approve:
+    name: approve release build
+    runs-on: ubuntu-24.04
+    environment: builds
+    timeout-minutes: 5
+    steps:
+      - name: approved
+        run: echo "Release build approved."
+
   meta:
     name: resolve metadata
+    needs: approve
     if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
