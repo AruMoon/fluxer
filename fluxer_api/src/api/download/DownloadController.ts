@@ -17,11 +17,28 @@ import {Config} from '../Config';
 import {OpenAPI} from '../middleware/ResponseTypeMiddleware';
 import type {HonoEnv} from '../types/HonoEnv';
 import {Validator} from '../Validator';
+import {resolveArtifactRoute} from './DownloadRouting';
 import type {DesktopChecksumFile, DownloadService, DownloadStreamResult} from './DownloadService';
-import {DESKTOP_REDIRECT_PREFIX, DOWNLOAD_PREFIX, UnsatisfiableRangeError} from './DownloadService';
+import {
+	DESKTOP_REDIRECT_PREFIX,
+	DOWNLOAD_PREFIX,
+	downloadCacheControlForKey,
+	UnsatisfiableRangeError,
+} from './DownloadService';
 
 function artifactFilename(key: string, filenameOverride?: string): string {
 	return filenameOverride ?? key.split('/').pop() ?? 'download';
+}
+
+function artifactRedirectResponse(location: string, cacheControl = 'no-store'): Response {
+	return new Response(null, {
+		status: 302,
+		headers: new Headers({
+			Location: location,
+			'Cache-Control': cacheControl,
+			'Accept-Ranges': 'bytes',
+		}),
+	});
 }
 
 function setCommonArtifactHeaders(
@@ -82,8 +99,12 @@ async function streamArtifactResponse(
 	cacheControl: string,
 	filenameOverride?: string,
 ): Promise<Response> {
+	const route = await resolveArtifactRoute({request: ctx.req.raw, downloadService, key, cacheControl});
+	if (route.kind === 'redirect') {
+		return artifactRedirectResponse(route.location, route.cacheControl);
+	}
 	if (ctx.req.method === 'HEAD') {
-		return headArtifactResponse(ctx, downloadService, key, cacheControl, filenameOverride);
+		return headArtifactResponse(ctx, downloadService, key, route.cacheControl, filenameOverride);
 	}
 	if (downloadService.isPresignedDownloadEnabled()) {
 		const location = await downloadService.getPresignedDownloadRedirect({
@@ -94,14 +115,7 @@ async function streamArtifactResponse(
 		if (!location) {
 			return ctx.text('Not Found', 404);
 		}
-		return new Response(null, {
-			status: 302,
-			headers: new Headers({
-				Location: location,
-				'Cache-Control': 'no-store',
-				'Accept-Ranges': 'bytes',
-			}),
-		});
+		return artifactRedirectResponse(location);
 	}
 	const range = ctx.req.header('range') ?? undefined;
 	let result: DownloadStreamResult | null;
@@ -112,7 +126,7 @@ async function streamArtifactResponse(
 			const headers = new Headers();
 			headers.set('Accept-Ranges', 'bytes');
 			headers.set('Content-Range', `bytes */${error.totalSize}`);
-			headers.set('Cache-Control', cacheControl);
+			headers.set('Cache-Control', route.cacheControl);
 			return new Response(null, {status: 416, headers});
 		}
 		throw error;
@@ -124,7 +138,7 @@ async function streamArtifactResponse(
 	setCommonArtifactHeaders(
 		headers,
 		key,
-		cacheControl,
+		route.cacheControl,
 		filenameOverride,
 		result.contentType,
 		result.contentDisposition,
@@ -290,7 +304,7 @@ export function DownloadController(routes: Hono<HonoEnv>): void {
 			if (!checksum) {
 				return ctx.text('Not Found', 404);
 			}
-			return checksumFileResponse(ctx, checksum, 'public, max-age=86400');
+			return checksumFileResponse(ctx, checksum, downloadCacheControlForKey(checksum.key));
 		},
 	);
 	routes.on(
@@ -316,7 +330,7 @@ export function DownloadController(routes: Hono<HonoEnv>): void {
 			if (!key) {
 				return ctx.text('Not Found', 404);
 			}
-			return streamArtifactResponse(ctx, downloadService, key, 'public, max-age=86400');
+			return streamArtifactResponse(ctx, downloadService, key, downloadCacheControlForKey(key));
 		},
 	);
 	routes.on(
@@ -340,7 +354,7 @@ export function DownloadController(routes: Hono<HonoEnv>): void {
 			if (!key) {
 				return ctx.text('Not Found', 404);
 			}
-			return streamArtifactResponse(ctx, downloadService, key, 'public, max-age=300');
+			return streamArtifactResponse(ctx, downloadService, key, downloadCacheControlForKey(key));
 		},
 	);
 }

@@ -70,9 +70,10 @@ const ACTIVE_CALL_DESCRIPTOR = msg({
 
 export function resolveDMListItemUnreadState(channelId: string): ChannelUnreadState {
 	return getChannelUnreadState({
+		hasUnread: ReadStates.hasUnread(channelId),
 		unreadCount: ReadStates.getUnreadCount(channelId),
 		mentionCount: ReadStates.getMentionCount(channelId),
-		isMuted: UserGuildSettings.isChannelMuted(null, channelId),
+		isMuted: UserGuildSettings.isChannelDirectlyMuted(null, channelId),
 		showFadedUnreadOnMutedChannels: Accessibility.showFadedUnreadOnMutedChannels,
 		unreadBadgesLevel: null,
 	});
@@ -124,7 +125,7 @@ const ResolvedDMListItem = observer(function ResolvedDMListItem({
 	const contextMenuOpen = useContextMenuHoverState(buttonRef, !isMobileExperience);
 	const [isFocused, setIsFocused] = useState(false);
 	const {keyboardModeEnabled} = KeyboardMode;
-	const isMuted = UserGuildSettings.isChannelMuted(null, channel.id);
+	const isMuted = UserGuildSettings.isChannelDirectlyMuted(null, channel.id);
 	const mentionCount = ReadStates.getMentionCount(channel.id);
 	const unreadState = resolveDMListItemUnreadState(channel.id);
 	const directMessageName = recipient ? NicknameUtils.getNickname(recipient, null, channel.id) : null;

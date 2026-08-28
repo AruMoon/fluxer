@@ -197,6 +197,7 @@ const FavoriteChannelResolvedItem = observer(
 		);
 		const refs = useMergeRefs([dragConnectorRef, dropConnectorRef, elementRef]);
 		const unreadCount = ReadStates.getUnreadCount(channel.id);
+		const hasUnread = ReadStates.hasUnread(channel.id);
 		const mentionCount = ReadStates.getMentionCount(channel.id);
 		const isGroupDM = channel.isGroupDM();
 		const isDM = channel.isDM();
@@ -206,11 +207,11 @@ const FavoriteChannelResolvedItem = observer(
 		const channelDisplayName = channel.isPrivate() ? ChannelUtils.getDMDisplayName(channel) : channel.name;
 		const displayName = favoriteChannel.nickname || channelDisplayName || i18n._(UNKNOWN_CHANNEL_DESCRIPTOR);
 		const isChannelDirectlyMuted = channel.guildId
-			? UserGuildSettings.isChannelMuted(channel.guildId, channel.id)
+			? UserGuildSettings.isChannelDirectlyMuted(channel.guildId, channel.id)
 			: false;
 		const isMuted =
 			isChannelDirectlyMuted ||
-			(channel.guildId ? UserGuildSettings.isCategoryMuted(channel.guildId, channel.id) : false);
+			(channel.guildId ? UserGuildSettings.isParentCategoryMuted(channel.guildId, channel.id) : false);
 		const unreadBadgesLevel = channel.guildId
 			? UserGuildSettings.resolvedUnreadBadgesLevel({
 					id: channel.id,
@@ -220,6 +221,7 @@ const FavoriteChannelResolvedItem = observer(
 				})
 			: null;
 		const unreadState = getChannelUnreadState({
+			hasUnread,
 			unreadCount,
 			mentionCount,
 			isMuted,
@@ -651,7 +653,7 @@ export const FavoritesChannelListContent = observer(() => {
 	const getScrollElement = useCallback(() => {
 		const scroller = scrollerRef.current;
 		if (scroller == null) return null;
-		return scroller.getScrollerNode();
+		return scroller.getViewportElement();
 	}, []);
 	useDragAutoScroll({active: isDraggingFavorite, getScrollElement});
 	const favorites = Favorites.sortedChannels;

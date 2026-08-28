@@ -164,7 +164,7 @@ export function useGuildMenuData(guild: Guild, options: UseGuildMenuDataOptions)
 	const isOwner = guild.isOwner(Authentication.currentUserId);
 	const developerMode = UserSettings.developerMode;
 	const canEditCommunityProfile = Users.getCurrentUser()?.isClaimed() ?? true;
-	const settings = UserGuildSettings.getSettings(guild.id);
+	const settings = UserGuildSettings.getSettingsForScope(guild.id);
 	const hideMutedChannels = settings?.hide_muted_channels ?? false;
 	const isMuted = settings?.muted ?? false;
 	const muteConfig = settings?.mute_config;
@@ -182,7 +182,7 @@ export function useGuildMenuData(guild: Guild, options: UseGuildMenuDataOptions)
 		() => ({
 			handleMarkAsRead: () => {
 				const channelIds = channels
-					.filter((channel) => ReadStates.getUnreadCount(channel.id) > 0)
+					.filter((channel) => ReadStates.isUnreadOrMentioned(channel.id))
 					.map((channel) => channel.id);
 				if (channelIds.length > 0) {
 					void ReadStateCommands.bulkAckChannels(channelIds);
@@ -298,7 +298,7 @@ export function useGuildMenuData(guild: Guild, options: UseGuildMenuDataOptions)
 				ModalCommands.runAfterBottomSheetClose(onClose, () => openReportGuildModal({i18n, guild}));
 			},
 			handleToggleHideMutedChannels: (checked: boolean) => {
-				const currentSettings = UserGuildSettings.getSettings(guild.id);
+				const currentSettings = UserGuildSettings.getSettingsForScope(guild.id);
 				const currentValue = currentSettings?.hide_muted_channels ?? false;
 				if (checked === currentValue) return;
 				UserGuildSettingsCommands.toggleHideMutedChannels(guild.id);

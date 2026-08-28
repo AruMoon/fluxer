@@ -35,6 +35,7 @@ export interface APIConfig {
 	nodeEnv: 'development' | 'production';
 	port: number;
 	ipBanExemptIps: Array<string>;
+	desktopGitHubRedirectCountries: ReadonlySet<string>;
 	cassandra: {
 		hosts: string;
 		port: number;
@@ -158,6 +159,7 @@ export interface APIConfig {
 		webhookSecret?: string;
 		fromEmail: string;
 		fromName: string;
+		appBaseUrl: string;
 		smtp?: {
 			host: string;
 			port: number;
@@ -204,6 +206,7 @@ export interface APIConfig {
 		apiSecret?: string;
 		webhookUrl?: string;
 		url?: string;
+		internalUrl?: string;
 		defaultRegion?: {
 			id: string;
 			name: string;
@@ -330,6 +333,7 @@ export interface APIConfig {
 	};
 	presignedAttachmentUploadsEnabled: boolean;
 	presignedDownloadsEnabled: boolean;
+	presignedHarvestDownloadsEnabled: boolean;
 	attachmentDecayEnabled: boolean;
 	deletionGracePeriodHours: number;
 	inactivityDeletionThresholdDays?: number;

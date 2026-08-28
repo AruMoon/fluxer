@@ -19,6 +19,26 @@ function trimTrailingSlash(url: string): string {
 	return url.replace(/\/+$/u, '');
 }
 
+function resolveEmailAppBaseUrl(master: MasterConfig): string {
+	const configuredAppBaseUrl = master.integrations.email.app_base_url.trim();
+	if (!configuredAppBaseUrl) return trimTrailingSlash(master.endpoints.app);
+	try {
+		const appBaseUrl = new URL(configuredAppBaseUrl);
+		if (
+			(appBaseUrl.protocol !== 'http:' && appBaseUrl.protocol !== 'https:') ||
+			appBaseUrl.username ||
+			appBaseUrl.password ||
+			appBaseUrl.search ||
+			appBaseUrl.hash
+		) {
+			throw new Error(`Invalid email app base URL: ${configuredAppBaseUrl}`);
+		}
+		return trimTrailingSlash(appBaseUrl.toString());
+	} catch {
+		throw new Error(`Invalid email app base URL: ${configuredAppBaseUrl}`);
+	}
+}
+
 function resolveGatewayInternalUrl(master: MasterConfig): string {
 	const configuredInternalGateway = (
 		master.internal as {
@@ -63,6 +83,18 @@ function normalizeIpBanExemptIps(values: Array<string>): Array<string> {
 		normalized.add(parsed.normalized);
 	}
 	return Array.from(normalized);
+}
+
+function normalizeCountryCodes(values: Array<string>, configName: string): ReadonlySet<string> {
+	const normalized = new Set<string>();
+	for (const value of values) {
+		const countryCode = value.trim().toUpperCase();
+		if (!/^[A-Z]{2}$/u.test(countryCode)) {
+			throw new Error(`${configName} contains an invalid ISO 3166-1 alpha-2 country code: ${value}`);
+		}
+		normalized.add(countryCode);
+	}
+	return normalized;
 }
 
 function mapPushProviderApps(
@@ -122,6 +154,10 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		nodeEnv: master.env === 'test' ? 'development' : master.env,
 		port: master.services.api.port,
 		ipBanExemptIps: normalizeIpBanExemptIps(master.services.api.ip_ban_exempt_ips),
+		desktopGitHubRedirectCountries: normalizeCountryCodes(
+			master.services.api.desktop_github_redirect_countries,
+			'FLUXER_API_DESKTOP_GITHUB_REDIRECT_COUNTRIES',
+		),
 		cassandra: {
 			hosts: cassandraSource?.hosts.join(',') ?? '',
 			port: cassandraSource?.port ?? 9042,
@@ -254,6 +290,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			webhookSecret: master.integrations.email.webhook_secret ?? undefined,
 			fromEmail: master.integrations.email.from_email,
 			fromName: master.integrations.email.from_name,
+			appBaseUrl: resolveEmailAppBaseUrl(master),
 			smtp: master.integrations.email.smtp
 				? {
 						host: master.integrations.email.smtp.host,
@@ -306,6 +343,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			apiSecret: master.integrations.voice.api_secret,
 			webhookUrl: master.integrations.voice.webhook_url,
 			url: master.integrations.voice.url,
+			internalUrl: master.integrations.voice.internal_url,
 			defaultRegion: master.integrations.voice.default_region,
 		},
 		stripe: {
@@ -432,6 +470,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		},
 		presignedAttachmentUploadsEnabled: master.services.api.presigned_attachment_uploads_enabled ?? false,
 		presignedDownloadsEnabled: master.services.api.presigned_downloads_enabled ?? false,
+		presignedHarvestDownloadsEnabled: master.services.api.presigned_harvest_downloads_enabled ?? true,
 		attachmentDecayEnabled: master.attachment_decay_enabled,
 		deletionGracePeriodHours: master.dev.test_mode_enabled ? 0.01 : master.deletion_grace_period_hours,
 		inactivityDeletionThresholdDays: master.inactivity_deletion_threshold_days,

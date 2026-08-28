@@ -230,6 +230,7 @@ export const ChannelItem = observer(
 		const isVoiceDragActive = draggingChannel?.channelType === ChannelTypes.GUILD_VOICE;
 		const shouldDimForVoiceDrag = Boolean(isVoiceDragActive && channelIsText && channel.parentId !== null);
 		const unreadCount = ReadStates.getUnreadCount(channel.id);
+		const hasUnread = ReadStates.hasUnread(channel.id);
 		const connectedVoiceGuildId = channelIsVoice ? MediaEngine.guildId : null;
 		const connectedVoiceChannelId = channelIsVoice ? MediaEngine.channelId : null;
 		const canManageChannels = Permission.can(Permissions.MANAGE_CHANNELS, channel);
@@ -238,7 +239,7 @@ export const ChannelItem = observer(
 		const canInvite = InviteUtils.canInviteToChannel(channel.id, channel.guildId);
 		const mobileLayout = MobileLayout;
 		const isMuted = UserGuildSettings.isGuildOrChannelMuted(guild.id, channel.id);
-		const isChannelDirectlyMuted = UserGuildSettings.isChannelMuted(guild.id, channel.id);
+		const isChannelDirectlyMuted = UserGuildSettings.isChannelDirectlyMuted(guild.id, channel.id);
 		const currentUserCount =
 			channelIsVoice && channel.userLimit != null && channel.userLimit > 0
 				? Object.keys(MediaEngine.getAllVoiceStatesInChannel(guild.id, channel.id)).length
@@ -265,6 +266,7 @@ export const ChannelItem = observer(
 			type: channel.type,
 		});
 		const unreadState = getChannelUnreadState({
+			hasUnread,
 			unreadCount,
 			mentionCount,
 			isMuted: isChannelDirectlyMuted,

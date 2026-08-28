@@ -10,18 +10,15 @@ import * as DraftCommands from '@app/features/messaging/commands/DraftCommands';
 import * as MessageCommands from '@app/features/messaging/commands/MessageCommands';
 import {AttachmentUploadConnectivityModal} from '@app/features/messaging/components/alerts/AttachmentUploadConnectivityModal';
 import {FileSizeTooLargeModal} from '@app/features/messaging/components/alerts/FileSizeTooLargeModal';
-import {MessageEditFailedModal} from '@app/features/messaging/components/alerts/MessageEditFailedModal';
-import {MessageEditTooQuickModal} from '@app/features/messaging/components/alerts/MessageEditTooQuickModal';
 import {MessageSendFailedModal} from '@app/features/messaging/components/alerts/MessageSendFailedModal';
 import {MessageSendTooQuickModal} from '@app/features/messaging/components/alerts/MessageSendTooQuickModal';
 import {
 	type MessageLocalSendRateLimitState,
-	type MessageQueueRequestOutcomeStatus,
 	resolveMessageLocalSendRateLimitDecision,
-	resolveMessageQueuePayloadRouteDecision,
 	resolveMessageQueueRequestOutcomeDecision,
 	resolveMessageQueueSendExecutionDecision,
 } from '@app/features/messaging/state/MessageQueueStateMachine';
+import {planTextareaAttachmentCancellation} from '@app/features/messaging/state/TextareaAttachmentUploadCancellation';
 import {
 	type ChunkedUploadPart,
 	type ChunkedUploadPlan,
@@ -32,11 +29,8 @@ import {exceedsMultipartFallbackRequestSize} from '@app/features/messaging/utils
 import {prepareAttachmentsForNonce} from '@app/features/messaging/utils/MessageAttachmentUtils';
 import {
 	type ApiAttachmentMetadata,
-	type ApiMessageEditAttachmentMetadata,
 	buildMessageCreateRequest,
 	type MessageCreateRequest,
-	type MessageEditRequest,
-	normalizeMessageEditContent,
 } from '@app/features/messaging/utils/MessageRequestUtils';
 import {resolveRetryAfterMs} from '@app/features/messaging/utils/RetryAfterUtils';
 import {MatureContentRejectedModal} from '@app/features/moderation/components/alerts/MatureContentRejectedModal';
@@ -50,7 +44,7 @@ import * as ModalCommands from '@app/features/ui/commands/ModalCommands';
 import {modal} from '@app/features/ui/commands/ModalCommands';
 import {formatUserSettingsPath} from '@app/features/user/components/settings_utils/SettingsConstants';
 import PrivacyPreferences from '@app/features/user/state/PrivacyPreferences';
-import {Queue, type QueueEntry} from '@app/lib/list/ListQueue';
+import {Queue} from '@app/lib/list/ListQueue';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import type {
 	AllowedMentions,
@@ -119,17 +113,7 @@ interface SendMessagePayload extends BaseMessagePayload {
 	tts?: boolean;
 }
 
-interface EditMessagePayload extends BaseMessagePayload {
-	type: 'edit';
-	messageId: string;
-	rateLimitRetryCount?: number;
-	content?: string;
-	allowedMentions?: AllowedMentions;
-	flags?: number;
-	attachments?: Array<ApiMessageEditAttachmentMetadata>;
-}
-
-export type MessageQueuePayload = SendMessagePayload | EditMessagePayload;
+export type MessageQueuePayload = SendMessagePayload;
 type MessageQueueCompletion<TResult> = {
 	retry: RetryError | null;
 	result?: TResult;
@@ -254,18 +238,9 @@ const isNetworkRequestError = (error: unknown): boolean => {
 	return error instanceof Error && error.message === 'Network error during request';
 };
 
-function isSendPayload(payload: MessageQueuePayload): payload is SendMessagePayload {
-	return payload.type === 'send';
-}
-
 function isRateLimitError(error: HttpError): boolean {
 	if (error.status !== 429) return false;
 	return !isSlowmodeError(error);
-}
-
-function getRequestErrorOutcomeStatus(error: HttpError): MessageQueueRequestOutcomeStatus {
-	if (isRateLimitError(error)) return 'rateLimit';
-	return 'failure';
 }
 
 function isSlowmodeError(error: HttpError): boolean {
@@ -354,13 +329,7 @@ export class MessageQueue extends Queue<MessageQueuePayload, RestResponse<Messag
 		}
 		const error = new Error(`Message queue capacity of ${this.maxSize} entries was reached`);
 		logger.error('Rejected message queue entry because capacity was reached', error);
-		if (message.type === 'send') {
-			this.handleSendError(message.channelId, message.nonce, error, i18n, message.hasAttachments);
-		} else {
-			ModalCommands.push(
-				modal(() => <MessageEditFailedModal data-flx="messaging.message-queue.message-edit-failed-modal--capacity" />),
-			);
-		}
+		this.handleSendError(message.channelId, message.nonce, error, i18n, message.hasAttachments);
 		try {
 			success(undefined, error);
 		} catch (callbackError) {
@@ -410,19 +379,7 @@ export class MessageQueue extends Queue<MessageQueuePayload, RestResponse<Messag
 		message: MessageQueuePayload,
 		completed: (err: RetryError | null, result?: RestResponse<Message>, error?: unknown) => void,
 	): Promise<unknown> | undefined {
-		const route = resolveMessageQueuePayloadRouteDecision({
-			payloadType: (message as {type?: string}).type,
-		});
-		switch (route.type) {
-			case 'send':
-				return this.handleSend(message as SendMessagePayload, completed);
-			case 'edit':
-				return this.handleEdit(message as EditMessagePayload, completed);
-			case 'unknown':
-				logger.error('Unknown message type, completing with null');
-				completed(null, undefined, new Error('Unknown message queue payload'));
-				return undefined;
-		}
+		return this.handleSend(message, completed);
 	}
 
 	private consumeLocalSendAllowance(channelId: string): boolean {
@@ -514,23 +471,6 @@ export class MessageQueue extends Queue<MessageQueuePayload, RestResponse<Messag
 		const controller = this.abortControllers.get(nonce);
 		controller?.abort();
 		this.abortControllers.delete(nonce);
-	}
-
-	cancelPendingSendRequests(channelId: string): Array<SendMessagePayload> {
-		const cancelled: Array<SendMessagePayload> = [];
-		const remaining: Array<QueueEntry<MessageQueuePayload, RestResponse<Message> | undefined>> = [];
-		while (this.queue.length > 0) {
-			const entry = this.queue.shift()!;
-			if (isSendPayload(entry.message) && entry.message.channelId === channelId) {
-				cancelled.push(entry.message);
-				this.cancelRequest(entry.message.nonce);
-			} else {
-				remaining.push(entry);
-			}
-		}
-		this.queue.push(...remaining);
-		logger.info('Cancel pending send requests', cancelled.length);
-		return cancelled;
 	}
 
 	async sendImmediately(payload: SendMessagePayload): Promise<RestResponse<Message> | undefined> {
@@ -713,16 +653,15 @@ export class MessageQueue extends Queue<MessageQueuePayload, RestResponse<Messag
 	}
 
 	private cancelTextareaAttachmentUploads(attachmentIds: ReadonlyArray<number>): void {
-		const channelIds = new Set<string>();
-		for (const attachmentId of attachmentIds) {
-			const upload = this.textareaAttachmentUploads.get(attachmentId);
-			if (!upload) continue;
-			channelIds.add(upload.channelId);
-			upload.requestAbortController.abort();
+		const plan = planTextareaAttachmentCancellation(this.textareaAttachmentUploads, attachmentIds);
+		for (const {attachmentId, upload} of plan.cancelled) {
 			upload.abortController.abort();
 			this.textareaAttachmentUploads.delete(attachmentId);
 		}
-		for (const channelId of channelIds) {
+		for (const controller of plan.requestControllersToAbort) {
+			controller.abort();
+		}
+		for (const channelId of plan.channelIds) {
 			this.disposeTextareaAttachmentUploadPrunerIfIdle(channelId);
 		}
 	}
@@ -1445,127 +1384,6 @@ export class MessageQueue extends Queue<MessageQueuePayload, RestResponse<Messag
 						retryAfter={retryAfter}
 						onRetry={onRetry}
 						data-flx="messaging.message-queue.message-send-too-quick-modal"
-					/>
-				);
-			}),
-		);
-	}
-
-	private async handleEdit(
-		payload: EditMessagePayload,
-		completed: (err: RetryError | null, result?: RestResponse<Message>, error?: unknown) => void,
-	): Promise<void> {
-		const {channelId, messageId, content, allowedMentions, flags, attachments} = payload;
-		const abortController = new AbortController();
-		this.abortControllers.set(messageId, abortController);
-		try {
-			logger.debug(`Editing message ${messageId} in channel ${channelId}`);
-			const body = this.buildEditRequestBody(content, allowedMentions, flags, attachments);
-			const response = await http.patch<Message>(Endpoints.CHANNEL_MESSAGE(channelId, messageId), {
-				body,
-				signal: abortController.signal,
-				suppressContentBlockedModal: true,
-			});
-			logger.debug(`Successfully edited message ${messageId} in channel ${channelId}`);
-			completed(null, response);
-		} catch (error) {
-			logger.error(`Failed to edit message ${messageId} in channel ${channelId}:`, error);
-			if (!(error instanceof HttpError)) {
-				ModalCommands.push(
-					modal(() => <MessageEditFailedModal data-flx="messaging.message-queue.message-edit-failed-modal--request" />),
-				);
-				completed(null, undefined, error);
-				return;
-			}
-			const responseErr = error;
-			const outcomeDecision = resolveMessageQueueRequestOutcomeDecision({
-				status: getRequestErrorOutcomeStatus(responseErr),
-			});
-			switch (outcomeDecision.type) {
-				case 'retryRateLimit':
-					this.handleEditRateLimit(payload, responseErr, completed);
-					break;
-				case 'completeFailure':
-				case 'completeSuccess':
-					this.showEditErrorModal(responseErr);
-					completed(null, undefined, responseErr);
-					break;
-			}
-		} finally {
-			this.abortControllers.delete(messageId);
-		}
-	}
-
-	private buildEditRequestBody(
-		content?: string,
-		allowedMentions?: AllowedMentions,
-		flags?: number,
-		attachments?: Array<ApiMessageEditAttachmentMetadata>,
-	): MessageEditRequest {
-		const body: MessageEditRequest = {};
-		if (content !== undefined) {
-			body.content = normalizeMessageEditContent(content);
-		}
-		if (allowedMentions !== undefined) {
-			body.allowed_mentions = allowedMentions;
-		}
-		if (flags !== undefined) {
-			body.flags = flags;
-		}
-		if (attachments !== undefined) {
-			body.attachments = attachments;
-		}
-		return body;
-	}
-
-	private handleEditRateLimit(
-		payload: EditMessagePayload,
-		error: HttpError,
-		completed: (err: RetryError | null, result?: RestResponse<Message>, error?: unknown) => void,
-	): void {
-		const retry = resolveMessageRateLimitRetry(error);
-		const retryCount = payload.rateLimitRetryCount === undefined ? 0 : payload.rateLimitRetryCount;
-		if (retry.automaticRetryDelayMs !== null && retryCount < MESSAGE_SEND_RATE_LIMIT_MAX_AUTOMATIC_RETRIES) {
-			payload.rateLimitRetryCount = retryCount + 1;
-			completed({retryAfter: retry.automaticRetryDelayMs}, undefined, error);
-			return;
-		}
-		completed(null, undefined, error);
-		this.handleEditRateLimitError(retryAfterMsToWholeSeconds(retry.retryAfterMs));
-	}
-
-	private showEditErrorModal(error: HttpError): void {
-		if (isFeatureDisabledError(error)) {
-			ModalCommands.push(
-				modal(() => (
-					<FeatureTemporarilyDisabledModal data-flx="messaging.message-queue.feature-temporarily-disabled-modal--2" />
-				)),
-			);
-		} else if (getApiErrorBody(error)?.code === APIErrorCodes.CONTENT_BLOCKED) {
-			void import('@app/features/auth/components/ContentBlockedHandler').then((m) => m.showContentBlockedModal());
-		} else {
-			ModalCommands.push(
-				modal(() => <MessageEditFailedModal data-flx="messaging.message-queue.message-edit-failed-modal" />),
-			);
-		}
-	}
-
-	private handleEditRateLimitError(retryAfter: number | null, onRetry?: () => void): void {
-		ModalCommands.push(
-			modal(() => {
-				if (retryAfter === null) {
-					return (
-						<MessageEditTooQuickModal
-							onRetry={onRetry}
-							data-flx="messaging.message-queue.message-edit-too-quick-modal"
-						/>
-					);
-				}
-				return (
-					<MessageEditTooQuickModal
-						retryAfter={retryAfter}
-						onRetry={onRetry}
-						data-flx="messaging.message-queue.message-edit-too-quick-modal"
 					/>
 				);
 			}),

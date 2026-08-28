@@ -656,7 +656,6 @@ export interface ElectronAPI {
 	clearThemeLocalFiles: () => Promise<void>;
 	importThemeDirectory: () => Promise<Array<ThemeDirectoryCssFile>>;
 	cacheVoiceBackgroundMedia: (options: VoiceBackgroundMediaCacheRequest) => Promise<VoiceBackgroundMediaCacheResult>;
-	resolveVoiceBackgroundMedia: (id: string) => Promise<VoiceBackgroundMediaCacheResult | null>;
 	readVoiceBackgroundMedia: (id: string) => Promise<VoiceBackgroundMediaReadResult | null>;
 	deleteVoiceBackgroundMedia: (id: string) => Promise<void>;
 	getDesktopTroubleshootingSettings: () => Promise<DesktopTroubleshootingSettings>;
@@ -689,7 +688,6 @@ export interface ElectronAPI {
 	pasteFromClipboard: () => Promise<void>;
 	onDeepLink: (callback: (url: string) => void) => () => void;
 	getInitialDeepLink: () => Promise<string | null>;
-	onRpcNavigate: (callback: (path: string) => void) => () => void;
 	autostartEnable: () => Promise<void>;
 	autostartDisable: () => Promise<void>;
 	autostartIsEnabled: () => Promise<boolean>;

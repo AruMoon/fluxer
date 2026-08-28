@@ -357,7 +357,6 @@ const api: ElectronAPI = {
 	clearThemeLocalFiles: () => ipcRenderer.invoke('theme-local-files-clear'),
 	importThemeDirectory: () => ipcRenderer.invoke('theme-directory-import'),
 	cacheVoiceBackgroundMedia: (options) => ipcRenderer.invoke('voice-background-media-cache:write', options),
-	resolveVoiceBackgroundMedia: (id) => ipcRenderer.invoke('voice-background-media-cache:resolve', id),
 	readVoiceBackgroundMedia: (id) => ipcRenderer.invoke('voice-background-media-cache:read', id),
 	deleteVoiceBackgroundMedia: (id) => ipcRenderer.invoke('voice-background-media-cache:delete', id),
 	getDesktopTroubleshootingSettings: (): Promise<DesktopTroubleshootingSettings> =>
@@ -426,15 +425,6 @@ const api: ElectronAPI = {
 		};
 	},
 	getInitialDeepLink: (): Promise<string | null> => ipcRenderer.invoke('get-initial-deep-link'),
-	onRpcNavigate: (callback: (path: string) => void): (() => void) => {
-		const handler = (_event: Electron.IpcRendererEvent, path: string): void => {
-			callback(path);
-		};
-		ipcRenderer.on('rpc-navigate', handler);
-		return () => {
-			ipcRenderer.removeListener('rpc-navigate', handler);
-		};
-	},
 	autostartEnable: (): Promise<void> => ipcRenderer.invoke('autostart-enable'),
 	autostartDisable: (): Promise<void> => ipcRenderer.invoke('autostart-disable'),
 	autostartIsEnabled: (): Promise<boolean> => ipcRenderer.invoke('autostart-is-enabled'),

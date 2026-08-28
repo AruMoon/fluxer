@@ -377,7 +377,6 @@ export interface ElectronAPI {
 	clearThemeLocalFiles?(): Promise<void>;
 	importThemeDirectory?(): Promise<Array<ThemeDirectoryCssFile>>;
 	cacheVoiceBackgroundMedia?(options: VoiceBackgroundMediaCacheRequest): Promise<VoiceBackgroundMediaCacheResult>;
-	resolveVoiceBackgroundMedia?(id: string): Promise<VoiceBackgroundMediaCacheResult | null>;
 	readVoiceBackgroundMedia?(id: string): Promise<VoiceBackgroundMediaReadResult | null>;
 	deleteVoiceBackgroundMedia?(id: string): Promise<void>;
 	getDesktopTroubleshootingSettings?(): Promise<DesktopTroubleshootingSettings>;
@@ -484,7 +483,6 @@ export interface ElectronAPI {
 	passkeyIsSupported?(): Promise<boolean>;
 	passkeyRegister?(options: unknown, requestContext?: {pin?: string}): Promise<RegistrationResponseJSON>;
 	passkeyAuthenticate?(options: unknown, requestContext?: {pin?: string}): Promise<AuthenticationResponseJSON>;
-	onRpcNavigate?(callback: (path: string) => void): () => void;
 	getOpenH264Status?(): Promise<OpenH264Status>;
 	setOpenH264Enabled?(enabled: boolean): Promise<OpenH264Status>;
 	virtmic?: VirtmicApi;

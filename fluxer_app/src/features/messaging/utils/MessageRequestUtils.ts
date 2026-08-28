@@ -57,6 +57,13 @@ export interface MessageEditRequest {
 	flags?: number;
 }
 
+export interface MessageEditPayload {
+	content?: string;
+	attachments?: Array<ApiMessageEditAttachmentMetadata>;
+	allowedMentions?: AllowedMentions;
+	flags?: number;
+}
+
 export interface MessageCreatePayload {
 	content?: string | null;
 	nonce?: string;
@@ -74,12 +81,12 @@ export interface NormalizedMessageContent {
 	flags: number;
 }
 
-export function normalizeMessageContent(content: string, favoriteMemeId?: string): NormalizedMessageContent {
+export function normalizeMessageContent(content: string): NormalizedMessageContent {
 	const withoutSilent = removeSilentFlag(content);
 	const converted = applyOutgoingEmoticonConversion(withoutSilent);
 	const sanitized = maybeSanitizeOutgoingMessage(converted);
 	const normalizedContent = hasVisibleMessageContent(sanitized) ? sanitized : '';
-	const flags = getMessageFlags(content, favoriteMemeId);
+	const flags = getMessageFlags(content);
 	return {content: normalizedContent, flags};
 }
 
@@ -121,6 +128,24 @@ export function buildMessageCreateRequest(payload: MessageCreatePayload): Messag
 	return requestBody;
 }
 
+export function buildMessageEditRequest(payload: MessageEditPayload): MessageEditRequest {
+	const {content, attachments, allowedMentions, flags} = payload;
+	const requestBody: MessageEditRequest = {};
+	if (content !== undefined) {
+		requestBody.content = normalizeMessageEditContent(content);
+	}
+	if (attachments !== undefined) {
+		requestBody.attachments = attachments;
+	}
+	if (allowedMentions !== undefined) {
+		requestBody.allowed_mentions = allowedMentions;
+	}
+	if (flags !== undefined) {
+		requestBody.flags = flags;
+	}
+	return requestBody;
+}
+
 const isSilentMessage = (content: string): boolean => {
 	return content.startsWith('@silent ');
 };
@@ -130,13 +155,10 @@ const removeSilentFlag = (content: string): string => {
 const applyOutgoingEmoticonConversion = (content: string): string => {
 	return ChatInputSettings.convertEmoticons ? convertEmoticonsToEmoji(content) : content;
 };
-const getMessageFlags = (content: string, favoriteMemeId?: string): number => {
+const getMessageFlags = (content: string): number => {
 	let flags = 0;
 	if (isSilentMessage(content)) {
 		flags |= MessageFlags.SUPPRESS_NOTIFICATIONS;
-	}
-	if (favoriteMemeId) {
-		flags |= MessageFlags.COMPACT_ATTACHMENTS;
 	}
 	return flags;
 };

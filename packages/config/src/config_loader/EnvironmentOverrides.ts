@@ -77,12 +77,20 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_NATS_AUTH_TOKEN: {path: ['services', 'nats', 'auth_token']},
 	FLUXER_API_PORT: {path: ['services', 'api', 'port'], parse: parseEnvValue},
 	FLUXER_API_IP_BAN_EXEMPT_IPS: {path: ['services', 'api', 'ip_ban_exempt_ips'], parse: parseCsv},
+	FLUXER_API_DESKTOP_GITHUB_REDIRECT_COUNTRIES: {
+		path: ['services', 'api', 'desktop_github_redirect_countries'],
+		parse: parseCsv,
+	},
 	FLUXER_API_PRESIGNED_ATTACHMENT_UPLOADS_ENABLED: {
 		path: ['services', 'api', 'presigned_attachment_uploads_enabled'],
 		parse: parseEnvValue,
 	},
 	FLUXER_API_PRESIGNED_DOWNLOADS_ENABLED: {
 		path: ['services', 'api', 'presigned_downloads_enabled'],
+		parse: parseEnvValue,
+	},
+	FLUXER_API_PRESIGNED_HARVEST_DOWNLOADS_ENABLED: {
+		path: ['services', 'api', 'presigned_harvest_downloads_enabled'],
 		parse: parseEnvValue,
 	},
 	FLUXER_API_WORKER_MODE: {path: ['services', 'api', 'worker', 'mode']},
@@ -239,6 +247,7 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_EMAIL_PROVIDER: {path: ['integrations', 'email', 'provider']},
 	FLUXER_EMAIL_FROM_EMAIL: {path: ['integrations', 'email', 'from_email']},
 	FLUXER_EMAIL_FROM_NAME: {path: ['integrations', 'email', 'from_name']},
+	FLUXER_EMAIL_APP_BASE_URL: {path: ['integrations', 'email', 'app_base_url']},
 	FLUXER_EMAIL_WEBHOOK_SECRET: {path: ['integrations', 'email', 'webhook_secret']},
 	FLUXER_EMAIL_SMTP_HOST: {path: ['integrations', 'email', 'smtp', 'host']},
 	FLUXER_EMAIL_SMTP_PORT: {path: ['integrations', 'email', 'smtp', 'port'], parse: parseEnvValue},
@@ -262,6 +271,7 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_LIVEKIT_API_KEY: {path: ['integrations', 'voice', 'api_key']},
 	FLUXER_LIVEKIT_API_SECRET: {path: ['integrations', 'voice', 'api_secret']},
 	FLUXER_LIVEKIT_URL: {path: ['integrations', 'voice', 'url']},
+	FLUXER_LIVEKIT_INTERNAL_URL: {path: ['integrations', 'voice', 'internal_url']},
 	FLUXER_LIVEKIT_WEBHOOK_URL: {path: ['integrations', 'voice', 'webhook_url']},
 	FLUXER_LIVEKIT_DEFAULT_REGION: {path: ['integrations', 'voice', 'default_region'], parse: parseEnvValue},
 	FLUXER_SEARCH_ENGINE: {path: ['integrations', 'search', 'engine']},
