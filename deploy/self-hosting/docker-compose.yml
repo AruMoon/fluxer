@@ -325,7 +325,7 @@ services:
         limits:
           memory: 1536mb
     working_dir: /usr/src/app/fluxer_api
-    command: ["./node_modules/.bin/tsx", "src/WorkerEntrypoint.ts"]
+    command: ["node", "dist/WorkerEntrypoint.js"]
     environment:
       <<: *fluxer-env
       FLUXER_API_WORKER_MODE: all_lanes
