@@ -490,7 +490,7 @@ export class MessageDataRepository {
 				bucket,
 			}),
 		);
-		await batch.execute(true);
+		await batch.execute(false);
 	}
 
 	private async markBucketEmpty(channelId: ChannelID, bucket: number): Promise<void> {
@@ -508,7 +508,7 @@ export class MessageDataRepository {
 				updated_at: new Date(),
 			}),
 		);
-		await batch.execute(true);
+		await batch.execute(false);
 	}
 
 	private async touchChannelHasMessages(channelId: ChannelID): Promise<void> {
