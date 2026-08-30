@@ -102,6 +102,10 @@ x-fluxer-service: &fluxer-service
 services:
   caddy:
     image: caddy:2.10-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     restart: unless-stopped
     networks: [fluxer]
     ports:
@@ -123,6 +127,12 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 2gb
+        reservations:
+          memory: 768mb
     restart: unless-stopped
     networks: [fluxer]
     command: >
@@ -164,9 +174,13 @@ services:
 
   valkey:
     image: valkey/valkey:8.1-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     restart: unless-stopped
     networks: [fluxer]
-    command: ["valkey-server", "--save", "", "--appendonly", "no"]
+    command: ["valkey-server", "--save", "", "--appendonly", "no", "--maxmemory", "192mb", "--maxmemory-policy", "allkeys-lru"]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
@@ -175,6 +189,10 @@ services:
 
   nats:
     image: nats:2.14-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     restart: unless-stopped
     networks: [fluxer]
     command: ["-js", "-sd", "/data", "-m", "8222"]
@@ -183,17 +201,26 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:v1.12
+    deploy:
+      resources:
+        limits:
+          memory: 768mb
     restart: unless-stopped
     networks: [fluxer]
     environment:
       MEILI_ENV: production
       MEILI_NO_ANALYTICS: "true"
+      MEILI_MAX_INDEXING_MEMORY: 384mb
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY in .env}
     volumes:
       - meilisearch-data:/meili_data
 
   seaweedfs:
     image: chrislusf/seaweedfs:4.34
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
     restart: unless-stopped
     networks: [fluxer]
     command: ["server", "-s3", "-dir=/data"]
@@ -202,6 +229,10 @@ services:
 
   seaweedfs-init:
     image: chrislusf/seaweedfs:4.34
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     networks: [fluxer]
     depends_on: [seaweedfs]
     restart: "no"
@@ -235,6 +266,10 @@ services:
 
   livekit:
     image: livekit/livekit-server:v1.12.0
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
     restart: unless-stopped
     networks: [fluxer]
     command: ["--config", "/etc/livekit.yaml"]
@@ -249,6 +284,12 @@ services:
   api:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-api:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 1536mb
+        reservations:
+          memory: 512mb
     environment:
       <<: *fluxer-env
       FLUXER_API_PORT: "8080"
@@ -279,6 +320,10 @@ services:
   worker:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-api:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 1536mb
     working_dir: /usr/src/app/fluxer_api
     command: ["./node_modules/.bin/tsx", "src/WorkerEntrypoint.ts"]
     environment:
@@ -299,6 +344,12 @@ services:
   gateway:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-gateway:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 1gb
+        reservations:
+          memory: 384mb
     environment:
       <<: *fluxer-env
       FLUXER_GATEWAY_PORT: "8080"
@@ -318,6 +369,10 @@ services:
   media-proxy:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-media-proxy:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
     environment:
       <<: *fluxer-env
       FLUXER_MEDIA_PROXY_HOST: 0.0.0.0
@@ -333,10 +388,18 @@ services:
   static-proxy:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-static:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
 
   app-proxy:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-app-proxy-self-hosted:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       FLUXER_APP_PROXY_HOST: 0.0.0.0
       FLUXER_APP_PROXY_PORT: "8080"
@@ -363,6 +426,10 @@ services:
   snowflakes:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-snowflakes:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: snowflakes
@@ -373,6 +440,10 @@ services:
   snowflakes-shard:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-snowflakes:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: snowflakes
@@ -384,6 +455,10 @@ services:
   users:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-users:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_MODE: router
@@ -393,6 +468,10 @@ services:
   users-shard:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-users:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_MODE: shard
@@ -406,6 +485,10 @@ services:
   gifs:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-gifs:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: gifs
@@ -417,6 +500,10 @@ services:
   gifs-shard:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-gifs:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: gifs
@@ -429,6 +516,10 @@ services:
   messages:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-messages:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: messages
@@ -439,6 +530,10 @@ services:
   messages-shard:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-messages:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_NAME: messages
@@ -453,6 +548,10 @@ services:
   unfurl:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-unfurl:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 128mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_MODE: router
@@ -462,6 +561,10 @@ services:
   unfurl-shard:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-unfurl:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_SVC_MODE: shard
@@ -472,6 +575,10 @@ services:
   admin:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-admin:${FLUXER_IMAGE_TAG:-v1}
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
     environment:
       <<: *fluxer-env
       FLUXER_ADMIN_HOST: 0.0.0.0
