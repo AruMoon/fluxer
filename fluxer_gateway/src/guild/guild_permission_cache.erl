@@ -17,6 +17,7 @@
     has_member/2,
     get_member/2,
     strip_data/1,
+    member_projection_changed/3,
     migrate_existing_entries/0
 ]).
 
@@ -45,7 +46,7 @@ put_state(_) ->
 
 -spec put_data(guild_id(), guild_data()) -> ok.
 put_data(GuildId, Data) when is_integer(GuildId), is_map(Data) ->
-    NormalizedData = guild_data_index:normalize_data(Data),
+    NormalizedData = guild_data_index:normalize_map(Data),
     put_normalized_data(GuildId, NormalizedData);
 put_data(_, _) ->
     ok.
@@ -152,6 +153,13 @@ strip_data(Data) when is_map(Data) ->
     };
 strip_data(Data) ->
     Data.
+
+-spec member_projection_changed(user_id() | undefined, guild_data(), guild_data()) -> boolean().
+member_projection_changed(UserId, OldData, NewData) when is_integer(UserId) ->
+    strip_member(guild_data_index:get_member(UserId, OldData)) =/=
+        strip_member(guild_data_index:get_member(UserId, NewData));
+member_projection_changed(_UserId, _OldData, _NewData) ->
+    true.
 
 -spec strip_guild(map() | term()) -> map().
 strip_guild(Guild) when is_map(Guild) ->

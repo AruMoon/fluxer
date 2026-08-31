@@ -4,6 +4,7 @@
 -typing([eqwalizer]).
 
 -export([get_guild_data/2]).
+-export([get_auth_context/2]).
 -export([get_guild_member/2]).
 -export([get_guild_members_batch/2]).
 -export([has_member/2]).
@@ -12,6 +13,7 @@
 -export([get_vanity_url_channel/1]).
 -export([get_first_viewable_text_channel/1]).
 -export([get_guild_state/2]).
+-export([build_connect_snapshot/2]).
 -export([fetch_latest_voice_states/1]).
 -export([find_everyone_viewable_text_channel/2]).
 
@@ -19,6 +21,10 @@
 -type guild_reply(T) :: {reply, T, guild_state()}.
 -type user_id() :: integer().
 -type guild_id() :: integer().
+
+-define(CONNECT_SNAPSHOT_HEAVY_MEMBER_KEYS, [
+    <<"members">>, members_normalized, <<"member_role_index">>, members_sorted_ids
+]).
 
 -export_type([guild_state/0, guild_reply/1, user_id/0]).
 
@@ -32,6 +38,50 @@ get_guild_data(#{user_id := UserId}, State) ->
         _ ->
             get_guild_data_for_user(UserId, Data, State)
     end.
+
+-spec get_auth_context(map(), guild_state()) -> guild_reply(map()).
+get_auth_context(#{user_id := UserId, channel_id := ChannelId}, State) ->
+    Data = guild_data_index:ensure_data_map(State),
+    case UserId of
+        null ->
+            {reply, #{auth_context => build_auth_context(ChannelId, Data, State)}, State};
+        _ ->
+            get_auth_context_for_member(UserId, ChannelId, Data, State)
+    end.
+
+-spec get_auth_context_for_member(user_id(), integer() | null, map(), guild_state()) ->
+    guild_reply(map()).
+get_auth_context_for_member(UserId, ChannelId, Data, State) ->
+    case guild_data_index:get_member(UserId, Data) of
+        undefined ->
+            {reply, #{auth_context => null, error_reason => <<"forbidden">>}, State};
+        _Member ->
+            {reply, #{auth_context => build_auth_context(ChannelId, Data, State)}, State}
+    end.
+
+-spec build_auth_context(integer() | null, map(), guild_state()) -> map().
+build_auth_context(ChannelId, Data, State) ->
+    #{
+        <<"guild">> => build_auth_guild(Data, State),
+        <<"parent_channel">> => find_channel(ChannelId, Data)
+    }.
+
+-spec build_auth_guild(map(), guild_state()) -> map().
+build_auth_guild(Data, State) ->
+    GuildProperties = map_utils:ensure_map(maps:get(<<"guild">>, Data, #{})),
+    GuildProperties#{
+        <<"roles">> => map_utils:ensure_list(maps:get(<<"roles">>, Data, [])),
+        <<"member_count">> => maps:get(
+            member_count, State, guild_data_index:member_count(Data)
+        ),
+        <<"online_count">> => guild_member_list:get_online_count(State)
+    }.
+
+-spec find_channel(integer() | null, map()) -> map() | null.
+find_channel(null, _Data) ->
+    null;
+find_channel(ChannelId, Data) ->
+    maps:get(ChannelId, guild_data_index:channel_index(Data), null).
 
 -spec get_guild_member(map(), guild_state()) -> guild_reply(map()).
 get_guild_member(Request, State) ->
@@ -102,6 +152,92 @@ get_guild_state(UserId, State) ->
         JoinedAt
     ).
 
+-spec build_connect_snapshot(map(), guild_state()) -> map().
+build_connect_snapshot(Item, State) ->
+    Base = maps:with(
+        [
+            id,
+            data,
+            sessions,
+            member_count,
+            voice_server_pid,
+            voice_states,
+            member_list_engine,
+            virtual_channel_access
+        ],
+        State
+    ),
+    maybe_trim_connect_snapshot(Item, Base, State).
+
+-spec maybe_trim_connect_snapshot(map(), map(), guild_state()) -> map().
+maybe_trim_connect_snapshot(Item, Base, State) ->
+    case has_members_ets(State) of
+        true -> trim_connect_snapshot(Item, Base);
+        false -> Base
+    end.
+
+-spec has_members_ets(guild_state()) -> boolean().
+has_members_ets(#{data := #{members_ets := Tab}}) -> is_reference(Tab);
+has_members_ets(_) -> false.
+
+-spec trim_connect_snapshot(map(), map()) -> map().
+trim_connect_snapshot(Item, #{data := Data} = Base) when is_map(Data) ->
+    Retained = retained_member_map(Item, Base, Data),
+    Trimmed = maps:without(?CONNECT_SNAPSHOT_HEAVY_MEMBER_KEYS, Data),
+    Base#{
+        data => Trimmed#{
+            <<"members">> => Retained,
+            members_normalized => Retained,
+            <<"member_role_index">> =>
+                guild_data_index_members:build_member_role_index(Retained)
+        }
+    };
+trim_connect_snapshot(_Item, Base) ->
+    Base.
+
+-spec retained_member_map(map(), map(), map()) -> #{integer() => map()}.
+retained_member_map(Item, Base, Data) ->
+    UserIds = [connect_user_id(Item) | voice_state_user_ids(Base)],
+    lists:foldl(
+        fun(UserId, Acc) -> retain_member(UserId, Data, Acc) end,
+        #{},
+        UserIds
+    ).
+
+-spec retain_member(term(), map(), #{integer() => map()}) -> #{integer() => map()}.
+retain_member(UserId, Data, Acc) when is_integer(UserId) ->
+    case guild_data_index_members:get_member_ets(UserId, Data) of
+        Member when is_map(Member) -> Acc#{UserId => Member};
+        _ -> Acc
+    end;
+retain_member(_UserId, _Data, Acc) ->
+    Acc.
+
+-spec connect_user_id(map()) -> integer() | undefined.
+connect_user_id(Item) ->
+    Request = maps:get(request, Item, #{}),
+    case maps:get(user_id, Request, undefined) of
+        UserId when is_integer(UserId) -> UserId;
+        _ -> undefined
+    end.
+
+-spec voice_state_user_ids(map()) -> [integer()].
+voice_state_user_ids(Base) ->
+    maps:fold(
+        fun(_Key, VoiceState, Acc) -> add_voice_state_user_id(VoiceState, Acc) end,
+        [],
+        voice_state_utils:voice_states(Base)
+    ).
+
+-spec add_voice_state_user_id(term(), [integer()]) -> [integer()].
+add_voice_state_user_id(VoiceState, Acc) when is_map(VoiceState) ->
+    case voice_state_utils:voice_state_user_id(VoiceState) of
+        UserId when is_integer(UserId) -> [UserId | Acc];
+        _ -> Acc
+    end;
+add_voice_state_user_id(_VoiceState, Acc) ->
+    Acc.
+
 -spec resolve_voice_members([map()], map()) -> [map()].
 resolve_voice_members(VoiceStates, Data) ->
     lists:filtermap(fun(VS) -> resolve_voice_member_entry(VS, Data) end, VoiceStates).
@@ -119,12 +255,16 @@ resolve_voice_member_entry(VoiceState, Data) ->
 resolve_voice_member_by_lookup(VoiceState, Data) ->
     case voice_state_utils:voice_state_user_id(VoiceState) of
         UserId when is_integer(UserId) ->
-            case guild_data_index_members:get_member_ets(UserId, Data) of
-                Member when is_map(Member) -> {true, Member};
-                _ -> false
-            end;
+            resolve_voice_member_from_index(UserId, Data);
         _ ->
             false
+    end.
+
+-spec resolve_voice_member_from_index(integer(), map()) -> {true, map()} | false.
+resolve_voice_member_from_index(UserId, Data) ->
+    case guild_data_index_members:get_member_ets(UserId, Data) of
+        Member when is_map(Member) -> {true, Member};
+        _ -> false
     end.
 
 -spec fetch_latest_voice_states(guild_state()) -> guild_state().

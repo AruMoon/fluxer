@@ -346,7 +346,7 @@ msgstr "{count, plural, one {# aktyvi prenumerata} few {# aktyvios prenumeratos}
 msgid "{count, plural, one {# attachment} other {# attachments}}"
 msgstr "{count, plural, one {# priedas} other {# priedai}}"
 
-#: src/features/channel/components/BlockedMessageGroups.tsx:229
+#: src/features/channel/components/BlockedMessageGroups.tsx:251
 msgid "{count, plural, one {# blocked message} other {# blocked messages}}"
 msgstr "{count, plural, one {# užblokuotas pranešimas} other {# užblokuoti pranešimai}}"
 
@@ -360,7 +360,7 @@ msgstr "{count, plural, one {# žymė} other {# žymės}}"
 msgid "{count, plural, one {# community found} other {# communities found}}"
 msgstr "{count, plural, one {# bendrija rasta} other {# bendrijų rasta}}"
 
-#: src/features/app/components/layout/GuildsLayout.tsx:1949
+#: src/features/app/components/layout/GuildsLayout.tsx:1950
 msgid "{count, plural, one {# community is temporarily unavailable due to a flux capacitor malfunction.} other {# communities are temporarily unavailable due to a flux capacitor malfunction.}}"
 msgstr "{count, plural, one {# bendruomenė laikinai nepasiekiama dėl srauto kondensatoriaus gedimo.} other {# bendruomenės laikinai nepasiekiamos dėl srauto kondensatoriaus gedimo.}}"
 
@@ -392,8 +392,8 @@ msgid "{count, plural, one {# item} other {# items}}"
 msgstr "{count, plural, one {# elementas} other {# elementai}}"
 
 #: src/features/channel/components/ChannelSourcePreview.tsx:245
-#: src/features/channel/components/direct_message/DMListItem.tsx:435
-#: src/features/channel/components/direct_message/DMListItem.tsx:599
+#: src/features/channel/components/direct_message/DMListItem.tsx:436
+#: src/features/channel/components/direct_message/DMListItem.tsx:600
 #: src/features/guild/components/bottomsheets/GuildHeaderBottomSheet.tsx:116
 #: src/features/user/components/modals/MutualItemsSheet.tsx:159
 #: src/features/user/components/modals/user_profile_modal/MutualGroupItem.tsx:26
@@ -413,7 +413,7 @@ msgstr "{count, plural, one {# kitas} other {# kiti}}"
 msgid "{count, plural, one {# participant in call} other {# participants in call}}"
 msgstr "{count, plural, one {# dalyvis skambutyje} other {# dalyviai skambutyje}}"
 
-#: src/features/channel/components/BlockedMessageGroups.tsx:222
+#: src/features/channel/components/BlockedMessageGroups.tsx:244
 msgid "{count, plural, one {# potential spammer message} other {# potential spammer messages}}"
 msgstr "{count, plural, one {# galimas šlamšto siuntėjo pranešimas} other {# galimi šlamšto siuntėjo pranešimai}}"
 
@@ -591,12 +591,12 @@ msgid "{countLabel} years"
 msgstr "{countLabel} metų"
 
 #. Media viewer attachment position text, such as 2 of 5.
-#: src/features/messaging/components/modals/media_modal/shared.ts:140
+#: src/features/messaging/components/modals/media_modal/shared.ts:141
 msgid "{currentAttachmentNumber} of {totalAttachments}"
 msgstr "{currentAttachmentNumber} iš {totalAttachments}"
 
 #. Compact media viewer attachment position, such as 2/5.
-#: src/features/messaging/components/modals/media_modal/shared.ts:60
+#: src/features/messaging/components/modals/media_modal/shared.ts:61
 msgid "{currentAttachmentNumber}/{totalAttachments}"
 msgstr "{currentAttachmentNumber}/{totalAttachments}"
 
@@ -776,7 +776,7 @@ msgstr "{fps} FPS"
 msgid "{guildName} channels"
 msgstr "{guildName} kanalai"
 
-#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:675
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:674
 msgid "{hiddenConnectionCount, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{hiddenConnectionCount, plural, one {Išskleisti # kitą įrenginį} other {Išskleisti # kitus įrenginius}}"
 
@@ -941,6 +941,11 @@ msgstr "{minutes} minutės"
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:37
 msgid "{months, plural, one {# month} other {# months}}"
 msgstr "{months, plural, one {# mėnuo} other {# mėnesiai}}"
+
+#. Default name for a role created by duplicating another role in the community roles settings tab. {name} is the source role name; translate the whole label so "copy" can move or inflect as the language needs.
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:52
+msgid "{name} copy"
+msgstr "{name} kopija"
 
 #. Time window preset label for a single-hour interval. The number is interpolated.
 #: src/features/app/config/TimeWindowPresets.ts:18
@@ -1160,7 +1165,7 @@ msgid "{productName} restarted while you were connected to the call in {directCa
 msgstr "{productName} paleista iš naujo, kol buvote prisijungę prie skambučio {directCallName}."
 
 #. Item in the textarea spellcheck submenu that opens the full settings page. Trailing horizontal ellipsis (…) indicates the action opens settings.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:94
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:96
 msgid "{productName} spellcheck settings…"
 msgstr "{productName} rašybos tikrinimo nustatymai…"
 
@@ -1738,7 +1743,7 @@ msgid "2 members (typing)"
 msgstr "2 nariai (rašo)"
 
 #. Ban duration option in the destructive ban-member modal for a two-week temporary ban.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:50
+#: src/features/moderation/components/modals/BanMemberModal.tsx:51
 msgid "2 weeks"
 msgstr "2 savaitės"
 
@@ -1780,7 +1785,7 @@ msgid "2FA requirement"
 msgstr "2FA reikalavimas"
 
 #. Ban duration option in the destructive ban-member modal for a three-day temporary ban.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:42
+#: src/features/moderation/components/modals/BanMemberModal.tsx:43
 msgid "3 days"
 msgstr "3 dienos"
 
@@ -1826,7 +1831,7 @@ msgid "480p"
 msgstr "480p"
 
 #. Ban duration option in the destructive ban-member modal for a five-day temporary ban.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:46
+#: src/features/moderation/components/modals/BanMemberModal.tsx:47
 msgid "5 days"
 msgstr "5 dienos"
 
@@ -2090,7 +2095,7 @@ msgstr "Priėmus šį kvietimą, paketas įdiegiamas automatiškai."
 msgid "Access granted"
 msgstr "Prieiga suteikta"
 
-#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/ChannelPermissionsSidebar.tsx:66
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/ChannelPermissionsSidebar.tsx:70
 #: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/MobileOverrideListView.tsx:84
 msgid "Access overrides"
 msgstr "Prieigos perrašymai"
@@ -2219,7 +2224,7 @@ msgstr "Tik visuose atidarytuose tiesioginiuose pranešimuose"
 msgid "Across every community you're in"
 msgstr "Visose bendruomenėse, kuriose esate"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:95
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:110
 msgid "Action"
 msgstr "Veiksmas"
 
@@ -2465,7 +2470,7 @@ msgid "Add an extra layer of security to your account"
 msgstr "Pridėkite papildomą saugumo lygį savo paskyrai"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:39
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:40
 msgid "Add another custom shortcut"
 msgstr "Pridėti kitą pasirinktinį spartųjį klavišą"
 
@@ -2563,7 +2568,7 @@ msgstr "Pridėti naujų reakcijų į žinutes."
 msgid "Add note"
 msgstr "Pridėti pastabą"
 
-#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/ChannelPermissionsSidebar.tsx:88
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/ChannelPermissionsSidebar.tsx:92
 #: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/MobileOverrideListView.tsx:96
 msgid "Add override"
 msgstr "Pridėti perrašymą"
@@ -2650,7 +2655,7 @@ msgid "Add the credentials during setup."
 msgstr "Pridėkite kredencialus sąrankos metu."
 
 #. Textarea right-click context menu item that adds the selected misspelled word to the personal dictionary.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:32
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:34
 msgid "Add to dictionary"
 msgstr "Pridėti į žodyną"
 
@@ -3228,7 +3233,7 @@ msgid "Already set to cancel"
 msgstr "Jau nustatyta atšaukti"
 
 #. Toggle-switch label in the moderator delete-message confirmation dialog. When enabled, the message is reported (category: other) before being deleted. {productName} is the product name (e.g., Fluxer).
-#: src/features/messaging/commands/MessageCommands.tsx:77
+#: src/features/messaging/commands/MessageCommands.tsx:81
 msgid "Also report this message to the {productName} Safety Team"
 msgstr "Taip pat pranešti apie šį pranešimą \"{productName}\" saugos komandai"
 
@@ -3463,7 +3468,7 @@ msgstr "Animuoti jaustukai, GIF ir lipdukai lieka jūsų valioje animacijos skir
 #. Media type chip shown in the media viewer info panel for animated GIFs.
 #. Short label in the channel and chat embed gifv. Keep it concise.
 #: src/features/channel/components/embeds/media/EmbedGifv.tsx:67
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:99
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:101
 msgid "Animated GIF"
 msgstr "Animuotas GIF"
 
@@ -3502,12 +3507,12 @@ msgid "Animated icons require the {animatedIconFeature} community feature."
 msgstr "Animuotiems ikonoms reikalinga {animatedIconFeature} bendruomenės funkcija."
 
 #. Media type chip shown in the media viewer info panel for animated images.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:107
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:109
 msgid "Animated image"
 msgstr "Animuotas vaizdas"
 
 #. Accessible label for an animated image (APNG/AVIF) shown in the media viewer.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:75
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:77
 msgid "Animated image preview"
 msgstr "Animuoto vaizdo peržiūra"
 
@@ -3527,7 +3532,7 @@ msgid "Animated uploads require a {premiumProductName} subscription."
 msgstr "Animuotų failų įkėlimas reikalauja {premiumProductName} prenumeratos."
 
 #. Media type chip shown in the media viewer info panel for short looping video clips.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:103
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:105
 msgid "Animated video"
 msgstr "Animuotas vaizdo įrašas"
 
@@ -3653,7 +3658,7 @@ msgid "Any uploaded attachment"
 msgstr "Bet koks įkeltas priedas"
 
 #. Helper text under the custom ban duration input. Both placeholders are integer numbers of seconds bounding the allowed range.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:72
+#: src/features/moderation/components/modals/BanMemberModal.tsx:73
 msgid "Any value from {minTempBanDurationSeconds} to {maxTempBanDurationSeconds} seconds."
 msgstr "Bet kokia reikšmė nuo {minTempBanDurationSeconds} iki {maxTempBanDurationSeconds} sekundžių."
 
@@ -3739,17 +3744,17 @@ msgid "Appearance"
 msgstr "Išvaizda"
 
 #. Slash-command description for /tableflip. Appends a kaomoji to the user's message.
-#: src/features/devtools/hooks/useCommands.ts:12
+#: src/features/devtools/hooks/useCommands.ts:13
 msgid "Appends (╯°□°)╯︵ ┻━┻ to your message."
 msgstr "Prideda (╯°□°)╯︵ ┻━┻ prie jūsų žinutės."
 
 #. Slash-command description for /shrug. Appends a kaomoji to the user's message.
-#: src/features/devtools/hooks/useCommands.ts:8
+#: src/features/devtools/hooks/useCommands.ts:9
 msgid "Appends ¯\\_(ツ)_/¯ to your message."
 msgstr "Prideda ¯\\_(ツ)_/¯ prie jūsų žinutės."
 
 #. Slash-command description for /unflip. Appends a kaomoji to the user's message.
-#: src/features/devtools/hooks/useCommands.ts:16
+#: src/features/devtools/hooks/useCommands.ts:17
 msgid "Appends ┬─┬ ノ( ゜-゜ノ) to your message."
 msgstr "Prideda ┬─┬ ノ( ゜-゜ノ) prie jūsų žinutės."
 
@@ -3894,7 +3899,7 @@ msgid "Are you sure you want to delete every message in your personal notes? Thi
 msgstr "Ar tikrai norite ištrinti visus pranešimus iš savo asmeninių užrašų? Tai visam laikui pašalins visus pranešimus ir jų priedus. Šio veiksmo anuliuoti negalima."
 
 #. placeholder {0}: selectedRole.name
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:354
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:410
 msgid "Are you sure you want to delete the <0>{0}</0> role? Any members with this role will no longer have it."
 msgstr "Ar tikrai norite ištrinti vaidmenį \"<0>{0}</0>\"? Visi nariai, turintys šį vaidmenį, jo nebeturės."
 
@@ -3922,7 +3927,7 @@ msgstr "Ar tikrai norite ištrinti kategoriją \"{categoryName}\"? Šio veiksmo 
 msgid "Are you sure you want to delete the passkey <0>{0}</0>?"
 msgstr "Ar tikrai norite ištrinti prisijungimo raktą <0>{0}</0>?"
 
-#: src/features/messaging/hooks/useDeleteAttachment.tsx:29
+#: src/features/messaging/hooks/useDeleteAttachment.tsx:41
 msgid "Are you sure you want to delete this attachment? This action cannot be undone and will remove the attachment from this message."
 msgstr "Ar tikrai norite ištrinti šį priedą? Šio veiksmo anuliuoti negalima ir jis pašalins priedą iš šio pranešimo."
 
@@ -4028,8 +4033,8 @@ msgstr "priedas"
 
 #. Accessible label for a thumbnail in the media viewer. index1 is the 1-based attachment index.
 #. Accessible label for the active attachment in the media viewer. index1 is the 1-based index.
-#: src/features/messaging/components/modals/media_modal/shared.ts:128
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:71
+#: src/features/messaging/components/modals/media_modal/shared.ts:129
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:73
 msgid "Attachment {index1}"
 msgstr "Priedas {index1}"
 
@@ -4088,7 +4093,7 @@ msgid "Attachment preview"
 msgstr "Priedo peržiūra"
 
 #. Accessible label for the thumbnail strip at the bottom of the media viewer.
-#: src/features/messaging/components/modals/media_modal/shared.ts:124
+#: src/features/messaging/components/modals/media_modal/shared.ts:125
 msgid "Attachment thumbnails"
 msgstr "Priedų miniatiūros"
 
@@ -4178,7 +4183,7 @@ msgid "Audio player"
 msgstr "Garso grotuvas"
 
 #. Accessible label for an audio clip shown in the media viewer.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:91
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:93
 msgid "Audio preview"
 msgstr "Garso peržiūra"
 
@@ -4437,7 +4442,6 @@ msgid "Autocomplete suggestion: {label}, {selectedOptionPosition} of {resultCoun
 msgstr "Automatinio užbaigimo pasiūlymas: {label}, {selectedOptionPosition} iš {resultCount}"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #. Label for the auto codec option in the screen-share codec radio group. Keep it concise.
 #. Option label for a WebRTC content hint select.
 #. Option label for an SVC mode select.
@@ -4446,7 +4450,6 @@ msgstr "Automatinio užbaigimo pasiūlymas: {label}, {selectedOptionPosition} i�
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Voice region option label in the voice settings menu meaning let Fluxer pick the best region automatically.
 #. Voice region picker option label meaning 'let Fluxer pick the best region automatically'.
-#: src/features/channel/components/channel_header_components/developer_tools/OptionPresets.ts:199
 #: src/features/channel/components/modals/channel_tabs/channel_overview_tab/RtcRegionSelect.tsx:19
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:59
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:99
@@ -4763,7 +4766,7 @@ msgstr "Grįžti prie perrašymų"
 #. Back-navigation label that returns from an individual role editor to the roles list.
 #: src/features/app/components/dialogs/components/DesktopGuildSettingsView.tsx:50
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx:149
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:112
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:116
 msgid "Back to roles"
 msgstr "Atgal į vaidmenis"
 
@@ -4884,12 +4887,12 @@ msgid "Ban"
 msgstr "Uždrausti"
 
 #. Title of the destructive ban-member modal. {tag} is the target user tag (username#tag). Destructive moderation action; keep tone direct.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:54
+#: src/features/moderation/components/modals/BanMemberModal.tsx:55
 msgid "Ban {tag}"
 msgstr "Užblokuoti {tag}"
 
 #. Slash-command description for /ban. Bans a member from the current community (moderation action).
-#: src/features/devtools/hooks/useCommands.ts:42
+#: src/features/devtools/hooks/useCommands.ts:43
 msgid "Ban a member from this community."
 msgstr "Užblokuoti narį šioje bendruomenėje."
 
@@ -4899,7 +4902,7 @@ msgid "Ban details"
 msgstr "Blokavimo informacija"
 
 #. Label above the ban duration dropdown in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:59
+#: src/features/moderation/components/modals/BanMemberModal.tsx:60
 msgid "Ban duration"
 msgstr "Uždraudimo trukmė"
 
@@ -4911,7 +4914,7 @@ msgstr "Uždraudimas baigiasi {0}."
 #. Moderation action that bans the selected member from the community.
 #. Moderation action that bans the selected member from the community.
 #. Moderation action that bans the selected member from the community.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:305
+#: src/features/moderation/components/modals/BanMemberModal.tsx:270
 #: src/features/ui/action_menu/GuildMemberContextMenu.tsx:66
 #: src/features/ui/action_menu/items/GuildMemberMenuItems.tsx:51
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts:94
@@ -4944,7 +4947,7 @@ msgstr "apribotas pralaidumas"
 msgid "Banned"
 msgstr "Užblokuotas"
 
-#: src/features/moderation/components/modals/BanMemberModal.tsx:160
+#: src/features/moderation/components/modals/BanMemberModal.tsx:134
 msgid "Banned {targetUserTag} from the community"
 msgstr "Išvarytas {targetUserTag} iš bendruomenės"
 
@@ -5822,7 +5825,7 @@ msgstr "Čia negalima įkelti failų"
 #: src/features/messaging/components/modals/ImageCropModal.tsx:925
 #: src/features/messaging/components/modals/MessageHistoryThresholdModal.tsx:107
 #: src/features/messaging/components/popouts/ScheduledMessagesContent.tsx:47
-#: src/features/moderation/components/modals/BanMemberModal.tsx:297
+#: src/features/moderation/components/modals/BanMemberModal.tsx:262
 #: src/features/moderation/components/modals/RemoveTimeoutModal.tsx:70
 #: src/features/moderation/components/modals/TimeoutMemberModal.tsx:126
 #: src/features/theme/components/modals/ThemeAcceptModal.tsx:173
@@ -6276,7 +6279,7 @@ msgid "Change your nickname for a community profile"
 msgstr "Pakeiskite savo bendruomenės profilio slapyvardį"
 
 #. Slash-command description for /nick. Changes the user's nickname in the current community.
-#: src/features/devtools/hooks/useCommands.ts:34
+#: src/features/devtools/hooks/useCommands.ts:35
 msgid "Change your nickname in this community."
 msgstr "Pakeiskite savo slapyvardį šioje bendruomenėje."
 
@@ -6779,7 +6782,7 @@ msgstr "Pasirinkite langą sistemos parinkiklyje"
 msgid "Choose an account"
 msgstr "Pasirinkite paskyrą"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:137
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:152
 msgid "Choose an action."
 msgstr "Pasirinkite veiksmą."
 
@@ -7436,12 +7439,12 @@ msgid "Close DM"
 msgstr "Uždaryti tiesioginį pokalbį"
 
 #. Accessible label for the dedicated close button at the top of the media viewer modal.
-#: src/features/messaging/components/modals/media_modal/shared.ts:112
+#: src/features/messaging/components/modals/media_modal/shared.ts:113
 msgid "Close media viewer"
 msgstr "Uždaryti medijos peržiūros programą"
 
 #. Generic accessible label for the close button on the media viewer modal backdrop.
-#: src/features/messaging/components/modals/media_modal/shared.ts:108
+#: src/features/messaging/components/modals/media_modal/shared.ts:109
 msgid "Close modal"
 msgstr "Uždaryti langą"
 
@@ -8235,7 +8238,7 @@ msgstr "Patvirtinimas"
 msgid "Confirmation or double-click for community voice joins"
 msgstr "Patvirtinimas arba dvigubas paspaudimas, norint prisijungti prie bendruomenės balsinės sesijos."
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:154
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:169
 msgid "Conflicts with {conflictLabel}"
 msgstr "Kertasi su \"{conflictLabel}\""
 
@@ -8607,7 +8610,7 @@ msgstr "URL nukopijuotas į iškarpinę"
 #. Textarea right-click context menu item that copies the selected text.
 #: src/features/app/components/dialogs/shared/CopyLinkSection.tsx:11
 #: src/features/auth/components/modals/BackupCodesModal.tsx:94
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:48
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:50
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:423
 #: src/features/theme_studio/sections/QuickCssSection.tsx:214
 #: src/features/ui/action_menu/MessageContextMenu.tsx:71
@@ -8808,7 +8811,7 @@ msgid "Copy media"
 msgstr "Kopijuoti mediją"
 
 #. Tooltip on the media viewer button that copies the current media item to the system clipboard.
-#: src/features/messaging/components/modals/media_modal/shared.ts:84
+#: src/features/messaging/components/modals/media_modal/shared.ts:85
 msgid "Copy media to clipboard"
 msgstr "Kopijuoti mediją į iškarpinę"
 
@@ -9302,7 +9305,7 @@ msgid "Couldn't rename this emoji"
 msgstr "Nepavyko pervadinti šio jaustuko"
 
 #. Error modal title shown when resetting the community role hoist order fails.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:55
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:62
 msgid "Couldn't reset hoist order"
 msgstr "Nepavyko atkurti iškėlimo tvarkos"
 
@@ -9681,7 +9684,7 @@ msgid "Create or join a community"
 msgstr "Sukurti arba prisijungti prie bendruomenės"
 
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/MobileRoleList.tsx:48
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:209
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:215
 msgid "Create role"
 msgstr "Kurti vaidmenį"
 
@@ -9977,7 +9980,7 @@ msgid "Custom"
 msgstr "Pasirinktinis"
 
 #. Label of the numeric input shown after choosing "Custom..." in the ban duration dropdown. The unit is seconds.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:67
+#: src/features/moderation/components/modals/BanMemberModal.tsx:68
 msgid "Custom ban duration (seconds)"
 msgstr "Pasirinktinė uždraudimo trukmė (sekundėmis)"
 
@@ -10017,7 +10020,7 @@ msgstr "Pasirinktiniai įėjimo garsai su „{premiumProductName}\""
 msgid "Custom expiry (seconds)"
 msgstr "Pasirinktinis galiojimo laikas (sekundėmis)"
 
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:225
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:231
 msgid "Custom hoist order"
 msgstr "Pasirinktinė iškėlimo tvarka"
 
@@ -10072,12 +10075,12 @@ msgid "Custom selection"
 msgstr "Pasirinktinis pasirinkimas"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:41
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:42
 msgid "Custom shortcut action"
 msgstr "Pasirinktinis spartusis veiksmas"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:37
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:38
 msgid "Custom shortcut options"
 msgstr "Tinkintų sparčiųjų klavišų parinktys"
 
@@ -10227,7 +10230,7 @@ msgid "Customizing your avatar, banner, accent color, and bio for individual com
 msgstr "Norint tinkinti savo avatarą, reklamjuostę, akcento spalvą ir biografiją atskiroms bendruomenėms, reikalingas \"{PREMIUM_PRODUCT_NAME}\". Bendruomenės slapyvardis ir įvardžiai yra nemokami visiems."
 
 #. Textarea right-click context menu item that cuts the selected text.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:44
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:46
 msgid "Cut"
 msgstr "Iškirpti"
 
@@ -10616,7 +10619,7 @@ msgstr "Numatytoji reikšmė mobiliajame įrenginyje yra išjungta, siekiant tau
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:204
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:216
 #: src/features/emoji/components/stickers/StickerGridItem.tsx:35
-#: src/features/messaging/commands/MessageCommands.tsx:73
+#: src/features/messaging/commands/MessageCommands.tsx:77
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:135
 #: src/features/theme_studio/sections/LibrarySection.tsx:514
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx:399
@@ -10757,8 +10760,8 @@ msgid "Delete message"
 msgstr "Ištrinti žinutę"
 
 #. Section heading and accessible label for the message-history-deletion radio group in the destructive ban-member modal. Destructive option group.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:77
-#: src/features/moderation/components/modals/BanMemberModal.tsx:255
+#: src/features/moderation/components/modals/BanMemberModal.tsx:78
+#: src/features/moderation/components/modals/BanMemberModal.tsx:229
 msgid "Delete message history"
 msgstr "Ištrinti susirašinėjimo istoriją"
 
@@ -10797,9 +10800,13 @@ msgstr "Ištrinti prisijungimo raktą"
 msgid "Delete redirect URI"
 msgstr "Ištrinti nukreipimo URL"
 
+#. Danger action in the channel permissions overwrite context menu that removes a role permission override from the channel.
 #. Destructive button in the role editor that removes the selected role. Removes the role from every member; keep tone plain.
+#. Destructive context menu action in the community roles settings tab that immediately removes the right-clicked role from every member. Keep it short.
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx:14
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx:173
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:50
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:57
+#: src/features/ui/action_menu/RoleContextMenu.tsx:17
 msgid "Delete role"
 msgstr "Ištrinti vaidmenį"
 
@@ -10811,7 +10818,7 @@ msgid "Delete saved media"
 msgstr "Ištrinti išsaugotą mediją"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:33
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:34
 msgid "Delete shortcut"
 msgstr "Ištrinti nuorodą"
 
@@ -10829,16 +10836,6 @@ msgstr "Ištrinti lipduką \"{stickerName}\""
 #: src/features/ui/action_menu/items/CategoryMenuData.tsx:47
 msgid "Delete the category \"{categoryName}\"? Can't be undone."
 msgstr "Ištrinti kategoriją \"{categoryName}\"? Šio veiksmo anuliuoti negalima."
-
-#. Helper text under the "Previous 24 hours" option in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:96
-msgid "Delete their messages from the last 24 hours"
-msgstr "Ištrinti jų žinutes per pastarąsias 24 valandas"
-
-#. Helper text under the "Previous 7 days" option in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:105
-msgid "Delete their messages from the last 7 days"
-msgstr "Ištrinti jų žinutes per pastarąsias 7 dienas"
 
 #. Button or menu action label in the theme studio library section. Keep it concise. Keep the tone plain and specific.
 #: src/features/theme_studio/sections/LibrarySection.tsx:59
@@ -10861,7 +10858,7 @@ msgid "Delete this message"
 msgstr "Ištrinti šį pranešimą"
 
 #. Error message in the messaging commands. Keep the tone plain and specific.
-#: src/features/messaging/commands/MessageCommands.tsx:69
+#: src/features/messaging/commands/MessageCommands.tsx:73
 msgid "Delete this message? Can't be undone."
 msgstr "Ištrinti šį pranešimą? Veiksmo anuliuoti negalima."
 
@@ -10869,6 +10866,11 @@ msgstr "Ištrinti šį pranešimą? Veiksmo anuliuoti negalima."
 #: src/features/user/components/modals/tabs/ExpressionPacksTab.tsx:45
 msgid "Delete this pack? Can't be undone."
 msgstr "Ištrinti šį paketą? Veiksmo anuliuoti negalima."
+
+#. Danger action in the channel permissions overwrite context menu that removes a member permission override from the channel.
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx:19
+msgid "Delete user"
+msgstr "Panaikinti naudotoją"
 
 #. Danger button label that deletes a webhook.
 #: src/features/webhook/components/WebhookListItem.tsx:360
@@ -11152,7 +11154,7 @@ msgstr "Išsami informacija"
 
 #. Item in the textarea spellcheck language submenu that detects draft message language and switches dictionaries as the user types.
 #. Spellcheck language mode label in the language tab. The app detects the draft message language and switches dictionaries as the user types.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:81
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:83
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:123
 msgid "Detect while typing"
 msgstr "Aptikti rašant"
@@ -11391,7 +11393,7 @@ msgid "Disable backend premium perks"
 msgstr "Išjungti \"premium\" privilegijas foninėje sistemoje"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:31
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:32
 msgid "Disable built-in shortcut"
 msgstr "Išjungti numatytąjį spartųjį klavišą"
 
@@ -11455,7 +11457,7 @@ msgid "Disable screen share picture-in-picture popouts?"
 msgstr "Ar norite išjungti ekrano dalijimosi iššokančius langus?"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:25
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:26
 msgid "Disable shortcut"
 msgstr "Išjungti nuorodą"
 
@@ -11931,12 +11933,10 @@ msgstr "Daugiau neklausti"
 msgid "Don't clear"
 msgstr "Neišvalyti"
 
-#. Choice label for retaining all messages when banning a member.
-#. Message-history-deletion option in the destructive ban-member modal. Keeps all messages from the banned member. Short standalone label.
-#: src/features/devtools/hooks/useCommands.ts:86
-#: src/features/moderation/components/modals/BanMemberModal.tsx:82
-msgid "Don't delete any"
-msgstr "Nieko netrinti"
+#. Message-history-deletion option when banning a member. Keeps all of the member's messages.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:14
+msgid "Don't Delete Any"
+msgstr "Neištrinti jokių"
 
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTabRenderers.tsx:663
 msgid "Don't display separately."
@@ -12088,7 +12088,7 @@ msgstr "Atsisiųsti diegimo programą"
 #. Generic media context menu download action when the specific type is unknown.
 #. Tooltip on the download button in the media viewer modal.
 #: src/features/channel/components/embeds/media/MediaContainer.tsx:28
-#: src/features/messaging/components/modals/media_modal/shared.ts:72
+#: src/features/messaging/components/modals/media_modal/shared.ts:73
 #: src/features/ui/action_menu/items/MediaMenuData.tsx:129
 msgid "Download media"
 msgstr "Atsisiųsti mediją"
@@ -12163,7 +12163,7 @@ msgstr "Nuvilkite jaustukų failus čia"
 msgid "Drag members between channels they can access."
 msgstr "Vilkite narius tarp kanalų, kuriuos jie gali pasiekti."
 
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:136
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:140
 msgid "Drag roles to customize the order they appear in the member list."
 msgstr "Vilkite vaidmenis, kad pakeistumėte jų rodymo tvarką narių sąraše."
 
@@ -12263,6 +12263,11 @@ msgstr "Dublikuoti"
 #: src/features/ui/action_menu/items/ChannelMenuData.tsx:136
 msgid "Duplicate channel"
 msgstr "Dublikuoti kanalą"
+
+#. Context menu action in the community roles settings tab that creates a new role copying the settings of the one right-clicked. Keep it short.
+#: src/features/ui/action_menu/RoleContextMenu.tsx:12
+msgid "Duplicate role"
+msgstr "Dubliuoti vaidmenį"
 
 #. Field label in the voice connection status popout. Shows how long the current voice session has been connected.
 #: src/features/voice/components/voice_connection_status/shared.ts:76
@@ -13085,7 +13090,7 @@ msgid "Enable Shift to expand"
 msgstr "Įjungti \"Shift\", kad išplėstumėte"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:29
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:30
 msgid "Enable shortcut"
 msgstr "Įjungti nuorodą"
 
@@ -13147,7 +13152,7 @@ msgstr "Įjunkite vaizdo įrašų peržiūros miniatiūras"
 #. Toggle item in the textarea spellcheck submenu. Master enable for spellcheck.
 #: src/features/app/components/setup/SetupWizardSteps.tsx:359
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:21
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:64
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:66
 msgid "Enabled"
 msgstr "Įjungta"
 
@@ -13309,7 +13314,7 @@ msgid "Enter a product name between 1 and 80 characters."
 msgstr "Įveskite produkto pavadinimą nuo 1 iki 80 simbolių."
 
 #. Placeholder in the optional reason input in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:114
+#: src/features/moderation/components/modals/BanMemberModal.tsx:88
 msgid "Enter a reason for the ban"
 msgstr "Įveskite blokavimo priežastį"
 
@@ -14044,7 +14049,7 @@ msgstr "Nepavyko įkelti pranešimų"
 msgid "Fail message sends"
 msgstr "Nepavykę pranešimų siuntimai"
 
-#: src/features/moderation/components/modals/BanMemberModal.tsx:167
+#: src/features/moderation/components/modals/BanMemberModal.tsx:141
 msgid "Failed to ban member. Try again."
 msgstr "Nepavyko užblokuoti nario. Bandykite dar kartą."
 
@@ -15031,7 +15036,7 @@ msgid "Forward {defaultSeekAmount} seconds"
 msgstr "Pirmyn {defaultSeekAmount} sekundžių"
 
 #. Tooltip on the media viewer button that forwards only the current media item.
-#: src/features/messaging/components/modals/media_modal/shared.ts:100
+#: src/features/messaging/components/modals/media_modal/shared.ts:101
 msgid "Forward media"
 msgstr "Persiųsti mediją"
 
@@ -15314,11 +15319,6 @@ msgstr "Visiškai uždarykite ir paleiskite iš naujo {productName}, kad „macO
 msgid "Gain control"
 msgstr "Valdykite"
 
-#. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
-#: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:281
-msgid "Game capture injection (Windows)"
-msgstr "Žaidimo fiksavimo įterpimas („Windows“)"
-
 #. Folder icon option in the community-folder settings modal: a game controller shape.
 #: src/features/guild/components/modals/GuildFolderSettingsModal.tsx:56
 msgid "Game controller"
@@ -15466,7 +15466,7 @@ msgid "GIF picker loading"
 msgstr "Įkeliamas GIF parinkiklis"
 
 #. Accessible label for an animated GIF shown in the media viewer.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:83
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:85
 msgid "GIF preview"
 msgstr "GIF peržiūra"
 
@@ -15528,7 +15528,7 @@ msgstr "Reikalingas dovanos kodas"
 msgid "Gift code is too long"
 msgstr "Dovanos kodas per ilgas"
 
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:143
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:139
 msgid "Gift code:"
 msgstr "Dovanos kodas:"
 
@@ -15563,7 +15563,7 @@ msgstr "Dovanų atsargų pranešimų juosta"
 
 #. Form field label for a gift redemption URL.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:38
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:34
 #: src/features/user/components/settings_utils/search_index/GiftInventoryIndex.ts:26
 msgid "Gift link"
 msgstr "Dovanos nuoroda"
@@ -15679,6 +15679,12 @@ msgstr "Visuotinis vardas"
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:97
 msgid "Global profile"
 msgstr "Visuotinis profilis"
+
+#. Toggle in the keybinds tab. When on, the shortcut works even when Fluxer is not focused. Keep it concise.
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:81
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:57
+msgid "Global shortcut"
+msgstr "Globalus spartusis klavišas"
 
 #. Generic back-navigation label in modals, settings tabs, and nested flows.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:107
@@ -16464,11 +16470,11 @@ msgstr "Hindi"
 msgid "Hints"
 msgstr "Patarimai"
 
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:95
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:99
 msgid "Hoist order"
 msgstr "Rikiavimo tvarka"
 
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:427
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:507
 msgid "Hoist order reset to default"
 msgstr "Rikiavimo tvarka atkurta į numatytąją"
 
@@ -16544,7 +16550,7 @@ msgid "How about:"
 msgstr "O gal:"
 
 #. Helper text under the ban duration dropdown in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:63
+#: src/features/moderation/components/modals/BanMemberModal.tsx:64
 msgid "How long they stay banned."
 msgstr "Kiek laiko jie bus užblokuoti."
 
@@ -16554,7 +16560,7 @@ msgid "How long they stay timed out."
 msgstr "Kiek laiko jie bus nutildyti."
 
 #. Description for the /ban delete_messages option.
-#: src/features/devtools/hooks/useCommands.ts:82
+#: src/features/devtools/hooks/useCommands.ts:83
 msgid "How much of the member's recent message history to delete."
 msgstr "Kiek nesenos nario žinučių istorijos ištrinti."
 
@@ -16630,11 +16636,6 @@ msgstr "Sutinku su atnaujintomis sąlygomis"
 #: src/features/user/components/modals/tabs/component_gallery_tab/OverlaysTab.tsx:19
 msgid "I am a tooltip"
 msgstr "Aš esu patarimas"
-
-#. Gift redemption pre-filled DM message for a sender who already owns lifetime premium.
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:26
-msgid "I can't redeem this because I already have lifetime {premiumProductName}, so this gift is all yours!"
-msgstr "Negaliu išpirkti šio dovanų kupono, nes jau turiu \"{premiumProductName}\" visam gyvenimui, tad ši dovana – visa tavo!"
 
 #: src/features/guild/components/modals/GuildDeleteModal.tsx:56
 msgid "I changed my mind"
@@ -16900,7 +16901,7 @@ msgstr "nuotrauka"
 #. Type label for image media.
 #: src/features/channel/components/embeds/media/EmbedImage.tsx:47
 #: src/features/expressions/utils/FavoriteMemeUtils.ts:14
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:111
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:113
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:25
 msgid "Image"
 msgstr "Nuotrauka"
@@ -16945,7 +16946,7 @@ msgid "Image options"
 msgstr "Nuotraukos parinktys"
 
 #. Accessible label for a static image shown in the media viewer.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:79
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:81
 msgid "Image preview"
 msgstr "Paveikslėlio peržiūra"
 
@@ -17157,7 +17158,7 @@ msgstr "Balso pokalbyje"
 
 #. Spellcheck engine option in the language tab. Uses the bundled in-app Hunspell dictionaries. Keep it concise.
 #. Spellcheck engine option in the textarea spellcheck submenu. The bundled in-app hunspell engine.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:73
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:75
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:97
 msgid "In-app dictionaries"
 msgstr "Programėlės žodynai"
@@ -18002,7 +18003,7 @@ msgstr "Prisijungti prie bendruomenės"
 #. Empty-state hint in the channel and chat mobile stickers picker.
 #. Empty-state hint in the channel and chat stickers picker.
 #: src/features/channel/components/MobileStickersPicker.tsx:55
-#: src/features/channel/components/StickersPicker.tsx:54
+#: src/features/channel/components/StickersPicker.tsx:55
 msgid "Join a community to unlock stickers."
 msgstr "Prisijunkite prie bendruomenės, kad atrakintumėte lipdukus."
 
@@ -18106,7 +18107,7 @@ msgstr "Peršokti tarp neskaitytų kanalų"
 msgid "Jump between unread channels with mentions"
 msgstr "Pereiti tarp neskaitytų kanalų su paminėjimais"
 
-#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:100
+#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:75
 msgid "Jump straight to the app to continue."
 msgstr "Pereikite tiesiai į programėlę, kad tęstumėte."
 
@@ -18210,11 +18211,6 @@ msgstr "Tiesiog prisijungti (išlaikyti kitus ryšius)"
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts:218
 msgid "Keep {productName} running when the window is closed"
 msgstr "Palikti \"{productName}\" veikti uždarius langą"
-
-#. Helper text under the "Don't delete any" message-history option in the destructive ban-member modal.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:87
-msgid "Keep all messages"
-msgstr "Palikti visas žinutes"
 
 #. Description text in the motion tab.
 #. Settings search entry description. One-line summary of what the settings search entry controls.
@@ -18326,7 +18322,7 @@ msgid "Kick"
 msgstr "Pašalinti"
 
 #. Slash-command description for /kick. Removes a member from the current community (moderation action).
-#: src/features/devtools/hooks/useCommands.ts:38
+#: src/features/devtools/hooks/useCommands.ts:39
 msgid "Kick a member from this community."
 msgstr "Pašalinti narį iš šios bendruomenės."
 
@@ -18370,7 +18366,7 @@ msgstr "Kalbos nustatymai"
 
 #. Submenu label in the textarea spellcheck submenu listing manual language overrides.
 #. Subsection title for spellcheck language settings. Keep it concise.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:86
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:88
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:119
 msgid "Languages"
 msgstr "Kalbos"
@@ -19695,7 +19691,7 @@ msgstr "Medijos mygtukai"
 
 #. Accessible label for the floating media controls toolbar in the media viewer modal.
 #. Voice participant context menu submenu label for camera, stream, and video actions.
-#: src/features/messaging/components/modals/media_modal/shared.ts:68
+#: src/features/messaging/components/modals/media_modal/shared.ts:69
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:190
 msgid "Media controls"
 msgstr "Medijos valdikliai"
@@ -19720,12 +19716,12 @@ msgstr "Medijos įkėlimo būsena"
 #. Accessible label for the overflow menu button in the media viewer modal.
 #. Short label in the channel and chat media action bottom sheet. Keep it concise.
 #: src/features/channel/components/MediaActionBottomSheet.tsx:37
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:67
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:69
 msgid "Media options"
 msgstr "Medijos parinktys"
 
 #. Generic accessible label for unknown media in the media viewer.
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:95
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:97
 msgid "Media preview"
 msgstr "Medijos peržiūra"
 
@@ -19924,7 +19920,7 @@ msgid "Mention badges"
 msgstr "Paminėjimų ženkliukai"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
-#: src/features/channel/components/channel_header_components/developer_tools/GeneralOptionsMenu.tsx:22
+#: src/features/channel/components/channel_header_components/developer_tools/GeneralOptionsMenu.tsx:18
 msgid "Mention controls"
 msgstr "Paminėjimų valdymas"
 
@@ -20640,7 +20636,7 @@ msgid "More options"
 msgstr "Daugiau parinkčių"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:52
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:53
 msgid "More shortcut options"
 msgstr "Daugiau sparčiųjų klavišų parinkčių"
 
@@ -21418,7 +21414,7 @@ msgid "New password"
 msgstr "Naujas slaptažodis"
 
 #. Default name for a newly created role in the community roles settings tab. Short label.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:46
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:48
 msgid "New role"
 msgstr "Naujas vaidmuo"
 
@@ -21467,9 +21463,9 @@ msgstr "Kitas"
 #. Accessible label for the next-attachment navigation button in the media viewer.
 #. Media viewer navigation button label for the next attachment.
 #. Media viewer navigation tooltip for the next attachment.
-#: src/features/messaging/components/modals/media_modal/shared.ts:64
-#: src/features/messaging/components/modals/media_modal/shared.ts:120
-#: src/features/messaging/components/modals/media_modal/shared.ts:144
+#: src/features/messaging/components/modals/media_modal/shared.ts:65
+#: src/features/messaging/components/modals/media_modal/shared.ts:121
+#: src/features/messaging/components/modals/media_modal/shared.ts:145
 msgid "Next attachment"
 msgstr "Kitas priedas"
 
@@ -21757,7 +21753,7 @@ msgstr "Nėra atitinkančių GIF"
 msgid "No gifts yet"
 msgstr "Dar nėra dovanų"
 
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:169
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:175
 msgid "No hoisted roles. Enable \"Show this role separately\" on a role to see it here."
 msgstr "Nėra iškeltų vaidmenų. Įjunkite \"Rodyti šį vaidmenį atskirai\" prie vaidmens, kad jį čia matytumėte."
 
@@ -22012,14 +22008,14 @@ msgid "No stickers match"
 msgstr "Nėra tinkančių lipdukų"
 
 #. Empty-state text in the channel and chat stickers picker.
-#: src/features/channel/components/StickersPicker.tsx:58
+#: src/features/channel/components/StickersPicker.tsx:59
 msgid "No stickers match that search"
 msgstr "Nėra lipdukų, atitinkančių paiešką"
 
 #. Empty-state text in the channel and chat mobile stickers picker.
 #. Empty-state text in the channel and chat stickers picker.
 #: src/features/channel/components/MobileStickersPicker.tsx:51
-#: src/features/channel/components/StickersPicker.tsx:50
+#: src/features/channel/components/StickersPicker.tsx:51
 msgid "No stickers yet"
 msgstr "Lipdukų dar nėra"
 
@@ -22584,7 +22580,7 @@ msgstr "Tik pasirinkti"
 msgid "Only Visionary members can join this community. Your access may have changed since this screen was opened."
 msgstr "Tik „Visionary“ nariai gali prisijungti prie šios bendruomenės. Jūsų prieiga galėjo pasikeisti nuo tada, kai atidarėte šį ekraną."
 
-#: src/features/channel/components/UserMessage.tsx:433
+#: src/features/channel/components/UserMessage.tsx:427
 msgid "Only you can see this message. <0>Dismiss</0>"
 msgstr "Šį pranešimą matote tik jūs. <0>Atmesti</0>"
 
@@ -22637,7 +22633,7 @@ msgid "Open {macosSystemSettingsName} → {macosPrivacyAndSecuritySettingsName} 
 msgstr "Atidarykite „{macosSystemSettingsName}“ → „{macosPrivacyAndSecuritySettingsName}“ → „{macosScreenRecordingPermissionName}\", tada leiskite naudoti programai „{productName}\". Jei programa „{productName2}\" jau įgalinta, visiškai uždarykite ir iš naujo paleiskite programą „{productName3}\", kad macOS pritaikytų leidimą."
 
 #. Button label that opens the desktop app. productName is the app name.
-#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:28
+#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:27
 msgid "Open {productName}"
 msgstr "Atidaryti „{productName}\""
 
@@ -22879,12 +22875,12 @@ msgid "Open image link"
 msgstr "Atidaryti paveikslėlio nuorodą"
 
 #. Title in a web prompt that opens the same flow in the desktop app. productName is the app name.
-#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:24
+#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:23
 msgid "Open in {productName} for desktop"
 msgstr "Atidaryti darbalaukio programoje „{productName}\""
 
 #. Media viewer action that opens the current media in the system default browser.
-#: src/features/messaging/components/modals/media_modal/shared.ts:76
+#: src/features/messaging/components/modals/media_modal/shared.ts:77
 msgid "Open in browser"
 msgstr "Atidaryti naršyklėje"
 
@@ -23105,7 +23101,7 @@ msgstr "Atidaro narių puslapį. Paspauskite tarpą arba Enter, kad atidarytumė
 #. Short label in the language tab. Keep it concise.
 #. Spellcheck engine option in the textarea spellcheck submenu. Uses the host operating system spellchecker.
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:184
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:77
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:79
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:107
 msgid "Operating system"
 msgstr "Operacinė sistema"
@@ -23178,7 +23174,7 @@ msgstr "Arba nusiųskite pakvietimo nuorodą draugui:"
 msgid "or send an invite to a friend:"
 msgstr "arba išsiųskite pakvietimą draugui:"
 
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:135
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:131
 msgid "or send the gift link to a friend:"
 msgstr "arba nusiųsti dovanos nuorodą draugui:"
 
@@ -23512,7 +23508,7 @@ msgid "Past 7 days"
 msgstr "Paskutinės 7 dienos"
 
 #. Textarea right-click context menu item that pastes clipboard contents.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:52
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:54
 msgid "Paste"
 msgstr "Įklijuoti"
 
@@ -23706,7 +23702,7 @@ msgid "Perks paused"
 msgstr "Privalumai pristabdyti"
 
 #. Ban duration option in the destructive ban-member modal meaning the ban never expires. Short standalone label.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:37
+#: src/features/moderation/components/modals/BanMemberModal.tsx:38
 msgid "Permanent"
 msgstr "Visam laikui"
 
@@ -24441,53 +24437,44 @@ msgstr "Peržiūros"
 msgid "Previous"
 msgstr "Ankstesnis"
 
-#. Choice label for deleting two days of messages when banning a member.
-#: src/features/devtools/hooks/useCommands.ts:94
-msgid "Previous 2 days"
-msgstr "Anksti 2 dienas"
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last 12 hours.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:37
+msgid "Previous 12 Hours"
+msgstr "Per pastarąsias 12 valandų"
 
-#. Choice label for deleting one day of messages when banning a member.
-#. Message-history-deletion option in the destructive ban-member modal. Deletes the banned member's messages from the last 24 hours.
-#: src/features/devtools/hooks/useCommands.ts:90
-#: src/features/moderation/components/modals/BanMemberModal.tsx:91
-msgid "Previous 24 hours"
-msgstr "Praėjusios 24 valandos"
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last 24 hours.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:45
+msgid "Previous 24 Hours"
+msgstr "Per pastarąsias 24 valandas"
 
-#. Choice label for deleting three days of messages when banning a member.
-#: src/features/devtools/hooks/useCommands.ts:98
-msgid "Previous 3 days"
-msgstr "Ankstesnių 3 dienų"
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last 3 days.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:53
+msgid "Previous 3 Days"
+msgstr "Paskutinės 3 dienos"
 
-#. Choice label for deleting four days of messages when banning a member.
-#: src/features/devtools/hooks/useCommands.ts:102
-msgid "Previous 4 days"
-msgstr "Ankstesnių 4 dienų"
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last 6 hours.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:29
+msgid "Previous 6 Hours"
+msgstr "Paskutinės 6 valandos"
 
-#. Choice label for deleting five days of messages when banning a member.
-#: src/features/devtools/hooks/useCommands.ts:106
-msgid "Previous 5 days"
-msgstr "Ankstesnių 5 dienų"
-
-#. Choice label for deleting six days of messages when banning a member.
-#: src/features/devtools/hooks/useCommands.ts:110
-msgid "Previous 6 days"
-msgstr "Ankstesnių 6 dienų"
-
-#. Choice label for deleting seven days of messages when banning a member.
-#. Message-history-deletion option in the destructive ban-member modal. Deletes the banned member's messages from the last 7 days.
-#: src/features/devtools/hooks/useCommands.ts:114
-#: src/features/moderation/components/modals/BanMemberModal.tsx:100
-msgid "Previous 7 days"
-msgstr "Praėjusios 7 dienos"
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last 7 days.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:61
+msgid "Previous 7 Days"
+msgstr "Per pastarąsias 7 dienas"
 
 #. Accessible label for the previous-attachment navigation button in the media viewer.
 #. Media viewer navigation button label for the previous attachment.
 #. Media viewer navigation tooltip for the previous attachment.
-#: src/features/messaging/components/modals/media_modal/shared.ts:56
-#: src/features/messaging/components/modals/media_modal/shared.ts:116
-#: src/features/messaging/components/modals/media_modal/shared.ts:136
+#: src/features/messaging/components/modals/media_modal/shared.ts:57
+#: src/features/messaging/components/modals/media_modal/shared.ts:117
+#: src/features/messaging/components/modals/media_modal/shared.ts:137
 msgid "Previous attachment"
 msgstr "Ankstesnis priedas"
+
+#. Message-history-deletion option when banning a member. Deletes the member's messages from the last hour.
+#: src/features/moderation/constants/BanDeleteMessageOptions.ts:21
+msgid "Previous Hour"
+msgstr "Ankstesnė valanda"
 
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts:47
@@ -25236,13 +25223,13 @@ msgstr "Priežastis"
 
 #. Label of the optional reason input in the destructive ban-member modal. Reason is recorded in the activity log.
 #. Label of the optional reason textarea in the timeout-member modal. The reason is recorded in the activity log.
-#: src/features/moderation/components/modals/BanMemberModal.tsx:109
+#: src/features/moderation/components/modals/BanMemberModal.tsx:83
 #: src/features/moderation/components/modals/TimeoutMemberModal.tsx:36
 msgid "Reason (optional)"
 msgstr "Priežastis (pasirinktinai)"
 
 #. Description for an optional moderation slash-command reason.
-#: src/features/devtools/hooks/useCommands.ts:66
+#: src/features/devtools/hooks/useCommands.ts:67
 msgid "Reason (optional)."
 msgstr "Priežastis (pasirenkama)."
 
@@ -25303,7 +25290,7 @@ msgstr "Gavėjai bus nukreipti į {0} <0>{1}</0>"
 #. Badge shown next to the auto codec option in the screen-share codec radio group. Keep it concise.
 #. Spellcheck engine option in the language tab. Lets the app choose the best available spellcheck engine.
 #. Spellcheck engine option in the textarea spellcheck submenu. Lets the app choose the best available engine.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:68
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:70
 #: src/features/user/components/modals/tabs/components/CodecSelectorSection.tsx:38
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:87
 msgid "Recommended"
@@ -25432,7 +25419,7 @@ msgid "Redirect URIs"
 msgstr "Peradresavimo URI"
 
 #. Textarea right-click context menu item that redoes the last undone edit.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:40
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:42
 msgid "Redo"
 msgstr "Grąžinti atgal"
 
@@ -25622,7 +25609,7 @@ msgid "Reload now"
 msgstr "Įkelti iš naujo"
 
 #. Hint in the textarea spellcheck submenu shown after switching engines.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:90
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:92
 msgid "Reload to apply engine change"
 msgstr "Įkelti iš naujo, kad būtų pritaikytas variklio pakeitimas"
 
@@ -25785,7 +25772,7 @@ msgid "Remove friend"
 msgstr "Pašalinti draugą"
 
 #. Textarea right-click context menu item that removes the selected misspelled word from the personal dictionary.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:27
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:29
 msgid "Remove from dictionary"
 msgstr "Pašalinti iš žodyno"
 
@@ -26172,7 +26159,7 @@ msgstr "Atsakymo paminėjimo nuostata šiai bendruomenei"
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #. Tooltip on the media viewer button that closes the viewer and replies to the message containing the media.
 #: src/features/input/state/input_keybind/shared.ts:21
-#: src/features/messaging/components/modals/media_modal/shared.ts:104
+#: src/features/messaging/components/modals/media_modal/shared.ts:105
 msgid "Reply to message"
 msgstr "Atsakyti į žinutę"
 
@@ -26461,7 +26448,7 @@ msgid "Reset"
 msgstr "Atstatyti"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:43
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:44
 msgid "Reset \"{label}\" to built-in"
 msgstr "Atkurti \"{label}\" numatytuosius nustatymus"
 
@@ -26542,7 +26529,7 @@ msgid "Reset mature content agreement state"
 msgstr "Iš naujo nustatyti sutikimo su brandaus turinio taisyklėmis būseną"
 
 #. Tooltip on the media viewer button that recenters the current media item and restores the default zoom.
-#: src/features/messaging/components/modals/media_modal/shared.ts:88
+#: src/features/messaging/components/modals/media_modal/shared.ts:89
 msgid "Reset media position"
 msgstr "Atkurti medijos padėtį"
 
@@ -26581,11 +26568,11 @@ msgid "Reset to actual values"
 msgstr "Atkurti tikrąsias reikšmes"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:35
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:36
 msgid "Reset to built-in"
 msgstr "Atkurti numatytuosius"
 
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:122
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:126
 msgid "Reset to default"
 msgstr "Atkurti numatytuosius"
 
@@ -27123,7 +27110,8 @@ msgstr "Rolės spalva"
 msgid "Role created"
 msgstr "Sukurtas vaidmuo"
 
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:334
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:341
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:388
 msgid "Role created successfully"
 msgstr "Vaidmuo sėkmingai sukurtas"
 
@@ -27132,7 +27120,8 @@ msgstr "Vaidmuo sėkmingai sukurtas"
 msgid "Role deleted"
 msgstr "Rolė ištrinta"
 
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:369
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:425
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:454
 msgid "Role deleted successfully"
 msgstr "Vaidmuo sėkmingai ištrintas"
 
@@ -27172,7 +27161,7 @@ msgstr "Vaidmenys"
 msgid "Roles and members"
 msgstr "Vaidmenys ir nariai"
 
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:278
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:285
 msgid "Roles updated successfully"
 msgstr "Vaidmenys sėkmingai atnaujinti"
 
@@ -27187,14 +27176,14 @@ msgid "Romanian"
 msgstr "rumunų"
 
 #. Tooltip on the media viewer button that rotates the current media item 90 degrees anticlockwise.
-#: src/features/messaging/components/modals/media_modal/shared.ts:96
+#: src/features/messaging/components/modals/media_modal/shared.ts:97
 msgid "Rotate anticlockwise"
 msgstr "Pasukti prieš laikrodžio rodyklę"
 
 #. Short label in the image crop modal. Keep it concise.
 #. Tooltip on the media viewer button that rotates the current media item 90 degrees clockwise.
 #: src/features/messaging/components/modals/ImageCropModal.tsx:23
-#: src/features/messaging/components/modals/media_modal/shared.ts:92
+#: src/features/messaging/components/modals/media_modal/shared.ts:93
 msgid "Rotate clockwise"
 msgstr "Pasukti pagal laikrodžio rodyklę"
 
@@ -27766,7 +27755,7 @@ msgid "Search filters"
 msgstr "Paieškos filtrai"
 
 #. Slash-command description for /gif. Searches for and sends a GIF.
-#: src/features/devtools/hooks/useCommands.ts:58
+#: src/features/devtools/hooks/useCommands.ts:59
 msgid "Search for and send a GIF."
 msgstr "Ieškoti ir siųsti GIF."
 
@@ -27793,7 +27782,7 @@ msgid "Search GIFs and pick your favorite"
 msgstr "Ieškokite GIF failų ir pasirinkite mėgstamiausią"
 
 #. Button or menu action label in the search scope sheet. Keep it concise.
-#: src/features/search/components/search/ScopeSheet.tsx:23
+#: src/features/search/components/search/ScopeSheet.tsx:16
 msgid "Search in"
 msgstr "Ieškoti čia"
 
@@ -28149,7 +28138,7 @@ msgid "Select account"
 msgstr "Pasirinkti paskyrą"
 
 #. Textarea right-click context menu item that selects all text in the textarea.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:56
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:58
 msgid "Select all"
 msgstr "Pasirinkti viską"
 
@@ -28307,7 +28296,7 @@ msgid "Send ({selectedCount}/{selectionLimit})"
 msgstr "Siųsti ({selectedCount}/{selectionLimit})"
 
 #. Slash-command description for /dm. Sends a direct message to a user.
-#: src/features/devtools/hooks/useCommands.ts:46
+#: src/features/devtools/hooks/useCommands.ts:47
 msgid "Send a direct message to a user."
 msgstr "Siųsti tiesioginę žinutę vartotojui."
 
@@ -28317,27 +28306,27 @@ msgid "Send a friend request to {userName}, or use the staff override to add the
 msgstr "Siųsti draugo užklausą vartotojui {userName} arba naudoti darbuotojo prieigos teises ir pridėti jį iškart."
 
 #. Slash-command description for /favorites. Sends a saved / favorited media item.
-#: src/features/devtools/hooks/useCommands.ts:50
+#: src/features/devtools/hooks/useCommands.ts:51
 msgid "Send a saved media item."
 msgstr "Siųsti išsaugotą medijos elementą."
 
 #. Slash-command description for /spoiler. Wraps the message in spoiler tags so recipients must click to reveal.
-#: src/features/devtools/hooks/useCommands.ts:24
+#: src/features/devtools/hooks/useCommands.ts:25
 msgid "Send a spoiler message (wraps in spoiler tags)."
 msgstr "Siųsti pranešimą su paslėptu tekstu (įterpia paslėpto teksto žymes)."
 
 #. Slash-command description for /sticker. Sends a sticker.
-#: src/features/devtools/hooks/useCommands.ts:54
+#: src/features/devtools/hooks/useCommands.ts:55
 msgid "Send a sticker."
 msgstr "Siųsti lipduką."
 
 #. Slash-command description for /tts. Sends a text-to-speech message played aloud for users with TTS enabled.
-#: src/features/devtools/hooks/useCommands.ts:29
+#: src/features/devtools/hooks/useCommands.ts:30
 msgid "Send a text-to-speech message."
 msgstr "Siųsti teksto į kalbą pranešimą."
 
 #. Slash-command description for /me. Sends the message wrapped in italics, IRC-style.
-#: src/features/devtools/hooks/useCommands.ts:20
+#: src/features/devtools/hooks/useCommands.ts:21
 msgid "Send an action message (wraps in italics)."
 msgstr "Siųsti veiksmo pranešimą (apgaubia kursyvu)."
 
@@ -28395,7 +28384,7 @@ msgstr "Siųsti GIF {title}"
 #. Plus menu item that opens the gift purchase flow.
 #: src/features/channel/components/textarea/MobileTextareaPlusBottomSheet.tsx:21
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:31
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:34
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:30
 msgid "Send gift"
 msgstr "Siųsti dovaną"
 
@@ -28625,12 +28614,12 @@ msgid "Set accent color to {0} <0/>."
 msgstr "Nustatyta akcento spalva: {0} <0/>."
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:27
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:28
 msgid "Set custom shortcut"
 msgstr "Nustatyti pasirinktinį spartųjį klavišą"
 
 #. Label in the keybinds tab. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:48
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:49
 msgid "Set custom shortcut for \"{label}\""
 msgstr "Nustatyti pasirinktinį spartųjį klavišą, skirtą \"{label}\""
 
@@ -29068,7 +29057,7 @@ msgstr "Trumpiniai kodai"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:106
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
 #: src/features/user/components/modals/tabs/UserVoiceTab.tsx:377
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:105
@@ -29341,7 +29330,7 @@ msgid "Show media button"
 msgstr "Rodyti medijos mygtuką"
 
 #. Tooltip on the info button in the media viewer modal. Toggles a metadata sidebar.
-#: src/features/messaging/components/modals/media_modal/shared.ts:80
+#: src/features/messaging/components/modals/media_modal/shared.ts:81
 msgid "Show media information"
 msgstr "Rodyti medijos informaciją"
 
@@ -29481,6 +29470,8 @@ msgstr "Rodyti išsaugotą mediją raiškos automatinio pildymo funkcijose"
 
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
+#. Short label in the channel and chat textarea plus menu. Keep it concise.
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:102
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:59
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:125
 msgid "Show send button"
@@ -30249,7 +30240,7 @@ msgstr "Kažkas nepavyko. Bandykite dar kartą vėliau."
 #. Toast error shown when the mature content check request fails unexpectedly.
 #: src/features/auth/components/modals/MatureContentCheckModal.tsx:18
 #: src/features/auth/components/modals/required_action/RequiredActionDescriptors.ts:430
-#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:32
+#: src/features/auth/flow/DesktopDeepLinkPrompt.tsx:31
 msgid "Something went wrong. Try again."
 msgstr "Kažkas nepavyko. Bandykite dar kartą."
 
@@ -30500,7 +30491,7 @@ msgstr "Rašybos tikrinimas"
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Settings section label for spellcheck settings.
 #. Submenu label in the textarea right-click context menu for spellcheck preferences.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:60
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:62
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:414
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:456
 #: src/features/user/components/settings_utils/search_index/LanguageIndex.ts:74
@@ -31083,11 +31074,6 @@ msgstr "Transliacija"
 msgid "Stream buffering"
 msgstr "Srautas buferizuojamas"
 
-#. Voice participant context menu submenu label for incoming screen share audio controls.
-#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:202
-msgid "Stream controls"
-msgstr "Srauto valdikliai"
-
 #. Status overlay on a voice participant tile when the remote screen share has ended.
 #: src/features/voice/components/voice_participant_tile/shared.ts:26
 msgid "Stream ended"
@@ -31296,7 +31282,7 @@ msgstr "Slėpti įterptąjį turinį"
 msgid "Suppress role mentions"
 msgstr "Slopinti vaidmenų paminėjimus"
 
-#: src/features/channel/components/channel_header_components/developer_tools/GeneralOptionsMenu.tsx:103
+#: src/features/channel/components/channel_header_components/developer_tools/GeneralOptionsMenu.tsx:90
 msgid "Suppress unprivileged self-mentions"
 msgstr "Slėpti neprivilegijuotus savęs paminėjimus"
 
@@ -32103,12 +32089,12 @@ msgid "The mature content check was canceled. You can close this tab and try aga
 msgstr "Brandos turinio patikra atšaukta. Galite uždaryti šį skirtuką ir bandyti dar kartą programėlėje."
 
 #. Description for the member option of a moderation slash command.
-#: src/features/devtools/hooks/useCommands.ts:62
+#: src/features/devtools/hooks/useCommands.ts:63
 msgid "The member to target."
 msgstr "Narys, į kurį bus nukreipta."
 
 #. Description for a required message option in a slash command.
-#: src/features/devtools/hooks/useCommands.ts:70
+#: src/features/devtools/hooks/useCommands.ts:71
 msgid "The message to send."
 msgstr "Žinutė, kurią reikia išsiųsti."
 
@@ -34242,7 +34228,7 @@ msgid "Understood"
 msgstr "Supratau"
 
 #. Textarea right-click context menu item that undoes the last edit.
-#: src/features/channel/components/textarea/TextareaContextMenu.tsx:36
+#: src/features/channel/components/textarea/TextareaContextMenu.tsx:38
 msgid "Undo"
 msgstr "Anuliuoti"
 
@@ -34439,7 +34425,7 @@ msgstr "nežinomas naudotojas"
 #: src/features/channel/components/guild_members_page/MemberTableRow.tsx:60
 #: src/features/channel/components/modals/channel_tabs/ChannelPermissionsTab.tsx:68
 #: src/features/channel/utils/ChannelUtils.tsx:55
-#: src/features/devtools/utils/CommandUtils.ts:23
+#: src/features/devtools/utils/CommandUtils.ts:27
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTab.tsx:114
 #: src/features/voice/components/VoiceParticipantAvatarList.tsx:43
 #: src/features/voice/components/VoiceParticipantTile.tsx:161
@@ -34487,7 +34473,7 @@ msgid "Unlock {lockedEmojiCount, plural, one {# custom emoji} other {# custom em
 msgstr "Atrakinkite {lockedEmojiCount, plural, one {# pasirinktinį jaustuką} other {# pasirinktinius jaustukus}} iš {communityCount, plural, one {# bendruomenės} other {# bendruomenių}} su \"{PREMIUM_PRODUCT_NAME}\"."
 
 #: src/features/channel/components/MobileStickersPicker.tsx:160
-#: src/features/channel/components/StickersPicker.tsx:155
+#: src/features/channel/components/StickersPicker.tsx:169
 msgid "Unlock {lockedStickerCount, plural, one {# sticker} other {# stickers}} from {stickerCommunityCount, plural, one {# community} other {# communities}} with {PREMIUM_PRODUCT_NAME}."
 msgstr "Atrakinkite {lockedStickerCount, plural, one {# lipduką} other {# lipdukus}} iš {stickerCommunityCount, plural, one {# bendruomenės} other {# bendruomenių}} su \"{PREMIUM_PRODUCT_NAME}\"."
 
@@ -34612,7 +34598,7 @@ msgid "Unmute stream audio"
 msgstr "Įjungti srauto garsą"
 
 #. Short label in the channel and chat use message search autocomplete. Keep it concise.
-#: src/features/channel/components/message_search_bar/useMessageSearchAutocomplete.ts:73
+#: src/features/channel/components/message_search_bar/useMessageSearchAutocomplete.ts:88
 msgid "Unnamed"
 msgstr "Be pavadinimo"
 
@@ -35239,11 +35225,6 @@ msgstr "Naudoti {everyoneMention}/{hereMention} ir {rolesMention}"
 msgid "Use {pixPaymentMethod}"
 msgstr "Naudoti {pixPaymentMethod}"
 
-#. Description for the recommended spellcheck engine option in the language tab. Preserve {productName}; it is inserted by code and must appear verbatim in the translation.
-#: src/features/user/components/modals/tabs/LanguageTab.tsx:91
-msgid "Use {productName}'s in-app dictionaries when available. Otherwise, use your operating system's spellchecker."
-msgstr "Kai įmanoma, naudoti „{productName}\" programėlės žodynus. Kitais atvejais naudoti operacinės sistemos rašybos tikrintuvą."
-
 #. Description text in the add custom search engine modal. Preserve {query}; it is inserted by code.
 #: src/features/user/components/modals/tabs/chat_settings_tab/AddCustomSearchEngineModal.tsx:50
 msgid "Use {query} where the search text should be inserted."
@@ -35563,6 +35544,11 @@ msgstr "Naudokite vaizdo ir kameros peržiūras."
 msgid "Use voice activity"
 msgstr "Naudoti balso aktyvavimą"
 
+#. Description for the recommended spellcheck engine option in the language tab. Preserve {productName}; it is inserted by code and must appear verbatim in the translation.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx:91
+msgid "Use your operating system's spellchecker when available. Otherwise, use {productName}'s in-app dictionaries."
+msgstr "Naudokite jūsų operacinės sistemos rašybos tikrintuvą, jei jis pasiekiamas. Kitu atveju naudokite {productName} programos viduje esančius žodynus."
+
 #. placeholder {0}: renderInline(change.newValue, i18n)
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTabRenderers.tsx:689
 msgid "Used {0} times."
@@ -35611,7 +35597,7 @@ msgid "User"
 msgstr "Vartotojas"
 
 #. Voice participant context menu submenu label for lower-frequency profile and communication actions.
-#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:206
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:202
 msgid "User actions"
 msgstr "Vartotojo veiksmai"
 
@@ -36217,8 +36203,8 @@ msgstr "Vaizdo paketų praradimas:"
 #. Accessible label for a video shown in the media viewer.
 #. Accessible label for a video thumbnail in the media viewer thumbnail strip.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/messaging/components/modals/media_modal/shared.ts:132
-#: src/features/messaging/components/modals/MediaViewerModal.tsx:87
+#: src/features/messaging/components/modals/media_modal/shared.ts:133
+#: src/features/messaging/components/modals/MediaViewerModal.tsx:89
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:177
 msgid "Video preview"
 msgstr "Vaizdo įrašo peržiūra"
@@ -37063,7 +37049,7 @@ msgstr "Atidarius prisijungimo naršyklėje langą, iš anksto užpildysime {pre
 msgid "We will send an SMS code when available."
 msgstr "Kai bus galima, atsiųsime SMS kodą."
 
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:91
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:87
 msgid "We'd love to give you more than infinity of {PREMIUM_PRODUCT_NAME}, but that breaks the space-time continuum. Send the gift to a friend instead?"
 msgstr "Norėtume jums padovanoti daugiau nei begalybę \"{PREMIUM_PRODUCT_NAME}\", bet tai pažeistų erdvės ir laiko kontinuumą. Gal geriau nusiųsti dovaną draugui?"
 
@@ -37365,7 +37351,7 @@ msgid "What to include"
 msgstr "Ką įtraukti"
 
 #. Description for a media search slash-command query.
-#: src/features/devtools/hooks/useCommands.ts:74
+#: src/features/devtools/hooks/useCommands.ts:75
 msgid "What to search for."
 msgstr "Ko ieškoti."
 
@@ -37696,7 +37682,7 @@ msgid "You already have a group with these users. Do you really want to create a
 msgstr "Jau turite grupę su šiais naudotojais. Ar tikrai norite sukurti naują? Tai irgi gerai!"
 
 #. Status label shown to a user who already owns the lifetime premium tier.
-#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:30
+#: src/features/expressions/components/modals/GiftSendToFriendModal.tsx:26
 msgid "You already have lifetime {premiumProductName}"
 msgstr "Jau turite \"{premiumProductName}\" visam gyvenimui"
 
@@ -38005,17 +37991,17 @@ msgid "You cannot delete your account while you own communities. Transfer owners
 msgstr "Negalite ištrinti paskyros, kol turite bendruomenių. Pirmiausia perleiskite nuosavybės teises šioms bendruomenėms:"
 
 #. Tooltip on the disabled permission list in the role editor when role hierarchy blocks editing.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:64
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:71
 msgid "You cannot edit a role at or above your highest role"
 msgstr "Negalite redaguoti vaidmens, kuris yra tokio pat lygio arba aukštesnis už jūsų aukščiausią vaidmenį"
 
 #. Tooltip on a disabled role row in the community roles settings tab. Explains the role hierarchy rule: you cannot edit roles at or above your own highest role.
-#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleItem.tsx:32
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleItem.tsx:34
 msgid "You cannot edit this role because it is your highest role or above you"
 msgstr "Negalite redaguoti šio vaidmens, nes tai yra jūsų aukščiausias vaidmuo arba jis yra aukščiau už jus"
 
 #. Tooltip on a permission toggle in the role editor that the current user cannot grant because they do not hold that permission themselves.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:68
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:75
 msgid "You cannot grant a permission you don't have"
 msgstr "Negalite suteikti leidimo, kurio neturite"
 
@@ -38025,12 +38011,12 @@ msgid "You cannot interact with this user right now."
 msgstr "Šiuo metu negalite bendrauti su šiuo vartotoju."
 
 #. Tooltip on a permission toggle in the role editor when revoking that permission would leave the current user without it.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:73
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:80
 msgid "You cannot remove this permission because it would remove it from yourself"
 msgstr "Negalite pašalinti šio leidimo, nes jis būtų pašalintas iš jūsų paties"
 
 #. Local system message after the user changes their community nickname with a slash command. The bold markdown markers should remain around the two names.
-#: src/features/devtools/utils/CommandUtils.ts:27
+#: src/features/devtools/utils/CommandUtils.ts:31
 msgid "You changed your nickname in this community from **{previousNickname}** to **{newNickname}**."
 msgstr "Šioje bendruomenėje savo slapyvardį pakeitėte iš **{previousNickname}** į **{newNickname}**."
 
@@ -38205,7 +38191,7 @@ msgid "You need the \"{manageChannelsPermissionLabel}\" permission to edit these
 msgstr "Norėdami redaguoti šiuos leidimus, turite turėti leidimą \"{manageChannelsPermissionLabel}\"."
 
 #. Tooltip on the disabled permission list in the role editor. {manageRolesPermissionLabel} is the localized name of the Manage Roles permission and should match its label exactly.
-#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:59
+#: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:66
 msgid "You need the \"{manageRolesPermissionLabel}\" permission to edit these permissions"
 msgstr "Norėdami redaguoti šiuos leidimus, turite turėti \"{manageRolesPermissionLabel}\" leidimą"
 
@@ -38765,27 +38751,27 @@ msgid "Your last purchase is outside the refund window. Contact support for bill
 msgstr "Paskutinis pirkinys nepatenka į pinigų grąžinimo laikotarpį. Dėl atsiskaitymo problemų susisiekite su palaikymo komanda."
 
 #. Label in the message queue state.
-#: src/features/messaging/state/MessageQueue.tsx:84
+#: src/features/messaging/state/MessageQueue.tsx:77
 msgid "Your message could not be delivered because it contains mature emoji or stickers that are not allowed in this context."
 msgstr "Jūsų pranešimo nepavyko pristatyti, nes jame yra suaugusiems skirtų jaustukų ar lipdukų, kurie šioje aplinkoje neleidžiami."
 
 #. Label in the message queue state.
-#: src/features/messaging/state/MessageQueue.tsx:79
+#: src/features/messaging/state/MessageQueue.tsx:72
 msgid "Your message could not be delivered because it was flagged by our safety systems. If you believe this is a mistake, please contact support."
 msgstr "Jūsų žinutė nebuvo pristatyta, nes ją pažymėjo mūsų saugos sistemos. Jei manote, kad tai klaida, susisiekite su palaikymo komanda."
 
 #. Label in the message queue state.
-#: src/features/messaging/state/MessageQueue.tsx:66
+#: src/features/messaging/state/MessageQueue.tsx:59
 msgid "Your message could not be delivered. This is usually because you don't share a community with the recipient or the recipient is only accepting direct messages from friends. You may also need to adjust your own direct message privacy settings in {directMessagePrivacySettingsPath}."
 msgstr "Jūsų žinutės nepavyko pristatyti. Paprastai taip nutinka, nes neturite bendros bendruomenės su gavėju arba gavėjas priima tiesiogines žinutes tik iš draugų. Jums taip pat gali reikėti pakoreguoti savo tiesioginių žinučių privatumo nustatymus čia: {directMessagePrivacySettingsPath}."
 
 #. Description text in the message queue state.
-#: src/features/messaging/state/MessageQueue.tsx:71
+#: src/features/messaging/state/MessageQueue.tsx:64
 msgid "Your message could not be delivered. You need to claim your account to send direct messages."
 msgstr "Jūsų žinutės nepavyko pristatyti. Norėdami siųsti tiesiogines žinutes, turite patvirtinti savo paskyrą."
 
 #. Description text in the message queue state.
-#: src/features/messaging/state/MessageQueue.tsx:75
+#: src/features/messaging/state/MessageQueue.tsx:68
 msgid "Your message could not be delivered. You need to claim your account to send messages."
 msgstr "Jūsų žinutės nepavyko pristatyti. Norėdami siųsti žinutes, turite patvirtinti savo paskyrą."
 
@@ -38810,7 +38796,7 @@ msgid "your new email"
 msgstr "jūsų naujas el. pašto adresas"
 
 #. Description for the /nick nickname option.
-#: src/features/devtools/hooks/useCommands.ts:78
+#: src/features/devtools/hooks/useCommands.ts:79
 msgid "Your new nickname, or leave blank to reset it."
 msgstr "Jūsų naujas slapyvardis arba palikite tuščią, kad jį atstatytumėte."
 

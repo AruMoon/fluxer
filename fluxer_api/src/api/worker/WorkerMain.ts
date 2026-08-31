@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {setupGracefulShutdown} from '@fluxer/hono/src/Server';
-import {initCassandra, shutdownCassandra} from '@pkgs/cassandra/src/Client';
+import {BACKGROUND_READ_TIMEOUT_MS, initCassandra, shutdownCassandra} from '@pkgs/cassandra/src/Client';
 import {JetStreamConnectionManager} from '@pkgs/nats/src/JetStreamConnectionManager';
 import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/postgres/src/Client';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
@@ -25,10 +25,12 @@ import {clearWorkerDependencies, setWorkerDependencies} from './WorkerContext';
 import {initializeWorkerDependencies, shutdownWorkerDependencies, type WorkerDependencies} from './WorkerDependencies';
 import {
 	resolveCronSchedulerEnabled,
+	resolveScheduledJobDrainIntervalSeconds,
 	resolveWorkerLanes,
 	validateLaneCompleteness,
 	type WorkerLaneDefinition,
 } from './WorkerLaneConfig';
+import {WorkerQueueOverflowError} from './WorkerQueueOverflowError';
 import {WorkerRunner} from './WorkerRunner';
 import {WorkerService} from './WorkerService';
 import {workerTasks} from './WorkerTaskRegistry';
@@ -42,7 +44,9 @@ const SEARCH_REQUIRED_TASKS = new Set<string>([
 
 function registerCronJobs(cron: CronScheduler): void {
 	cron.upsert('processAssetDeletionQueue', 'processAssetDeletionQueue', {}, '0 */5 * * * *', {ledger: false});
-	cron.upsert('processBunnyPurgeQueue', 'processBunnyPurgeQueue', {}, '*/10 * * * * *', {ledger: false});
+	if (Config.bunny.purgeEnabled) {
+		cron.upsert('processBunnyPurgeQueue', 'processBunnyPurgeQueue', {}, '*/10 * * * * *', {ledger: false});
+	}
 	cron.upsert('processPendingBulkMessageDeletions', 'processPendingBulkMessageDeletions', {}, '0 */10 * * * *', {
 		ledger: false,
 	});
@@ -50,7 +54,16 @@ function registerCronJobs(cron: CronScheduler): void {
 	cron.upsert('processPremiumStateReconciliationQueue', 'processPremiumStateReconciliationQueue', {}, '0 * * * * *', {
 		ledger: false,
 	});
-	cron.upsert('processExpiredPremiumSweep', 'processExpiredPremiumSweep', {}, '0 0 * * * *', {ledger: false});
+	cron.upsert(
+		'processScheduledJobQueue',
+		'processScheduledJobQueue',
+		{},
+		`*/${resolveScheduledJobDrainIntervalSeconds()} * * * * *`,
+		{ledger: false},
+	);
+	if (!Config.instance.selfHosted) {
+		cron.upsert('processExpiredPremiumSweep', 'processExpiredPremiumSweep', {}, '0 0 * * * *', {ledger: false});
+	}
 	cron.upsert('processInactivityDeletions', 'processInactivityDeletions', {}, '0 0 */6 * * *', {ledger: false});
 	cron.upsert('expireAttachments', 'expireAttachments', {}, '0 0 */12 * * *', {ledger: false});
 	cron.upsert('prunePostgresKvTtl', 'prunePostgresKvTtl', {}, '0 */5 * * * *', {ledger: false});
@@ -61,7 +74,14 @@ function registerCronJobs(cron: CronScheduler): void {
 		cron.upsert('syncFileShaBlocklists', 'syncFileShaBlocklists', {}, '0 0 */12 * * *', {ledger: true});
 	}
 	cron.upsert('flushUserActivityBuffer', 'flushUserActivityBuffer', {}, '*/10 * * * * *', {ledger: false});
-	Logger.info({blocklistFeeds: Config.blocklistFeeds.enabled}, 'Cron jobs registered successfully');
+	Logger.info(
+		{
+			blocklistFeeds: Config.blocklistFeeds.enabled,
+			bunnyPurge: Config.bunny.purgeEnabled,
+			selfHosted: Config.instance.selfHosted,
+		},
+		'Cron jobs registered successfully',
+	);
 }
 
 function workerLanesRequireSearch(activeWorkerLanes: ReadonlyArray<WorkerLaneDefinition>): boolean {
@@ -155,6 +175,7 @@ export async function startWorkerMain(): Promise<void> {
 				localDc: Config.cassandra.localDc,
 				username: Config.cassandra.username || undefined,
 				password: Config.cassandra.password || undefined,
+				readTimeoutMs: BACKGROUND_READ_TIMEOUT_MS,
 			});
 			cassandraInitialized = true;
 			Logger.info('Cassandra client initialised for worker backend');
@@ -205,7 +226,14 @@ export async function startWorkerMain(): Promise<void> {
 			);
 			if (didClaimEmailSync) {
 				Logger.info('Triggering initial disposable email domain sync');
-				await workerService.addJob('syncDisposableEmailDomains', {});
+				try {
+					await workerService.addJob('syncDisposableEmailDomains', {});
+				} catch (error) {
+					if (!(error instanceof WorkerQueueOverflowError)) {
+						throw error;
+					}
+					Logger.warn('Dropped initial disposable email domain sync, jobs stream is at its limit');
+				}
 			}
 		}
 		cron = new CronScheduler(workerService, Logger, dependencies.kvClient);
@@ -221,6 +249,7 @@ export async function startWorkerMain(): Promise<void> {
 			const runner = new WorkerRunner({
 				tasks: laneTasks,
 				queue,
+				scheduledJobQueue: dependencies.scheduledJobQueueService,
 				consumerName: lane.consumerName,
 				laneName: lane.name,
 				ledger: jobLedger,

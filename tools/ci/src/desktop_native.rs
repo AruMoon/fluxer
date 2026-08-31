@@ -365,9 +365,6 @@ fn build_rust_node_addon_for_arch(
         OsString::from("--manifest-path"),
         OsString::from("Cargo.toml"),
     ];
-    if addon.special == DesktopNativeSpecialBuild::WinGameCapture {
-        args.push(OsString::from("--no-default-features"));
-    }
     if !addon.features.is_empty() {
         args.push(OsString::from("--features"));
         args.push(OsString::from(addon.features.join(",")));
@@ -416,6 +413,7 @@ fn build_rust_node_addon_for_arch(
     );
     sign_macos_node_addon(&out_file, platform)?;
     assert_no_redistributable_runtime_imports(&out_file, platform)?;
+    assert_system32_dependent_load_flag(&out_file, platform)?;
     assert_no_disabled_win_game_capture_capabilities(&out_file, addon, platform)?;
     Ok(BuiltNodeAddon {
         out_file,
@@ -708,26 +706,6 @@ fn remove_stale_win_game_capture_outputs(root: &Path, primary_node: &Path) -> Re
     Ok(())
 }
 
-#[cfg(test)]
-fn vulkan_layer_manifest(layer_dll_name: &str) -> String {
-    format!(
-        "{{\n\
-\t\"file_format_version\": \"1.2.0\",\n\
-\t\"layer\": {{\n\
-\t\t\"name\": \"VK_LAYER_FLUXER_game_capture\",\n\
-\t\t\"type\": \"GLOBAL\",\n\
-\t\t\"library_path\": \".\\\\\\\\{layer_dll_name}\",\n\
-\t\t\"api_version\": \"1.0.0\",\n\
-\t\t\"implementation_version\": \"1\",\n\
-\t\t\"description\": \"Fluxer Vulkan game capture layer\",\n\
-\t\t\"disable_environment\": {{\n\
-\t\t\t\"DISABLE_FLUXER_VULKAN_CAPTURE\": \"\"\n\
-\t\t}}\n\
-\t}}\n\
-}}\n"
-    )
-}
-
 fn assert_no_redistributable_runtime_imports(node_file_path: &Path, platform: &str) -> Result<()> {
     if platform != "win32" {
         return Ok(());
@@ -755,6 +733,44 @@ const DISABLED_WIN_GAME_CAPTURE_BINARY_MARKERS: &[&[u8]] = &[
     b"SetWindowsHookExW",
     b"fluxer-inject-helper.",
 ];
+
+const LOAD_LIBRARY_SEARCH_SYSTEM32: u16 = 0x0800;
+
+fn read_dependent_load_flags(file_path: &Path) -> Option<u16> {
+    let buffer = fs::read(file_path).ok()?;
+    let pe = PeFile { buffer };
+    let header = pe.parse_header()?;
+    if header.load_config_directory_rva == 0 {
+        return None;
+    }
+    let offset = pe.rva_to_offset(&header.sections, header.load_config_directory_rva)?;
+    if offset + 4 > pe.buffer.len() {
+        return None;
+    }
+    let size = pe.u32(offset) as usize;
+    let flags_offset = if header.is_pe32_plus { 0x4e } else { 0x36 };
+    if size <= flags_offset + 2 || offset + flags_offset + 2 > pe.buffer.len() {
+        return None;
+    }
+    Some(pe.u16(offset + flags_offset))
+}
+
+fn assert_system32_dependent_load_flag(node_file_path: &Path, platform: &str) -> Result<()> {
+    if platform != "win32" {
+        return Ok(());
+    }
+    let flags = read_dependent_load_flags(node_file_path);
+    ensure!(
+        flags.is_some_and(|value| value & LOAD_LIBRARY_SEARCH_SYSTEM32 != 0),
+        "{} does not set LOAD_LIBRARY_SEARCH_SYSTEM32 in its load config DependentLoadFlags (read {}).\nEvery import of a shipped addon must resolve from System32 so a planted DLL cannot be loaded in its place.\nSee fluxer_desktop/native/.cargo/config.toml for the /DEPENDENTLOADFLAG:0x800 link argument that sets it.",
+        node_file_path.display(),
+        flags.map_or_else(
+            || "no load config".to_string(),
+            |value| format!("{value:#06x}")
+        )
+    );
+    Ok(())
+}
 
 fn assert_no_disabled_win_game_capture_capabilities(
     node_file_path: &Path,
@@ -825,6 +841,8 @@ struct PeFile {
 struct PeHeader {
     sections: Vec<PeSection>,
     import_directory_rva: u32,
+    load_config_directory_rva: u32,
+    is_pe32_plus: bool,
 }
 
 #[derive(Debug)]
@@ -900,6 +918,11 @@ impl PeFile {
             return None;
         }
         let import_directory_rva = self.u32(import_directory_entry_offset);
+        let load_config_directory_entry_offset = data_directories_offset + 10 * 8;
+        if load_config_directory_entry_offset + 8 > self.buffer.len() {
+            return None;
+        }
+        let load_config_directory_rva = self.u32(load_config_directory_entry_offset);
         let section_table_offset = optional_header_offset + size_of_optional_header;
         let mut sections = Vec::new();
         for index in 0..number_of_sections {
@@ -917,6 +940,8 @@ impl PeFile {
         Some(PeHeader {
             sections,
             import_directory_rva,
+            load_config_directory_rva,
+            is_pe32_plus,
         })
     }
 
@@ -1018,31 +1043,77 @@ mod tests {
         assert!(!is_redistributable_runtime_import("vcruntime.dll"));
     }
 
+    fn synthetic_pe(pe32_plus: bool, dependent_load_flags: u16) -> Vec<u8> {
+        let opt_size: usize = if pe32_plus { 240 } else { 224 };
+        let load_config_size: usize = if pe32_plus { 0x140 } else { 0xc0 };
+        let flags_offset: usize = if pe32_plus { 0x4e } else { 0x36 };
+        let pe_offset: usize = 0x80;
+        let opt_offset = pe_offset + 4 + 20;
+        let section_offset = opt_offset + opt_size;
+        let raw_pointer = section_offset + 40;
+        let virtual_address: u32 = 0x1000;
+
+        let mut buffer = vec![0u8; raw_pointer + load_config_size];
+        buffer[0..2].copy_from_slice(b"MZ");
+        buffer[0x3c..0x40].copy_from_slice(&(pe_offset as u32).to_le_bytes());
+        buffer[pe_offset..pe_offset + 4].copy_from_slice(&0x4550u32.to_le_bytes());
+        buffer[pe_offset + 6..pe_offset + 8].copy_from_slice(&1u16.to_le_bytes());
+        buffer[pe_offset + 20..pe_offset + 22].copy_from_slice(&(opt_size as u16).to_le_bytes());
+        let magic: u16 = if pe32_plus { 0x20b } else { 0x10b };
+        buffer[opt_offset..opt_offset + 2].copy_from_slice(&magic.to_le_bytes());
+
+        let data_dirs = opt_offset + if pe32_plus { 112 } else { 96 };
+        let load_config_entry = data_dirs + 10 * 8;
+        buffer[load_config_entry..load_config_entry + 4]
+            .copy_from_slice(&virtual_address.to_le_bytes());
+        buffer[load_config_entry + 4..load_config_entry + 8]
+            .copy_from_slice(&(load_config_size as u32).to_le_bytes());
+
+        buffer[section_offset + 8..section_offset + 12]
+            .copy_from_slice(&(load_config_size as u32).to_le_bytes());
+        buffer[section_offset + 12..section_offset + 16]
+            .copy_from_slice(&virtual_address.to_le_bytes());
+        buffer[section_offset + 16..section_offset + 20]
+            .copy_from_slice(&(load_config_size as u32).to_le_bytes());
+        buffer[section_offset + 20..section_offset + 24]
+            .copy_from_slice(&(raw_pointer as u32).to_le_bytes());
+
+        buffer[raw_pointer..raw_pointer + 4]
+            .copy_from_slice(&(load_config_size as u32).to_le_bytes());
+        let flags_at = raw_pointer + flags_offset;
+        buffer[flags_at..flags_at + 2].copy_from_slice(&dependent_load_flags.to_le_bytes());
+        buffer
+    }
+
+    #[test]
+    fn dependent_load_flags_are_read_from_both_pe_widths() {
+        for pe32_plus in [false, true] {
+            let dir = tempfile::tempdir().expect("tempdir");
+            let set = dir.path().join("set.bin");
+            let unset = dir.path().join("unset.bin");
+            fs::write(&set, synthetic_pe(pe32_plus, LOAD_LIBRARY_SEARCH_SYSTEM32)).expect("write");
+            fs::write(&unset, synthetic_pe(pe32_plus, 0)).expect("write");
+
+            assert_eq!(
+                read_dependent_load_flags(&set),
+                Some(LOAD_LIBRARY_SEARCH_SYSTEM32),
+                "pe32_plus={pe32_plus}"
+            );
+            assert_eq!(
+                read_dependent_load_flags(&unset),
+                Some(0),
+                "pe32_plus={pe32_plus}"
+            );
+            assert!(assert_system32_dependent_load_flag(&set, "win32").is_ok());
+            assert!(assert_system32_dependent_load_flag(&unset, "win32").is_err());
+            assert!(assert_system32_dependent_load_flag(&unset, "linux").is_ok());
+        }
+    }
+
     #[test]
     fn linux_library_bundling_denylist_matches_legacy_prefixes() {
         assert!(!should_bundle_linux_library("libc.so.6"));
         assert!(!should_bundle_linux_library("ld-linux-x86-64.so.2"));
         assert!(should_bundle_linux_library("libfido2.so.1"));
-    }
-
-    #[test]
-    fn vulkan_layer_manifest_matches_legacy_json_shape() {
-        assert_eq!(
-            vulkan_layer_manifest("fluxer-vulkan-layer.win32-x64-msvc.dll"),
-            "{\n\
-\t\"file_format_version\": \"1.2.0\",\n\
-\t\"layer\": {\n\
-\t\t\"name\": \"VK_LAYER_FLUXER_game_capture\",\n\
-\t\t\"type\": \"GLOBAL\",\n\
-\t\t\"library_path\": \".\\\\\\\\fluxer-vulkan-layer.win32-x64-msvc.dll\",\n\
-\t\t\"api_version\": \"1.0.0\",\n\
-\t\t\"implementation_version\": \"1\",\n\
-\t\t\"description\": \"Fluxer Vulkan game capture layer\",\n\
-\t\t\"disable_environment\": {\n\
-\t\t\t\"DISABLE_FLUXER_VULKAN_CAPTURE\": \"\"\n\
-\t\t}\n\
-\t}\n\
-}\n"
-        );
     }
 }

@@ -65,6 +65,13 @@ function isBoolean(value: unknown): value is boolean {
 	return typeof value === 'boolean';
 }
 
+function resolveValidateResponses(master: MasterConfig): boolean {
+	if (isBoolean(master.dev.validate_responses)) {
+		return master.dev.validate_responses;
+	}
+	return master.env !== 'production';
+}
+
 function resolveTrustClientIpHeader(proxyConfig: object): boolean {
 	const configuredValue = Reflect.get(proxyConfig, 'trust_client_ip_header');
 	if (isBoolean(configuredValue)) {
@@ -153,6 +160,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 	return {
 		nodeEnv: master.env === 'test' ? 'development' : master.env,
 		port: master.services.api.port,
+		maxInflightRequests: master.services.api.max_inflight_requests,
 		ipBanExemptIps: normalizeIpBanExemptIps(master.services.api.ip_ban_exempt_ips),
 		desktopGitHubRedirectCountries: normalizeCountryCodes(
 			master.services.api.desktop_github_redirect_countries,
@@ -467,6 +475,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			disableRateLimits: master.dev.disable_rate_limits,
 			testModeEnabled: master.dev.test_mode_enabled,
 			testHarnessToken: master.dev.test_harness_token,
+			validateResponses: resolveValidateResponses(master),
 		},
 		presignedAttachmentUploadsEnabled: master.services.api.presigned_attachment_uploads_enabled ?? false,
 		presignedDownloadsEnabled: master.services.api.presigned_downloads_enabled ?? false,

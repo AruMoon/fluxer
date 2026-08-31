@@ -45,16 +45,54 @@ broadcast_member_list_updates(
     _NewPresence
 ) ->
     {ok, UpdatedState};
-broadcast_member_list_updates(UserId, OldState, UpdatedState, _OldPresence, _NewPresence) ->
+broadcast_member_list_updates(UserId, OldState, UpdatedState, OldPresence, NewPresence) ->
     guild_member_list_write_context:with_guild_id(UpdatedState, fun(_GuildId) ->
-        SubsTab = maps:get(member_list_subscriptions, UpdatedState),
         OldMember = find_member_in_state_data(UserId, OldState),
         NewMember = find_member_in_state_data(UserId, UpdatedState),
-        State1 = dispatch_user_change_to_subscribed_lists(
-            UserId, OldMember, NewMember, SubsTab, UpdatedState
+        State1 = dispatch_presence_delta(
+            UserId, OldMember, NewMember, OldPresence, NewPresence, UpdatedState
         ),
         {ok, State1}
     end).
+
+-spec dispatch_presence_delta(
+    user_id(),
+    map() | undefined,
+    map() | undefined,
+    map() | undefined,
+    map() | undefined,
+    guild_state()
+) -> guild_state().
+dispatch_presence_delta(UserId, OldMember, NewMember, OldPresence, NewPresence, State) ->
+    case presence_delta_is_inert(OldPresence, NewPresence, OldMember, NewMember) of
+        true ->
+            State;
+        false ->
+            SubsTab = maps:get(member_list_subscriptions, State),
+            dispatch_user_change_to_subscribed_lists(
+                UserId, OldMember, NewMember, SubsTab, State
+            )
+    end.
+
+-spec presence_delta_is_inert(
+    map() | undefined,
+    map() | undefined,
+    map() | undefined,
+    map() | undefined
+) -> boolean().
+presence_delta_is_inert(OldPresence, NewPresence, Member, Member) when
+    is_map(OldPresence), is_map(NewPresence), is_map(Member)
+->
+    member_list_presence_fields(OldPresence) =:= member_list_presence_fields(NewPresence);
+presence_delta_is_inert(_OldPresence, _NewPresence, _OldMember, _NewMember) ->
+    false.
+
+-spec member_list_presence_fields(map()) -> {binary(), term()}.
+member_list_presence_fields(Presence) ->
+    {
+        maps:get(<<"status">>, Presence, <<"offline">>),
+        maps:get(<<"custom_status">>, Presence, null)
+    }.
 
 -spec find_member_in_state_data(user_id(), guild_state()) -> map() | undefined.
 find_member_in_state_data(UserId, State) ->
@@ -142,10 +180,10 @@ broadcast_channel_engine_connection_change(UserId, State, SubsTab) ->
     guild_state().
 fold_connection_change_lists(GuildId, UserId, State, SubsTab) ->
     Sessions = maps:get(sessions, State, #{}),
-    guild_member_list_subs:fold_lists(
-        fun(ListId, ListSubs, AccState) ->
+    guild_member_list_subs:fold_list_ids(
+        fun(ListId, AccState) ->
             sync_connection_change_for_list(
-                GuildId, UserId, ListId, ListSubs, Sessions, AccState
+                GuildId, UserId, ListId, SubsTab, Sessions, AccState
             )
         end,
         State,
@@ -162,10 +200,10 @@ fold_connection_change_lists(GuildId, UserId, State, SubsTab) ->
 dispatch_user_change_to_subscribed_lists(
     UserId, OldMember, NewMember, SubsTab, State
 ) ->
-    guild_member_list_subs:fold_lists(
-        fun(ListId, ListSubs, AccState) ->
+    guild_member_list_subs:fold_list_ids(
+        fun(ListId, AccState) ->
             dispatch_user_change_to_list(
-                UserId, OldMember, NewMember, ListId, ListSubs, AccState
+                UserId, OldMember, NewMember, ListId, SubsTab, AccState
             )
         end,
         State,
@@ -177,14 +215,14 @@ dispatch_user_change_to_subscribed_lists(
     map() | undefined,
     map() | undefined,
     list_id(),
-    guild_member_list_subs:list_subs(),
+    ets:table(),
     guild_state()
 ) -> guild_state().
 dispatch_user_change_to_list(
-    UserId, OldMember, NewMember, ListId, ListSubs, State
+    UserId, OldMember, NewMember, ListId, SubsTab, State
 ) ->
     State1 = apply_user_change_to_channel_store(UserId, ListId, OldMember, NewMember, State),
-    queue_list_sync_if_subscribed(ListId, ListSubs, State1).
+    queue_list_sync_if_subscribed(ListId, SubsTab, State1).
 
 -spec apply_user_change_to_channel_store(
     user_id(), list_id(), map() | undefined, map() | undefined, guild_state()
@@ -215,14 +253,14 @@ apply_channel_member_change(_UserId, _ListId, _OldMember, _NewMember, _State) ->
     integer(),
     user_id(),
     list_id(),
-    guild_member_list_subs:list_subs(),
+    ets:table(),
     map(),
     guild_state()
 ) -> guild_state().
-sync_connection_change_for_list(_GuildId, _UserId, ListId, ListSubs, _Sessions, State) ->
+sync_connection_change_for_list(_GuildId, _UserId, ListId, SubsTab, _Sessions, State) ->
     case guild_member_list_channel_engine:is_engine_list(ListId, State) of
         true ->
-            queue_list_sync_if_subscribed(ListId, ListSubs, State);
+            queue_list_sync_if_subscribed(ListId, SubsTab, State);
         false ->
             State
     end.
@@ -257,13 +295,11 @@ rebuild_channel_store(ListId, State) ->
         false -> State
     end.
 
--spec queue_list_sync_if_subscribed(
-    list_id(), guild_member_list_subs:list_subs(), guild_state()
-) -> guild_state().
-queue_list_sync_if_subscribed(ListId, ListSubs, State) ->
-    case map_size(ListSubs) of
-        0 -> State;
-        _ -> guild_member_list_sync_batch:queue_list_sync(ListId, State)
+-spec queue_list_sync_if_subscribed(list_id(), ets:table(), guild_state()) -> guild_state().
+queue_list_sync_if_subscribed(ListId, SubsTab, State) ->
+    case guild_member_list_subs:has_subs(ListId, SubsTab) of
+        false -> State;
+        true -> guild_member_list_sync_batch:queue_list_sync(ListId, State)
     end.
 
 -spec flush_pending_member_list_syncs(guild_state()) -> guild_state().
@@ -281,9 +317,11 @@ apply_user_change_to_channel_store_updates_engine_test() ->
     ?assert(maps:is_key(<<"123">>, maps:get(channel_member_list_engines, State1))).
 
 sync_connection_change_ignores_zero_list_test() ->
+    SubsTab = guild_member_list_subs:new(),
     ?assertEqual(
         #{},
-        sync_connection_change_for_list(1, 2, <<"0">>, #{}, #{}, #{})
-    ).
+        sync_connection_change_for_list(1, 2, <<"0">>, SubsTab, #{}, #{})
+    ),
+    guild_member_list_subs:destroy(SubsTab).
 
 -endif.
