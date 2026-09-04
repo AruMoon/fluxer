@@ -152,7 +152,7 @@ jobs:
             'packages/markdown_parser/rust/src/**') }}
 
   rust:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Checkout code
