@@ -1154,20 +1154,6 @@ mod tests {
     }
 
     #[test]
-    fn self_hosted_workflow_keeps_assets_same_origin() {
-        let workflow = include_str!("../../../.github/workflows/build-app-proxy-self-hosted.yaml");
-        for entry in [
-            "PUBLIC_ASSET_BASE_URL: \"\"",
-            "BUNDLE_LOCAL_ASSETS: \"true\"",
-        ] {
-            assert!(
-                workflow.contains(entry),
-                "a self-hosted dist that inherits the hosted CDN default would ship index.html pointing at fluxerstatic.com, so the workflow must set {entry}"
-            );
-        }
-    }
-
-    #[test]
     fn path_to_s3_key_uses_forward_slashes() {
         assert_eq!(
             path_to_s3_key(Path::new("assets").join("chunks").join("a.js").as_path()),

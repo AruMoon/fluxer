@@ -102,6 +102,9 @@ jobs:
           CACHE_TO: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:buildcache-dist,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
           DOCKER_BUILD_SUMMARY: false
           DOCKER_BUILD_RECORD_UPLOAD: false
+          PUBLIC_ASSET_BASE_URL: ""
+          BUNDLE_LOCAL_ASSETS: true
+          FLUXER_APP_PROXY_TIME_FREEZE_ENABLED: true
         run: >-
           tools/ci/run.sh build-app-proxy
           --step build_dist
