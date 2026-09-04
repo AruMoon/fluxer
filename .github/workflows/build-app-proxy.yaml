@@ -208,7 +208,7 @@ jobs:
           VERSION: ${{ needs.meta.outputs.build_version }}
         run: |
           set -euo pipefail
-          amd64_digest="$(docker buildx imagetools inspect "${IMAGE}:${VERSION}" --format '{{json .Manifest}}' | jq -r '.digest')"
+          amd64_digest="$(docker buildx imagetools inspect "${IMAGE}:${VERSION}-amd64" --format '{{json .Manifest}}' | jq -r '.digest')"
           echo "amd64 digest: ${amd64_digest}"
           docker buildx imagetools create \
             -t "${IMAGE}:${VERSION}" \
