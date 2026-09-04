@@ -74,7 +74,7 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE_REPO: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy-self-hosted
+      IMAGE_REPO: ghcr.io/arumoon/fluxer-app-proxy-self-hosted
       BUILD_VERSION: ${{ needs.meta.outputs.build_version }}
       PUBLIC_ASSET_BASE_URL: ""
       BUNDLE_LOCAL_ASSETS: "true"
