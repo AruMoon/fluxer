@@ -60,78 +60,78 @@ jobs:
           cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- resolve-calver
           --github-output
 
-  build_admin:
+  build_app_proxy:
     needs: meta
+    uses: ./.github/workflows/build-app-proxy.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_admin:
+    needs: build_app_proxy
     uses: ./.github/workflows/build-admin.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_api:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-api.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
-  build_app_proxy_self_hosted:
-    needs: meta
-    uses: ./.github/workflows/build-app-proxy-self-hosted.yaml
-    with:
-      build-version: ${{ needs.meta.outputs.build_version }}
-    secrets: inherit
-
   build_gateway:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-gateway.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_gifs:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-gifs.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_media_proxy:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-media-proxy.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_messages:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-messages.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_snowflakes:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-snowflakes.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_static:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-static.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_unfurl:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-unfurl.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_users:
-    needs: meta
+    needs: build_app_proxy
     uses: ./.github/workflows/build-users.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}

@@ -90,7 +90,6 @@ jobs:
       - name: build the dist once and publish it as the canonical asset image
         env:
           BUILD_VERSION: ${{ needs.meta.outputs.build_version }}
-          PUBLIC_ASSET_BASE_URL: https://fluxerstatic.com
           CACHE_FROM: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:buildcache-dist
           CACHE_TO: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:buildcache-dist,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
           DOCKER_BUILD_SUMMARY: false
@@ -104,19 +103,7 @@ jobs:
           tools/ci/run.sh build-app-proxy
           --step generate_asset_manifest
 
-      - name: upload assets to S3 static bucket
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.STATIC_AWS_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATIC_AWS_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
-          S3_ENDPOINT: ${{ vars.STATIC_S3_ENDPOINT }}
-          STATIC_BUCKET: ${{ vars.STATIC_S3_BUCKET }}
-        run: >-
-          tools/ci/run.sh build-app-proxy
-          --step upload_assets
-
-      - name: verify every uploaded asset is readable
-        env:
-          PUBLIC_ASSET_BASE_URL: https://fluxerstatic.com
+      - name: verify every manifest asset ships in the image
         run: >-
           tools/ci/run.sh build-app-proxy
           --step verify_published_assets
@@ -159,7 +146,6 @@ jobs:
           BUILD_VERSION: ${{ needs.meta.outputs.build_version }}
           SOURCE_SHA: ${{ github.sha }}
           SOURCE_DATE: ${{ steps.source.outputs.date }}
-          PUBLIC_ASSET_BASE_URL: https://fluxerstatic.com
           CACHE_FROM: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:buildcache-amd64
           CACHE_TO: type=registry,ref=ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:buildcache-amd64,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
           DOCKER_BUILD_SUMMARY: false
@@ -254,20 +240,6 @@ jobs:
             "${IMAGE}@${amd64_digest}" \
             "${IMAGE}:${VERSION}-arm64"
           docker buildx imagetools inspect "${IMAGE}:${VERSION}"
-
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SOURCE_SHA: ${{ github.sha }}
-          VERSION: ${{ needs.meta.outputs.build_version }}
-          RELEASE_BASELINE_SHA: ${{ vars.RELEASE_BASELINE_SHA }}
-        run: >-
-          tools/ci/run.sh release
-          publish
-          --component fluxer-app-proxy
-          --build-version "${VERSION}"
-          --source-sha "${SOURCE_SHA}"
-          --previous-sha "${RELEASE_BASELINE_SHA}"
 
       - name: Advance moving image tags
         env:
