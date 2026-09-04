@@ -27,7 +27,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GHCR_OWNER: ${{ github.repository_owner }}
+  GHCR_OWNER: arumoon
 
 jobs:
   approve:
@@ -74,7 +74,7 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/fluxer-app-proxy-self-hosted
+      IMAGE_REPO: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy-self-hosted
       BUILD_VERSION: ${{ needs.meta.outputs.build_version }}
       PUBLIC_ASSET_BASE_URL: ""
       BUNDLE_LOCAL_ASSETS: "true"
@@ -212,29 +212,6 @@ jobs:
             "${IMAGE}:${VERSION}-amd64" \
             "${IMAGE}:${VERSION}-arm64"
           docker buildx imagetools inspect "${IMAGE}:${VERSION}"
-
-      - name: Create token
-        id: create-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
-        with:
-          client-id: ${{ vars.FLUXER_CI_APP_ID }}
-          private-key: ${{ secrets.FLUXER_CI_APP_KEY }}
-          owner: fluxerapp
-          repositories: fluxer
-          permission-contents: write
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ steps.create-token.outputs.token }}
-          SOURCE_SHA: ${{ github.sha }}
-          VERSION: ${{ needs.meta.outputs.build_version }}
-          RELEASE_BASELINE_SHA: ${{ vars.RELEASE_BASELINE_SHA }}
-        run: >-
-          tools/ci/run.sh release
-          publish
-          --component fluxer-app-proxy-self-hosted
-          --build-version "${VERSION}"
-          --source-sha "${SOURCE_SHA}"
-          --previous-sha "${RELEASE_BASELINE_SHA}"
 
       - name: Advance moving image tags
         env:
