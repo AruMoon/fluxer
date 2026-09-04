@@ -996,7 +996,7 @@ mod tests {
                 .lines()
                 .filter(|line| line.starts_with("    image: "))
                 .count(),
-            17
+            16
         );
 
         let api = manifest
@@ -1035,7 +1035,7 @@ mod tests {
         let mut sorted = services.clone();
         sorted.sort_unstable();
         assert_eq!(services, sorted);
-        assert_eq!(services.len(), 17);
+        assert_eq!(services.len(), 16);
     }
 
     #[test]
