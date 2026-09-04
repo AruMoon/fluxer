@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {execFileSync, spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
 import {createServer} from 'node:net';
 import {
 	getDefaultPostgresClient,
@@ -10,6 +10,7 @@ import {
 	shutdownPostgres,
 } from '@pkgs/postgres/src/Client';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
+import {startDockerContainer} from '../test/DockerTestContainer';
 import {LegacyPostgresKvQueryExecutor} from './__testref__/LegacyPostgresKvQueryExecutor';
 import type {CassandraParams, KvQueryMeta, KvTableSpec, WhereExpr} from './CassandraTypes';
 import {ensurePostgresKvSchema, PostgresKvQueryExecutor} from './PostgresKvQueryExecutor';
@@ -49,6 +50,37 @@ class PlainClient implements IPostgresClient {
 		return (await this.inner.query(text, values)) as unknown as Awaited<ReturnType<IPostgresClient['query']>> & {
 			rows: Array<T>;
 		};
+	}
+	async connect(): Promise<void> {
+		await this.inner.connect();
+	}
+	async shutdown(): Promise<void> {}
+	isConnected(): boolean {
+		return this.inner.isConnected();
+	}
+	async transaction<T>(fn: (client: PostgresQueryable) => Promise<T>): Promise<T> {
+		return this.inner.transaction(fn);
+	}
+	kvTable(): string {
+		return this.table;
+	}
+}
+
+class CountingClient implements IPostgresClient {
+	rowsRead = 0;
+	readonly selects: Array<{text: string; values: Array<unknown>}> = [];
+
+	constructor(
+		private readonly inner: IPostgresClient,
+		private readonly table: string,
+	) {}
+	async query<T extends Record<string, unknown>>(text: string, values: Array<unknown> = [], name?: string) {
+		const result = await this.inner.query(text, values, name);
+		if (/^\s*SELECT\s+(kv\.)?row_key/iu.test(text) && text.includes(this.table)) {
+			this.rowsRead += result.rows.length;
+			this.selects.push({text, values});
+		}
+		return result as unknown as Awaited<ReturnType<IPostgresClient['query']>> & {rows: Array<T>};
 	}
 	async connect(): Promise<void> {
 		await this.inner.connect();
@@ -141,29 +173,25 @@ describe.skipIf(!dockerAvailable)('postgres kv paging adversarial', () => {
 
 	beforeAll(async () => {
 		const port = await freePort();
-		execFileSync(
-			'docker',
-			[
-				'run',
-				'-d',
-				'--name',
-				CONTAINER,
-				'-e',
-				'POSTGRES_USER=fluxer',
-				'-e',
-				'POSTGRES_PASSWORD=fluxer',
-				'-e',
-				'POSTGRES_DB=fluxer',
-				'-p',
-				`127.0.0.1:${port}:5432`,
-				POSTGRES_IMAGE,
-				'-c',
-				'fsync=off',
-				'-c',
-				'synchronous_commit=off',
-			],
-			{stdio: 'ignore'},
-		);
+		startDockerContainer([
+			'run',
+			'-d',
+			'--name',
+			CONTAINER,
+			'-e',
+			'POSTGRES_USER=fluxer',
+			'-e',
+			'POSTGRES_PASSWORD=fluxer',
+			'-e',
+			'POSTGRES_DB=fluxer',
+			'-p',
+			`127.0.0.1:${port}:5432`,
+			POSTGRES_IMAGE,
+			'-c',
+			'fsync=off',
+			'-c',
+			'synchronous_commit=off',
+		]);
 		let ready = false;
 		for (let attempt = 0; attempt < 180 && !ready; attempt += 1) {
 			await sleep(500);
@@ -250,7 +278,7 @@ describe.skipIf(!dockerAvailable)('postgres kv paging adversarial', () => {
 		expect(dupes, `duplicate rows: ${dupes.join(',')}`).toEqual([]);
 	}, 300_000);
 
-	it('pages identically to the legacy executor while rows are deleted between pages', async () => {
+	it('keeps returning later rows while already-returned rows are deleted between pages', async () => {
 		const run = async (exec: AnyExec) => {
 			await wipe(KV);
 			for (let i = 0; i < 30; i += 1) await upsert(exec, FlatTable, {k: BigInt(i), v: `v${i}`});
@@ -264,18 +292,23 @@ describe.skipIf(!dockerAvailable)('postgres kv paging adversarial', () => {
 					kvMeta: deleteMeta(FlatTable, [{kind: 'eq', col: 'k', param: 'k'} as WhereExpr<Row>]),
 				});
 			});
-			return {
-				error: result.error,
-				pages: result.pages.map((page) => page.map((row) => String(row.k)).join(',')).join('|'),
-			};
+			return {error: result.error, seen: result.pages.flat().map((row) => String(row.k))};
 		};
 		const legacyRun = await run(legacy);
 		const nextRun = await run(next);
+		const seeded = Array.from({length: 30}, (_, index) => String(index));
 		expect(nextRun.error).toBeNull();
-		expect(nextRun, `legacy=${legacyRun.pages} next=${nextRun.pages}`).toEqual(legacyRun);
+		const skipped = seeded.filter((key) => !nextRun.seen.includes(key));
+		const dupes = nextRun.seen.filter((key, index) => nextRun.seen.indexOf(key) !== index);
+		expect(skipped, `rows never returned: ${skipped.join(',')}`).toEqual([]);
+		expect(dupes, `rows returned twice: ${dupes.join(',')}`).toEqual([]);
+		expect(
+			seeded.filter((key) => !legacyRun.seen.includes(key)).length,
+			'offset paging is expected to skip rows once earlier rows are deleted',
+		).toBeGreaterThan(0);
 	}, 300_000);
 
-	it('pages identically to the legacy executor when the last row of each page is deleted', async () => {
+	it('does not skip the row after a page cursor that was deleted', async () => {
 		const run = async (exec: AnyExec) => {
 			await wipe(KV);
 			for (let i = 0; i < 20; i += 1)
@@ -302,9 +335,17 @@ describe.skipIf(!dockerAvailable)('postgres kv paging adversarial', () => {
 			}
 			return seen.join(',');
 		};
-		const legacySeen = await run(legacy);
-		const nextSeen = await run(next);
-		expect(nextSeen, `legacy=${legacySeen} next=${nextSeen}`).toBe(legacySeen);
+		const legacySeen = (await run(legacy)).split(',');
+		const nextSeen = (await run(next)).split(',');
+		const seeded = Array.from({length: 20}, (_, index) => `key${String(index).padStart(2, '0')}`);
+		const skipped = seeded.filter((key) => !nextSeen.includes(key));
+		const dupes = nextSeen.filter((key, index) => nextSeen.indexOf(key) !== index);
+		expect(skipped, `rows never returned: ${skipped.join(',')}`).toEqual([]);
+		expect(dupes, `rows returned twice: ${dupes.join(',')}`).toEqual([]);
+		expect(
+			seeded.filter((key) => !legacySeen.includes(key)).length,
+			'offset paging is expected to skip the row after a deleted cursor',
+		).toBeGreaterThan(0);
 	}, 300_000);
 
 	it('never returns an empty page together with a non-null page state', async () => {
@@ -535,6 +576,125 @@ describe.skipIf(!dockerAvailable)('postgres kv paging adversarial', () => {
 		expect(datedNextOrder.slice().sort(), 'date-keyed row set').toEqual(datedLegacyOrder.slice().sort());
 		expect(numericNextOrder.slice().sort(), 'bigint-keyed row set').toEqual(numericLegacyOrder.slice().sort());
 		expect(deltas, `paged order deltas:\n${deltas.join('\n')}`).toEqual([]);
+	}, 300_000);
+
+	it('reads a page instead of the whole table for every page after the first', async () => {
+		await wipe(KV);
+		const rowCount = 40;
+		const pageSize = 4;
+		for (let i = 0; i < rowCount; i += 1) {
+			await upsert(next, FlatTable, {k: 999_999_999_999_999_980n + BigInt(i), v: `v${i}`});
+		}
+		const drain = async (build: (client: IPostgresClient) => AnyExec) => {
+			const counter = new CountingClient(raw, KV);
+			const exec = build(counter);
+			const reads: Array<number> = [];
+			let pageState: string | null = null;
+			let seen = 0;
+			for (let guard = 0; guard < 100; guard += 1) {
+				const before = counter.rowsRead;
+				const page: {rows: Array<Row>; pageState: string | null} = await exec.executePagedQuery<Row>(
+					{cql: '__reads__', params: {}, kvMeta: selectMeta(FlatTable)},
+					{pageSize, pageState},
+				);
+				reads.push(counter.rowsRead - before);
+				seen += page.rows.length;
+				pageState = page.pageState;
+				if (pageState === null) break;
+			}
+			return {reads, seen};
+		};
+		const legacyDrain = await drain((client) => new LegacyPostgresKvQueryExecutor(client));
+		const nextDrain = await drain((client) => new PostgresKvQueryExecutor(client));
+		const total = (reads: Array<number>) => reads.reduce((sum, count) => sum + count, 0);
+		expect(legacyDrain.seen).toBe(rowCount);
+		expect(nextDrain.seen).toBe(rowCount);
+		expect(nextDrain.reads.length).toBe(rowCount / pageSize);
+		expect(Math.min(...legacyDrain.reads), 'offset paging re-reads the whole table for every page').toBe(rowCount);
+		expect(
+			Math.max(...nextDrain.reads.slice(1)),
+			`rows read per page: ${nextDrain.reads.join(',')}`,
+		).toBeLessThanOrEqual(pageSize + 1);
+		expect(total(nextDrain.reads), `next=${total(nextDrain.reads)} legacy=${total(legacyDrain.reads)}`).toBeLessThan(
+			total(legacyDrain.reads) / 2,
+		);
+	}, 300_000);
+
+	it('serves every page after the first from an index instead of sorting the table', async () => {
+		await wipe(KV);
+		for (let i = 0; i < 2000; i += 1) {
+			await upsert(next, FlatTable, {k: 999_999_999_999_999_000n + BigInt(i), v: `v${i}`});
+		}
+		await raw.query(`ANALYZE ${KV}`);
+		const counter = new CountingClient(raw, KV);
+		const exec = new PostgresKvQueryExecutor(counter);
+		const query = {cql: '__plan__', params: {}, kvMeta: selectMeta(FlatTable)};
+		const first = await exec.executePagedQuery<Row>(query, {pageSize: 4});
+		expect(first.pageState).not.toBeNull();
+		counter.selects.length = 0;
+		await exec.executePagedQuery<Row>(query, {pageSize: 4, pageState: first.pageState});
+		const paged = counter.selects[counter.selects.length - 1];
+		expect(paged, 'no paged select was issued').toBeDefined();
+		const explained = await raw.query<Record<string, string>>(`EXPLAIN ${paged!.text}`, paged!.values);
+		const plan = explained.rows.map((row) => Object.values(row)[0]).join('\n');
+		expect(plan, plan).toContain(`${KV}_row_key_numeric_idx`);
+		expect(plan, plan).not.toContain('Seq Scan');
+	}, 300_000);
+
+	it('pages a bigint scan at the same cost on both sides of a digit count boundary', async () => {
+		const drain = async (ids: ReadonlyArray<bigint>) => {
+			await wipe(KV);
+			for (const id of ids) await upsert(next, FlatTable, {k: id, v: id.toString()});
+			const counter = new CountingClient(raw, KV);
+			const exec = new PostgresKvQueryExecutor(counter);
+			const seen: Array<string> = [];
+			let pageState: string | null = null;
+			for (let guard = 0; guard < 100; guard += 1) {
+				const page: {rows: Array<Row>; pageState: string | null} = await exec.executePagedQuery<Row>(
+					{cql: '__digits__', params: {}, kvMeta: selectMeta(FlatTable)},
+					{pageSize: 4, pageState},
+				);
+				for (const row of page.rows) seen.push(String(row.k));
+				pageState = page.pageState;
+				if (pageState === null) break;
+			}
+			return {seen, rowsRead: counter.rowsRead};
+		};
+		const sameWidth = Array.from({length: 40}, (_, index) => 1_000_000_000_000_000_000n + BigInt(index));
+		const straddling = Array.from({length: 40}, (_, index) => 999_999_999_999_999_980n + BigInt(index));
+		const flat = await drain(sameWidth);
+		const crossing = await drain(straddling);
+		expect(flat.seen, 'same width scan order').toEqual(sameWidth.map(String));
+		expect(crossing.seen, 'boundary crossing scan order').toEqual(straddling.map(String));
+		expect(
+			crossing.rowsRead,
+			`same width read ${flat.rowsRead} rows, boundary crossing read ${crossing.rowsRead}`,
+		).toBe(flat.rowsRead);
+	}, 300_000);
+
+	it('keeps paging bigint keys across a digit count boundary while returned rows are deleted', async () => {
+		await wipe(KV);
+		const ids = Array.from({length: 30}, (_, index) => 999_999_999_999_999_985n + BigInt(index));
+		for (const id of ids) await upsert(next, FlatTable, {k: id, v: id.toString()});
+		const seen: Array<string> = [];
+		let pageState: string | null = null;
+		for (let guard = 0; guard < 100; guard += 1) {
+			const page: {rows: Array<Row>; pageState: string | null} = await next.executePagedQuery<Row>(
+				{cql: '__digitdrain__', params: {}, kvMeta: selectMeta(FlatTable)},
+				{pageSize: 4, pageState},
+			);
+			for (const row of page.rows) seen.push(String(row.k));
+			pageState = page.pageState;
+			for (const row of page.rows) {
+				await next.executeQuery({
+					cql: '__digitdrain_delete__',
+					params: {k: row.k} as CassandraParams,
+					kvMeta: deleteMeta(FlatTable, [{kind: 'eq', col: 'k', param: 'k'} as WhereExpr<Row>]),
+				});
+			}
+			if (pageState === null) break;
+		}
+		expect(seen, `returned order: ${seen.join(',')}`).toEqual(ids.map(String));
 	}, 300_000);
 
 	it('pages a prefix range whose keys sit adjacent to the range bounds', async () => {

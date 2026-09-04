@@ -18,6 +18,7 @@ import {
 	isValidAudioFrameMessage,
 	type NativeAudioBridgeHandle,
 	type NativeAudioBridgeStats,
+	nativeAudioRoutingRulesEqual,
 	patchTrackStopForCleanup,
 	replaceStreamAudioTrack,
 	shouldMixSelfWindowAudioIntoSystemCapture,
@@ -47,6 +48,7 @@ const logger = new Logger('NativeAudioCaptureBridge');
 let patched = false;
 let originalGetDisplayMedia: MediaDevices['getDisplayMedia'] | null = null;
 let availabilityCache: Promise<NativeAudioAvailability> | null = null;
+let resolvedAvailability: NativeAudioAvailability | null = null;
 let armedCapture: ArmedNativeAudioCapture | null = null;
 let lastArmFailure: ScreenShareAudioCaptureDebugInfo | null = null;
 let activeBridge: ActiveNativeAudioBridge | null = null;
@@ -765,10 +767,18 @@ export async function getNativeAudioAvailabilityCached(): Promise<NativeAudioAva
 			: Promise.resolve<NativeAudioAvailability>({available: false, reason: 'unsupported-platform'});
 	}
 	const availability = await availabilityCache;
+	resolvedAvailability = availability;
 	if (!availability.available) {
 		availabilityCache = null;
 	}
 	return availability;
+}
+
+export function getNativeAudioAvailabilitySnapshot(): NativeAudioAvailability | null {
+	if (resolvedAvailability == null) {
+		void getNativeAudioAvailabilityCached().catch(() => undefined);
+	}
+	return resolvedAvailability;
 }
 
 function nativeAudioSupportsScope(availability: NativeAudioAvailability, scope: 'process' | 'system'): boolean {
@@ -1354,6 +1364,35 @@ export function captureNativeAudioTrackForSelfWindow(): MediaStreamTrack | null 
 	return track;
 }
 
+export type LinuxNativeAudioReconfigureResult = 'unchanged' | 'updated' | 'unsupported';
+
+export async function reconfigureLinuxNativeAudioRouting(
+	linuxRule: NonNullable<NativeAudioStartOptions['linuxRule']>,
+	options: {includeSelfWindowAudio?: boolean} = {},
+): Promise<LinuxNativeAudioReconfigureResult> {
+	const bridge = activeBridge;
+	if (!bridge) return 'unsupported';
+	if (bridge.linuxRule === undefined) return 'unsupported';
+	if (Boolean(bridge.includeSelfWindowAudio) !== (options.includeSelfWindowAudio === true)) return 'unsupported';
+	if (nativeAudioRoutingRulesEqual(bridge.linuxRule, linuxRule)) return 'unchanged';
+	const nativeAudioApi = getNativeAudioApi();
+	if (typeof nativeAudioApi?.setRule !== 'function') return 'unsupported';
+	let applied = false;
+	try {
+		applied = await nativeAudioApi.setRule(bridge.captureId, linuxRule);
+	} catch (error) {
+		logger.warn('Failed to reconfigure Linux native audio routing in place', {
+			captureId: bridge.captureId,
+			error,
+		});
+		return 'unsupported';
+	}
+	if (!applied) return 'unsupported';
+	if (activeBridge !== bridge) return 'unsupported';
+	activeBridge = {...bridge, linuxRule};
+	return 'updated';
+}
+
 export async function captureNativeAudioTrackForLinuxRouting(
 	linuxRule: NonNullable<NativeAudioStartOptions['linuxRule']>,
 	options: {includeSelfWindowAudio?: boolean} = {},
@@ -1367,7 +1406,12 @@ export async function captureNativeAudioTrackForLinuxRouting(
 			? await createNativeAudioBridgeWithSelfWindowAudio(result.captureId)
 			: await createNativeAudioBridge(result.captureId);
 		const cleanup = attachNativeAudioCleanup(new MediaStream([handle.track]), result.captureId, handle);
-		activeBridge = {captureId: result.captureId, cleanup};
+		activeBridge = {
+			captureId: result.captureId,
+			cleanup,
+			linuxRule,
+			includeSelfWindowAudio: options.includeSelfWindowAudio === true,
+		};
 		if (previousBridge && previousBridge.captureId !== result.captureId) {
 			supersededBridge = previousBridge;
 		}
@@ -1439,6 +1483,7 @@ export function disarmNativeAudio(): void {
 
 export function resetNativeAudioAvailabilityCache(): void {
 	availabilityCache = null;
+	resolvedAvailability = null;
 }
 
 export function resetNativeAudioCaptureBridgeForTests(): void {

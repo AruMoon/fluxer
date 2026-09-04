@@ -40,7 +40,6 @@ import type {IVoiceRoomStore} from '../infrastructure/IVoiceRoomStore';
 import type {KVAccountDeletionQueueService} from '../infrastructure/KVAccountDeletionQueueService';
 import type {KVActivityTracker} from '../infrastructure/KVActivityTracker';
 import type {KVBulkMessageDeletionQueueService} from '../infrastructure/KVBulkMessageDeletionQueueService';
-import type {KVScheduledJobQueueService} from '../infrastructure/KVScheduledJobQueueService';
 import type {PremiumStateReconciliationQueueService} from '../infrastructure/PremiumStateReconciliationQueueService';
 import type {UserCacheService} from '../infrastructure/UserCacheService';
 import type {InstanceConfigRepository} from '../instance/InstanceConfigRepository';
@@ -78,7 +77,6 @@ import {
 	getEmailService,
 	getEmbedService,
 	getEntityAssetService,
-	getExpressionAssetPurger,
 	getFavoriteMemeRepository,
 	getGuildAuditLogService,
 	getGuildRepository,
@@ -87,11 +85,9 @@ import {
 	getKVAccountDeletionQueue,
 	getKVActivityTracker,
 	getKVBulkMessageDeletionQueue,
-	getKVScheduledJobQueue,
 	getLimitConfigService,
 	getNcmecSubmissionService,
 	getOAuth2TokenRepository,
-	getPackRepository,
 	getPremiumStateReconciliationQueueService,
 	getPurgeQueue,
 	getRateLimitService,
@@ -164,7 +160,6 @@ export interface WorkerDependencies {
 	activityTracker: KVActivityTracker;
 	deletionQueueService: KVAccountDeletionQueueService;
 	bulkMessageDeletionQueueService: KVBulkMessageDeletionQueueService;
-	scheduledJobQueueService: KVScheduledJobQueueService;
 	premiumStateReconciliationQueueService: PremiumStateReconciliationQueueService;
 	deletionEligibilityService: UserDeletionEligibilityService;
 	voiceRoomStore: IVoiceRoomStore;
@@ -218,7 +213,6 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 	await ensureVirusScanInitialized();
 	const virusScanService = getVirusScanServiceInstance();
 	const rateLimitService = getRateLimitService();
-	const packRepository = getPackRepository();
 	const emailService = getEmailService();
 	const workerService = getWorkerService();
 	const guildAuditLogService = getGuildAuditLogService();
@@ -229,7 +223,6 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 	const activityTracker = getKVActivityTracker();
 	const deletionQueueService = getKVAccountDeletionQueue();
 	const bulkMessageDeletionQueueService = getKVBulkMessageDeletionQueue();
-	const scheduledJobQueueService = getKVScheduledJobQueue();
 	const premiumStateReconciliationQueueService = getPremiumStateReconciliationQueueService();
 	const deletionEligibilityService = new UserDeletionEligibilityService(kvClient);
 	await ensureVoiceResourcesInitialized();
@@ -265,7 +258,6 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 	const apiContext = createApiContext();
 	const {channelService, guildService, inviteService} = createGuildStackServices({
 		apiContext,
-		packRepository,
 		channelRepository,
 		userRepository,
 		guildRepository,
@@ -275,7 +267,6 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 		avatarService,
 		entityAssetService,
 		assetDeletionQueue,
-		expressionAssetPurger: getExpressionAssetPurger(),
 		userCacheService,
 		limitConfigService,
 		embedService,
@@ -341,7 +332,6 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 		activityTracker,
 		deletionQueueService,
 		bulkMessageDeletionQueueService,
-		scheduledJobQueueService,
 		premiumStateReconciliationQueueService,
 		deletionEligibilityService,
 		voiceRoomStore,
@@ -362,7 +352,7 @@ export async function initializeWorkerDependencies(snowflakeService: ISnowflakeS
 export async function shutdownWorkerDependencies(deps: WorkerDependencies): Promise<void> {
 	Logger.info('Shutting down worker dependencies...');
 	if (deps.voiceReconciliationWorker !== null) {
-		deps.voiceReconciliationWorker.stop();
+		await deps.voiceReconciliationWorker.stop();
 	}
 	Logger.info('Worker dependencies shut down successfully');
 }

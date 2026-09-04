@@ -21,7 +21,6 @@ import {ChannelRepository} from '../channel/ChannelRepository';
 import {ChannelRequestService} from '../channel/services/ChannelRequestService';
 import {MessageRequestService} from '../channel/services/message/MessageRequestService';
 import {createMessageResponseDataService} from '../channel/services/message/MessageResponseDataService';
-import {ScheduledMessageService} from '../channel/services/ScheduledMessageService';
 import {StreamService} from '../channel/services/StreamService';
 import {ConnectionRequestService} from '../connection/ConnectionRequestService';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -72,6 +71,7 @@ import {AgeVerificationService} from '../stripe/services/AgeVerificationService'
 import type {HonoEnv} from '../types/HonoEnv';
 import type {UserRepository} from '../user/repositories/UserRepository';
 import {EmailChangeService} from '../user/services/EmailChangeService';
+import {MfaBackupCodesChallengeService} from '../user/services/MfaBackupCodesChallengeService';
 import {PasswordChangeService} from '../user/services/PasswordChangeService';
 import {UserAccountRequestService} from '../user/services/UserAccountRequestService';
 import {UserAuthRequestService} from '../user/services/UserAuthRequestService';
@@ -125,7 +125,6 @@ import {
 	getEntranceSoundPlayService,
 	getEntranceSoundService,
 	getErrorI18nService,
-	getExpressionAssetPurger,
 	getFavoriteMemeRepository,
 	getGatewayRequestService,
 	getGifService,
@@ -140,7 +139,6 @@ import {
 	getLimitConfigService,
 	getNcmecSubmissionService,
 	getOAuth2TokenRepository,
-	getPackRepository,
 	getPasswordChangeRepository,
 	getPremiumStateReconciliationQueueService,
 	getPurgeQueue,
@@ -148,7 +146,6 @@ import {
 	getReadStateRequestService,
 	getReadStateService,
 	getReportRepository,
-	getScheduledMessageRepository,
 	getStorageService,
 	getStreamPreviewService,
 	getSweegoWebhookService,
@@ -367,6 +364,7 @@ class RequestServices implements RequestScopedServices {
 	private cachedFavoriteMemeRequestService: FavoriteMemeRequestService | undefined;
 	private cachedSingleCommunityService: SingleCommunityService | undefined;
 	private cachedEmailChangeService: EmailChangeService | undefined;
+	private cachedMfaBackupCodesChallengeService: MfaBackupCodesChallengeService | undefined;
 	private cachedPasswordChangeService: PasswordChangeService | undefined;
 	private cachedInviteRequestService: InviteRequestService | undefined;
 	private cachedOAuth2Service: OAuth2Service | undefined;
@@ -384,7 +382,6 @@ class RequestServices implements RequestScopedServices {
 	private cachedUserChannelRequestService: UserChannelRequestService | undefined;
 	private cachedUserContentRequestService: UserContentRequestService | undefined;
 	private cachedUserRelationshipRequestService: UserRelationshipRequestService | undefined;
-	private cachedScheduledMessageService: ScheduledMessageService | undefined;
 	private cachedWebhookService: WebhookService | undefined;
 	private cachedWebhookRequestService: WebhookRequestService | undefined;
 
@@ -447,7 +444,6 @@ class RequestServices implements RequestScopedServices {
 	private get guildStack(): GuildStackServices {
 		this.cachedGuildStack ??= createGuildStackServices({
 			apiContext: this.context,
-			packRepository: getPackRepository(),
 			channelRepository: this.channelRepository,
 			userRepository: getUserRepository(),
 			guildRepository: this.requestGuildRepository,
@@ -457,7 +453,6 @@ class RequestServices implements RequestScopedServices {
 			avatarService: getAvatarService(),
 			entityAssetService: getEntityAssetService(),
 			assetDeletionQueue: getAssetDeletionQueue(),
-			expressionAssetPurger: getExpressionAssetPurger(),
 			userCacheService: getUserCacheService(),
 			limitConfigService: getLimitConfigService(),
 			embedService: getEmbedService(),
@@ -473,10 +468,6 @@ class RequestServices implements RequestScopedServices {
 			ipInfoService: getIpInfoService(),
 		});
 		return this.cachedGuildStack;
-	}
-
-	get packService() {
-		return this.guildStack.packService;
 	}
 
 	get channelService() {
@@ -584,10 +575,6 @@ class RequestServices implements RequestScopedServices {
 
 	get oauth2TokenRepository() {
 		return getOAuth2TokenRepository();
-	}
-
-	get packRepository() {
-		return getPackRepository();
 	}
 
 	get rateLimitService() {
@@ -814,6 +801,11 @@ class RequestServices implements RequestScopedServices {
 		return this.cachedEmailChangeService;
 	}
 
+	get mfaBackupCodesChallengeService(): MfaBackupCodesChallengeService {
+		this.cachedMfaBackupCodesChallengeService ??= new MfaBackupCodesChallengeService(this.context);
+		return this.cachedMfaBackupCodesChallengeService;
+	}
+
 	get passwordChangeService(): PasswordChangeService {
 		this.cachedPasswordChangeService ??= new PasswordChangeService(this.context, getPasswordChangeRepository());
 		return this.cachedPasswordChangeService;
@@ -825,7 +817,6 @@ class RequestServices implements RequestScopedServices {
 			this.channelService,
 			this.guildService,
 			this.gatewayService,
-			getPackRepository(),
 			getUserCacheService(),
 		);
 		return this.cachedInviteRequestService;
@@ -1020,16 +1011,6 @@ class RequestServices implements RequestScopedServices {
 			getUserCacheService(),
 		);
 		return this.cachedUserRelationshipRequestService;
-	}
-
-	get scheduledMessageService(): ScheduledMessageService {
-		this.cachedScheduledMessageService ??= new ScheduledMessageService(
-			this.channelService,
-			getScheduledMessageRepository(),
-			getWorkerService(),
-			getSnowflakeService(),
-		);
-		return this.cachedScheduledMessageService;
 	}
 
 	get webhookService(): WebhookService {

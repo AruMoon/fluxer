@@ -23,7 +23,7 @@ const rpmBuildIdLinkFpmArgs = [
 	'--rpm-rpmbuild-define',
 	'_missing_build_ids_terminate_build 0',
 ];
-const macOSMinimumSystemVersion = '12.0';
+const macOSMinimumSystemVersion = '13.0';
 const isLinuxBuild = process.argv.includes('--linux');
 const isMacBuild = process.argv.includes('--mac');
 const isWindowsBuild = process.argv.includes('--win');
@@ -741,7 +741,7 @@ async function verifyPackagedNativeArtifacts(context) {
 			[
 				`Missing unpacked native runtime artifact(s) after packaging for ${platform}/${arch}:`,
 				...missing.map((entry) => `  - ${entry}`),
-				'Check electron-builder asarUnpack patterns and native package artifact sync.',
+				'Check electron-builder asar.unpack patterns and native package artifact sync.',
 			].join('\n'),
 		);
 	}
@@ -1203,7 +1203,8 @@ async function inspectAppImageLauncher(artifactPath) {
 		}
 
 		const appRunUsesNamespaceProbe = /unshare\s+(?:-Ur|--user)\s+true/.test(appRun);
-		if (!appRunUsesNamespaceProbe || !appRun.includes('NO_SANDBOX=--no-sandbox')) {
+		const appRunFallsBackToNoSandbox = /NO_SANDBOX=\(?--no-sandbox\)?/.test(appRun);
+		if (!appRunUsesNamespaceProbe || !appRunFallsBackToNoSandbox) {
 			violations.push('AppRun does not use the expected user-namespace probe before falling back to --no-sandbox');
 		}
 
@@ -1315,63 +1316,65 @@ module.exports = {
 	],
 	asar: {
 		smartUnpack: false,
+		unpack: [
+			'**/*.node',
+			'node_modules/@fluxer/win-process-loopback/*.node',
+			...winGameCaptureTargetArchs.map(
+				(arch) => `node_modules/@fluxer/win-game-capture/win-game-capture.win32-${arch}-msvc.node`,
+			),
+			'node_modules/@fluxer/win-clipboard/*.node',
+			'node_modules/@fluxer/win-shell/*.node',
+			'node_modules/@fluxer/win-toast/*.node',
+			'node_modules/@fluxer/linux-audio-capture/*.node',
+			'node_modules/@fluxer/linux-portals/*.node',
+			'node_modules/@fluxer/linux-screen-capture/*.node',
+			'node_modules/@fluxer/linux-screen-capture/obs-vkcapture/**/*',
+			'node_modules/@fluxer/linux-notifications/*.node',
+			'node_modules/@fluxer/linux-evdev/*.node',
+			'node_modules/@fluxer/system-hunspell/*.node',
+			'node_modules/@fluxer/macos-input-hook/*.node',
+			'node_modules/@fluxer/mac-app-audio/*.node',
+			'node_modules/@fluxer/mac-screen-capture/*.node',
+			'node_modules/@fluxer/mac-clipboard/*.node',
+			'node_modules/@fluxer/mac-sysctl/*.node',
+			'node_modules/@fluxer/mac-tcc/*.node',
+			'node_modules/@fluxer/windows-input-hook/*.node',
+			'node_modules/@fluxer/linux-input-hook/*.node',
+			'node_modules/@fluxer/platform-info/*.node',
+			'node_modules/@fluxer/webauthn/*.node',
+			'node_modules/@fluxer/webauthn/*.so*',
+			'node_modules/.pnpm/@fluxer+win-process-loopback@*/node_modules/@fluxer/win-process-loopback/*.node',
+			...winGameCaptureTargetArchs.map(
+				(arch) =>
+					`node_modules/.pnpm/@fluxer+win-game-capture@*/node_modules/@fluxer/win-game-capture/win-game-capture.win32-${arch}-msvc.node`,
+			),
+			'node_modules/.pnpm/@fluxer+win-clipboard@*/node_modules/@fluxer/win-clipboard/*.node',
+			'node_modules/.pnpm/@fluxer+win-shell@*/node_modules/@fluxer/win-shell/*.node',
+			'node_modules/.pnpm/@fluxer+win-toast@*/node_modules/@fluxer/win-toast/*.node',
+			'node_modules/.pnpm/@fluxer+windows-input-hook@*/node_modules/@fluxer/windows-input-hook/*.node',
+			'node_modules/.pnpm/@fluxer+linux-audio-capture@*/node_modules/@fluxer/linux-audio-capture/*.node',
+			'node_modules/.pnpm/@fluxer+linux-portals@*/node_modules/@fluxer/linux-portals/*.node',
+			'node_modules/.pnpm/@fluxer+linux-screen-capture@*/node_modules/@fluxer/linux-screen-capture/*.node',
+			'node_modules/.pnpm/@fluxer+linux-screen-capture@*/node_modules/@fluxer/linux-screen-capture/obs-vkcapture/**/*',
+			'node_modules/.pnpm/@fluxer+linux-notifications@*/node_modules/@fluxer/linux-notifications/*.node',
+			'node_modules/.pnpm/@fluxer+linux-evdev@*/node_modules/@fluxer/linux-evdev/*.node',
+			'node_modules/.pnpm/@fluxer+linux-input-hook@*/node_modules/@fluxer/linux-input-hook/*.node',
+			'node_modules/.pnpm/@fluxer+system-hunspell@*/node_modules/@fluxer/system-hunspell/*.node',
+			'node_modules/.pnpm/@fluxer+macos-input-hook@*/node_modules/@fluxer/macos-input-hook/*.node',
+			'node_modules/.pnpm/@fluxer+mac-app-audio@*/node_modules/@fluxer/mac-app-audio/*.node',
+			'node_modules/.pnpm/@fluxer+mac-screen-capture@*/node_modules/@fluxer/mac-screen-capture/*.node',
+			'node_modules/.pnpm/@fluxer+mac-clipboard@*/node_modules/@fluxer/mac-clipboard/*.node',
+			'node_modules/.pnpm/@fluxer+mac-sysctl@*/node_modules/@fluxer/mac-sysctl/*.node',
+			'node_modules/.pnpm/@fluxer+mac-tcc@*/node_modules/@fluxer/mac-tcc/*.node',
+			'node_modules/.pnpm/@fluxer+platform-info@*/node_modules/@fluxer/platform-info/*.node',
+			'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.node',
+			'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.so*',
+		],
 	},
-	asarUnpack: [
-		'**/*.node',
-		'node_modules/@fluxer/win-process-loopback/*.node',
-		...winGameCaptureTargetArchs.map(
-			(arch) => `node_modules/@fluxer/win-game-capture/win-game-capture.win32-${arch}-msvc.node`,
-		),
-		'node_modules/@fluxer/win-clipboard/*.node',
-		'node_modules/@fluxer/win-shell/*.node',
-		'node_modules/@fluxer/win-toast/*.node',
-		'node_modules/@fluxer/linux-audio-capture/*.node',
-		'node_modules/@fluxer/linux-portals/*.node',
-		'node_modules/@fluxer/linux-screen-capture/*.node',
-		'node_modules/@fluxer/linux-screen-capture/obs-vkcapture/**/*',
-		'node_modules/@fluxer/linux-notifications/*.node',
-		'node_modules/@fluxer/linux-evdev/*.node',
-		'node_modules/@fluxer/system-hunspell/*.node',
-		'node_modules/@fluxer/macos-input-hook/*.node',
-		'node_modules/@fluxer/mac-app-audio/*.node',
-		'node_modules/@fluxer/mac-screen-capture/*.node',
-		'node_modules/@fluxer/mac-clipboard/*.node',
-		'node_modules/@fluxer/mac-sysctl/*.node',
-		'node_modules/@fluxer/mac-tcc/*.node',
-		'node_modules/@fluxer/windows-input-hook/*.node',
-		'node_modules/@fluxer/linux-input-hook/*.node',
-		'node_modules/@fluxer/platform-info/*.node',
-		'node_modules/@fluxer/webauthn/*.node',
-		'node_modules/@fluxer/webauthn/*.so*',
-		'node_modules/.pnpm/@fluxer+win-process-loopback@*/node_modules/@fluxer/win-process-loopback/*.node',
-		...winGameCaptureTargetArchs.map(
-			(arch) =>
-				`node_modules/.pnpm/@fluxer+win-game-capture@*/node_modules/@fluxer/win-game-capture/win-game-capture.win32-${arch}-msvc.node`,
-		),
-		'node_modules/.pnpm/@fluxer+win-clipboard@*/node_modules/@fluxer/win-clipboard/*.node',
-		'node_modules/.pnpm/@fluxer+win-shell@*/node_modules/@fluxer/win-shell/*.node',
-		'node_modules/.pnpm/@fluxer+win-toast@*/node_modules/@fluxer/win-toast/*.node',
-		'node_modules/.pnpm/@fluxer+windows-input-hook@*/node_modules/@fluxer/windows-input-hook/*.node',
-		'node_modules/.pnpm/@fluxer+linux-audio-capture@*/node_modules/@fluxer/linux-audio-capture/*.node',
-		'node_modules/.pnpm/@fluxer+linux-portals@*/node_modules/@fluxer/linux-portals/*.node',
-		'node_modules/.pnpm/@fluxer+linux-screen-capture@*/node_modules/@fluxer/linux-screen-capture/*.node',
-		'node_modules/.pnpm/@fluxer+linux-screen-capture@*/node_modules/@fluxer/linux-screen-capture/obs-vkcapture/**/*',
-		'node_modules/.pnpm/@fluxer+linux-notifications@*/node_modules/@fluxer/linux-notifications/*.node',
-		'node_modules/.pnpm/@fluxer+linux-evdev@*/node_modules/@fluxer/linux-evdev/*.node',
-		'node_modules/.pnpm/@fluxer+linux-input-hook@*/node_modules/@fluxer/linux-input-hook/*.node',
-		'node_modules/.pnpm/@fluxer+system-hunspell@*/node_modules/@fluxer/system-hunspell/*.node',
-		'node_modules/.pnpm/@fluxer+macos-input-hook@*/node_modules/@fluxer/macos-input-hook/*.node',
-		'node_modules/.pnpm/@fluxer+mac-app-audio@*/node_modules/@fluxer/mac-app-audio/*.node',
-		'node_modules/.pnpm/@fluxer+mac-screen-capture@*/node_modules/@fluxer/mac-screen-capture/*.node',
-		'node_modules/.pnpm/@fluxer+mac-clipboard@*/node_modules/@fluxer/mac-clipboard/*.node',
-		'node_modules/.pnpm/@fluxer+mac-sysctl@*/node_modules/@fluxer/mac-sysctl/*.node',
-		'node_modules/.pnpm/@fluxer+mac-tcc@*/node_modules/@fluxer/mac-tcc/*.node',
-		'node_modules/.pnpm/@fluxer+platform-info@*/node_modules/@fluxer/platform-info/*.node',
-		'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.node',
-		'node_modules/.pnpm/@fluxer+webauthn@*/node_modules/@fluxer/webauthn/*.so*',
-	],
 	compression: 'normal',
-	npmRebuild: false,
+	nativeModules: {
+		npmRebuild: false,
+	},
 	protocols: [
 		{
 			name: appId,
@@ -1387,18 +1390,21 @@ module.exports = {
 	},
 	mac: {
 		category: 'public.app-category.social-networking',
-		x64ArchFiles: '**/@fluxer/**/*.node',
+		universal: {
+			x64ArchFiles: '**/@fluxer/**/*.node',
+		},
 		minimumSystemVersion: macOSMinimumSystemVersion,
 		icon: `build_resources/${iconDir}/_compiled/AppIcon.icns`,
 		darkModeSupport: true,
-		hardenedRuntime: true,
-		gatekeeperAssess: false,
 		notarize: true,
-		provisioningProfile,
-		entitlements: isCanary
-			? 'build_resources/entitlements.mac.canary.plist'
-			: 'build_resources/entitlements.mac.stable.plist',
-		entitlementsInherit: 'build_resources/entitlements.mac.inherit.plist',
+		sign: {
+			hardenedRuntime: true,
+			provisioningProfile,
+			entitlements: isCanary
+				? 'build_resources/entitlements.mac.canary.plist'
+				: 'build_resources/entitlements.mac.stable.plist',
+			entitlementsInherit: 'build_resources/entitlements.mac.inherit.plist',
+		},
 		target: [
 			{
 				target: 'dmg',

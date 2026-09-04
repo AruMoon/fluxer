@@ -160,6 +160,8 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 	return {
 		nodeEnv: master.env === 'test' ? 'development' : master.env,
 		port: master.services.api.port,
+		headersTimeoutMs: master.services.api.headers_timeout_ms,
+		requestTimeoutMs: master.services.api.request_timeout_ms,
 		maxInflightRequests: master.services.api.max_inflight_requests,
 		ipBanExemptIps: normalizeIpBanExemptIps(master.services.api.ip_ban_exempt_ips),
 		desktopGitHubRedirectCountries: normalizeCountryCodes(
@@ -185,6 +187,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			sslCa: postgresSource?.ssl_ca ?? '',
 			maxConnections: postgresSource?.max_connections ?? 20,
 			kvTable: postgresSource?.kv_table ?? 'fluxer_kv',
+			preparedStatements: postgresSource?.prepared_statements ?? true,
 		},
 		database: {
 			backend: master.database.backend,
@@ -526,6 +529,20 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 				batch: apiWorkerConfig?.lane_concurrency_overrides?.batch,
 			},
 		},
+	};
+}
+
+interface APIServerOptions {
+	port: number;
+	headersTimeoutMs: number;
+	requestTimeoutMs: number;
+}
+
+export function buildAPIServerOptions(config: APIConfig): APIServerOptions {
+	return {
+		port: config.port,
+		headersTimeoutMs: config.headersTimeoutMs,
+		requestTimeoutMs: config.requestTimeoutMs,
 	};
 }
 

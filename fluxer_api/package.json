@@ -70,7 +70,6 @@
 		"jose": "catalog:",
 		"livekit-server-sdk": "catalog:",
 		"lodash": "catalog:",
-		"luxon": "catalog:",
 		"maxmind": "catalog:",
 		"mime": "catalog:",
 		"nats": "catalog:",
@@ -83,13 +82,13 @@
 		"transliteration": "catalog:",
 		"tsx": "catalog:",
 		"uint8array-extras": "catalog:",
+		"undici": "catalog:",
 		"validator": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@types/archiver": "catalog:",
 		"@types/lodash": "catalog:",
-		"@types/luxon": "catalog:",
 		"@typescript/native-preview": "catalog:",
 		"esbuild": "catalog:",
 		"msw": "catalog:",

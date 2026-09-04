@@ -227,6 +227,7 @@ export type UsernameSuggestionsResponse = z.infer<typeof UsernameSuggestionsResp
 export const HandoffInitiateResponse = z.object({
 	code: z.string().describe('Handoff code to share with the receiving device'),
 	expires_at: z.iso.datetime().describe('ISO 8601 timestamp when the handoff code expires'),
+	poll_secret: z.string().optional().describe('Secret the initiating device must present to retrieve the token'),
 });
 
 export type HandoffInitiateResponse = z.infer<typeof HandoffInitiateResponse>;
@@ -331,6 +332,18 @@ export const HandoffCodeParam = z.object({
 
 export type HandoffCodeParam = z.infer<typeof HandoffCodeParam>;
 
+export const HandoffStatusRequest = z.object({
+	poll_secret: createStringType().describe('The poll secret issued when the handoff was initiated'),
+});
+
+export type HandoffStatusRequest = z.infer<typeof HandoffStatusRequest>;
+
+export const HandoffCancelRequest = z.object({
+	poll_secret: createStringType().describe('The poll secret issued when the handoff was initiated'),
+});
+
+export type HandoffCancelRequest = z.infer<typeof HandoffCancelRequest>;
+
 export const EnableMfaTotpRequest = z
 	.object({
 		secret: createStringType(1, 256).describe('The TOTP secret key'),
@@ -368,6 +381,38 @@ export const MfaBackupCodesResponse = z.object({
 });
 
 export type MfaBackupCodesResponse = z.infer<typeof MfaBackupCodesResponse>;
+
+export const MfaBackupCodesChallengeStartResponse = z.object({
+	ticket: z.string().describe('Ticket for backup codes challenge actions'),
+	code_expires_at: z.string().describe('ISO8601 timestamp when the verification code expires'),
+	resend_available_at: z.string().describe('ISO8601 timestamp when the code can be resent'),
+});
+
+export type MfaBackupCodesChallengeStartResponse = z.infer<typeof MfaBackupCodesChallengeStartResponse>;
+
+export const MfaBackupCodesChallengeResendRequest = z.object({
+	ticket: createStringType().describe('Backup codes challenge ticket identifier'),
+});
+
+export type MfaBackupCodesChallengeResendRequest = z.infer<typeof MfaBackupCodesChallengeResendRequest>;
+
+export const MfaBackupCodesChallengeVerifyRequest = MfaBackupCodesChallengeResendRequest.extend({
+	code: createStringType().describe('Verification code sent to the email address'),
+});
+
+export type MfaBackupCodesChallengeVerifyRequest = z.infer<typeof MfaBackupCodesChallengeVerifyRequest>;
+
+export const MfaBackupCodesChallengeVerifyResponse = MfaBackupCodesResponse.extend({
+	verification_proof: z.string().describe('Proof token authorizing backup code regeneration on this ticket'),
+});
+
+export type MfaBackupCodesChallengeVerifyResponse = z.infer<typeof MfaBackupCodesChallengeVerifyResponse>;
+
+export const MfaBackupCodesChallengeRegenerateRequest = MfaBackupCodesChallengeResendRequest.extend({
+	verification_proof: createStringType().describe('Proof token obtained from verifying the email code'),
+});
+
+export type MfaBackupCodesChallengeRegenerateRequest = z.infer<typeof MfaBackupCodesChallengeRegenerateRequest>;
 
 export const PhoneSendVerificationRequest = z.object({
 	phone: PhoneNumberType.describe('Phone number to send verification code'),

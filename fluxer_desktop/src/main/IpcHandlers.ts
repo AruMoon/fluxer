@@ -35,6 +35,7 @@ import {openExternalDeduped} from '@electron/main/OpenExternal';
 import {getStatus as getOpenH264Status, setEnabled as setOpenH264Enabled} from '@electron/main/OpenH264Manager';
 import {registerPasskeyHandlers} from '@electron/main/Passkeys';
 import {getAppMetricsSnapshot, getDesktopInfo, getGpuInfo} from '@electron/main/PlatformInfo';
+import {requirePrivilegedRendererDocumentSender} from '@electron/main/PrivilegedRendererDocuments';
 import {getStreamerModeCaptureAppStatus} from '@electron/main/StreamerModeProcessDetection';
 import {
 	acquireStreamingPriority,
@@ -341,13 +342,14 @@ export function registerIpcHandlers(): void {
 		}
 		await openExternalDeduped(url);
 	});
-	ipcMain.handle('clipboard-write-text', (_event, text: string): void => {
-		clipboard.writeText(text);
+	ipcMain.handle('clipboard-write-text', async (_event, text: string): Promise<void> => {
+		await clipboard.writeText(text);
 	});
-	ipcMain.handle('clipboard-read-text', (): string => {
+	ipcMain.handle('clipboard-read-text', (): Promise<string> => {
 		return clipboard.readText();
 	});
-	ipcMain.handle('clipboard-write-file', async (_event, rawOptions: unknown): Promise<ClipboardWriteFileResult> => {
+	ipcMain.handle('clipboard-write-file', async (event, rawOptions: unknown): Promise<ClipboardWriteFileResult> => {
+		requirePrivilegedRendererDocumentSender(event, 'clipboard-write-file');
 		try {
 			return await copyRemoteFileToClipboard(parseClipboardWriteFileOptions(rawOptions));
 		} catch (error) {
@@ -355,6 +357,7 @@ export function registerIpcHandlers(): void {
 		}
 	});
 	ipcMain.handle('clipboard-paste', (event): void => {
+		requirePrivilegedRendererDocumentSender(event, 'clipboard-paste');
 		event.sender.paste();
 	});
 	ipcMain.handle(
@@ -386,6 +389,7 @@ export function registerIpcHandlers(): void {
 				defaultPath: string;
 			},
 		): Promise<DownloadFileResult> => {
+			requirePrivilegedRendererDocumentSender(event, 'download-file');
 			const win = BrowserWindow.fromWebContents(event.sender);
 			if (!win) {
 				return {success: false, error: 'No window found'};

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {execFileSync, spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
 import {createServer} from 'node:net';
 import {
 	getDefaultPostgresClient,
@@ -11,6 +11,7 @@ import {
 } from '@pkgs/postgres/src/Client';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {GuildMembers, ReadStates, Users} from '../Tables';
+import {startDockerContainer} from '../test/DockerTestContainer';
 import {LegacyPostgresKvQueryExecutor, legacyEnsurePostgresKvSchema} from './__testref__/LegacyPostgresKvQueryExecutor';
 import {ensurePostgresKvSchema, POSTGRES_KV_MIGRATION_TABLE, PostgresKvQueryExecutor} from './PostgresKvQueryExecutor';
 
@@ -46,29 +47,25 @@ async function freePort(): Promise<number> {
 if (dockerUp) {
 	beforeAll(async () => {
 		PORT = await freePort();
-		execFileSync(
-			'docker',
-			[
-				'run',
-				'-d',
-				'--name',
-				CONTAINER,
-				'-e',
-				'POSTGRES_USER=fluxer',
-				'-e',
-				'POSTGRES_PASSWORD=fluxer',
-				'-e',
-				'POSTGRES_DB=fluxer',
-				'-p',
-				`127.0.0.1:${PORT}:5432`,
-				POSTGRES_IMAGE,
-				'-c',
-				'fsync=off',
-				'-c',
-				'synchronous_commit=off',
-			],
-			{stdio: 'ignore'},
-		);
+		startDockerContainer([
+			'run',
+			'-d',
+			'--name',
+			CONTAINER,
+			'-e',
+			'POSTGRES_USER=fluxer',
+			'-e',
+			'POSTGRES_PASSWORD=fluxer',
+			'-e',
+			'POSTGRES_DB=fluxer',
+			'-p',
+			`127.0.0.1:${PORT}:5432`,
+			POSTGRES_IMAGE,
+			'-c',
+			'fsync=off',
+			'-c',
+			'synchronous_commit=off',
+		]);
 		for (let attempt = 0; attempt < 180; attempt += 1) {
 			await sleep(500);
 			const probe = spawnSync('docker', ['exec', CONTAINER, 'pg_isready', '-U', 'fluxer', '-d', 'fluxer'], {
@@ -309,9 +306,13 @@ suite('postgres kv upgrade safety', () => {
 				 WHERE tablename = '${OLD}' AND indexname <> '${OLD}_row_key_c_idx'
 				 EXCEPT SELECT replace(indexdef, '${NEW}', 'KV') FROM pg_indexes WHERE tablename = '${NEW}')
 				UNION ALL
-				(SELECT replace(indexdef, '${NEW}', 'KV') FROM pg_indexes WHERE tablename = '${NEW}'
+				(SELECT replace(indexdef, '${NEW}', 'KV') FROM pg_indexes
+				 WHERE tablename = '${NEW}' AND indexname <> '${NEW}_row_key_numeric_idx'
 				 EXCEPT SELECT replace(indexdef, '${OLD}', 'KV') FROM pg_indexes WHERE tablename = '${OLD}')
 			) d`);
+		const added = await raw.query<{indexname: string}>(`
+			SELECT indexname FROM pg_indexes WHERE tablename = '${NEW}'
+			EXCEPT SELECT replace(indexname, '${OLD}', '${NEW}') FROM pg_indexes WHERE tablename = '${OLD}'`);
 		const collations = await raw.query<{tablename: string; attname: string; collname: string}>(`
 			SELECT cls.relname AS tablename, att.attname, col.collname
 			FROM pg_attribute att
@@ -325,6 +326,7 @@ suite('postgres kv upgrade safety', () => {
 		);
 		expect(Number(diff.rows[0]!.n)).toBe(0);
 		expect(Number(schemaDiff.rows[0]!.n)).toBe(0);
+		expect(added.rows.map((r) => r.indexname)).toEqual([`${NEW}_row_key_numeric_idx`]);
 		expect(collations.rows.filter((r) => r.tablename === OLD).map((r) => r.collname)).toEqual(['default', 'default']);
 		expect(collations.rows.filter((r) => r.tablename === NEW).map((r) => r.collname)).toEqual(['C', 'C']);
 		expect(cIndexes.rows.map((r) => r.tablename)).toEqual([OLD]);
@@ -363,6 +365,50 @@ suite('postgres kv upgrade safety', () => {
 			{status: 'fulfilled', value: undefined},
 			{status: 'fulfilled', value: undefined},
 		]);
+	}, 120_000);
+
+	it('survives a peer that creates the table without the schema lock', async () => {
+		const RACE = `${KV}_race`;
+		await raw.query(`DROP TABLE IF EXISTS ${RACE}`);
+		let release = () => {};
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		let created = () => {};
+		const tableCreated = new Promise<void>((resolve) => {
+			created = resolve;
+		});
+		const peer = raw.transaction(async (db) => {
+			await db.query(`
+CREATE TABLE IF NOT EXISTS ${RACE} (
+	table_name text NOT NULL,
+	partition_key text COLLATE "C" NOT NULL,
+	row_key text COLLATE "C" NOT NULL,
+	row_data jsonb NOT NULL,
+	expires_at timestamptz,
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	PRIMARY KEY (table_name, row_key)
+)`);
+			created();
+			await gate;
+		});
+		await Promise.race([tableCreated, peer]);
+		const booting = ensurePostgresKvSchema(new TableClient(raw, RACE)).then(
+			() => 'ok',
+			(error: Error) => `failed: ${error.message}`,
+		);
+		for (let attempt = 0; attempt < 200; attempt += 1) {
+			const blocked = await raw.query(
+				`SELECT 1 FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND wait_event_type = 'Lock' AND query LIKE $1`,
+				[`%${RACE}%`],
+			);
+			if (blocked.rows.length > 0) break;
+			await sleep(50);
+		}
+		release();
+		await peer;
+		expect(await booting).toBe('ok');
+		await raw.query(`DROP TABLE IF EXISTS ${RACE}`);
 	}, 120_000);
 
 	it('backfills the messages partition key once and never scans for it again', async () => {

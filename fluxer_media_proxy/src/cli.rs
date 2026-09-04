@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::config::{Config, DeploymentMode, StorageBackend};
-use clap::{ArgAction, Parser, ValueEnum};
+use clap::{ArgAction, Parser, Subcommand, ValueEnum};
 
 #[derive(Debug, Parser)]
 #[command(name = "fluxer-media-proxy", disable_help_subcommand = true)]
@@ -23,6 +23,14 @@ pub struct Args {
 
     #[arg(long = "read-only", action = ArgAction::SetTrue)]
     pub read_only: bool,
+
+    #[command(subcommand)]
+    pub command: Option<Command>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Subcommand)]
+pub enum Command {
+    Healthcheck,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
@@ -65,14 +73,14 @@ fn apply_overrides(args: &Args, cfg: &mut Config) -> anyhow::Result<()> {
         cfg.mode = mode.into();
     }
     if let Some(storage_backend) = args.storage_backend {
-        cfg.storage_backend = storage_backend.into();
+        cfg.storage.backend = storage_backend.into();
     }
     if let Some(storage_root) = args.storage_root.as_deref() {
         anyhow::ensure!(
             !storage_root.trim().is_empty(),
             "--storage-root cannot be empty"
         );
-        cfg.storage_root = storage_root.to_owned();
+        cfg.storage.root = storage_root.to_owned();
     }
     if args.read_only {
         cfg.read_only = true;
@@ -132,9 +140,25 @@ mod tests {
         assert_eq!("127.0.0.1", cfg.bind_host);
         assert_eq!(18080, cfg.port);
         assert_eq!(DeploymentMode::Static, cfg.mode);
-        assert_eq!(StorageBackend::S3, cfg.storage_backend);
-        assert_eq!("/srv/media", cfg.storage_root);
+        assert_eq!(StorageBackend::S3, cfg.storage.backend);
+        assert_eq!("/srv/media", cfg.storage.root);
         assert!(cfg.read_only);
+    }
+
+    #[test]
+    fn cli_parses_healthcheck_subcommand() {
+        assert_eq!(
+            Some(Command::Healthcheck),
+            Args::try_parse_from(["fluxer-media-proxy", "healthcheck"])
+                .unwrap()
+                .command
+        );
+        assert!(
+            Args::try_parse_from(["fluxer-media-proxy"])
+                .unwrap()
+                .command
+                .is_none()
+        );
     }
 
     #[test]

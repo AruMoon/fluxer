@@ -43,7 +43,6 @@ import {createNatsGifProvider} from '../gif/NatsGifProvider';
 import {GuildAuditLogService} from '../guild/GuildAuditLogService';
 import {GuildDiscoveryRepository} from '../guild/repositories/GuildDiscoveryRepository';
 import {GuildRepository} from '../guild/repositories/GuildRepository';
-import {ExpressionAssetPurger} from '../guild/services/content/ExpressionAssetPurger';
 import {GuildDiscoveryService} from '../guild/services/GuildDiscoveryService';
 import {AssetDeletionQueue} from '../infrastructure/AssetDeletionQueue';
 import {AvatarService} from '../infrastructure/AvatarService';
@@ -60,7 +59,6 @@ import type {IUnfurlerService} from '../infrastructure/IUnfurlerService';
 import {KVAccountDeletionQueueService} from '../infrastructure/KVAccountDeletionQueueService';
 import {KVActivityTracker} from '../infrastructure/KVActivityTracker';
 import {KVBulkMessageDeletionQueueService} from '../infrastructure/KVBulkMessageDeletionQueueService';
-import {KVScheduledJobQueueService} from '../infrastructure/KVScheduledJobQueueService';
 import {NatsUnfurlerService} from '../infrastructure/NatsUnfurlerService';
 import {PremiumStateReconciliationQueueService} from '../infrastructure/PremiumStateReconciliationQueueService';
 import {createDownloadsStorageService, createStorageService} from '../infrastructure/StorageServiceFactory';
@@ -76,7 +74,6 @@ import {BotAuthService} from '../oauth/BotAuthService';
 import {BotMfaMirrorService} from '../oauth/BotMfaMirrorService';
 import {ApplicationRepository} from '../oauth/repositories/ApplicationRepository';
 import {OAuth2TokenRepository} from '../oauth/repositories/OAuth2TokenRepository';
-import {PackRepository} from '../pack/PackRepository';
 import {ReadStateRepository} from '../read_state/ReadStateRepository';
 import {ReadStateRequestService} from '../read_state/ReadStateRequestService';
 import {ReadStateService} from '../read_state/ReadStateService';
@@ -88,7 +85,6 @@ import {EntranceSoundRepository} from '../user/entrance_sound/EntranceSoundRepos
 import {EntranceSoundService} from '../user/entrance_sound/EntranceSoundService';
 import {EmailChangeRepository} from '../user/repositories/auth/EmailChangeRepository';
 import {PasswordChangeRepository} from '../user/repositories/auth/PasswordChangeRepository';
-import {ScheduledMessageRepository} from '../user/repositories/ScheduledMessageRepository';
 import {UserContactChangeLogRepository} from '../user/repositories/UserContactChangeLogRepository';
 import {UserRepository} from '../user/repositories/UserRepository';
 import {VisionarySlotRepository} from '../user/repositories/VisionarySlotRepository';
@@ -121,9 +117,7 @@ export const getAdminArchiveRepository = singleton(() => new AdminArchiveReposit
 export const getVoiceRepository = singleton(() => new VoiceRepository());
 export const getApplicationRepository = singleton(() => new ApplicationRepository());
 export const getOAuth2TokenRepository = singleton(() => new OAuth2TokenRepository());
-export const getPackRepository = singleton(() => new PackRepository());
 export const getGuildDiscoveryRepository = singleton(() => new GuildDiscoveryRepository());
-export const getScheduledMessageRepository = singleton(() => new ScheduledMessageRepository());
 export const getEmailChangeRepository = singleton(() => new EmailChangeRepository());
 export const getPasswordChangeRepository = singleton(() => new PasswordChangeRepository());
 const getUserContactChangeLogRepository = singleton(() => new UserContactChangeLogRepository());
@@ -228,18 +222,6 @@ export function getKVBulkMessageDeletionQueue(): KVBulkMessageDeletionQueueServi
 		bulkMessageDeletionQueueClient = kvClient;
 	}
 	return bulkMessageDeletionQueue;
-}
-
-let scheduledJobQueueClient: IKVProvider | null = null;
-let scheduledJobQueue: KVScheduledJobQueueService | null = null;
-
-export function getKVScheduledJobQueue(): KVScheduledJobQueueService {
-	const kvClient = getKVClient();
-	if (!scheduledJobQueue || scheduledJobQueueClient !== kvClient) {
-		scheduledJobQueue = new KVScheduledJobQueueService(kvClient);
-		scheduledJobQueueClient = kvClient;
-	}
-	return scheduledJobQueue;
 }
 
 let premiumStateQueueClient: IKVProvider | null = null;
@@ -413,7 +395,6 @@ export const getGifService = singleton(() => {
 		createNatsGifProvider(async () => (await instanceConfigRepository.getEffectiveGifConfig()).klipy_api_key),
 	);
 });
-export const getExpressionAssetPurger = singleton(() => new ExpressionAssetPurger(getAssetDeletionQueue()));
 export const getGuildAuditLogService = singleton(
 	() => new GuildAuditLogService(getGuildRepository(), getSnowflakeService(), getWorkerService(), getGatewayService()),
 );
