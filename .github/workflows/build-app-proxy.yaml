@@ -196,7 +196,7 @@ jobs:
       - name: verify cross-architecture asset parity
         env:
           APP_PROXY_ASSETS_REF: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:${{ needs.meta.outputs.build_version }}-assets
-          APP_PROXY_AMD64_REF: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:${{ needs.meta.outputs.build_version }}
+          APP_PROXY_AMD64_REF: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:${{ needs.meta.outputs.build_version }}-amd64
           APP_PROXY_ARM64_REF: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:${{ needs.meta.outputs.build_version }}-arm64
         run: >-
           tools/ci/run.sh build-app-proxy
