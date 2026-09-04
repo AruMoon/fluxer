@@ -173,7 +173,7 @@ jobs:
 
   merge:
     name: merge multi-arch manifest
-    needs: [meta, build, build-arm64]
+    needs: [meta, build]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
