@@ -10,6 +10,14 @@ on:
         required: false
         default: ""
 
+  workflow_call:
+    inputs:
+      build-version:
+        description: "Explicit Fluxer CalVer build version (YYYY.MDD.MICRO, UTC HHMMSS without leading zeroes) to use instead of automatic UTC clock allocation"
+        type: string
+        required: false
+        default: ""
+
 permissions:
   actions: read
   contents: write
