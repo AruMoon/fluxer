@@ -74,7 +74,7 @@ jobs:
       actions: read
       contents: read
       packages: write
-    environment:
+    env:
       PUBLIC_ASSET_BASE_URL: ""
       BUNDLE_LOCAL_ASSETS: "true"
       FLUXER_APP_PROXY_TIME_FREEZE_ENABLED: "false"
