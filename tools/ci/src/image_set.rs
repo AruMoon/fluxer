@@ -45,14 +45,6 @@ const COMPONENTS: &[Component] = &[
         services: &[],
     },
     Component {
-        image: "fluxer-app-proxy-self-hosted",
-        services: &["app-proxy"],
-    },
-    Component {
-        image: "fluxer-docs",
-        services: &[],
-    },
-    Component {
         image: "fluxer-gateway",
         services: &["gateway"],
     },
@@ -900,7 +892,7 @@ mod tests {
             .collect();
         let unique: BTreeSet<&str> = services.iter().copied().collect();
         assert_eq!(services.len(), unique.len());
-        assert_eq!(services.len(), 17);
+        assert_eq!(services.len(), 16);
     }
 
     #[test]
@@ -1022,19 +1014,6 @@ mod tests {
             );
         }
 
-        let app_proxy = manifest
-            .components
-            .iter()
-            .find(|entry| entry.component == "fluxer-app-proxy-self-hosted")
-            .unwrap();
-        assert!(
-            rendered.contains(&format!(
-                "  app-proxy:\n    image: {COMPOSE_IMAGE_PREFIX}/fluxer-app-proxy-self-hosted@${{FLUXER_APP_PROXY_SELF_HOSTED_IMAGE_DIGEST:-{}}}\n",
-                app_proxy.digest
-            )),
-            "{rendered}"
-        );
-        assert!(!rendered.contains("fluxer-docs"), "{rendered}");
         assert!(
             rendered.starts_with(
                 "# fluxer-release@2026.901.120000 image set\n# docker compose -f docker-compose.yml -f fluxer-release-2026.901.120000.yml up -d\nservices:\n"
