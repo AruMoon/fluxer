@@ -8,7 +8,7 @@ export const GuildEmojiResponse = z.object({
 	id: SnowflakeStringType.describe('The unique identifier for this emoji'),
 	name: z.string().describe('The name of the emoji'),
 	animated: z.boolean().describe('Whether this emoji is animated'),
-	nsfw: z.boolean().describe('Whether this emoji is classified as NSFW'),
+	nsfw: z.boolean().describe('Deprecated; always false. Retained for compatibility with older clients'),
 });
 
 export type GuildEmojiResponse = z.infer<typeof GuildEmojiResponse>;
@@ -17,7 +17,7 @@ export const GuildEmojiWithUserResponse = z.object({
 	id: SnowflakeStringType.describe('The unique identifier for this emoji'),
 	name: z.string().describe('The name of the emoji'),
 	animated: z.boolean().describe('Whether this emoji is animated'),
-	nsfw: z.boolean().describe('Whether this emoji is classified as NSFW'),
+	nsfw: z.boolean().describe('Deprecated; always false. Retained for compatibility with older clients'),
 	user: z.lazy(() => UserPartialResponse).describe('The user who uploaded this emoji'),
 });
 
@@ -29,7 +29,7 @@ export const GuildStickerResponse = z.object({
 	description: z.string().describe('The description of the sticker'),
 	tags: z.array(z.string()).max(100).describe('Autocomplete/suggestion tags for the sticker'),
 	animated: z.boolean().describe('Whether this sticker is animated'),
-	nsfw: z.boolean().describe('Whether this sticker is classified as NSFW'),
+	nsfw: z.boolean().describe('Deprecated; always false. Retained for compatibility with older clients'),
 });
 
 export type GuildStickerResponse = z.infer<typeof GuildStickerResponse>;
@@ -40,7 +40,7 @@ export const GuildStickerWithUserResponse = z.object({
 	description: z.string().describe('The description of the sticker'),
 	tags: z.array(z.string()).max(100).describe('Autocomplete/suggestion tags for the sticker'),
 	animated: z.boolean().describe('Whether this sticker is animated'),
-	nsfw: z.boolean().describe('Whether this sticker is classified as NSFW'),
+	nsfw: z.boolean().describe('Deprecated; always false. Retained for compatibility with older clients'),
 	user: z.lazy(() => UserPartialResponse).describe('The user who uploaded this sticker'),
 });
 
@@ -104,7 +104,6 @@ export interface GuildEmoji {
 	readonly id: string;
 	readonly name: string;
 	readonly animated: boolean;
-	readonly nsfw: boolean;
 	readonly user?: UserPartial;
 }
 
@@ -118,7 +117,6 @@ export interface GuildSticker {
 	readonly description: string;
 	readonly tags: Array<string>;
 	readonly animated: boolean;
-	readonly nsfw: boolean;
 	readonly user?: UserPartial;
 }
 

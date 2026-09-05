@@ -209,6 +209,8 @@
 }
 
 .messageFailed {
+	--markup-link-color: var(--status-danger);
+	--markup-mention-color: var(--status-danger);
 	color: var(--status-danger);
 }
 
@@ -217,7 +219,6 @@
 	opacity: 1;
 }
 
-.messageFailed .link,
 .messageFailed a {
 	color: var(--status-danger) !important;
 }
@@ -995,6 +996,11 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.repliedTextContent,
+.repliedTextContent * {
+	white-space: nowrap !important;
 }
 
 .repliedMessage .repliedTextPreview .repliedTextContent {
