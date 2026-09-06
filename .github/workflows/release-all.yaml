@@ -68,70 +68,70 @@ jobs:
     secrets: inherit
 
   build_admin:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-admin.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_api:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-api.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_gateway:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-gateway.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_gifs:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-gifs.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_media_proxy:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-media-proxy.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_messages:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-messages.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_snowflakes:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-snowflakes.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_static:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-static.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_unfurl:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-unfurl.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
   build_users:
-    needs: build_app_proxy
+    needs: meta
     uses: ./.github/workflows/build-users.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
