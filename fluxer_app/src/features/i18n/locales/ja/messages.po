@@ -355,7 +355,7 @@ msgstr "{count, plural, one {#件のブックマーク} other {#件のブック�
 msgid "{count, plural, one {# community found} other {# communities found}}"
 msgstr "{count, plural, one {#件のコミュニティが見つかりました} other {#件のコミュニティが見つかりました}}"
 
-#: src/features/app/components/layout/GuildsLayout.tsx:1950
+#: src/features/app/components/layout/GuildsLayout.tsx:1953
 msgid "{count, plural, one {# community is temporarily unavailable due to a flux capacitor malfunction.} other {# communities are temporarily unavailable due to a flux capacitor malfunction.}}"
 msgstr "{count, plural, one {#件のコミュニティはフラックスキャパシタの不具合により一時的に利用できません。} other {#件のコミュニティはフラックスキャパシタの不具合により一時的に利用できません。}}"
 
@@ -404,7 +404,7 @@ msgstr "{count, plural, one {#つの共通コミュニティ} other {#つの共�
 msgid "{count, plural, one {# other} other {# others}}"
 msgstr "{count, plural, one {#人} other {#人}}"
 
-#: src/features/voice/components/VoiceCallView.tsx:506
+#: src/features/voice/components/VoiceCallView.tsx:507
 msgid "{count, plural, one {# participant in call} other {# participants in call}}"
 msgstr "{count, plural, one {#人が通話中} other {#人が通話中}}"
 
@@ -450,7 +450,7 @@ msgstr "{count, plural, one {展開（#行）} other {展開（#行）}}"
 msgid "{count, plural, one {Expand (# row)} other {Expand (# rows)}}"
 msgstr "{count, plural, one {#行を展開} other {#行を展開}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:311
+#: src/features/voice/components/VoiceParticipantTile.tsx:315
 msgid "{count, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{count, plural, one {#件の他のデバイスを展開} other {#件の他のデバイスを展開}}"
 
@@ -471,7 +471,7 @@ msgstr "{count, plural, one {通話中} other {#人が通話中}}"
 msgid "{count, plural, one {Join video call (# participant)} other {Join video call (# participants)}}"
 msgstr "{count, plural, one {ビデオ通話に参加（#人）} other {ビデオ通話に参加（#人）}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:637
+#: src/features/voice/components/VoiceParticipantTile.tsx:655
 msgid "{count, plural, one {Keep watching # stream and add this one} other {Keep watching # streams and add this one}}"
 msgstr "{count, plural, one {#件のストリームを視聴し続け、これを追加} other {#件のストリームを視聴し続け、これを追加}}"
 
@@ -748,7 +748,7 @@ msgstr "{fps} FPS"
 msgid "{guildName} channels"
 msgstr "{guildName}のチャンネル"
 
-#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:673
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:674
 msgid "{hiddenConnectionCount, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{hiddenConnectionCount, plural, one {#件の他のデバイスを展開} other {#件の他のデバイスを展開}}"
 
@@ -866,7 +866,7 @@ msgid "{memberCount} {rawMemberCount, plural, one {member} other {members}}"
 msgstr "{memberCount} {rawMemberCount, plural, one {人} other {人}}"
 
 #. Generic aria-label for an unread-mentions badge. Preserve {mentionCount}.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:799
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:795
 msgid "{mentionCount} mentions"
 msgstr "{mentionCount}件のメンション"
 
@@ -959,6 +959,16 @@ msgstr "{premiumProductFullName}の登録日: {premiumSinceFormatted}"
 #: src/features/user/components/modals/tabs/my_profile_tab/PremiumBadgeSettings.tsx:58
 msgid "{premiumProductName} badge privacy"
 msgstr "{premiumProductName}バッジのプライバシー設定"
+
+#. Nagbar body shown to monthly subscribers who are still billed the older, higher price after a price cut. {premiumProductName} is the short paid product name. {currentPrice} and {newPrice} are monthly currency amounts already formatted and localized by code, and {effectiveDate} is a date already formatted and localized by code; never write an amount or a date into the translation. Keep the tone calm and plain.
+#: src/features/premium/config/PriceAnnouncementCampaign.ts:13
+msgid "{premiumProductName} costs less now. Switch from {currentPrice} to {newPrice} a month starting {effectiveDate}, and nothing is charged today."
+msgstr "{premiumProductName} の料金が値下げされました。{effectiveDate} より、月額 {currentPrice} から {newPrice} に切り替えることができます。本日課金されるものはありません。"
+
+#. Nagbar body shown to yearly subscribers who are still billed the older, higher price after a price cut. {premiumProductName} is the short paid product name. {currentPrice} and {newPrice} are yearly currency amounts already formatted and localized by code, and {effectiveDate} is a date already formatted and localized by code; never write an amount or a date into the translation. Keep the tone calm and plain.
+#: src/features/premium/config/PriceAnnouncementCampaign.ts:19
+msgid "{premiumProductName} costs less now. Switch from {currentPrice} to {newPrice} a year starting {effectiveDate}, and nothing is charged today."
+msgstr "{premiumProductName} の料金が値下げされました。{effectiveDate} より、年額 {currentPrice} から {newPrice} に切り替えることができます。本日課金されるものはありません。"
 
 #. Link label that opens the premium perks list. premiumProductName is the premium plan name.
 #: src/features/app/components/dialogs/components/PerksButton.tsx:10
@@ -1884,6 +1894,11 @@ msgstr "ホスト名（例: {exampleDomain}）"
 msgid "A Linux desktop update is available. Choose the package format for this system and {productName} will save it locally."
 msgstr "Linux デスクトップのアップデートが利用可能です。このシステムで使用するパッケージ形式を選択すると、{productName} がローカルに保存されます。"
 
+#. Plutonium subscription card line offering a move to a lower price. {listPriceEffectiveDate} is a date already formatted and localized by code; never write a date into the translation.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:682
+msgid "A lower price is available. Switching takes effect on <0>{listPriceEffectiveDate}</0> and changes nothing else."
+msgstr "より安い価格が利用可能です。<0>{listPriceEffectiveDate}</0>から適用され、他は何も変更されません。"
+
 #. Duration label component for an elapsed call. Shown when the call lasted about a minute.
 #: src/features/channel/components/CallMessage.tsx:35
 msgid "a minute"
@@ -2088,7 +2103,7 @@ msgid "Account data"
 msgstr "アカウントデータ"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:279
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:253
 msgid "Account exists to spam, scam, or abuse the platform."
 msgstr "スパム、詐欺、またはプラットフォームの悪用を目的としたアカウントです。"
 
@@ -2110,7 +2125,7 @@ msgstr "アカウントが新しすぎます"
 #. Required-action modal title shown when an account-level verification step is required to proceed.
 #. Title of the error modal shown when an unclaimed (guest) account tries to accept a community or group DM invite. Auth-related; keep tone plain.
 #: src/features/auth/components/modals/required_action/RequiredActionDescriptors.ts:8
-#: src/features/invite/commands/InviteCommands.tsx:35
+#: src/features/invite/commands/InviteCommands.tsx:34
 msgid "Account verification required"
 msgstr "アカウント認証が必要です"
 
@@ -2176,13 +2191,13 @@ msgstr "アクション"
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subscription status badge meaning the paid subscription is active.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:370
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:445
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:37
 #: src/features/user/components/settings_utils/search_index/DevicesIndex.ts:19
 msgid "Active"
 msgstr "有効"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:358
+#: src/features/app/components/floating/UserAreaPopout.tsx:356
 #: src/features/auth/components/accounts/AccountRow.tsx:136
 msgid "Active account"
 msgstr "使用中のアカウント"
@@ -2222,7 +2237,7 @@ msgstr "月額プラン利用中（キャンセル予約済み）"
 #. Short label in the appearance tab. Keep it concise.
 #. Short label in the inline. Keep it concise.
 #. Status label indicating a user is currently active.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:743
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:739
 #: src/features/user/components/modals/tabs/appearance_tab/AppearanceTabInline.tsx:43
 #: src/features/user/components/modals/tabs/AppearanceTab.tsx:51
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:430
@@ -2386,7 +2401,7 @@ msgid "Add an account to continue."
 msgstr "続けるにはアカウントを追加してください。"
 
 #. Body of the error modal shown when an unclaimed (guest) account tries to accept a community invite. Tells the user to complete sign-up first.
-#: src/features/invite/commands/InviteCommands.tsx:40
+#: src/features/invite/commands/InviteCommands.tsx:39
 msgid "Add an email and password to your account first."
 msgstr "まずアカウントにメールアドレスとパスワードを追加してください。"
 
@@ -2483,6 +2498,11 @@ msgstr "項目を追加"
 msgid "Add local files"
 msgstr "ローカルファイルを追加"
 
+#. Permission description in the channel-scoped permissions editor for the Add Reactions permission. "New" reaction means starting a new reaction emoji on a message (not stacking onto an existing one).
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:269
+msgid "Add new reactions to messages in this channel."
+msgstr "このチャンネルのメッセージに新しいリアクションを追加します。"
+
 #. Permission description in the role/permission editor for the Add Reactions permission. "New" reaction means starting a new reaction emoji on a message (not stacking onto an existing one).
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:83
 msgid "Add new reactions to messages."
@@ -2512,7 +2532,7 @@ msgid "Add reaction"
 msgstr "リアクションを追加"
 
 #. Permission name: allows adding reactions to messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:245
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:436
 msgid "Add reactions"
 msgstr "リアクションを追加"
 
@@ -2651,7 +2671,7 @@ msgid "Added roles."
 msgstr "ロールを追加しました."
 
 #. Button or menu action label in the messaging commands. Keep it concise.
-#: src/features/messaging/commands/SavedMessageCommands.tsx:19
+#: src/features/messaging/commands/SavedMessageCommands.tsx:20
 msgid "Added to bookmarks"
 msgstr "ブックマークに追加しました"
 
@@ -2735,7 +2755,7 @@ msgid "Adjust the overall zoom level of the app. Use {zoomIn} / {zoomOut} to adj
 msgstr "アプリ全体の表示サイズを調整します。{zoomIn}または{zoomOut}で素早く調整できます。"
 
 #. Permission name: grants all permissions and bypasses restrictions.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:157
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:348
 msgid "Administrator"
 msgstr "管理者"
 
@@ -2830,19 +2850,19 @@ msgstr "配置調整は、画面幅が広い場合のみ利用できます"
 msgid "All"
 msgstr "すべて"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:447
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:522
 msgid "All <0/> for <1>{effectiveMonthlyPrice}/month</1>."
 msgstr "すべて<0/>で<1>{effectiveMonthlyPrice}/月</1>。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:469
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:544
 msgid "All <0/> for <1>{effectiveYearlyPrice}/year</1>."
 msgstr "すべて <0/> <1>{effectiveYearlyPrice}/年</1>でご利用いただけます。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:490
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:565
 msgid "All <0/> included with your subscription."
 msgstr "すべての<0/>はサブスクリプションに含まれています。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:437
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:512
 msgid "All <0/>, forever. No billing, no renewals."
 msgstr "すべて<0/>、永久に。請求も更新もありません。"
 
@@ -3160,7 +3180,7 @@ msgid "Already set to cancel"
 msgstr "キャンセル設定済み"
 
 #. Toggle-switch label in the moderator delete-message confirmation dialog. When enabled, the message is reported (category: other) before being deleted. {productName} is the product name (e.g., Fluxer).
-#: src/features/messaging/commands/MessageCommands.tsx:81
+#: src/features/messaging/commands/MessageCommands.tsx:84
 msgid "Also report this message to the {productName} Safety Team"
 msgstr "このメッセージを{productName}安全チームにも報告する"
 
@@ -3353,7 +3373,7 @@ msgid "Animated avatars ({animatedAvatarFormats}) require {premiumProductName}."
 msgstr "アニメーションアバター({animatedAvatarFormats})には、{premiumProductName}が必要です。"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:75
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:71
 msgid "Animated avatars & profile banners"
 msgstr "動くアバターとプロフィールバナー"
 
@@ -3551,7 +3571,7 @@ msgid "Another checkbox"
 msgstr "別のチェックボックス"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:383
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:357
 msgid "Another clear rule violation"
 msgstr "明らかなルール違反が他にあります"
 
@@ -3649,7 +3669,7 @@ msgid "App settings"
 msgstr "アプリ設定"
 
 #. Developer options group for overriding app/account state.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:37
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:47
 msgid "App state"
 msgstr "アプリの状態"
 
@@ -3664,7 +3684,7 @@ msgid "App zoom"
 msgstr "アプリのズーム"
 
 #. Setting label for the global UI zoom level.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:775
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:771
 msgid "App zoom level"
 msgstr "アプリの表示サイズ"
 
@@ -3954,7 +3974,7 @@ msgid "At least one channel must have \"{viewChannelPermissionLabel}\" permissio
 msgstr "カスタムURLを機能させるには、少なくとも1つのチャンネルで{EVERYONE_MENTION}に対して「{viewChannelPermissionLabel}」が有効になっている必要があります。現在、{EVERYONE_MENTION}に表示できるチャンネルはありません。"
 
 #. Permission name: allows uploading files to messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:229
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:420
 msgid "Attach files"
 msgstr "ファイルを添付"
 
@@ -4058,7 +4078,7 @@ msgid "Audio"
 msgstr "オーディオ"
 
 #. Permission category for voice, video, and streaming permissions.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:149
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:340
 msgid "Audio & video"
 msgstr "オーディオとビデオ"
 
@@ -4573,9 +4593,9 @@ msgstr "現在離席中"
 #. Button that moves to the previous setup wizard step.
 #. Footer button in the IAR modal that returns to the previous step.
 #. OAuth authorization secondary button. Returns to the previous carousel step.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:75
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:77
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx:14
-#: src/features/auth/flow/IpAuthorizationScreen.tsx:150
+#: src/features/auth/flow/IpAuthorizationScreen.tsx:152
 #: src/features/channel/components/channel_header/shared.ts:27
 #: src/features/connection/components/modals/AddConnectionModal.tsx:397
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateForm.tsx:164
@@ -4583,7 +4603,7 @@ msgstr "現在離席中"
 #: src/features/guild/components/modals/add_guild_modal/TemplateImportForm.tsx:354
 #: src/features/guild/components/modals/add_guild_modal/TemplateImportForm.tsx:375
 #: src/features/guild/components/modals/add_guild_modal/TemplateImportForm.tsx:395
-#: src/features/moderation/components/report_modal/IARModal.tsx:89
+#: src/features/moderation/components/report_modal/IARModal.tsx:86
 #: src/features/moderation/components/report/ReportStepDetails.tsx:312
 #: src/features/user/components/modals/PhoneAddModal.tsx:411
 #: src/features/user/components/modals/PhoneAddModal.tsx:430
@@ -4637,7 +4657,7 @@ msgid "Back to sticker"
 msgstr "ステッカーに戻る"
 
 #. Tooltip / aria label on the back button that returns from the call view to the voice channel view.
-#: src/features/voice/components/VoiceCallView.tsx:114
+#: src/features/voice/components/VoiceCallView.tsx:115
 msgid "Back to voice channel"
 msgstr "音声チャンネルに戻る"
 
@@ -4732,7 +4752,7 @@ msgstr "バランス"
 
 #. IAR modal: quick-action card button label for opening the ban dialog.
 #. Short moderation action label. Ban a member from a community by removing them and preventing rejoining.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:155
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:129
 #: src/features/moderation/utils/ModerationMessageDescriptors.ts:5
 msgid "Ban"
 msgstr "追放"
@@ -4773,12 +4793,17 @@ msgid "Ban member"
 msgstr "メンバーをBANする"
 
 #. Permission name: allows banning members from a community.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:181
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:372
 msgid "Ban members"
 msgstr "メンバーをBANする"
 
+#. Permission description in the role/permission editor for the Ban Members permission. A ban keeps the member out until it is lifted, and the moderator chooses how much recent message history to delete.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:123
+msgid "Ban members from the community, with the option to delete their recent messages."
+msgstr "メンバーをコミュニティから追放し、最近のメッセージを削除するオプションを選択できます。"
+
 #. IAR modal: quick-action card title for banning the reported user (moderator-only).
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:147
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:121
 msgid "Ban this user"
 msgstr "このユーザーをBANする"
 
@@ -4788,7 +4813,7 @@ msgid "Bandwidth"
 msgstr "帯域幅"
 
 #. IAR modal: disabled-state label on the ban card after the user is banned from this community.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:159
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:133
 msgid "Banned"
 msgstr "BAN済み"
 
@@ -4859,6 +4884,16 @@ msgstr "基本設定と許可されたリダイレクトURI。"
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:178
 msgid "Basic text inputs"
 msgstr "テキスト入力"
+
+#. Permission description in the channel-scoped permissions editor for the Priority Speaker permission. "Push to talk (priority)" is the name of a keybind in the keybind settings, so match the wording used there.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:300
+msgid "Be heard over other members in this channel while holding the push to talk (priority) keybind."
+msgstr "プッシュトゥトーク（優先）キーバインドを押している間、このチャンネルの他のメンバーよりも優先的に発言できます。"
+
+#. Permission description in the role/permission editor for the Priority Speaker permission at community scope. "Push to talk (priority)" is the name of a keybind in the keybind settings, so match the wording used there.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:176
+msgid "Be heard over other members while holding the push to talk (priority) keybind."
+msgstr "プッシュトゥトーク（優先）キーバインドを押している間、他のメンバーよりも優先的に発言できます。"
 
 #. Short label in the guild members date range modal. Keep it concise.
 #: src/features/guild/components/modals/guild_tabs/GuildMembersDateRangeModal.tsx:19
@@ -5003,7 +5038,7 @@ msgid "Block spoiler"
 msgstr "ネタバレをブロック"
 
 #. IAR modal: quick-action card title.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:407
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:381
 msgid "Block this user"
 msgstr "このユーザーをブロック"
 
@@ -5099,14 +5134,14 @@ msgstr "メッセージをブックマーク"
 
 #. Description text in the saved messages content popout.
 #. Description text in the saved messages page.
-#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:169
+#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:185
 #: src/features/messaging/components/pages/SavedMessagesPage.tsx:31
 #: src/features/messaging/components/popouts/SavedMessagesContent.tsx:34
 msgid "Bookmark messages to save them for later."
 msgstr "メッセージをブックマークして後で見返しましょう。"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:51
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:47
 msgid "Bookmarked messages"
 msgstr "ブックマークしたメッセージ"
 
@@ -5118,7 +5153,7 @@ msgstr "ブックマークしました。"
 #. Short label in the bookmarks bottom sheet. Keep it concise.
 #. Short label in the saved messages page. Keep it concise.
 #. Tab label in the inbox popout listing the user bookmarks.
-#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:33
+#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:34
 #: src/features/messaging/components/pages/SavedMessagesPage.tsx:23
 #: src/features/messaging/components/popouts/InboxPopout.tsx:34
 msgid "Bookmarks"
@@ -5371,12 +5406,12 @@ msgid "Bulk delete"
 msgstr "一括削除"
 
 #. IAR modal: rule description for a message report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:171
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:145
 msgid "Bullying, repeated unwanted contact, stalking, or targeted abuse."
 msgstr "いじめ、迷惑行為の繰り返し、ストーカー行為、標的型嫌がらせ。"
 
 #. IAR modal: rule-category description for the targeted-harm group.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:62
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:44
 msgid "Bullying, threats, hate, violence, raids, or content that pushes self-harm."
 msgstr "いじめ、脅迫、ヘイト、暴力、荒らし、または自傷行為を助長するコンテンツ。"
 
@@ -5444,7 +5479,7 @@ msgstr "{productName}のご利用により、更新されたポリシーに同�
 #. Developer option label.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:41
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:41
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:51
 msgid "Bypass loading skeleton"
 msgstr "ローディングスケルトンをバイパス"
 
@@ -5454,7 +5489,7 @@ msgid "Bypass mention suppression"
 msgstr "メンション制限をバイパス"
 
 #. Permission name: allows ignoring per-channel message rate limits.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:249
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:440
 msgid "Bypass slowmode"
 msgstr "低速モードをバイパス"
 
@@ -5464,7 +5499,7 @@ msgid "Call"
 msgstr "通話"
 
 #. IAR modal: quick-action card title.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:459
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:433
 msgid "Call & group chat settings"
 msgstr "通話とグループチャットの設定"
 
@@ -5512,7 +5547,7 @@ msgstr "通話"
 #. Generic voice/video setting label for the active camera device.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the video tab. Keep it concise.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:719
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:715
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx:68
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:157
 #: src/features/voice/utils/SettingsDeviceOptions.ts:23
@@ -5572,7 +5607,7 @@ msgstr "カメラオフ"
 
 #. Generic action label that enables the local camera.
 #. Notification sound setting label. Sound played when the user turns their camera on in a call.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:723
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:719
 #: src/features/notification/utils/SoundLabels.ts:52
 msgid "Camera on"
 msgstr "カメラオン"
@@ -5712,6 +5747,11 @@ msgstr "別のユーザー名を選択したい場合はキャンセルしてく
 msgid "Cancel import"
 msgstr "インポートをキャンセル"
 
+#. Billing button that cancels a scheduled move to a lower subscription price.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:819
+msgid "Cancel price change"
+msgstr "価格変更をキャンセル"
+
 #. Accessible label and tooltip for the cancel-reply button in the reply bar.
 #: src/features/channel/components/ChannelReplyBar.tsx:66
 msgid "Cancel reply"
@@ -5723,13 +5763,13 @@ msgid "Cancel request"
 msgstr "リクエストをキャンセル"
 
 #. Billing button that cancels a scheduled billing-cycle change.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:668
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:827
 msgid "Cancel scheduled switch"
 msgstr "予約済みの切り替えをキャンセル"
 
 #. Billing button that starts subscription cancellation.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:683
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:842
 #: src/features/app/components/dialogs/components/PlutoniumContent.tsx:138
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts:31
 msgid "Cancel subscription"
@@ -5739,13 +5779,18 @@ msgstr "サブスクリプションをキャンセル"
 msgid "Cancel subscription?"
 msgstr "サブスクリプションをキャンセルしますか？"
 
+#. Plutonium subscription card hint shown to a subscriber who could move to a lower price but has another billing change already scheduled.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:645
+msgid "Cancel the scheduled change to move to the current price instead."
+msgstr "現在の価格に変更するには、予定されている変更をキャンセルしてください。"
+
 #. Button or menu action label in the channel and chat message upload progress. Keep it concise.
 #: src/features/channel/components/MessageUploadProgress.tsx:21
 msgid "Cancel upload"
 msgstr "アップロードをキャンセル"
 
 #. Billing button that cancels a scheduled yearly upgrade.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:664
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:823
 msgid "Cancel yearly upgrade"
 msgstr "年額プランのアップグレードをキャンセル"
 
@@ -5755,7 +5800,7 @@ msgid "Cancel your friend request to {displayName}?"
 msgstr "{displayName}への友達リクエストをキャンセルしますか？"
 
 #. Subscription status badge meaning cancellation is scheduled for the renewal date.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:358
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:433
 msgid "Canceling"
 msgstr "キャンセル中"
 
@@ -5764,7 +5809,7 @@ msgstr "キャンセル中"
 msgid "Cancellation"
 msgstr "キャンセル"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:424
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:499
 msgid "Cancels on <0>{cancelDate}</0>. <1/> remain active until then."
 msgstr "<0>{cancelDate}</0>にキャンセルされます。<1/>それまでは引き続きご利用いただけます。"
 
@@ -6031,7 +6076,7 @@ msgid "Change other members' nicknames."
 msgstr "他のメンバーのニックネームを変更."
 
 #. Permission name: allows a member to edit their own nickname.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:189
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:380
 msgid "Change own nickname"
 msgstr "自分のニックネームを変更"
 
@@ -6055,7 +6100,7 @@ msgid "Change password form"
 msgstr "パスワード変更フォーム"
 
 #. Subscription status badge meaning a future billing plan change is scheduled.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:362
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:437
 msgid "Change scheduled"
 msgstr "変更を予約済み"
 
@@ -6091,13 +6136,23 @@ msgstr "ユーザー名変更フォーム"
 msgid "Change what users without \"{readMessageHistoryPermissionLabel}\" can see"
 msgstr "\"{readMessageHistoryPermissionLabel}\"がないユーザーの閲覧範囲を変更"
 
+#. Permission description in the role/permission editor for the Set Voice Region permission at community scope. The region is the geographic location of the voice server.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:190
+msgid "Change which voice region a voice channel uses."
+msgstr "ボイスチャンネルで使用するボイスリージョンを変更します。"
+
+#. Permission description in the channel-scoped permissions editor for the Set Voice Region permission. The region is the geographic location of the voice server.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:319
+msgid "Change which voice region this channel uses."
+msgstr "このチャンネルで使用するボイスリージョンを変更します。"
+
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:463
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:437
 msgid "Change who can call or add you."
 msgstr "あなたに電話したり追加できる人を変更します。"
 
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:451
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:425
 msgid "Change who can reach you."
 msgstr "あなたに連絡できる人を変更."
 
@@ -6185,7 +6240,7 @@ msgid "Channel {id}"
 msgstr "チャンネル {id}"
 
 #. Permission category for viewing or entering channels.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:145
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:336
 msgid "Channel access"
 msgstr "チャンネルアクセス"
 
@@ -6204,7 +6259,7 @@ msgid "Channel actions"
 msgstr "チャンネル操作"
 
 #. Toast confirming a channel was added to the favorites list.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:791
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:787
 msgid "Channel added to favorites"
 msgstr "チャンネルをお気に入りに追加しました"
 
@@ -6232,7 +6287,7 @@ msgstr "チャンネルのデバッグ"
 #. Audit log entry label. Past-tense action describing that a channel was deleted.
 #. Toast confirming a channel was successfully deleted.
 #: src/features/app/config/AuditLogConstants.ts:20
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:759
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:755
 msgid "Channel deleted"
 msgstr "チャンネルを削除しました"
 
@@ -6243,7 +6298,7 @@ msgstr "チャンネル詳細"
 
 #. Toast confirming the channel ID was copied to the clipboard.
 #. Toast confirming the channel ID was copied to the clipboard.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:108
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:106
 #: src/features/ui/action_menu/items/dm_menu_data/shared.ts:37
 msgid "Channel ID copied"
 msgstr "チャンネルIDをコピーしました"
@@ -6261,7 +6316,7 @@ msgid "channel link"
 msgstr "チャンネルリンク"
 
 #. Toast confirming the channel link was copied to the clipboard.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:100
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:98
 msgid "Channel link copied"
 msgstr "チャンネルリンクをコピーしました"
 
@@ -6285,7 +6340,7 @@ msgid "Channel list typing indicators"
 msgstr "チャンネルリストの入力インジケーター"
 
 #. Permission category for managing channels and channel settings.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:153
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:344
 msgid "Channel management"
 msgstr "チャンネル管理"
 
@@ -6337,7 +6392,7 @@ msgid "Channel record"
 msgstr "チャンネルレコード"
 
 #. Toast confirming a channel was removed from the favorites list.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:787
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:783
 msgid "Channel removed from favorites"
 msgstr "お気に入りからチャンネルを削除しました"
 
@@ -6524,12 +6579,12 @@ msgid "Child safety concerns"
 msgstr "児童の安全に関する懸念"
 
 #. IAR modal: child-safety rule label (message and guild reports).
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:98
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:80
 msgid "Child safety or exploitation of minors"
 msgstr "児童の安全または搾取"
 
 #. IAR modal: rule-category label grouping child-safety and mature-content reports.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:66
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:48
 msgid "Child safety or mature content"
 msgstr "児童の安全または成人向けコンテンツ"
 
@@ -6852,7 +6907,7 @@ msgid "Claim your account"
 msgstr "アカウントを登録"
 
 #. IAR modal: body of the account-not-ready notice.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:45
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:27
 msgid "Claim your account and verify your email to send reports."
 msgstr "レポートを送信するには、アカウントを申請してメールアドレスを確認してください。"
 
@@ -6940,7 +6995,7 @@ msgid "Claim your gift to activate your {premiumProductName} subscription!"
 msgstr "ギフトを交換して、{premiumProductName} サブスクリプションを有効にしましょう！"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:339
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:313
 msgid "Claiming to be another person, brand, or organization."
 msgstr "他人、ブランド、または組織になりすましている."
 
@@ -7297,7 +7352,7 @@ msgid "Close popout"
 msgstr "ピクチャインピクチャを閉じる"
 
 #. IAR modal: quick-action card title.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:427
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:401
 msgid "Close this DM"
 msgstr "このDMを閉じる"
 
@@ -7324,7 +7379,7 @@ msgid "Close window"
 msgstr "ウィンドウを閉じる"
 
 #. Confirmation copy in the IAR modal for the Close DM quick action. Reassures the user the action is not destructive.
-#: src/features/moderation/components/report_modal/IARModal.tsx:68
+#: src/features/moderation/components/report_modal/IARModal.tsx:65
 msgid "Close your current DM with {dmDisplayName}. This does not block the user, and you can reopen the DM later."
 msgstr "{dmDisplayName}さんとのDMを閉じます。この操作では相手はブロックされず、後でDMを再開できます。"
 
@@ -7467,7 +7522,7 @@ msgstr "チャンネルのトピックを折りたたむ"
 #. Tooltip / aria label on a voice participant tile button that collapses expanded device tiles for one user.
 #. Voice menu action that collapses expanded device tiles back into a single tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts:122
-#: src/features/voice/components/VoiceParticipantTile.tsx:173
+#: src/features/voice/components/VoiceParticipantTile.tsx:176
 msgid "Collapse devices"
 msgstr "デバイスを折りたたむ"
 
@@ -7665,7 +7720,7 @@ msgid "Community debug"
 msgstr "コミュニティデバッグ"
 
 #. Notification level option indicating the channel inherits the community default.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:763
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:759
 msgid "Community default"
 msgstr "コミュニティのデフォルト"
 
@@ -7680,12 +7735,12 @@ msgid "Community DM"
 msgstr "コミュニティDM"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:283
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:257
 msgid "Community exists to spam, scam, or abuse the platform."
 msgstr "コミュニティはスパム、詐欺、またはプラットフォームの悪用を目的として存在します。"
 
 #. IAR modal: rule description for a community report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:187
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:161
 msgid "Community facilitates pile-ons or targeted abuse."
 msgstr "コミュニティは、集団攻撃や標的型嫌がらせを助長する可能性があります。"
 
@@ -7845,7 +7900,7 @@ msgid "Community voice"
 msgstr "コミュニティ音声"
 
 #. Permission category for permissions that affect the whole community.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:133
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:324
 msgid "Community-wide"
 msgstr "コミュニティ全体"
 
@@ -8099,7 +8154,7 @@ msgstr "マイクを接続して、もう一度お試しください。"
 
 #. Permission name: allows joining voice channels.
 #. Primary CTA in the mobile voice-channel lobby bottom sheet. Joins the voice channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:265
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:456
 #: src/features/voice/components/bottomsheets/VoiceLobbyBottomSheet.tsx:56
 msgid "Connect to voice"
 msgstr "ボイスに接続"
@@ -8127,7 +8182,7 @@ msgstr "ボイスに接続中"
 #. Action label state in the DM channel header pill while the join request is in flight. Trailing ASCII ellipsis is intentional.
 #. Overlay status in the voice call view while joining. Trailing ellipsis indicates in-progress.
 #: src/features/channel/components/channel_view/dm_channel_view/shared.ts:129
-#: src/features/voice/components/VoiceCallView.tsx:93
+#: src/features/voice/components/VoiceCallView.tsx:94
 msgid "Connecting..."
 msgstr "接続中..."
 
@@ -8188,7 +8243,7 @@ msgid "Connection removed"
 msgstr "接続を削除しました"
 
 #. Tooltip / aria label on the connection-stats button in the voice call header. Opens the voice connection status popout.
-#: src/features/voice/components/VoiceCallView.tsx:118
+#: src/features/voice/components/VoiceCallView.tsx:119
 msgid "Connection stats"
 msgstr "接続状況"
 
@@ -8330,7 +8385,7 @@ msgstr "左クリック（ボタン上）または右クリック（その他の
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAccountStep.tsx:34
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:109
 #: src/features/connection/components/modals/AddConnectionModal.tsx:384
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:711
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:707
 #: src/features/user/components/modals/FluxerTagChangeModal.tsx:397
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx:181
 msgid "Continue"
@@ -8425,7 +8480,7 @@ msgid "Converts incoming content to speech, regardless of whether it came from /
 msgstr "/ttsコマンドで送信されたかどうかにかかわらず、受信したコンテンツを音声に変換します。"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:363
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:337
 msgid "Coordinates raids, brigading, or harassment against people or communities."
 msgstr "個人またはコミュニティに対する襲撃、集団的嫌がらせ、またはハラスメントを調整する行為。"
 
@@ -8436,7 +8491,7 @@ msgid "Copied"
 msgstr "コピーしました"
 
 #. Toast shown after copying stats for nerds JSON to clipboard.
-#: src/features/voice/components/StatsForNerdsCopyDescriptors.ts:13
+#: src/features/voice/components/StatsForNerdsCopyDescriptors.ts:9
 msgid "Copied stats JSON to clipboard"
 msgstr "統計情報JSONをクリップボードにコピーしました"
 
@@ -8461,18 +8516,13 @@ msgstr "URLをクリップボードにコピーしました"
 #: src/features/app/components/dialogs/shared/CopyLinkSection.tsx:11
 #: src/features/auth/components/modals/BackupCodesModal.tsx:96
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:50
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:423
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:397
 #: src/features/theme_studio/sections/QuickCssSection.tsx:214
 #: src/features/ui/action_menu/MessageContextMenu.tsx:71
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/OAuthBuilderSection.tsx:228
 #: src/features/user/components/modals/tabs/GiftInventoryTab.tsx:59
 msgid "Copy"
 msgstr "コピー"
-
-#. Aria label for a button that copies stats for nerds data as JSON to the clipboard.
-#: src/features/voice/components/StatsForNerdsCopyDescriptors.ts:5
-msgid "Copy as JSON"
-msgstr "JSONとしてコピー"
 
 #. Developer-mode action that copies the attachment ID to the clipboard.
 #: src/features/ui/action_menu/MessageContextMenu.tsx:67
@@ -8510,7 +8560,7 @@ msgid "Copy banner URL"
 msgstr "バナーURLをコピー"
 
 #. Tray menu item. Copies build / version diagnostics to the clipboard for bug reports.
-#: src/features/app/components/floating/UserAreaPopout.tsx:714
+#: src/features/app/components/floating/UserAreaPopout.tsx:707
 #: src/features/platform/utils/DesktopLocaleBridge.ts:164
 msgid "Copy build info"
 msgstr "ビルド情報をコピー"
@@ -8530,7 +8580,7 @@ msgstr "チャンネルIDをコピー"
 #. Action that copies a deep link to the selected channel.
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:205
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:132
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:130
 msgid "Copy channel link"
 msgstr "チャンネルリンクをコピー"
 
@@ -8541,7 +8591,7 @@ msgid "Copy code"
 msgstr "コードをコピー"
 
 #. Developer-mode action that copies a community snowflake/ID to the clipboard.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:727
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:723
 msgid "Copy community ID"
 msgstr "コミュニティIDをコピー"
 
@@ -8639,7 +8689,7 @@ msgid "Copy invite URL"
 msgstr "招待URLをコピー"
 
 #. Generic action label that copies a URL to the clipboard.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:739
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:735
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:330
 #: src/features/user/components/modals/tabs/component_gallery_tab/index.tsx:145
 msgid "Copy link"
@@ -8672,7 +8722,7 @@ msgstr "メッセージをコピー"
 
 #. Developer-mode action that copies a message snowflake/ID to the clipboard.
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:731
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:727
 #: src/features/input/state/input_keybind/shared.ts:277
 msgid "Copy message ID"
 msgstr "メッセージIDをコピー"
@@ -8682,7 +8732,7 @@ msgstr "メッセージIDをコピー"
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:518
 #: src/features/input/state/input_keybind/shared.ts:273
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:415
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:389
 msgid "Copy message link"
 msgstr "メッセージのリンクをコピー"
 
@@ -8713,8 +8763,8 @@ msgstr "設定キーをコピー"
 msgid "Copy stack trace"
 msgstr "スタックトレースをコピー"
 
-#. Button label in audio and video settings. Copies stats for nerds data as JSON to the clipboard.
-#: src/features/voice/components/StatsForNerdsCopyDescriptors.ts:9
+#. Menu item label in the screen share menu. Copies stats for nerds data as JSON to the clipboard.
+#: src/features/voice/components/StatsForNerdsCopyDescriptors.ts:5
 msgid "Copy stats JSON"
 msgstr "統計情報をJSONでコピー"
 
@@ -8742,13 +8792,13 @@ msgid "Copy the setup key into your authenticator app."
 msgstr "認証アプリに設定キーをコピーしてください。"
 
 #. Developer-mode action that copies a user snowflake/ID to the clipboard.
-#: src/features/app/components/floating/UserAreaPopout.tsx:699
+#: src/features/app/components/floating/UserAreaPopout.tsx:692
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:172
 msgid "Copy user ID"
 msgstr "ユーザーIDをコピー"
 
 #. Action that copies a user username (handle) to the clipboard.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:735
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:731
 msgid "Copy username"
 msgstr "ユーザー名をコピー"
 
@@ -8767,7 +8817,7 @@ msgstr "動画をコピー"
 msgid "Copy video link"
 msgstr "動画のリンクをコピー"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:727
+#: src/features/app/components/floating/UserAreaPopout.tsx:720
 msgid "Copy voice diagnostics"
 msgstr "音声診断をコピー"
 
@@ -8797,7 +8847,7 @@ msgid "Could not decode this audio file."
 msgstr "この音声ファイルをデコードできませんでした。"
 
 #. Error shown when the setup wizard fails to load the instance configuration.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:91
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:93
 msgid "Could not load the instance configuration. Try reloading the page."
 msgstr "インスタンスの設定を読み込めませんでした。ページを再読み込みしてください。"
 
@@ -8856,19 +8906,24 @@ msgid "Couldn't cancel the friend request. Try again."
 msgstr "フレンド申請をキャンセルできませんでした。もう一度お試しください。"
 
 #. Title of the generic fallback error modal shown when canceling a scheduled Plutonium billing cycle change fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:84
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:86
 msgid "Couldn't cancel your pending billing change"
 msgstr "保留中の請求変更をキャンセルできませんでした"
 
 #. Title of the generic fallback error modal shown when cancelling a Plutonium subscription fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:24
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:26
 msgid "Couldn't cancel your subscription"
 msgstr "サブスクリプションをキャンセルできませんでした"
 
 #. Title of the generic fallback error modal shown when changing the Plutonium billing cycle fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:76
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:78
 msgid "Couldn't change your billing cycle"
 msgstr "請求サイクルを変更できませんでした"
+
+#. Title of the generic fallback error modal shown when moving a Plutonium subscription down to the current price fails.
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:111
+msgid "Couldn't change your price"
+msgstr "価格を変更できませんでした"
 
 #. Modal title shown when a user-initiated update check fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx:104
@@ -8983,12 +9038,12 @@ msgid "Couldn't download the desktop update"
 msgstr "デスクトップ版のアップデートをダウンロードできませんでした"
 
 #. Title of the error modal shown when duplicating a channel fails.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:140
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:138
 msgid "Couldn't duplicate this channel"
 msgstr "このチャンネルを複製できませんでした"
 
 #. Title of the generic fallback error modal shown when ending the Plutonium grace period fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:36
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:38
 msgid "Couldn't end your grace period"
 msgstr "猶予期間を終了できませんでした"
 
@@ -9066,14 +9121,14 @@ msgstr "検索結果を開けませんでした"
 #. Title of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Title of the generic fallback error modal shown when opening the billing customer portal fails.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:30
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:12
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:14
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:29
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:29
 msgid "Couldn't open the billing portal"
 msgstr "請求ポータルを開けませんでした"
 
 #. Title of the error modal shown when pinning a DM or group DM fails.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:120
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:118
 msgid "Couldn't pin this conversation"
 msgstr "この会話をピン留めできませんでした"
 
@@ -9085,7 +9140,7 @@ msgid "Couldn't process image"
 msgstr "画像を処理できませんでした"
 
 #. Title of the generic fallback error modal shown when reactivating a Plutonium subscription fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:48
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:50
 msgid "Couldn't reactivate your subscription"
 msgstr "サブスクリプションを再開できませんでした"
 
@@ -9185,12 +9240,12 @@ msgid "Couldn't send invite"
 msgstr "招待を送信できませんでした"
 
 #. Toast shown when sending an invite (group DM or community) fails.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:703
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:699
 msgid "Couldn't send invite. Try again."
 msgstr "招待を送信できませんでした。もう一度お試しください。"
 
 #. Error toast in the IAR modal when the report submission fails. Keep tone plain and short.
-#: src/features/moderation/components/report_modal/IARModal.tsx:81
+#: src/features/moderation/components/report_modal/IARModal.tsx:78
 msgid "Couldn't send it. Try again."
 msgstr "送信できませんでした。もう一度お試しください。"
 
@@ -9252,7 +9307,7 @@ msgid "Couldn't unblock user"
 msgstr "ユーザーのブロックを解除できませんでした"
 
 #. Title of the error modal shown when unpinning a DM or group DM fails.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:124
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:122
 msgid "Couldn't unpin this conversation"
 msgstr "この会話のピン留めを解除できませんでした"
 
@@ -9453,7 +9508,7 @@ msgid "Create DM"
 msgstr "DMを作成"
 
 #. Permission name: allows uploading custom emoji and stickers.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:197
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:388
 msgid "Create emoji & stickers"
 msgstr "絵文字とステッカーを作成"
 
@@ -9480,7 +9535,7 @@ msgid "Create invite"
 msgstr "招待を作成"
 
 #. Permission name: allows creating invite links.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:185
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:376
 msgid "Create invite links"
 msgstr "招待リンクを作成"
 
@@ -9514,7 +9569,7 @@ msgstr "ロールを作成"
 msgid "Create the administrator account"
 msgstr "管理者アカウントを作成"
 
-#: src/features/channel/components/modals/UnaddableRecipientsConfirmModal.tsx:93
+#: src/features/channel/components/modals/UnaddableRecipientsConfirmModal.tsx:94
 msgid "Create the group DM with the remaining {addableCount} recipient(s) and skip the others?"
 msgstr "追加可能な{addableCount}人のメンバーでグループDMを作成し、他のメンバーはスキップしますか？"
 
@@ -9544,7 +9599,7 @@ msgid "Create, edit, or delete roles below your highest role. Also allows editin
 msgstr "自分の最高ロールより下位のロールを作成、編集、または削除できます。チャンネルの権限オーバーライドの編集も許可します。"
 
 #. Permission description in the channel-scoped permissions editor for the Manage Webhooks permission. Scoped to a single channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:123
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:205
 msgid "Create, edit, or delete webhooks for this channel."
 msgstr "このチャンネルのウェブフックを作成、編集、または削除します。"
 
@@ -9605,7 +9660,7 @@ msgid "Credentials"
 msgstr "認証情報"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:211
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:185
 msgid "Credible threats, graphic violence, or glorification of violence."
 msgstr "信憑性のある脅迫、露骨な暴力、または暴力の賛美。"
 
@@ -9913,7 +9968,7 @@ msgid "Custom tags"
 msgstr "カスタムタグ"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:83
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:79
 msgid "Custom themes"
 msgstr "カスタムテーマ"
 
@@ -9943,7 +9998,7 @@ msgid "Custom value"
 msgstr "カスタム値"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:39
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:35
 msgid "Custom video backgrounds"
 msgstr "カスタムビデオ背景"
 
@@ -9960,13 +10015,13 @@ msgid "Custom warning text"
 msgstr "カスタム警告文"
 
 #. Last "Custom…" option in dropdown menus that opens a custom-value picker.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:767
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:763
 msgid "Custom…"
 msgstr "カスタム…"
 
 #. Billing button that opens the external customer portal.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:608
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:748
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts:39
 msgid "Customer portal"
 msgstr "カスタマーポータル"
@@ -10141,11 +10196,6 @@ msgstr "データのエクスポート"
 msgid "Date"
 msgstr "日付"
 
-#. Field label for the date and time picker in the schedule-message modal. The ampersand is intentional.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:23
-msgid "Date & time"
-msgstr "日時"
-
 #. Form field label for a date and time value.
 #: src/features/ui/components/form/DateTimePickerField.tsx:22
 msgid "Date and time"
@@ -10201,9 +10251,19 @@ msgid "Deafen device"
 msgstr "デバイスをスピーカーミュート"
 
 #. Permission name: allows moderators to deafen other voice participants.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:290
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:481
 msgid "Deafen members"
 msgstr "メンバーをスピーカーミュートにする"
+
+#. Permission description in the channel-scoped permissions editor for the Deafen Members permission.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:310
+msgid "Deafen other members in this voice channel, so they cannot hear or speak."
+msgstr "このボイスチャンネルで他のメンバーをミュートし、聞こえなくしたり話せなくしたりします。"
+
+#. Permission description in the role/permission editor for the Deafen Members permission at community scope.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:186
+msgid "Deafen other members in voice channels, so they cannot hear or speak."
+msgstr "ボイスチャンネルで他のメンバーをミュートし、聞こえなくしたり話せなくしたりします。"
 
 #. Settings label for the keyboard shortcut that toggles voice deafen. Deafen controls hearing voice chat, not microphone mute.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:157
@@ -10400,8 +10460,8 @@ msgstr "バッテリーとデータ使用量を節約するため、モバイル
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:204
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:216
 #: src/features/emoji/components/stickers/StickerGridItem.tsx:35
-#: src/features/messaging/commands/MessageCommands.tsx:77
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:135
+#: src/features/messaging/commands/MessageCommands.tsx:80
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:109
 #: src/features/theme_studio/sections/LibrarySection.tsx:514
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx:399
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:117
@@ -10432,7 +10492,7 @@ msgstr "\"{stickerName}\"を削除しますか？この操作は元に戻せま�
 #. Channel details bottom sheet label or action (channel type, settings, toast, confirmation, or notification option).
 #. Confirm dialog body before deleting a channel.
 #: src/features/channel/components/bottomsheets/channel_details_bottom_sheet/ChannelDetailsBottomSheetShared.ts:107
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:104
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:102
 msgid "Delete {channelLabel}? Can't be undone."
 msgstr "{channelLabel}を削除しますか？この操作は元に戻せません。"
 
@@ -10472,7 +10532,7 @@ msgid "Delete application"
 msgstr "アプリを削除"
 
 #. Generic action label that removes an attachment from the upload tray / message.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:747
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:743
 msgid "Delete attachment"
 msgstr "添付ファイルを削除"
 
@@ -10560,6 +10620,11 @@ msgstr "メッセージを削除"
 msgid "Delete my messages"
 msgstr "自分のメッセージを削除"
 
+#. Permission description in the channel-scoped permissions editor for the Manage Messages permission. Notes that pinning has its own permission.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:229
+msgid "Delete other members' messages in this channel. Pinning is controlled separately."
+msgstr "このチャンネルの他のメンバーのメッセージを削除します。ピン留めは別途管理されます。"
+
 #. Permission description in the role/permission editor for the Manage Messages permission. Notes that pinning has its own permission.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:68
 msgid "Delete other members' messages. Pinning is controlled separately."
@@ -10628,12 +10693,12 @@ msgid "Delete this invite? Can't be undone."
 msgstr "この招待を削除しますか？元に戻すことはできません。"
 
 #. IAR modal: quick-action card title for deleting the reported message (moderator-only).
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:127
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:101
 msgid "Delete this message"
 msgstr "このメッセージを削除"
 
 #. Error message in the messaging commands. Keep the tone plain and specific.
-#: src/features/messaging/commands/MessageCommands.tsx:73
+#: src/features/messaging/commands/MessageCommands.tsx:76
 msgid "Delete this message? Can't be undone."
 msgstr "このメッセージを削除しますか？元に戻すことはできません。"
 
@@ -10668,7 +10733,7 @@ msgid "Delete your messages in this conversation?"
 msgstr "この会話内のメッセージをすべて削除しますか？"
 
 #. IAR modal: disabled-state label on the delete card after the message has been deleted.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:139
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:113
 msgid "Deleted"
 msgstr "削除済み"
 
@@ -11236,6 +11301,11 @@ msgstr "ショートカットを無効にする"
 msgid "Disable sounds"
 msgstr "サウンドをオフにする"
 
+#. Developer option label for turning off the page-translator DOM crash guard.
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:37
+msgid "Disable translation DOM guard"
+msgstr "翻訳DOMガードを無効にする"
+
 #. Button or menu action label in the links tab. Keep it concise.
 #: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabLinksTab.tsx:35
 msgid "Disable trust all"
@@ -11384,7 +11454,7 @@ msgstr "ソケットを切断"
 #. Overlay status in the voice call view when not connected.
 #. Overlay status text in the compact / floating voice call tile when not connected.
 #: src/features/voice/components/compact_voice_call_view/shared.ts:15
-#: src/features/voice/components/VoiceCallView.tsx:102
+#: src/features/voice/components/VoiceCallView.tsx:103
 msgid "Disconnected"
 msgstr "切断されました"
 
@@ -11534,7 +11604,7 @@ msgid "Display scaling"
 msgstr "表示サイズ"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:303
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:277
 msgid "Distributes malware, credential theft, or harmful files."
 msgstr "マルウェア、認証情報、または有害なファイルを配布する。"
 
@@ -11544,7 +11614,7 @@ msgid "DM"
 msgstr "DM"
 
 #. IAR modal: quick-action card title.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:447
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:421
 msgid "DM & friend request settings"
 msgstr "DM・友達リクエスト設定"
 
@@ -11670,13 +11740,13 @@ msgid "Doesn't allow being added to group DMs"
 msgstr "グループDMに追加できません"
 
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:431
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:405
 msgid "Doesn't block. You can reopen later."
 msgstr "ブロックしません。後で再開できます。"
 
 #. Generic form-field / table-column label for an internet domain.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:771
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:767
 #: src/features/user/components/settings_utils/search_index/LinkedAccountsIndex.ts:28
 msgid "Domain"
 msgstr "ドメイン"
@@ -11741,7 +11811,7 @@ msgstr "{deviceName}を再度提案しない"
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthSuccessState.tsx:44
 #: src/features/channel/components/pickers/gif/ImportFavoriteGifsModal.tsx:54
 #: src/features/input/components/KeybindRecorder.tsx:470
-#: src/features/moderation/components/report_modal/IARModal.tsx:97
+#: src/features/moderation/components/report_modal/IARModal.tsx:94
 #: src/features/moderation/components/report/ReportBreadcrumbs.tsx:31
 #: src/features/search/components/search/ChannelFilterSheet.tsx:165
 #: src/features/search/components/search/HasFilterSheet.tsx:206
@@ -11884,12 +11954,12 @@ msgid "Downloading desktop update…"
 msgstr "デスクトップのアップデートをダウンロード中…"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:311
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:285
 msgid "Doxxing, exposed private info, or stalking."
 msgstr "個人情報晒し、個人情報漏洩、ストーカー行為."
 
 #. IAR modal: rule-category description for the privacy / impersonation group.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:78
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:60
 msgid "Doxxing, stalking, pretending to be someone, or an inappropriate profile."
 msgstr "個人情報の暴露、ストーカー行為、なりすまし、不適切なプロフィール。"
 
@@ -11918,10 +11988,15 @@ msgstr "ファイルをドラッグ＆ドロップしてアップロード"
 msgid "Drag and drop emoji files here"
 msgstr "絵文字ファイルをここにドラッグ＆ドロップ"
 
-#. Permission description in the role/permission editor for the Move Members permission. The target channel must already be accessible to the member being moved.
+#. Permission description in the role/permission editor for the Move Members permission. The target channel must already be accessible to the member being moved. This permission also covers forcing a member out of voice entirely.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:108
-msgid "Drag members between channels they can access."
-msgstr "メンバーをアクセス可能なチャンネル間でドラッグする."
+msgid "Drag members between voice channels they can access, and disconnect them from voice."
+msgstr "アクセス可能なボイスチャンネル間でメンバーをドラッグ＆ドロップしたり、ボイスから切断したりできます。"
+
+#. Permission description in the channel-scoped permissions editor for the Move Members permission. The target channel must already be accessible to the member being moved. This permission also covers forcing a member out of voice entirely.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:314
+msgid "Drag members out of this voice channel into channels they can access, and disconnect them from voice."
+msgstr "このボイスチャンネルからメンバーを、アクセス可能な他のチャンネルへドラッグ＆ドロップしたり、ボイスから切断したりできます。"
 
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleSidebar.tsx:140
 msgid "Drag roles to customize the order they appear in the member list."
@@ -12020,7 +12095,7 @@ msgstr "複製"
 #. Action that creates a copy of the selected channel.
 #. Short label in the channel duplicate modal. Keep it concise.
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:28
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:136
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:134
 msgid "Duplicate channel"
 msgstr "チャンネルを複製"
 
@@ -12045,7 +12120,7 @@ msgid "e.g., YubiKey, iPhone, work computer"
 msgstr "例: YubiKey、iPhone、会社のPC"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:79
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:75
 msgid "Early access to new features"
 msgstr "新機能への早期アクセス"
 
@@ -12127,7 +12202,7 @@ msgstr "カテゴリを編集"
 #. Action that opens the edit-channel modal.
 #. Channel details bottom sheet label or action (channel type, settings, toast, confirmation, or notification option).
 #: src/features/channel/components/bottomsheets/channel_details_bottom_sheet/ChannelDetailsBottomSheetShared.ts:162
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:148
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:146
 #: src/features/ui/action_menu/items/ChannelMenuItems.tsx:75
 msgid "Edit channel"
 msgstr "チャンネルを編集"
@@ -12189,7 +12264,7 @@ msgstr "メディアを編集"
 
 #. Generic action label that opens the message edit composer.
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:707
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:703
 #: src/features/input/state/input_keybind/shared.ts:9
 msgid "Edit message"
 msgstr "メッセージを編集"
@@ -12207,11 +12282,11 @@ msgid "Edit or delete emoji and stickers created by other members."
 msgstr "他のメンバーが作成した絵文字やスタンプを編集または削除する."
 
 #. Permission description in the channel-scoped permissions editor for the Manage Permissions permission. "Overwrites" are per-channel permission overrides.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:118
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:200
 msgid "Edit overwrites for roles and members in this channel."
 msgstr "このチャンネルでのロールとメンバーの上書き設定を編集."
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:750
+#: src/features/app/components/floating/UserAreaPopout.tsx:743
 #: src/features/app/components/pages/YouPage.tsx:157
 #: src/features/user/components/modals/UserProfileMobileSheet.tsx:682
 #: src/features/user/components/modals/UserProfileModal.tsx:587
@@ -12429,7 +12504,7 @@ msgid "Embed debugger form"
 msgstr "埋め込みデバッガーフォーム"
 
 #. Permission name: allows links to unfurl/embed in messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:225
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:416
 msgid "Embed links"
 msgstr "リンクを埋め込む"
 
@@ -12736,7 +12811,7 @@ msgstr "モバイルプッシュ通知をオンにする"
 
 #. Generic action label / toggle that turns on push or desktop notifications.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:779
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:775
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts:127
 msgid "Enable notifications"
 msgstr "通知をオンにする"
@@ -12895,12 +12970,12 @@ msgid "Encoder, SVC, backup stream, and bitrate presets"
 msgstr "エンコーダー、SVC、バックアップストリーム、およびビットレートプリセット"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:375
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:349
 msgid "Encourages self-harm"
 msgstr "自傷行為を助長するおそれ"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:379
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:353
 msgid "Encourages suicide, self-harm, or eating disorders."
 msgstr "自殺、自傷行為、摂食障害を助長するコンテンツ."
 
@@ -12910,7 +12985,7 @@ msgid "End date"
 msgstr "終了日"
 
 #. Billing button that ends premium grace period immediately.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:695
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:854
 msgid "End grace now"
 msgstr "猶予期間を終了"
 
@@ -12938,7 +13013,7 @@ msgid "End-to-end encryption is unavailable because an unsupported participant i
 msgstr "サポートされていない参加者がこのボイスチャンネルにいるため、エンドツーエンド暗号化は利用できません。"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:255
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:229
 msgid "Endangers minors or hosts child-exploitation content."
 msgstr "未成年者を危険にさらしたり、児童搾取コンテンツをホストしたりする行為。"
 
@@ -12967,7 +13042,7 @@ msgstr "英語 (米国)"
 #. Generic radio / dropdown option label for an "enhanced" tier.
 #. Noise suppression option label in the voice tab (neural filter). Keep it concise.
 #. Noise suppression option using the enhanced neural filter (DeepFilterNet3). Keep it concise.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:783
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:779
 #: src/features/user/components/modals/tabs/UserVoiceTab.tsx:85
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:47
 msgid "Enhanced"
@@ -13064,7 +13139,7 @@ msgstr "コードを入力"
 #. Tooltip / aria label on the fullscreen toggle in the voice call view (not in fullscreen).
 #: src/features/voice/components/compact_voice_call_view/shared.ts:28
 #: src/features/voice/components/media_player/components/MediaFullscreenButton.tsx:18
-#: src/features/voice/components/VoiceCallView.tsx:110
+#: src/features/voice/components/VoiceCallView.tsx:111
 msgid "Enter fullscreen"
 msgstr "全画面表示"
 
@@ -13232,7 +13307,7 @@ msgstr "画面全体"
 msgid "Entire system"
 msgstr "システム全体"
 
-#: src/features/voice/components/AudioSourcePickerLinux.tsx:249
+#: src/features/voice/components/AudioSourcePickerLinux.tsx:253
 msgid "Entire system audio"
 msgstr "システム全体の音声"
 
@@ -13275,7 +13350,7 @@ msgid "Entrance sound volume"
 msgstr "入室サウンドの音量"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:43
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:39
 msgid "Entrance sounds"
 msgstr "入室音"
 
@@ -13433,7 +13508,7 @@ msgstr "終了"
 #. Tooltip / aria label on the fullscreen toggle in the voice call view (currently in fullscreen).
 #: src/features/voice/components/compact_voice_call_view/shared.ts:24
 #: src/features/voice/components/media_player/components/MediaFullscreenButton.tsx:14
-#: src/features/voice/components/VoiceCallView.tsx:106
+#: src/features/voice/components/VoiceCallView.tsx:107
 msgid "Exit fullscreen"
 msgstr "フルスクリーンを終了"
 
@@ -13514,7 +13589,7 @@ msgstr "有効期限"
 #. Error message in the invite list item.
 #. Short label in the authentication account row. Keep the tone plain and specific.
 #. Subscription status badge meaning premium access has fully expired.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:348
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:423
 #: src/features/auth/components/accounts/AccountRow.tsx:19
 #: src/features/channel/components/modals/GroupInvitesBottomSheet.tsx:41
 #: src/features/invite/components/InviteListItem.tsx:30
@@ -13551,7 +13626,7 @@ msgstr "{date}に期限切れ"
 msgid "Expired on {earliest}"
 msgstr "{earliest}に期限切れ"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:379
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:454
 msgid "Expired on <0>{expiredDate}</0>. <1/> are no longer active. You can resubscribe at any time."
 msgstr "<0>{expiredDate}</0>に期限切れになりました。<1/>は無効になりました。いつでも再登録できます。"
 
@@ -13640,7 +13715,7 @@ msgid "Export themes"
 msgstr "テーマをエクスポート"
 
 #. Developer / debug surface — keep terse and technical. Tooltip / description for the profile timezone settings toggle.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:129
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:139
 msgid "Expose the staff-only timezone section in profile settings."
 msgstr "プロフィール設定で、スタッフ専用のタイムゾーンセクションを表示します。"
 
@@ -13652,7 +13727,7 @@ msgid "Expression autocomplete"
 msgstr "表現のオートコンプリート"
 
 #. Aria label for the expression picker category nav.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:751
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:747
 msgid "Expression picker categories"
 msgstr "表現ピッカーのカテゴリ"
 
@@ -14047,7 +14122,7 @@ msgid "Failed to upload emojis. Try again."
 msgstr "絵文字のアップロードに失敗しました。もう一度お試しください。"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:263
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:237
 msgid "False claims likely to cause real-world harm."
 msgstr "現実世界に危害を及ぼす可能性のある虚偽の主張。"
 
@@ -14131,7 +14206,7 @@ msgstr "お気に入り"
 msgid "Favorites"
 msgstr "お気に入り"
 
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:177
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:172
 msgid "Feature"
 msgstr "機能"
 
@@ -14142,7 +14217,7 @@ msgstr "この機能は一時的に利用できません"
 
 #. Developer options group for feature behavior overrides.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:113
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:123
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts:137
 msgid "Features"
 msgstr "機能"
@@ -14206,7 +14281,7 @@ msgid "File upload"
 msgstr "ファイルアップロード"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:55
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:51
 msgid "File upload size"
 msgstr "ファイルアップロードサイズ"
 
@@ -14331,18 +14406,18 @@ msgid "Fingerprint"
 msgstr "指紋認証"
 
 #. Button label in the IAR modal that opens the account-setup flow.
-#: src/features/moderation/components/report_modal/IARModal.tsx:85
+#: src/features/moderation/components/report_modal/IARModal.tsx:82
 msgid "Finish account setup"
 msgstr "アカウント設定を完了する"
 
 #. IAR modal: title of the account-not-ready notice.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:41
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:23
 msgid "Finish account setup first"
 msgstr "まずアカウント設定を完了してください"
 
 #. Button that saves the configuration and completes the setup wizard.
 #. Setup wizard finish step title.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:83
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:85
 #: src/features/app/components/setup/SetupWizardSteps.tsx:327
 msgid "Finish setup"
 msgstr "セットアップを完了"
@@ -14579,17 +14654,17 @@ msgid "Force enabled"
 msgstr "強制的に有効"
 
 #. Developer option label for simulating failed message loads.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:109
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:119
 msgid "Force failed message loads"
 msgstr "メッセージの読み込み失敗を強制する"
 
 #. Developer option label for simulating failed message sends.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:105
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:115
 msgid "Force failed message sends"
 msgstr "メッセージ送信の失敗を強制する"
 
 #. Developer option label for simulating a loading GIF picker.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:65
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:75
 msgid "Force GIF picker loading"
 msgstr "GIFピッカーの読み込みを強制する"
 
@@ -14601,7 +14676,7 @@ msgstr "強制的に非表示"
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:45
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:45
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:55
 msgid "Force loading skeleton"
 msgstr "スケルトンの強制読み込み"
 
@@ -14621,12 +14696,12 @@ msgid "Force no {permissionName} permission"
 msgstr "{permissionName}の権限がない状態を強制する"
 
 #. Developer option label for always showing profile data warnings.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:101
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:111
 msgid "Force profile data warning"
 msgstr "プロフィールデータの警告を強制表示"
 
 #. Developer option label for forcing user profile loading skeletons.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:97
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:107
 msgid "Force profile skeletons"
 msgstr "プロフィールスケルトンを強制"
 
@@ -14636,12 +14711,12 @@ msgid "Force show"
 msgstr "強制的に表示"
 
 #. Developer option label for always showing a community settings warning.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:69
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:79
 msgid "Force show vanity URL disclaimer"
 msgstr "カスタムURLの免責事項を常に表示"
 
 #. Developer option label for always showing the voice connection status bar.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:121
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:131
 msgid "Force show voice connection"
 msgstr "音声接続を強制的に表示"
 
@@ -14650,12 +14725,12 @@ msgid "Force slowmode active"
 msgstr "スローモードを強制的に有効にする"
 
 #. Developer option label for rendering messages as unknown message types.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:117
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:127
 msgid "Force unknown message type"
 msgstr "不明なメッセージタイプを強制する"
 
 #. Developer option label for simulating an available update.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:49
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:59
 msgid "Force update ready"
 msgstr "アップデートの準備完了を強制"
 
@@ -14767,7 +14842,7 @@ msgstr "30 FPSを超えるフレームレートには{premiumProductName}が必�
 msgid "France"
 msgstr "フランス"
 
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:182
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:177
 msgid "Free"
 msgstr "無料"
 
@@ -15062,7 +15137,7 @@ msgid "Germany"
 msgstr "ドイツ"
 
 #. Generic upsell CTA button to start the Plutonium purchase flow. Preserve {premiumProductName}.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:795
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:791
 msgid "Get {premiumProductName}"
 msgstr "{premiumProductName}を入手"
 
@@ -15161,7 +15236,7 @@ msgstr "GIFを読み込めませんでした"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subscription status badge meaning premium access came from a gift.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:368
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:443
 #: src/features/expressions/components/modals/GiftAcceptModal.tsx:294
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts:79
 msgid "Gift"
@@ -15301,7 +15376,7 @@ msgstr "ギフト：もうすぐ期限切れ"
 msgid "Gift: grace period (still have access)"
 msgstr "ギフト：猶予期間（引き続きアクセス可能）"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:409
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:484
 msgid "Gifted <0/> until <1>{giftEndDate}</1>. Does not renew automatically. Redeem more gift codes to extend."
 msgstr "贈呈済み: <0/><1>{giftEndDate}</1>まで。自動更新されません。ギフトコードを追加して期間を延長してください。"
 
@@ -15333,7 +15408,7 @@ msgid "Glad you're here, {username}!"
 msgstr "{username}さんが参加しました！"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:67
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:63
 msgid "Global emoji & sticker access"
 msgstr "グローバル絵文字・スタンプアクセス"
 
@@ -15465,7 +15540,7 @@ msgid "Got it"
 msgstr "OK"
 
 #. Subscription status badge meaning access remains briefly after subscription end.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:350
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:425
 msgid "Grace period"
 msgstr "猶予期間"
 
@@ -15541,7 +15616,7 @@ msgid "Grid view"
 msgstr "グリッド表示"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:247
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:221
 msgid "Grooming or child-exploitation content."
 msgstr "グルーミングまたは児童搾取コンテンツ。"
 
@@ -15711,7 +15786,7 @@ msgid "Harassment"
 msgstr "ハラスメント"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:231
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:205
 msgid "Harassment involving mature content"
 msgstr "成人向けコンテンツを含むハラスメント"
 
@@ -15721,17 +15796,17 @@ msgid "Harassment or bullying"
 msgstr "ハラスメントまたは嫌がらせ"
 
 #. IAR modal: rule label for a user report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:175
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:149
 msgid "Harassment or stalking"
 msgstr "ハラスメントまたはストーカー行為"
 
 #. IAR modal: rule label for a community report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:183
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:157
 msgid "Harassment or targeted abuse"
 msgstr "ハラスメントまたは標的型嫌がらせ"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:167
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:141
 msgid "Harassment or threats"
 msgstr "ハラスメントまたは脅迫"
 
@@ -15765,7 +15840,7 @@ msgid "Hardware-accelerated on most Windows and macOS systems. Reliable for olde
 msgstr "ほとんどのWindows、macOSでハードウェアアクセラレーションに対応。古いデバイスでも安定しています。"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:259
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:233
 msgid "Harmful misinformation"
 msgstr "有害な誤情報"
 
@@ -15790,7 +15865,7 @@ msgstr "購入履歴を上書き"
 
 #. IAR modal: rule label.
 #. Report category label for hate speech. Keep tone plain and neutral.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:191
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:165
 #: src/features/moderation/components/report/OptionDescriptors.ts:28
 msgid "Hate speech"
 msgstr "ヘイトスピーチ"
@@ -15997,7 +16072,7 @@ msgid "Hide expiry footnotes"
 msgstr "有効期限の注釈を非表示"
 
 #. Toggle / action label that collapses or hides the favorites section.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:695
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:691
 msgid "Hide favorites"
 msgstr "お気に入りを非表示"
 
@@ -16316,21 +16391,6 @@ msgstr "ツールチップです"
 msgid "I changed my mind"
 msgstr "やっぱりやめます"
 
-#. IAR modal: preference path option label for a community report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:32
-msgid "I don't like this community"
-msgstr "このコミュニティは好みではありません"
-
-#. IAR modal: preference path option label for a message report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:24
-msgid "I don't like this content"
-msgstr "このコンテンツは好ましくありません"
-
-#. IAR modal: preference path option label for a user report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:28
-msgid "I don't like this user"
-msgstr "このユーザーは好みではありません"
-
 #. Secondary button in the required-action modal. Opens recovery options for the current verification step.
 #: src/features/auth/components/modals/required_action/RequiredActionDescriptors.ts:166
 msgid "I need another way"
@@ -16393,7 +16453,7 @@ msgid "If {pixPaymentMethod} is unavailable or you prefer standard pricing, you 
 msgstr "{pixPaymentMethod}が利用できない場合や、通常価格をご希望の場合は、いつでも米ドルに切り替えられます。"
 
 #. IAR modal: inline routing hint shown under reasons that overlap with child safety.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:106
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:88
 msgid "If a minor is involved, use \"{childSafetyReasonName}\" instead."
 msgstr "未成年者が関係している場合は、「{childSafetyReasonName}」を使用してください。"
 
@@ -16403,7 +16463,7 @@ msgid "If recurring {upiPaymentMethod} is unavailable or you prefer standard pri
 msgstr "定期的な{upiPaymentMethod}が利用できない場合や、標準価格をご希望の場合は、いつでもUSDに切り替えられます。"
 
 #. IAR modal: inline safety note for self-harm reports.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:395
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:369
 msgid "If someone may be in immediate danger, contact local emergency services if you can do so safely."
 msgstr "もし誰かが差し迫った危険に晒されている場合、安全にできるのであれば、地域の緊急サービスに連絡してください。"
 
@@ -16413,17 +16473,17 @@ msgid "If someone told you to paste something here, it is a scam that can hand t
 msgstr "誰かがここに何かを貼り付けるように言ってきたら、それは詐欺で、あなたの{productName}アカウントを相手に渡してしまう可能性があります。"
 
 #. IAR modal: inline safety note shown for child-safety reports.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:391
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:365
 msgid "If this involves CSAM or exploitation of a minor, send it now and don't reshare the material."
 msgstr "児童性的虐待コンテンツ（CSAM）や未成年者の搾取に関する場合は、今すぐ送信してください。その素材を再共有しないでください。"
 
 #. IAR modal: inline safety note for violence reports.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:399
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:373
 msgid "If this is a credible imminent threat, contact local emergency services too."
 msgstr "差し迫った脅威がある場合は、地域の緊急サービスにも連絡してください。"
 
 #. IAR modal: inline safety note for terrorism reports.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:403
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:377
 msgid "If this is an imminent terrorist threat, contact local emergency services too."
 msgstr "差し迫ったテロの脅威である場合は、現地の緊急サービスにも連絡してください。"
 
@@ -16544,29 +16604,34 @@ msgstr "スパム報告を無視"
 msgid "Ignore the friend request from {displayName}?"
 msgstr "{displayName}からの友達リクエストを無視しますか？"
 
+#. Permission description in the channel-scoped permissions editor for the Bypass Slowmode permission. Slowmode is the per-channel cooldown between messages.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:274
+msgid "Ignore this channel's slowmode cooldown."
+msgstr "このチャンネルの低速モードのクールダウンを無視する"
+
 #: src/features/voice/components/StreamSettingsMenuContent.tsx:1038
 msgid "Ignore virtual"
 msgstr "バーチャル背景を無視"
 
 #. IAR modal: rule label.
 #. Report category label for content describing or coordinating illegal activity. Keep tone plain.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:351
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:325
 #: src/features/moderation/components/report/OptionDescriptors.ts:44
 msgid "Illegal activity"
 msgstr "不正行為"
 
 #. IAR modal: rule-category label grouping illegal activity and the catch-all "Other" option.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:90
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:72
 msgid "Illegal activity or something else"
 msgstr "違法行為、またはその他"
 
 #. IAR modal: rule-category description for the illegal / other group.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:94
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:76
 msgid "Illegal sales, criminal facilitation, or a clear rule violation that doesn't fit above."
 msgstr "違法な販売、犯罪を助長する行為、または上記のいずれにも当てはまらない明確なルール違反。"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:355
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:329
 msgid "Illegal sales, criminal facilitation, or unlawful activity."
 msgstr "違法な販売、犯罪幇助、または違法行為。"
 
@@ -16665,13 +16730,13 @@ msgstr "クリップボードから貼り付けた画像は添付ファイルと
 
 #. IAR modal: rule label.
 #. Report category label for a user impersonating another person or brand.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:327
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:301
 #: src/features/moderation/components/report/OptionDescriptors.ts:66
 msgid "Impersonation"
 msgstr "なりすまし"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:331
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:305
 msgid "Impersonation or deceptive media"
 msgstr "なりすましまたは誤解を招くメディア"
 
@@ -16795,7 +16860,7 @@ msgstr "「OSの設定に従う」モードでは、上記の辞書は推奨と�
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "ブラウザでは、プッシュトゥトークは{PRODUCT_NAME}タブがフォーカスされている間のみ機能します。システム全体でプッシュトゥトークを使用するには、デスクトップアプリをインストールしてください。"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:728
+#: src/features/app/components/floating/UserAreaPopout.tsx:721
 msgid "In a call"
 msgstr "通話中"
 
@@ -17387,6 +17452,16 @@ msgstr "招待モーダル"
 msgid "Invite modal preview"
 msgstr "招待モーダルのプレビュー"
 
+#. Permission description in the channel-scoped permissions editor for the Create Invite Links permission. The invite drops the new member into this channel.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:215
+msgid "Invite new people to the community with a link to this channel."
+msgstr "このコミュニティへの招待リンクをこのチャンネルに発行します。"
+
+#. Permission description in the role/permission editor for the Create Invite Links permission. Covers links that let someone outside the community join it.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:113
+msgid "Invite new people to the community with an invite link."
+msgstr "招待リンクを使ってコミュニティに新しい人を招待します。"
+
 #. Title for invite errors when the invite code does not exist or cannot be used.
 #: src/features/invite/utils/InviteMessageDescriptors.ts:9
 msgid "Invite not found"
@@ -17472,7 +17547,7 @@ msgstr "招待者:"
 #. Generic section / tab label for the invites list.
 #: src/features/channel/components/modals/channel_tabs/ChannelInvitesTab.tsx:191
 #: src/features/guild/components/modals/guild_tabs/GuildInvitesTab.tsx:53
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:683
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:679
 msgid "Invites"
 msgstr "招待"
 
@@ -17660,7 +17735,7 @@ msgid "Join call"
 msgstr "通話に参加"
 
 #. Generic action label that accepts a community invite / joins a community.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:679
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:675
 msgid "Join community"
 msgstr "コミュニティに参加"
 
@@ -17700,6 +17775,11 @@ msgstr "このデバイスで参加"
 msgid "Join the call"
 msgstr "通話に参加"
 
+#. Permission description in the channel-scoped permissions editor for the Connect permission. "View channel" is another permission in this same editor, so match the wording used for its name. The placeholder renders the literal @everyone role name and must not be translated.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:279
+msgid "Join this voice channel and hear others. Denying it along with View channel for {everyoneMention} makes the channel private."
+msgstr "このボイスチャンネルに参加して、他の人の声を聞きましょう。{everyoneMention} の「チャンネルを見る」権限と一緒にこれを拒否すると、チャンネルはプライベートになります。"
+
 #. Confirm dialog body shown before joining a voice channel from a context where confirmation is required.
 #: src/features/voice/hooks/usePendingVoiceConnection.tsx:16
 msgid "Join this voice channel?"
@@ -17730,6 +17810,11 @@ msgstr "音声通話に参加"
 #: src/features/voice/hooks/usePendingVoiceConnection.tsx:12
 msgid "Join voice channel"
 msgstr "音声チャンネルに参加"
+
+#. Permission description in the role/permission editor for the Connect permission at community scope.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:162
+msgid "Join voice channels and hear others."
+msgstr "ボイスチャンネルに参加して、他の人の声を聞くことができます。"
 
 #. Community members table column header for the date the account joined Fluxer.
 #: src/features/channel/components/guild_members_page/MembersTableHeaderRow.tsx:29
@@ -17777,7 +17862,7 @@ msgid "Jump to first unread message"
 msgstr "未読の最初のメッセージに移動"
 
 #. Short label in the bookmarks bottom sheet. Keep it concise.
-#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:29
+#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:30
 msgid "Jump to message"
 msgstr "メッセージに移動"
 
@@ -17804,7 +17889,7 @@ msgid "Jump to page"
 msgstr "ページに移動"
 
 #. Short label in the channel and chat messages. Keep it concise.
-#: src/features/channel/components/ChannelMessages.tsx:83
+#: src/features/channel/components/ChannelMessages.tsx:89
 msgid "Jump to present"
 msgstr "最新のメッセージへ"
 
@@ -17972,12 +18057,12 @@ msgid "Kick a member from this community."
 msgstr "このコミュニティからメンバーをキックする."
 
 #. Moderation action label that removes a member from a community without banning.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:675
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:671
 msgid "Kick member"
 msgstr "メンバーをキック"
 
 #. Permission name: allows removing members from a community.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:177
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:368
 msgid "Kick members"
 msgstr "メンバーを追放"
 
@@ -18100,7 +18185,7 @@ msgid "Learn more"
 msgstr "詳細はこちら"
 
 #. IAR modal: quick-action card button label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:443
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:417
 msgid "Leave"
 msgstr "退出"
 
@@ -18125,7 +18210,7 @@ msgid "Leave call"
 msgstr "通話を終了"
 
 #. Destructive action label that removes the current user from a community.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:671
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:667
 msgid "Leave community"
 msgstr "コミュニティを脱退"
 
@@ -18145,7 +18230,7 @@ msgid "Leave silently"
 msgstr "通知なしで退出"
 
 #. IAR modal: quick-action card title.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:435
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:409
 msgid "Leave the community"
 msgstr "コミュニティを脱退"
 
@@ -18199,8 +18284,8 @@ msgstr "左ツールチップ"
 msgid "Legacy emoji slots"
 msgstr "従来の絵文字スロット"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:462
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:484
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:537
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:559
 msgid "Legacy rate"
 msgstr "旧料金"
 
@@ -18279,7 +18364,7 @@ msgstr "ライブラリ: {count}/{max}"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #. Subscription status badge meaning permanent premium access.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:366
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:441
 #: src/features/channel/components/channel_header_components/developer_tools/OptionPresets.ts:19
 msgid "Lifetime"
 msgstr "永久"
@@ -18537,7 +18622,7 @@ msgid "Loading destinations…"
 msgstr "送信先を読み込み中…"
 
 #. Accessible status while the setup wizard loads the instance configuration.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:87
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:89
 msgid "Loading instance configuration"
 msgstr "インスタンス設定を読み込み中"
 
@@ -18810,18 +18895,18 @@ msgstr "マルタ"
 
 #. IAR modal: rule label.
 #. Report category label for a community distributing malware or malicious software.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:299
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:273
 #: src/features/moderation/components/report/OptionDescriptors.ts:103
 msgid "Malware distribution"
 msgstr "マルウェア配布"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:287
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:261
 msgid "Malware or dangerous links"
 msgstr "マルウェアまたは危険なリンク"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:291
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:265
 msgid "Malware, credential theft, or harmful files."
 msgstr "マルウェア、認証情報窃盗、または有害なファイル。"
 
@@ -18830,7 +18915,7 @@ msgstr "マルウェア、認証情報窃盗、または有害なファイル。
 msgid "Manage"
 msgstr "管理"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:398
+#: src/features/app/components/floating/UserAreaPopout.tsx:396
 #: src/features/auth/components/accounts/AccountSwitcherModal.tsx:78
 msgid "Manage accounts"
 msgstr "アカウントを管理"
@@ -18851,17 +18936,17 @@ msgid "Manage blocked users"
 msgstr "ブロック中のユーザーを管理"
 
 #. Channel-scoped permission name: allows editing this channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:302
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:493
 msgid "Manage channel"
 msgstr "チャンネルを管理"
 
 #. Permission name: allows creating, editing, or deleting channels.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:173
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:364
 msgid "Manage channels"
 msgstr "チャンネルを管理"
 
 #. Permission name: allows editing global community settings.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:165
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:356
 msgid "Manage community"
 msgstr "コミュニティを管理"
 
@@ -18871,7 +18956,7 @@ msgid "Manage community features"
 msgstr "コミュニティ機能を管理"
 
 #. Permission name: allows editing or deleting custom emoji and stickers.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:201
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:392
 msgid "Manage emoji & stickers"
 msgstr "絵文字とステッカーを管理"
 
@@ -18884,12 +18969,12 @@ msgid "Manage invite links for this channel."
 msgstr "このチャンネルの招待リンクを管理します。"
 
 #. Permission name: allows deleting other members' messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:217
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:408
 msgid "Manage messages"
 msgstr "メッセージを管理"
 
 #. Permission name: allows changing other members' nicknames.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:193
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:384
 msgid "Manage nicknames"
 msgstr "ニックネームを管理"
 
@@ -18899,7 +18984,7 @@ msgid "Manage payment methods"
 msgstr "支払い方法を管理"
 
 #. Channel-scoped permission name: allows editing permission overwrites.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:306
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:497
 msgid "Manage permissions"
 msgstr "権限を管理"
 
@@ -18909,7 +18994,7 @@ msgid "Manage purchased gift codes and gift URLs"
 msgstr "購入済みのギフトコードとギフトURLを管理"
 
 #. Permission name: allows role management and permission overwrite editing.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:169
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:360
 msgid "Manage roles"
 msgstr "ロールを管理"
 
@@ -18919,7 +19004,7 @@ msgid "Manage subscription"
 msgstr "サブスクリプションを管理"
 
 #. Permission name: allows creating, editing, or deleting webhooks.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:205
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:396
 msgid "Manage webhooks"
 msgstr "ウェブフックを管理"
 
@@ -18987,7 +19072,7 @@ msgstr "ネタバレにする"
 
 #. Generic action label that flips a channel back to unread.
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:667
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:663
 #: src/features/input/state/input_keybind/shared.ts:33
 msgid "Mark as unread"
 msgstr "未読にする"
@@ -19093,7 +19178,7 @@ msgid "Mask Visionary as subscription"
 msgstr "Visionaryをサブスクリプションとして隠す"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:271
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:245
 msgid "Mass spam, fraud, fake giveaways, or account abuse."
 msgstr "大量のスパム、詐欺、偽のプレゼント企画、またはアカウントの不正利用。"
 
@@ -19175,12 +19260,12 @@ msgid "Mature content not allowed"
 msgstr "不適切なコンテンツは許可されていません"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:223
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:197
 msgid "Mature content or harassment"
 msgstr "成人向けコンテンツまたはハラスメント"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:239
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:213
 msgid "Mature content or unsafe gating"
 msgstr "成人向けコンテンツまたは不適切なコンテンツの制限"
 
@@ -19195,7 +19280,7 @@ msgid "Mature content policy violation"
 msgstr "成人向けコンテンツポリシー違反"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:243
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:217
 msgid "Mature content without proper gating."
 msgstr "適切な制限が設定されていない成人向けコンテンツ。"
 
@@ -19539,6 +19624,11 @@ msgstr "メンション設定"
 msgid "Mention everyone or any role (even if the role isn't set to be mentionable)."
 msgstr "全員または任意のロールにメンションできます（メンション不可に設定されているロールも含む）。"
 
+#. Permission description in the channel-scoped permissions editor for the Mention Everyone permission. Notes that this overrides the per-role "mentionable" flag.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:254
+msgid "Mention everyone or any role in this channel (even if the role isn't set to be mentionable)."
+msgstr "このチャンネルの全員またはすべてのロールにメンションする（ロールがメンション可能に設定されていなくても）。"
+
 #. Notifications settings: section heading for the default reply-mention behavior.
 #. Settings section label. Names the settings section in the settings UI.
 #. Short label in the inline. Keep it concise.
@@ -19658,7 +19748,7 @@ msgid "Message buttons"
 msgstr "メッセージボタン"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:47
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:43
 msgid "Message character limit"
 msgstr "メッセージの文字数制限"
 
@@ -19770,12 +19860,12 @@ msgid "Message link"
 msgstr "メッセージリンク"
 
 #. Short label in the channel and chat messages. Keep it concise.
-#: src/features/channel/components/ChannelMessages.tsx:75
+#: src/features/channel/components/ChannelMessages.tsx:81
 msgid "Message list"
 msgstr "メッセージリスト"
 
 #. Label in the channel and chat messages. Preserve {channelName}; it is inserted by code.
-#: src/features/channel/components/ChannelMessages.tsx:71
+#: src/features/channel/components/ChannelMessages.tsx:77
 msgid "Message list for {channelName}"
 msgstr "{channelName}のメッセージリスト"
 
@@ -19807,11 +19897,6 @@ msgstr "DMリストのメッセージプレビュー"
 #: src/features/devtools/components/debug/MessageDebugModal.tsx:15
 msgid "Message record"
 msgstr "メッセージ記録"
-
-#. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:31
-msgid "Message scheduling"
-msgstr "メッセージの送信予約"
 
 #. Short label in the buttons tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx:77
@@ -19871,7 +19956,7 @@ msgid "Messages"
 msgstr "メッセージ"
 
 #. Permission category for chat messages, uploads, embeds, reactions, and media.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:137
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:328
 msgid "Messages & media"
 msgstr "メッセージとメディア"
 
@@ -19881,7 +19966,7 @@ msgid "Messages deleted"
 msgstr "メッセージを削除しました"
 
 #. Error message in the channel and chat messages.
-#: src/features/channel/components/ChannelMessages.tsx:87
+#: src/features/channel/components/ChannelMessages.tsx:93
 msgid "Messages failed to load"
 msgstr "メッセージの読み込みに失敗しました"
 
@@ -20010,7 +20095,7 @@ msgid "Minimum lifetime (days)"
 msgstr "最小有効期間（日）"
 
 #. IAR modal: rule-category description for the child-safety / mature-content group.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:70
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:52
 msgid "Minors at risk, mature content in the wrong place, or unwanted conduct."
 msgstr "未成年者の危険、不適切な場所での成人向けコンテンツ、または迷惑行為。"
 
@@ -20141,7 +20226,7 @@ msgid "Mod"
 msgstr "モデレーター"
 
 #. Permission category for moderation actions against members or messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:141
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:332
 msgid "Moderation"
 msgstr "モデレーション"
 
@@ -20184,11 +20269,11 @@ msgstr "月額"
 msgid "Monthly {monthlyPrice}"
 msgstr "月額{monthlyPrice}"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:542
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:629
 msgid "Monthly billing starts on <0>{pendingChangeDate}</0>."
 msgstr "月額の請求は<0>{pendingChangeDate}</0>に開始されます。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:535
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:622
 msgid "Monthly billing starts on <0>{pendingChangeDate}</0>. First monthly charge: {pendingInitialPriceLabel}. Future monthly renewals: {pendingRecurringPriceLabel}/month."
 msgstr "<0>{pendingChangeDate}</0>より月額請求が開始されます。初回月額料金: {pendingInitialPriceLabel}。次月以降の月額更新料金: {pendingRecurringPriceLabel}/月。"
 
@@ -20334,7 +20419,7 @@ msgid "Move item up"
 msgstr "項目を上に移動"
 
 #. Permission name: allows moving members between voice channels.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:294
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:485
 msgid "Move members"
 msgstr "メンバーを移動"
 
@@ -20513,12 +20598,12 @@ msgid "Mute entrance sound"
 msgstr "入室サウンドをミュート"
 
 #. Action label that mutes notifications for the favourites pseudo-guild.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:687
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:683
 msgid "Mute favourites"
 msgstr "お気に入りをミュート"
 
 #. Permission name: allows moderators to mute other voice participants.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:286
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:477
 msgid "Mute members"
 msgstr "メンバーをミュート"
 
@@ -20533,6 +20618,16 @@ msgstr "マイクをミュート"
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts:191
 msgid "Mute notifications"
 msgstr "通知をミュート"
+
+#. Permission description in the channel-scoped permissions editor for the Mute Members permission. The mute applies for every listener, not only for the moderator.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:305
+msgid "Mute other members in this voice channel for everyone."
+msgstr "このボイスチャンネルの他のメンバーを全員ミュートします。"
+
+#. Permission description in the role/permission editor for the Mute Members permission at community scope. The mute applies for every listener, not only for the moderator.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:181
+msgid "Mute other members in voice channels for everyone."
+msgstr "他のメンバーのボイスチャンネルでの発言を全員に対してミュートします。"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:174
@@ -20892,7 +20987,7 @@ msgid "Network error"
 msgstr "ネットワークエラー"
 
 #. Developer options group for simulated slow or failed operations.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:73
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:83
 msgid "Networking and performance"
 msgstr "ネットワークとパフォーマンス"
 
@@ -21017,6 +21112,16 @@ msgstr "新しいマイク"
 msgid "New password"
 msgstr "新しいパスワード"
 
+#. Plutonium subscription card line shown when a move to a lower price is scheduled but the new amount is unknown. {pendingChangeDate} is a date already formatted and localized by code; never write a date into the translation.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:593
+msgid "New price scheduled for <0>{pendingChangeDate}</0>."
+msgstr "新しい価格は<0>{pendingChangeDate}</0>に予定されています。"
+
+#. Plutonium subscription card line shown when a move to a lower price is scheduled. {pendingChangeDate} is a date and {pendingTargetPriceLabel} is a currency amount, both already formatted and localized by code; never write a date or an amount into the translation.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:587
+msgid "New price scheduled for <0>{pendingChangeDate}</0>. Renewals will be {pendingTargetPriceLabel} from then on."
+msgstr "<0>{pendingChangeDate}</0>に新しい価格が適用されます。それ以降の更新は{pendingTargetPriceLabel}になります。"
+
 #. Default name for a newly created role in the community roles settings tab. Short label.
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx:48
 msgid "New role"
@@ -21058,9 +21163,9 @@ msgstr "新しい順"
 #. Button that moves to the next setup wizard step.
 #. Generic primary or pagination action label that advances to the next step, page, or item.
 #. Primary button in the required-action modal. Moves to the next carousel step.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:79
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:81
 #: src/features/auth/components/modals/required_action/RequiredActionDescriptors.ts:154
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:715
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:711
 msgid "Next"
 msgstr "次へ"
 
@@ -21198,7 +21303,7 @@ msgstr "ブロック中のユーザーはいません"
 
 #. Empty-state text in the saved messages content popout.
 #. Empty-state text in the saved messages page.
-#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:166
+#: src/features/channel/components/modals/BookmarksBottomSheet.tsx:182
 #: src/features/messaging/components/pages/SavedMessagesPage.tsx:27
 #: src/features/messaging/components/popouts/SavedMessagesContent.tsx:30
 msgid "No bookmarks"
@@ -21281,11 +21386,6 @@ msgstr "カスタムショートカットが見つかりませんでした。"
 #: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindsList.tsx:180
 msgid "No custom shortcuts yet."
 msgstr "カスタムショートカットはまだありません。"
-
-#. Generic short empty-state body shown when an entity has no description set.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:651
-msgid "No description provided."
-msgstr "説明はありません."
 
 #. Empty-state text in the discovery guild card.
 #. Empty-state text shown in the Discovery community preview modal when a community has no description.
@@ -21510,7 +21610,7 @@ msgstr "理由が入力されていません。"
 msgid "No recent mentions"
 msgstr "最近のメンションはありません"
 
-#: src/features/channel/components/modals/UnaddableRecipientsConfirmModal.tsx:97
+#: src/features/channel/components/modals/UnaddableRecipientsConfirmModal.tsx:98
 msgid "No remaining recipients to create a group DM with."
 msgstr "グループDMを作成できる相手がいません。"
 
@@ -21699,7 +21799,7 @@ msgid "No webhooks"
 msgstr "ウェブフックなし"
 
 #. Developer option label for short-circuiting the in-app reporting (IAR) flow. When enabled, submitting a report skips the network call.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:134
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:144
 msgid "No-op in-app reports"
 msgstr "アプリ内レポートを無効化"
 
@@ -21739,7 +21839,7 @@ msgstr "非アニメーション絵文字 ({emojiCount})"
 #: src/features/user/components/modals/tabs/components/EntranceSoundSection.tsx:143
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx:219
 #: src/features/user/components/modals/tabs/UserVoiceTab.tsx:93
-#: src/features/voice/components/AudioSourcePickerLinux.tsx:257
+#: src/features/voice/components/AudioSourcePickerLinux.tsx:261
 msgid "None"
 msgstr "なし"
 
@@ -21787,7 +21887,7 @@ msgstr "不要な場合はいつでもオフにできます。"
 #. Short label in the Plutonium self serve refund section. Keep the tone plain and specific.
 #. Short label in the authentication new device monitoring. Keep the tone plain and specific.
 #: src/features/app/components/dialogs/components/plutonium/SelfServeRefundSection.tsx:31
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:58
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:69
 #: src/features/app/components/layout/app_layout/nagbars/VoiceSessionRestoreNagbar.tsx:35
 #: src/features/auth/state/NewDeviceMonitoring.tsx:31
 msgid "Not now"
@@ -21893,7 +21993,7 @@ msgstr "通知音量"
 #. Generic section header / tab label for the notifications area.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/app/components/layout/MobileBottomNav.tsx:136
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:699
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:695
 #: src/features/notification/components/pages/NotificationsPage.tsx:61
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedSettingsCategories.ts:18
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts:30
@@ -22014,6 +22114,11 @@ msgstr "オン"
 msgctxt "audit-log-boolean-value"
 msgid "On"
 msgstr "オン"
+
+#. Billing confirmation body for moving an active subscription down to the current price. {listPriceEffectiveDate} is a date, and {listPriceCurrentLabel} and {listPriceNewLabel} are currency amounts, all already formatted and localized by code; never write a date or an amount into the translation.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:372
+msgid "On <0>{listPriceEffectiveDate}</0> your subscription moves from {listPriceCurrentLabel} to {listPriceNewLabel}. Nothing is charged today, and the rest of your subscription stays exactly as it is."
+msgstr "<0>{listPriceEffectiveDate}</0>に、サブスクリプションが{listPriceCurrentLabel}から{listPriceNewLabel}に移行します。本日課金されるものはありません。サブスクリプションの残りの部分はそのまま維持されます。"
 
 #. Short label in the display tab. Keep it concise.
 #: src/features/user/components/modals/tabs/chat_settings_tab/DisplayTab.tsx:22
@@ -22187,7 +22292,7 @@ msgstr "不透明度"
 #: src/features/app/components/dialogs/components/plutonium/InvoiceList.tsx:21
 #: src/features/app/components/dialogs/components/plutonium/InvoiceList.tsx:159
 #: src/features/app/components/setup/SetupWizardSteps.tsx:154
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:455
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:429
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedSettingRow.tsx:22
 msgid "Open"
 msgstr "開く"
@@ -22333,7 +22438,7 @@ msgstr "{channelName}のチャンネル詳細を開く"
 #. Context-menu action that opens a voice channel's embedded chat view without connecting to voice.
 #. Tooltip and accessible label for the chat icon shown beside a voice channel in the channel list.
 #: src/features/app/components/layout/ChannelItem.tsx:128
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:152
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:150
 msgid "Open chat"
 msgstr "チャットを開く"
 
@@ -22587,7 +22692,7 @@ msgid "Open template JSON"
 msgstr "テンプレートJSONを開く"
 
 #. IAR modal: quick-action card description for banning the reported user.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:151
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:125
 msgid "Open the ban dialog for this community."
 msgstr "このコミュニティのBANダイアログを開く。"
 
@@ -22831,7 +22936,7 @@ msgid "Our phone number check is down right now. This is on us, not your number.
 msgstr "電話番号の確認が現在利用できません。これは当社の問題であり、お客様の電話番号の問題ではありません。数分お待ちになってから、同じ電話番号をもう一度お試しください。"
 
 #. IAR modal: body copy on the success step shown after a platform report is submitted. Reassures the user about follow-up.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:122
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:96
 msgid "Our safety team is reviewing it. We'll send you a DM and email once we've reached a verdict."
 msgstr "Fluxerの安全チームが内容を確認しています。結果が出ましたら、DMとメールでお知らせします。"
 
@@ -23268,7 +23373,7 @@ msgid "Perks"
 msgstr "特典"
 
 #. Subscription status badge meaning premium is paid but perks are temporarily disabled.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:354
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:429
 msgid "Perks paused"
 msgstr "特典は一時停止中"
 
@@ -23346,7 +23451,7 @@ msgid "PgUp"
 msgstr "PageUp"
 
 #. IAR modal: rule-category description for the scams / malware / misinformation group.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:86
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:68
 msgid "Phishing, fraud, malicious links, or false claims likely to cause real-world harm."
 msgstr "フィッシング、詐欺、悪意のあるリンク、または現実世界に危害を及ぼす可能性のある虚偽の主張。"
 
@@ -23413,11 +23518,6 @@ msgstr "画像検索プロバイダを選択"
 msgid "Pick a theme on the left to edit its name, metadata, and CSS. Or import a new one."
 msgstr "左側でテーマを選択して、名前、メタデータ、CSSを編集するか、新しいテーマをインポートしてください。"
 
-#. Helper text in the schedule-message modal explaining the action.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:19
-msgid "Pick a time when this message should be posted."
-msgstr "メッセージを投稿する時間を選択."
-
 #. Title of the picker modal when choosing a translation provider.
 #: src/features/search/components/modals/SearchProviderPickerModal.tsx:23
 msgid "Pick a translation provider"
@@ -23429,7 +23529,7 @@ msgid "Pick a web search provider"
 msgstr "ウェブ検索プロバイダーを選択"
 
 #. Validation hint in the IAR modal when the user tries to advance without picking a radio option.
-#: src/features/moderation/components/report_modal/IARModal.tsx:73
+#: src/features/moderation/components/report_modal/IARModal.tsx:70
 msgid "Pick an option to continue."
 msgstr "続行するにはオプションを選択してください。"
 
@@ -23454,7 +23554,7 @@ msgid "Pick the method you can complete now."
 msgstr "今すぐ完了できる方法を選んでください。"
 
 #. Validation hint in the IAR modal on the rule selection step.
-#: src/features/moderation/components/report_modal/IARModal.tsx:77
+#: src/features/moderation/components/report_modal/IARModal.tsx:74
 msgid "Pick the rule to review."
 msgstr "確認するルールを選択."
 
@@ -23510,7 +23610,7 @@ msgid "Pin message"
 msgstr "メッセージをピン留め"
 
 #. Permission name: allows pinning messages in a channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:221
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:412
 msgid "Pin messages"
 msgstr "メッセージをピン留めする"
 
@@ -23518,6 +23618,16 @@ msgstr "メッセージをピン留めする"
 #: src/features/app/components/shared/ChannelPinsContent.tsx:51
 msgid "Pin messages here for everyone to see."
 msgstr "全員が見られるように、ここにメッセージをピン留めしましょう。"
+
+#. Permission description in the channel-scoped permissions editor for the Pin Messages permission. Covers messages from anyone, not only their own.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:234
+msgid "Pin or unpin any message in this channel."
+msgstr "このチャンネルのメッセージを固定または解除できます。"
+
+#. Permission description in the role/permission editor for the Pin Messages permission at community scope. Covers messages from anyone, not only their own.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:137
+msgid "Pin or unpin any message."
+msgstr "すべてのメッセージをピン留めまたはピン解除します。"
 
 #. Body of the confirmation alert shown when pinning a message.
 #: src/features/channel/components/MessageActionUtils.tsx:60
@@ -23554,7 +23664,7 @@ msgid "pinned"
 msgstr "ピン留め中"
 
 #. Generic short toast / status label confirming a DM was pinned.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:655
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:651
 msgid "Pinned DM"
 msgstr "ピン留めされたDM"
 
@@ -23565,7 +23675,7 @@ msgstr "ピン留めされたグループ"
 
 #. Toast confirming a group DM was pinned in the sidebar.
 #. Toast confirming a group DM was pinned in the sidebar.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:112
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:110
 #: src/features/ui/action_menu/items/dm_menu_data/shared.ts:13
 msgid "Pinned group DM"
 msgstr "ピン留めされたグループDM"
@@ -23933,7 +24043,7 @@ msgid "press to remove reaction"
 msgstr "タップしてリアクションを削除"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:335
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:309
 msgid "Pretending to be someone else, including deceptive AI-generated content."
 msgstr "他人になりすます行為（AIが生成した偽情報を含む）."
 
@@ -24111,7 +24221,7 @@ msgid "Prioritize speakers"
 msgstr "発言者を優先表示"
 
 #. Permission name: allows a voice participant to be heard over others.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:282
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:473
 msgid "Priority speaker"
 msgstr "優先スピーカー"
 
@@ -24125,7 +24235,7 @@ msgid "Privacy"
 msgstr "プライバシー"
 
 #. IAR modal: rule-category label grouping privacy violations and impersonation.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:74
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:56
 msgid "Privacy or impersonation"
 msgstr "プライバシーまたはなりすまし"
 
@@ -24135,7 +24245,7 @@ msgid "Privacy policy"
 msgstr "プライバシーポリシー"
 
 #. Generic section heading / button label for the privacy settings area.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:663
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:659
 msgid "Privacy settings"
 msgstr "プライバシー設定"
 
@@ -24145,17 +24255,17 @@ msgid "Privacy URL"
 msgstr "プライバシーポリシーのURL"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:307
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:281
 msgid "Privacy violation"
 msgstr "プライバシー侵害"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:319
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:293
 msgid "Privacy violation or doxxing"
 msgstr "プライバシー侵害または個人情報漏洩"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:315
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:289
 msgid "Privacy violation or stalking"
 msgstr "プライバシー侵害またはストーカー行為"
 
@@ -24201,7 +24311,7 @@ msgid "Profile"
 msgstr "プロフィール"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:35
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:31
 msgid "Profile badge"
 msgstr "プロフィールバッジ"
 
@@ -24312,22 +24422,22 @@ msgid "Profile updated"
 msgstr "プロフィールを更新しました"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:343
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:317
 msgid "Profile, username, or avatar violation"
 msgstr "プロフィール、ユーザー名、またはアバターの違反"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:203
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:177
 msgid "Promotes hatred against protected groups."
 msgstr "保護されたグループに対する憎悪を助長する."
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:219
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:193
 msgid "Promotes, recruits for, or coordinates violent extremist activity."
 msgstr "暴力的過激派活動を助長、勧誘、または調整する行為."
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:371
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:345
 msgid "Promotion or instructions encouraging self-harm or eating disorders."
 msgstr "自傷行為や摂食障害を助長または指示する内容。"
 
@@ -24673,7 +24783,7 @@ msgstr "ラジオグループ"
 
 #. IAR modal: rule label.
 #. Report category label for a community coordinating raids (mass harassment of other communities or users). "Raid" is product jargon.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:359
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:333
 #: src/features/moderation/components/report/OptionDescriptors.ts:94
 msgid "Raid coordination"
 msgstr "レイドの調整"
@@ -24719,7 +24829,7 @@ msgstr "{emojiShortcode}でリアクション"
 
 #. Generic short section / tab / aria label for emoji reactions.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:659
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:655
 #: src/features/messaging/components/modals/MessageReactionsModal.tsx:144
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:10
 msgid "Reactions"
@@ -24727,7 +24837,7 @@ msgstr "リアクション"
 
 #. Billing button that cancels a scheduled subscription cancellation.
 #. Button label on the premium-expired nagbar. Opens billing so the user can reactivate their subscription.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:604
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:744
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:25
 msgid "Reactivate"
 msgstr "再開する"
@@ -24748,7 +24858,7 @@ msgid "Read message aloud"
 msgstr "メッセージを読み上げる"
 
 #. Permission name: allows seeing earlier messages in a channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:233
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:424
 msgid "Read message history"
 msgstr "メッセージ履歴を読む"
 
@@ -24758,6 +24868,16 @@ msgstr "メッセージ履歴を読む"
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:126
 msgid "Read messages"
 msgstr "メッセージを読む"
+
+#. Permission description in the role/permission editor for the Read Message History permission at community scope. Without the permission the member sees only messages that arrive while the channel is open in front of them.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:151
+msgid "Read messages sent before they opened a channel. Without it, they only see messages that arrive while it is open."
+msgstr "チャンネルを開く前に送信されたメッセージを読み取ります。この権限がない場合、チャンネルが開いている間に届いたメッセージしか表示されません。"
+
+#. Permission description in the channel-scoped permissions editor for the Read Message History permission. Without the permission the member sees only messages that arrive while the channel is open in front of them.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:248
+msgid "Read messages sent in this channel before they opened it. Without it, they only see messages that arrive while it is open."
+msgstr "このチャンネルで、メンバーが開く前に送信されたメッセージを読むことができます。この権限がない場合、メンバーはチャンネルを開いている間に届いたメッセージしか見ることができません。"
 
 #. Permission description in the role/permission editor for the View Activity Log permission. Refers to the per-community audit/activity log.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:18
@@ -24881,7 +25001,7 @@ msgid "Reconnect succeeded. Pick a screen again if you want to resume your previ
 msgstr "再接続しました。以前のストリームを再開したい場合は、もう一度画面を選択してください。"
 
 #. Overlay status in the voice call view while reconnecting after a drop. Trailing ellipsis indicates in-progress.
-#: src/features/voice/components/VoiceCallView.tsx:97
+#: src/features/voice/components/VoiceCallView.tsx:98
 msgid "Reconnecting..."
 msgstr "再接続中..."
 
@@ -24944,7 +25064,7 @@ msgid "Redeem for yourself"
 msgstr "自分で使用"
 
 #. Billing button for entering a premium gift code.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:577
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:717
 msgid "Redeem gift code"
 msgstr "ギフトコードを使う"
 
@@ -25022,7 +25142,7 @@ msgstr "参照をコピーしました。"
 msgid "Referral parameters"
 msgstr "紹介パラメーター"
 
-#: src/features/voice/components/AudioSourcePickerLinux.tsx:301
+#: src/features/voice/components/AudioSourcePickerLinux.tsx:305
 msgid "Refresh audio sources"
 msgstr "音声ソースを更新"
 
@@ -25374,9 +25494,14 @@ msgid "Remove icon"
 msgstr "アイコンを削除"
 
 #. IAR modal: quick-action card description for deleting the reported message.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:131
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:105
 msgid "Remove it from the channel for everyone."
 msgstr "全員のチャンネルから削除します。"
+
+#. Permission description in the role/permission editor for the Kick Members permission. Note that a kick is not permanent, unlike a ban.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:118
+msgid "Remove members from the community. They can rejoin with a new invite."
+msgstr "コミュニティからメンバーを削除します。招待があれば再参加できます。"
 
 #. Button or menu action label in the recent mentions content popout. Keep it concise. Keep the tone plain and specific.
 #: src/features/messaging/components/popouts/RecentMentionsContent.tsx:52
@@ -25490,7 +25615,7 @@ msgid "Removed deny for {0}."
 msgstr "{0} の拒否を削除しました。"
 
 #. Button or menu action label in the messaging commands. Keep it concise. Keep the tone plain and specific.
-#: src/features/messaging/commands/SavedMessageCommands.tsx:23
+#: src/features/messaging/commands/SavedMessageCommands.tsx:24
 msgid "Removed from bookmarks"
 msgstr "ブックマークから削除しました"
 
@@ -25568,7 +25693,7 @@ msgid "Rename :{emojiName}:"
 msgstr "絵文字「:{emojiName}:」の名前を変更:"
 
 #. Permission description in the channel-scoped permissions editor for the Manage Channel permission. "This channel" refers to the channel currently being edited.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:113
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:195
 msgid "Rename and edit this channel's settings."
 msgstr "このチャンネルの名前変更と設定編集."
 
@@ -25637,7 +25762,7 @@ msgstr "更新しきい値（日）"
 msgid "Renew window (days)"
 msgstr "更新ウィンドウ（日）"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:559
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:699
 msgid "Renews on <0>{renewalDate}.</0>"
 msgstr "<0>{renewalDate}に更新されます。</0>"
 
@@ -25728,13 +25853,8 @@ msgstr "コミュニティを報告"
 msgid "Report a message"
 msgstr "メッセージを報告"
 
-#. IAR modal: primary path label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:110
-msgid "Report a platform rule violation"
-msgstr "プラットフォームのルール違反を報告"
-
 #. IAR modal: screen-reader description for the whole modal.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:467
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:441
 msgid "Report a rule violation, or find tools to manage contact and preferences."
 msgstr "ルール違反を報告するか、連絡先と設定を管理するツールを見つけます。"
 
@@ -25771,15 +25891,10 @@ msgid "Report message"
 msgstr "メッセージを報告"
 
 #. IAR modal: title on the success step shown after a platform report is submitted.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:118
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:92
 #: src/features/moderation/components/report/ReportStepComplete.tsx:31
 msgid "Report sent"
 msgstr "レポートを送信しました"
-
-#. IAR modal: community-mod path label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:114
-msgid "Report to the moderators of this community"
-msgstr "このコミュニティのモデレーターに報告"
 
 #. Button or menu action label in the moderation report step selection. Keep it concise. Keep the tone plain and specific.
 #: src/features/moderation/components/report/ReportStepSelection.tsx:11
@@ -25927,11 +26042,6 @@ msgstr "電話番号の認証が必要です。"
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:79
 msgid "Requires everything in medium, plus being a member of the community for at least 10 minutes."
 msgstr "中レベルのすべての条件に加え、コミュニティのメンバーになってから10分以上経過していること。"
-
-#. Title of the confirmation alert shown when editing a scheduled message to change the scheduled time.
-#: src/features/channel/components/channel_textarea/shared.ts:24
-msgid "Reschedule message"
-msgstr "メッセージを再スケジュール"
 
 #: src/features/auth/components/modals/BackupCodesViewModal.tsx:200
 #: src/features/auth/components/modals/ClaimAccountModal.tsx:240
@@ -26380,8 +26490,8 @@ msgstr "ウィンドウを元に戻す"
 
 #. Billing button for restarting a subscription during the grace period.
 #. Billing button for starting a new subscription after premium expired.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:596
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:600
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:736
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:740
 msgid "Resubscribe"
 msgstr "再登録"
 
@@ -26887,7 +26997,7 @@ msgstr "保存しました"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:59
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:55
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:63
 msgid "Saved media"
 msgstr "保存したメディア"
@@ -26922,7 +27032,7 @@ msgid "Scale"
 msgstr "表示サイズ"
 
 #. IAR modal: rule-category label grouping spam/scams, malware, and harmful misinformation.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:82
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:64
 msgid "Scams, malware, or misinformation"
 msgstr "詐欺、マルウェア、誤情報"
 
@@ -26930,25 +27040,10 @@ msgstr "詐欺、マルウェア、誤情報"
 msgid "Scan the QR code with your authenticator app."
 msgstr "認証アプリでQRコードをスキャンしてください。"
 
-#. Confirm button label in the schedule-message modal that saves the scheduled send.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:36
-msgid "Schedule"
-msgstr "送信予約"
-
-#. Title of the schedule-message modal.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:15
-msgid "Schedule message"
-msgstr "メッセージを予約"
-
 #. Developer / debug surface — keep terse and technical. Label in the developer Nagbar controls panel for the scheduled-maintenance banner.
 #: src/features/devtools/components/NagbarControls.ts:22
 msgid "Scheduled maintenance nagbar"
 msgstr "メンテナンスのお知らせ"
-
-#. Inline validation message in the schedule-message modal when the picked time is more than 30 days away. Keep tone plain.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:31
-msgid "Scheduled messages can be at most 30 days in the future."
-msgstr "メッセージの予約は30日後まで可能です。"
 
 #. Discovery category dropdown option in the community Discovery settings tab.
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx:92
@@ -27593,6 +27688,11 @@ msgstr "セキュリティキーのPIN"
 msgid "Security key PIN form"
 msgstr "セキュリティキーのPINフォーム"
 
+#. Permission description in the role/permission editor for the View Channel permission at community scope. Per-channel overwrites still decide access for individual channels.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:128
+msgid "See channels by default. Channels that deny it stay hidden."
+msgstr "デフォルトでチャンネルを表示します。拒否したチャンネルは非表示のままになります。"
+
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/fields/GuildInviteSplashSettingsField.tsx:89
 msgid "See how your invite looks to visitors."
 msgstr "招待が訪問者からどう見えるかを確認する."
@@ -27603,9 +27703,14 @@ msgid "See the member list for channels in this community."
 msgstr "このコミュニティのチャンネルメンバーリストを見る."
 
 #. Permission description in the channel-scoped permissions editor for the View Channel Members permission. Scoped to a single channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:128
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:210
 msgid "See the member list for this channel."
 msgstr "このチャンネルのメンバーリストを見る."
+
+#. Permission description in the channel-scoped permissions editor for the View Channel permission. The placeholder renders the literal @everyone role name and must not be translated.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:220
+msgid "See this channel. Denying it for {everyoneMention} makes the channel private."
+msgstr "このチャンネルを見る。{everyoneMention} に対してこれを拒否すると、チャンネルはプライベートになります。"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/AccessibilityIndex.ts:121
@@ -27805,13 +27910,13 @@ msgstr "選択"
 
 #. IAR modal: rule label.
 #. Report category label for content that promotes or depicts self-harm or suicide. Keep tone calm and respectful; this is a safety surface.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:367
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:341
 #: src/features/moderation/components/report/OptionDescriptors.ts:52
 msgid "Self-harm or suicide"
 msgstr "自傷行為または自殺"
 
 #. Accessible label for the self-host setup wizard carousel.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:67
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:69
 msgid "Self-host setup"
 msgstr "セルフホスト設定"
 
@@ -27821,7 +27926,7 @@ msgid "Self-hosted mode"
 msgstr "セルフホストモード"
 
 #. Developer option label for forcing self-hosted client mode.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:57
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:67
 msgid "Self-hosted mode override"
 msgstr "セルフホストモードを強制"
 
@@ -27945,7 +28050,7 @@ msgstr "メッセージを送信"
 #. Audit log operation flag label for message sending.
 #. Permission name: allows sending chat messages.
 #: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:174
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:209
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:400
 msgid "Send messages"
 msgstr "メッセージを送信"
 
@@ -27954,8 +28059,18 @@ msgstr "メッセージを送信"
 msgid "Send messages disabled"
 msgstr "メッセージ送信がオフです"
 
+#. Permission description in the role/permission editor for the Send Messages permission at community scope.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:133
+msgid "Send messages in channels."
+msgstr "チャンネルでメッセージを送信"
+
+#. Permission description in the channel-scoped permissions editor for the Send Messages permission.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:225
+msgid "Send messages in this channel."
+msgstr "このチャンネルでメッセージを送信"
+
 #. Footer submit button in the IAR modal. Sends the report to the safety team.
-#: src/features/moderation/components/report_modal/IARModal.tsx:93
+#: src/features/moderation/components/report_modal/IARModal.tsx:90
 msgid "Send report"
 msgstr "レポートを送信"
 
@@ -27973,10 +28088,10 @@ msgstr "再設定リンクを送信"
 msgid "Send saved media {memeName}"
 msgstr "保存済みメディア「{memeName}」を送信"
 
-#. Permission description in the role/permission editor for the Send TTS Messages permission. Keep "text-to-speech" spelled out for clarity.
+#. Permission description in the role/permission editor for the Send TTS Messages permission. Keep "text-to-speech" spelled out for clarity. "/tts" is a literal command prefix typed in the message box and must not be translated.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:63
-msgid "Send text-to-speech messages."
-msgstr "テキスト読み上げメッセージを送信."
+msgid "Send text-to-speech messages with /tts. Members who turned text-to-speech on hear them read aloud."
+msgstr "/tts で読み上げメッセージを送信します。読み上げ機能をオンにしているメンバーは、メッセージを音声で聞くことができます。"
 
 #. placeholder {0}: inboundChallenge.challenge_code
 #. placeholder {1}: inboundChallenge.our_number
@@ -28005,7 +28120,7 @@ msgid "Send to"
 msgstr "送信先"
 
 #. Permission name: allows sending text-to-speech messages.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:213
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:404
 msgid "Send TTS messages"
 msgstr "TTSメッセージを送信"
 
@@ -28037,7 +28152,7 @@ msgid "Sending an SMS to this phone number is too expensive for {PRODUCT_NAME}, 
 msgstr "{PRODUCT_NAME}からこの電話番号にSMSを送信すると費用が高額になるため、代わりにSMSを送信していただく必要があります。ご不便をおかけして申し訳ございません。<0>{SUPPORT_EMAIL}</0>までご連絡いただければ、この要件を解除することも可能です。"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:295
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:269
 msgid "Sending malware or dangerous links"
 msgstr "マルウェアや危険なリンクの送信"
 
@@ -28075,7 +28190,7 @@ msgid "Sensitive media"
 msgstr "センシティブなメディア"
 
 #. Generic short status label confirming an item (invite, gift, theme link) was sent.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:803
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:799
 msgid "Sent"
 msgstr "送信済み"
 
@@ -28150,7 +28265,7 @@ msgstr "セッション"
 msgid "Set {fieldNode} to {0}."
 msgstr "{fieldNode}を{0}に設定."
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:608
+#: src/features/app/components/floating/UserAreaPopout.tsx:601
 #: src/features/app/components/shared/custom_status_display/CustomStatusDisplay.tsx:314
 msgid "Set a custom status"
 msgstr "カスタムステータスを設定"
@@ -28349,7 +28464,7 @@ msgid "Set this check aside?"
 msgstr "このチェックをスキップしますか？"
 
 #. Title for the self-host setup wizard modal.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:71
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:73
 msgid "Set up {productName}"
 msgstr "{productName} を設定する"
 
@@ -28375,7 +28490,7 @@ msgid "Set verification level to <0>none</0>."
 msgstr "認証レベルを<0>なし</0>に設定しました。"
 
 #. Permission name: allows changing the voice service region.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:298
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:489
 msgid "Set voice region"
 msgstr "音声リージョンを設定"
 
@@ -28513,7 +28628,7 @@ msgid "Share with a friend"
 msgstr "友達にシェア"
 
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:419
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:393
 msgid "Share with community mods."
 msgstr "コミュニティのモデレーターと共有."
 
@@ -28556,7 +28671,7 @@ msgid "Shared window audio"
 msgstr "共有ウィンドウの音声"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:323
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:297
 msgid "Shares personal info, stalks users, or coordinates privacy abuse."
 msgstr "個人情報共有、ストーカー行為、プライバシー侵害の共謀など."
 
@@ -28774,6 +28889,16 @@ msgstr "削除ボタンを表示"
 msgid "Show download button"
 msgstr "ダウンロードボタンを表示"
 
+#. Permission description in the channel-scoped permissions editor for the Embed Links permission. The preview is the card rendered under a message that contains a link.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:239
+msgid "Show embedded previews for links they send in this channel."
+msgstr "このチャンネルで送信したリンクの埋め込みプレビューを表示する"
+
+#. Permission description in the role/permission editor for the Embed Links permission at community scope. The preview is the card rendered under a message that contains a link.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:142
+msgid "Show embedded previews for links they send."
+msgstr "送信したリンクの埋め込みプレビューを表示する"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:46
 msgid "Show embeds"
@@ -28945,7 +29070,7 @@ msgstr "自分の画面共有を表示"
 #. Developer option label for showing the current user as typing.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:89
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:53
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:63
 msgid "Show myself typing"
 msgstr "自分を「入力中」と表示"
 
@@ -28999,7 +29124,7 @@ msgid "Show per-device participant volume sliders in voice menus"
 msgstr "デバイスごとの参加者の音量スライダーを音声メニューに表示"
 
 #. Developer option label for exposing the staff-only profile timezone section in profile settings.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:125
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:135
 msgid "Show profile timezone settings"
 msgstr "プロファイル設定で、スタッフ専用のプロファイルタイムゾーンセクションを表示します"
 
@@ -29366,7 +29491,7 @@ msgid "Skip the external link warning for all domains"
 msgstr "すべてのドメインで外部リンクの警告をスキップ"
 
 #. Developer / debug surface — keep terse and technical. Tooltip / description for the no-op in-app reports toggle.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:139
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:149
 msgid "Skip the network call when an in-app report is submitted. The flow still advances to the success screen so you can exercise the UI, but nothing is actually sent to the safety team."
 msgstr "アプリ内レポートが送信されてもネットワーク呼び出しをスキップします。フローは成功画面に進むためUIを試すことはできますが、実際には安全チームには何も送信されません。"
 
@@ -29424,7 +29549,7 @@ msgstr "スロベニア"
 #. Developer option label for simulating slow file uploads.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:93
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:89
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:99
 msgid "Slow attachment upload"
 msgstr "添付ファイルのアップロードを低速化"
 
@@ -29441,28 +29566,28 @@ msgstr "落ち着いてください。しばらく待ってからもう一度お
 #. Developer option label for simulating slow message edits.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:105
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:85
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:95
 msgid "Slow message edit"
 msgstr "メッセージ編集を低速化"
 
 #. Developer option label for simulating slow message loading.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:97
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:77
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:87
 msgid "Slow message load"
 msgstr "メッセージの読み込みを遅くする"
 
 #. Developer option label for simulating slow message sending.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:101
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:81
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:91
 msgid "Slow message send"
 msgstr "メッセージ送信を遅くする"
 
 #. Developer option label for simulating slow profile loading.
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:109
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:93
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:103
 msgid "Slow profile load"
 msgstr "プロフィールの読み込みを遅くする"
 
@@ -29529,7 +29654,7 @@ msgid "Slowmode time remaining"
 msgstr "スローモード残り時間"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:195
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:169
 msgid "Slurs, dehumanizing language, or attacks on protected groups."
 msgstr "中傷、非人間的な言葉、または保護されたグループへの攻撃。"
 
@@ -29684,26 +29809,31 @@ msgid "Something went wrong loading members. Try again later."
 msgstr "メンバーの読み込み中に問題が発生しました。後でもう一度お試しください。"
 
 #. Body of the generic fallback error modal shown when canceling a scheduled Plutonium billing cycle change fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:89
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:91
 msgid "Something went wrong while canceling your pending billing change. Please try again in a moment."
 msgstr "保留中の請求変更のキャンセル中に問題が発生しました。しばらくしてからもう一度お試しください。"
 
 #. Body of the generic fallback error modal shown when cancelling a Plutonium subscription fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:28
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:30
 msgid "Something went wrong while cancelling your subscription. Please try again in a moment."
 msgstr "サブスクリプションのキャンセル中に問題が発生しました。しばらくしてからもう一度お試しください。"
 
 #. Body of the generic fallback error modal shown when changing the Plutonium billing cycle fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:80
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:82
 msgid "Something went wrong while changing your billing cycle. Please try again in a moment."
 msgstr "請求サイクル変更中に問題が発生しました。しばらくしてからもう一度お試しください。"
+
+#. Body of the generic fallback error modal shown when moving a Plutonium subscription down to the current price fails.
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:116
+msgid "Something went wrong while changing your price. Please try again in a moment."
+msgstr "価格の変更中に問題が発生しました。しばらくしてからもう一度お試しください。"
 
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:48
 msgid "Something went wrong while connecting your account. You can close this tab and try again."
 msgstr "アカウントの連携中に問題が発生しました。このタブを閉じて、もう一度お試しください。"
 
 #. Body of the generic fallback error modal shown when ending the Plutonium grace period fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:40
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:42
 msgid "Something went wrong while ending your grace period. Please try again in a moment."
 msgstr "猶予期間の終了中に問題が発生しました。しばらくしてからもう一度お試しください。"
 
@@ -29722,7 +29852,7 @@ msgstr "アクティビティログの読み込み中に問題が発生しまし
 #. Body of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Body of the generic fallback error modal shown when opening the billing customer portal fails.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:34
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:16
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:18
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:34
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:34
 msgid "Something went wrong while opening the billing portal. Please try again in a moment."
@@ -29734,7 +29864,7 @@ msgid "Something went wrong while preparing this sticker. Try another file or tr
 msgstr "このスタンプの準備中に問題が発生しました。別のファイルをお試しいただくか、しばらくしてからもう一度お試しください。"
 
 #. Body of the generic fallback error modal shown when reactivating a Plutonium subscription fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:52
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:54
 msgid "Something went wrong while reactivating your subscription. Please try again in a moment."
 msgstr "サブスクリプションの再開中に問題が発生しました。しばらくしてからもう一度お試しください。"
 
@@ -29777,8 +29907,8 @@ msgstr "問題が発生しました。"
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:129
 #: src/features/theme/components/modals/ShareThemeModal.tsx:51
 #: src/features/ui/action_menu/items/CallMenuItems.tsx:45
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:128
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:144
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:126
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:142
 msgid "Something went wrong. Please try again in a moment."
 msgstr "問題が発生しました。しばらくしてからもう一度お試しください。"
 
@@ -29851,7 +29981,7 @@ msgstr "音量"
 
 #. Section heading / tab label for the notification-sounds area.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:807
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:803
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts:135
 msgid "Sounds"
 msgstr "サウンド"
@@ -29929,12 +30059,12 @@ msgid "Spam or scam community"
 msgstr "スパムまたは詐欺コミュニティ"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:275
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:249
 msgid "Spam, scam, or phishing account"
 msgstr "スパム、詐欺、またはフィッシングアカウント"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:267
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:241
 msgid "Spam, scams, or phishing"
 msgstr "スパム、詐欺、フィッシング"
 
@@ -29954,7 +30084,7 @@ msgid "Spatial and temporal layers"
 msgstr "空間的および時間的レイヤー"
 
 #. Permission name: allows speaking in voice channels.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:269
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:460
 msgctxt "voice-permission"
 msgid "Speak"
 msgstr "発言"
@@ -30255,7 +30385,7 @@ msgstr "最初からやり直す"
 msgid "Start recording"
 msgstr "録音を開始"
 
-#: src/features/search/components/quick_switcher/QuickSwitcherModal.tsx:585
+#: src/features/search/components/quick_switcher/QuickSwitcherModal.tsx:586
 msgid "Start searches with <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> to narrow down results."
 msgstr "検索を始めるには、<0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> を使用して、結果を絞り込みます。"
 
@@ -30507,7 +30637,7 @@ msgid "Stop hiding muted channels by default?"
 msgstr "ミュートしたチャンネルをデフォルトで非表示にするのをやめますか？"
 
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:411
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:385
 msgid "Stop messages and friend requests."
 msgstr "メッセージと友達リクエストを停止."
 
@@ -30516,13 +30646,18 @@ msgstr "メッセージと友達リクエストを停止."
 msgid "Stop Neko from chasing your cursor while keeping it draggable and interactive."
 msgstr "カーソルをドラッグ可能かつインタラクティブなまま、ネコがカーソルを追いかけるのを止めます。"
 
+#. Developer / debug surface — keep terse and technical. Tooltip / description for the translation DOM guard kill switch.
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:41
+msgid "Stop patching Node.prototype insertBefore and removeChild. The app will crash again when a page translator re-parents text nodes React still holds."
+msgstr "Node.prototype の insertBefore と removeChild のパッチを停止します。ページ翻訳者が React がまだ保持しているテキストノードを再親子化すると、アプリは再びクラッシュします。"
+
 #. Action that stops ringing the selected participant in a voice call.
 #: src/features/ui/action_menu/items/CallMenuItems.tsx:29
 msgid "Stop ringing"
 msgstr "着信を停止"
 
 #. IAR modal: quick-action card description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:439
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:413
 msgid "Stop seeing its content and members."
 msgstr "コンテンツやメンバーが表示されなくなります。"
 
@@ -30617,7 +30752,7 @@ msgid "Stream settings"
 msgstr "配信設定"
 
 #. Permission name: allows video streaming or screen sharing in voice.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:274
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:465
 msgid "Stream video"
 msgstr "動画を配信"
 
@@ -30849,7 +30984,7 @@ msgstr "スウェーデン語"
 msgid "Switch account"
 msgstr "アカウントを切り替える"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:684
+#: src/features/app/components/floating/UserAreaPopout.tsx:677
 msgid "Switch accounts"
 msgstr "アカウントを切り替える"
 
@@ -30878,6 +31013,16 @@ msgstr "グローバルプロフィールとコミュニティごとのプロフ
 msgid "Switch device"
 msgstr "デバイスを切り替える"
 
+#. Button confirming a move of an active subscription down to the current price.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:65
+msgid "Switch price"
+msgstr "価格を変更"
+
+#. Billing button that opens confirmation to move the subscription down to the current price. {listPriceNewLabel} is the localized new price.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:804
+msgid "Switch to {listPriceNewLabel}"
+msgstr "{listPriceNewLabel} に切り替える"
+
 #. Tooltip on the density toggle when currently in dense mode.
 #. Tooltip on the layout toggle button in the role editor that switches the permission list to comfy layout.
 #: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/LayoutToggleButtons.tsx:25
@@ -30898,13 +31043,13 @@ msgstr "直接入力に切り替える"
 
 #. Billing button that opens confirmation to switch to monthly billing.
 #. Button confirming a change to monthly subscription billing.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:54
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:646
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:57
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:787
 msgid "Switch to monthly"
 msgstr "月額払いに変更"
 
 #. Billing confirmation title for changing an active subscription to monthly billing.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:46
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:49
 msgid "Switch to monthly billing?"
 msgstr "月額払いに切り替えますか？"
 
@@ -30945,6 +31090,11 @@ msgstr "前のコミュニティまたはDMに切り替える"
 msgid "Switch to single column"
 msgstr "1列表示に切り替え"
 
+#. Billing confirmation title for moving an active subscription down to the current price.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:61
+msgid "Switch to the new price?"
+msgstr "新しい料金に切り替えますか？"
+
 #: src/features/auth/utils/AccountSwitcherModalUtils.tsx:290
 msgid "Switch to this account"
 msgstr "このアカウントに切り替える"
@@ -30962,13 +31112,13 @@ msgstr "2列表示に切り替え"
 
 #. Billing button that opens confirmation to switch to yearly billing.
 #. Button confirming a change to yearly subscription billing.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:50
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:642
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:53
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:783
 msgid "Switch to yearly"
 msgstr "年払いに変更"
 
 #. Billing confirmation title for changing an active subscription to yearly billing.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:42
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:45
 msgid "Switch to yearly billing?"
 msgstr "年額払いに切り替えますか？"
 
@@ -31200,23 +31350,23 @@ msgstr "タグ ({tagCount}/{tagLimit})"
 msgid "Tags must be 2 to {maxLength} characters and alphanumeric."
 msgstr "タグは2～{maxLength}文字の半角英数字で入力してください。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:242
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:291
 msgid "Takes effect at your next renewal. We'll apply a {creditLabel} credit from your current monthly payment, so your first yearly charge will be <0>{firstRenewalPriceLabel}</0>. Future yearly renewals will be {renewalPrice}/year."
 msgstr "次回更新時に適用されます。現在の月額料金から{creditLabel}のクレジットが適用されるため、最初の年間請求額は<0>{firstRenewalPriceLabel}</0>になります。それ以降の年間更新は{renewalPrice}/年となります。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:251
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:300
 msgid "Takes effect at your next renewal. Your subscription stays monthly until then, and your next renewal will be <0>{renewalPrice}/year</0>."
 msgstr "次回更新時に適用されます。それまでは月額プランが継続され、次回の更新は<0>{renewalPrice}/年</0>となります。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:260
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:309
 msgid "Takes effect at your next renewal. Your subscription stays yearly until then, and your next renewal will be <0>{renewalPrice}/month</0>."
 msgstr "次回更新時に適用されます。それまでは年額プランが継続され、次回の更新からは<0>{renewalPrice}/month</0>となります。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:279
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:328
 msgid "Takes effect immediately. A prorated adjustment may apply via {PAYMENT_PROVIDER_NAME}. Your next renewal will be <0>{renewalPrice}/month</0>."
 msgstr "すぐに適用されます。{PAYMENT_PROVIDER_NAME}を通じて日割り調整が行われる場合があります。次回の更新は<0>{renewalPrice}/月</0>となります。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:270
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:319
 msgid "Takes effect immediately. A prorated charge may apply via {PAYMENT_PROVIDER_NAME}. Your next renewal will be <0>{renewalPrice}/year</0>."
 msgstr "すぐに有効になります。{PAYMENT_PROVIDER_NAME}を通じて日割り料金が適用される場合があります。次回の更新は<0>{renewalPrice}/年</0>となります。"
 
@@ -31225,13 +31375,23 @@ msgstr "すぐに有効になります。{PAYMENT_PROVIDER_NAME}を通じて日�
 msgid "Talk in calls and test your input."
 msgstr "通話で話したり、入力をテストしたりします。"
 
+#. Permission description in the channel-scoped permissions editor for the Speak permission. "Mute members" is another permission in this same editor, so match the wording used for its name.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:285
+msgid "Talk in this voice channel. Without it, members stay muted until someone with Mute members unmutes them."
+msgstr "このボイスチャンネルで話すことができます。これがないと、メンバーは「メンバーをミュート」権限を持つユーザーがミュート解除するまでミュートされたままになります。"
+
+#. Permission description in the role/permission editor for the Speak permission at community scope. "Mute members" is another permission in this same editor, so match the wording used for its name.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:166
+msgid "Talk in voice channels. Without it, members stay muted until someone with Mute members unmutes them."
+msgstr "ボイスチャンネルで発言する。これがないと、メンバーは「メンバーをミュート」権限を持つ誰かがミュート解除するまでミュートされたままになります。"
+
 #. Label in the note edit sheet.
 #: src/features/user/components/modals/NoteEditSheet.tsx:21
 msgid "Tap to add a note"
 msgstr "タップしてメモを追加"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:199
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:173
 msgid "Targets people by protected characteristics."
 msgstr "保護されている特性を持つユーザーをターゲットにする."
 
@@ -31311,7 +31471,7 @@ msgid "Terms URL"
 msgstr "利用規約URL"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:215
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:189
 msgid "Terrorism or violent extremism"
 msgstr "テロまたは暴力的過激主義"
 
@@ -31496,7 +31656,7 @@ msgid "That friend request is no longer available. Refresh and try again."
 msgstr "この友達リクエストは利用できなくなりました。画面を更新してもう一度お試しください。"
 
 #. Error shown when a branding image fails to upload in the setup wizard.
-#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:95
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:102
 msgid "That image could not be used. Try a different file."
 msgstr "その画像は使用できませんでした。別のファイルをお試しください。"
 
@@ -31526,6 +31686,11 @@ msgstr "ブックマークは以上です。"
 #: src/features/user/components/modals/FluxerTagChangeModal.tsx:69
 msgid "The #0000 tag is reserved for Visionary subscribers. Visionary is no longer available for purchase."
 msgstr "#0000タグはVisionary登録者専用です。Visionaryは現在購入できません。"
+
+#. Error shown when the setup wizard cannot load because the API origin differs from the page origin.
+#: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:97
+msgid "The API is on a different origin than this page, so setup requests are sent without your session. Check the public origin and port this instance is configured with, then reload."
+msgstr "APIがこのページと異なるオリジンにあるため、セットアップリクエストはセッションなしで送信されます。このインスタンスで設定されているパブリックオリジンとポートを確認してから、再読み込みしてください。"
 
 #: src/features/app/components/ErrorFallback.tsx:120
 msgid "The app crashed"
@@ -31626,6 +31791,11 @@ msgstr "名前は以前のものに戻されました。しばらくしてから
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:63
 msgid "The new channel will reuse the permissions from <0>{channelLabel}</0>."
 msgstr "新しいチャンネルには、<0>{channelLabel}</0>の権限が再利用されます。"
+
+#. Toast success shown when a move down to the current price was already scheduled by an earlier request. {effectiveDate} is the localized date the new price starts.
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:101
+msgid "The new price is already scheduled for {effectiveDate}."
+msgstr "新しい価格はすでに{effectiveDate}にスケジュールされています。"
 
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:58
 msgid "The new voice channel will reuse the permissions, user limit, and bitrate from <0>{channelLabel}</0>."
@@ -32349,7 +32519,7 @@ msgid "This member isn't connected to voice anymore."
 msgstr "このメンバーは音声に接続していません。"
 
 #. IAR modal: tooltip on the delete card when the reported message is already deleted.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:143
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:117
 msgid "This message has already been deleted."
 msgstr "このメッセージはすでに削除されています。"
 
@@ -32522,7 +32692,7 @@ msgid "This user has no roles in this community."
 msgstr "このユーザーはコミュニティで役割を持っていません。"
 
 #. IAR modal: tooltip on the ban card when the reported user is already banned.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:163
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:137
 msgid "This user is already banned from the community."
 msgstr "このユーザーはすでにコミュニティからBANされています。"
 
@@ -32588,11 +32758,6 @@ msgstr "これにより、ボタンやメニュー項目など、お気に入り
 msgid "This will invalidate your existing backup codes and generate new ones."
 msgstr "既存のバックアップコードは無効になり、新しいコードが生成されます。"
 
-#. Body of the reschedule scheduled-message alert clarifying that the update modifies the scheduled message instead of sending it now.
-#: src/features/channel/components/channel_textarea/shared.ts:32
-msgid "This will modify the existing scheduled message rather than sending immediately."
-msgstr "既存の予約メッセージが変更され、すぐに送信されることはありません。"
-
 #. Warning text before notifying every member in the current channel.
 #: src/features/channel/components/MentionEveryonePopout.tsx:93
 msgid "This will notify <0>{memberCount}</0> members in this channel. Are you sure you want to do this?"
@@ -32655,12 +32820,12 @@ msgid "This window updates automatically after we receive your message."
 msgstr "メッセージを受信すると、このウィンドウは自動的に更新されます。"
 
 #. IAR modal: rule description for a user report.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:179
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:153
 msgid "Threats, following across spaces, or unwanted contact."
 msgstr "脅迫、ストーカー行為、迷惑行為など."
 
 #. IAR modal: rule-category label grouping harassment, hate, violence, terrorism, raids, and self-harm content.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:57
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:39
 msgid "Threats, harassment, or harm"
 msgstr "脅迫、ハラスメント、または危害"
 
@@ -32717,7 +32882,7 @@ msgid "Time format selection"
 msgstr "時刻表示形式の選択"
 
 #. Permission name: allows temporarily restricting members.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:253
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:444
 msgid "Time out members"
 msgstr "メンバーをタイムアウトにする"
 
@@ -32783,9 +32948,7 @@ msgstr "タイムスタンプまたは関連性"
 msgid "Timestamps"
 msgstr "タイムスタンプ"
 
-#. Field label for the timezone picker in the schedule-message modal.
 #. Field label in profile settings for choosing the timezone used to show local time on the profile.
-#: src/features/messaging/components/modals/ScheduleMessageModal.tsx:27
 #: src/features/user/components/modals/tabs/my_profile_tab/TimezoneProfileSettings.tsx:19
 msgid "Timezone"
 msgstr "タイムゾーン"
@@ -33389,6 +33552,16 @@ msgstr "ストリームをオフにする"
 msgid "Turn off streaming privacy before viewing login or account security details."
 msgstr "ログイン情報やアカウントのセキュリティ詳細を表示する前に、ストリーミングプライバシーをオフにしてください。"
 
+#. Permission description in the channel-scoped permissions editor for the Stream Video permission. Covers both the webcam and screen sharing.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:290
+msgid "Turn on a camera or share a screen in this voice channel."
+msgstr "このボイスチャンネルでカメラをオンにするか、画面を共有します。"
+
+#. Permission description in the role/permission editor for the Stream Video permission at community scope. Covers both the webcam and screen sharing.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:171
+msgid "Turn on a camera or share a screen in voice channels."
+msgstr "カメラをオンにするか、ボイスチャンネルで画面を共有する。"
+
 #. Label for the automatic streaming privacy detection settings toggle.
 #: src/features/user/components/modals/tabs/appearance_tab/StreamerModeTab.tsx:19
 msgid "Turn on automatically when OBS or XSplit is detected"
@@ -33540,7 +33713,7 @@ msgid "Typing state"
 msgstr "入力中"
 
 #. Developer options group for forcing UI component states.
-#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:61
+#: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:71
 msgid "UI components"
 msgstr "UIコンポーネント"
 
@@ -33724,7 +33897,7 @@ msgid "Undeafen yourself"
 msgstr "自分のミュートを解除"
 
 #. IAR modal: child-safety rule label (user reports).
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:102
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:84
 msgid "Underage or child-safety concern"
 msgstr "未成年または児童の安全に関する懸念"
 
@@ -33835,7 +34008,7 @@ msgstr "汎用フォールバック。音質は最低ですが、どこでも動
 #. Generic fallback label when a more specific value is unavailable.
 #. Short label in the invite list item. Keep it concise.
 #: src/features/emoji/components/emojis/EmojiListItem.tsx:584
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:755
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:751
 #: src/features/invite/components/InviteListItem.tsx:34
 #: src/features/moderation/components/modals/BanDetailsModal.tsx:114
 #: src/features/updater/commands/UpdaterModalCommands.tsx:144
@@ -33956,7 +34129,7 @@ msgstr "不明なユーザー"
 #: src/features/devtools/utils/CommandUtils.ts:27
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTab.tsx:114
 #: src/features/voice/components/VoiceParticipantAvatarList.tsx:44
-#: src/features/voice/components/VoiceParticipantTile.tsx:169
+#: src/features/voice/components/VoiceParticipantTile.tsx:172
 #: src/features/webhook/components/WebhookListItem.tsx:30
 msgid "Unknown user"
 msgstr "不明なユーザー"
@@ -34102,7 +34275,7 @@ msgid "Unmute DMs"
 msgstr "DMのミュートを解除"
 
 #. Action label that unmutes notifications for the favourites pseudo-guild.
-#: src/features/i18n/utils/CommonMessageDescriptors.ts:691
+#: src/features/i18n/utils/CommonMessageDescriptors.ts:687
 msgid "Unmute favourites"
 msgstr "お気に入りのミュートを解除"
 
@@ -34194,7 +34367,7 @@ msgstr "グループのピン留めを解除"
 
 #. Toast confirming a group DM was unpinned in the sidebar.
 #. Toast confirming a group DM was unpinned in the sidebar.
-#: src/features/ui/action_menu/items/ChannelMenuData.tsx:116
+#: src/features/ui/action_menu/items/ChannelMenuData.tsx:114
 #: src/features/ui/action_menu/items/dm_menu_data/shared.ts:25
 msgid "Unpinned group DM"
 msgstr "グループDMのピン留めを解除"
@@ -34337,12 +34510,12 @@ msgid "Unverified email"
 msgstr "未確認のメールアドレス"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:227
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:201
 msgid "Unwanted conduct or mature content in the wrong place."
 msgstr "不適切な行為、または不適切な場所での成人向けコンテンツ。"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:235
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:209
 msgid "Unwanted mature conduct, comments, or requests."
 msgstr "不適切な言動、コメント、または要求。"
 
@@ -34351,14 +34524,9 @@ msgid "Up to {DISCOVERY_MAX_TAGS} tags help people find your community. They sho
 msgstr "最大{DISCOVERY_MAX_TAGS}個のタグで、あなたのコミュニティを見つけやすくしましょう。これらのタグは、コミュニティ検索に表示されます。"
 
 #. Feature comparison table value label. Shown in the restricted or stock column for a text-valued perk. Format includes a resolution token (4K) and a framerate token that should not be translated.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:87
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:83
 msgid "Up to 4K/60fps"
 msgstr "最大4K/60fps"
-
-#. Confirm button label on the reschedule scheduled-message alert.
-#: src/features/channel/components/channel_textarea/shared.ts:28
-msgid "Update"
-msgstr "更新"
 
 #. Message placeholder shown when the app cannot render a newer message type.
 #: src/features/channel/components/UnknownMessage.tsx:23
@@ -34585,6 +34753,16 @@ msgstr "絵文字をアップロード"
 msgid "Upload file"
 msgstr "ファイルをアップロード"
 
+#. Permission description in the role/permission editor for the Attach Files permission at community scope.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:147
+msgid "Upload files and media in messages."
+msgstr "メッセージでファイルやメディアをアップロードします。"
+
+#. Permission description in the channel-scoped permissions editor for the Attach Files permission.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:244
+msgid "Upload files and media in this channel."
+msgstr "このチャンネルにファイルやメディアをアップロードします。"
+
 #: src/features/channel/components/modals/EditGroupBottomSheet.tsx:328
 #: src/features/channel/components/modals/EditGroupModal.tsx:283
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateForm.tsx:304
@@ -34807,7 +34985,7 @@ msgid "Use an email you can open. We will send a code there."
 msgstr "開くことができるメールアドレスを使用してください。そこにコードを送信します。"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:63
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:59
 msgid "Use animated emojis"
 msgstr "アニメーション絵文字を使う"
 
@@ -34870,6 +35048,11 @@ msgstr "別のメールアドレスを使う"
 msgid "Use email"
 msgstr "メールアドレスを使う"
 
+#. Permission description in the channel-scoped permissions editor for the Use External Emoji permission. "Other communities" means custom emoji uploaded in a different Fluxer community.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:259
+msgid "Use emoji from other communities in this channel."
+msgstr "他のコミュニティの絵文字をこのチャンネルで使用する"
+
 #. Premium upsell shown when sending external emoji without a subscription.
 #: src/features/expressions/utils/ExpressionPermissionUtils.ts:24
 msgid "Use emoji from other communities with {premiumProductName}"
@@ -34881,12 +35064,12 @@ msgid "Use emoji from other communities."
 msgstr "他のコミュニティの絵文字を使用."
 
 #. Permission name: allows using emoji from other communities.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:237
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:428
 msgid "Use external emoji"
 msgstr "外部の絵文字を使用"
 
 #. Permission name: allows using stickers from other communities.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:241
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:432
 msgid "Use external stickers"
 msgstr "外部スタンプを使用"
 
@@ -34954,7 +35137,7 @@ msgid "Use native title bar"
 msgstr "ネイティブのタイトルバーを使用"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:387
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:361
 msgid "Use only if it clearly breaks {productName}'s rules and doesn't fit above."
 msgstr "{productName}のルールに明らかに違反し、上記のいずれにも当てはまらない場合にのみ使用してください。"
 
@@ -34982,10 +35165,20 @@ msgstr "保存したメディアを使う"
 msgid "Use selection"
 msgstr "選択範囲を使用"
 
+#. Permission description in the channel-scoped permissions editor for the Use External Stickers permission. "Other communities" means stickers uploaded in a different Fluxer community.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:264
+msgid "Use stickers from other communities in this channel."
+msgstr "他のコミュニティのスタンプをこのチャンネルで使用する"
+
 #. Premium upsell shown when sending external stickers without a subscription.
 #: src/features/expressions/utils/ExpressionPermissionUtils.ts:36
 msgid "Use stickers from other communities with {premiumProductName}"
 msgstr "{premiumProductName}で他のコミュニティのスタンプを使用"
+
+#. Permission description in the role/permission editor for the Use External Stickers permission. "Other communities" means stickers uploaded in a different Fluxer community.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:157
+msgid "Use stickers from other communities."
+msgstr "他のコミュニティのスタンプを使用する"
 
 #. Label in the language tab.
 #: src/features/user/components/modals/tabs/LanguageTab.tsx:63
@@ -35053,7 +35246,7 @@ msgid "Use video and camera previews."
 msgstr "ビデオとカメラのプレビューを使用します。"
 
 #. Permission name: allows voice activation instead of requiring push-to-talk.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:278
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:469
 msgid "Use voice activity"
 msgstr "音声認識を使用"
 
@@ -35110,7 +35303,7 @@ msgid "User"
 msgstr "ユーザー"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:251
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:225
 msgid "User appears underage, or is involved in grooming or child exploitation."
 msgstr "ユーザーが未成年であるか、グルーミングまたは児童搾取に関与している可能性があります。"
 
@@ -35721,7 +35914,7 @@ msgid "Video progress"
 msgstr "動画の再生位置"
 
 #. Feature comparison table perk label. Shown as the row name comparing restricted vs stock limits.
-#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:71
+#: src/features/app/components/dialogs/components/FeatureComparisonTable.tsx:67
 msgid "Video quality"
 msgstr "ビデオ品質"
 
@@ -35797,7 +35990,7 @@ msgid "View {userName}'s profile"
 msgstr "{userName}さんのプロフィールを見る"
 
 #. Permission name: allows viewing community audit/activity logs.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:161
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:352
 msgid "View activity log"
 msgstr "アクティビティログを表示"
 
@@ -35848,17 +36041,17 @@ msgid "View call"
 msgstr "通話を表示"
 
 #. Aria label for the show-controls trigger when the call toolbar is auto-hidden.
-#: src/features/voice/components/VoiceCallView.tsx:123
+#: src/features/voice/components/VoiceCallView.tsx:124
 msgid "View call controls"
 msgstr "通話コントロールを表示"
 
 #. Permission name: allows seeing a channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:257
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:448
 msgid "View channel"
 msgstr "チャンネルを表示"
 
 #. Permission name: allows seeing the member list for a channel.
-#: src/features/permissions/utils/PermissionLabelDescriptors.ts:261
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:452
 msgid "View channel members"
 msgstr "チャンネルメンバーを表示"
 
@@ -36004,12 +36197,12 @@ msgid "Violation category"
 msgstr "違反カテゴリ"
 
 #. IAR modal: rule description.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:347
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:321
 msgid "Violation is in the user's profile, not a specific message."
 msgstr "違反は特定のメッセージではなく、ユーザーのプロフィールにあります。"
 
 #. IAR modal: rule label.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:207
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:181
 msgid "Violence or violent threats"
 msgstr "暴力または暴力的な脅迫"
 
@@ -36029,7 +36222,7 @@ msgid "Visibility"
 msgstr "公開設定"
 
 #. Audit log community feature label for the Visionary premium feature.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:341
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:416
 #: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:158
 msgid "Visionary"
 msgstr "Visionary"
@@ -36526,6 +36719,11 @@ msgstr "この国への確認メッセージは送信できません。別の国
 msgid "We found an existing {premiumProductFullName} subscription for this account. Manage it in the secure billing portal to update payment details or check renewal status. If you just paid, wait a minute and reopen this page."
 msgstr "このアカウントには、既存の{premiumProductFullName}サブスクリプションが見つかりました。支払い情報の更新や更新状況の確認は、安全な請求ポータルで行ってください。お支払いいただいたばかりの場合は、1分ほど待ってからこのページを再度開いてください。"
 
+#. Nagbar body announcing a price cut to people in Brazil who do not have a paid subscription. {premiumProductName} is the short paid product name. {monthlyPrice} and {yearlyPrice} are currency amounts already formatted and localized by code; never write an amount into the translation. Keep the tone calm and plain.
+#: src/features/premium/config/PriceAnnouncementCampaign.ts:7
+msgid "We lowered the price of {premiumProductName} in Brazil. It is now {monthlyPrice} a month or {yearlyPrice} a year."
+msgstr "ブラジルでの{premiumProductName}の価格を値下げしました。月額{monthlyPrice}、年額{yearlyPrice}になります。"
+
 #. Required-action modal intro text for a generic verification requirement. productName is inserted by code. Keep it calm and concise.
 #: src/features/auth/components/modals/required_action/RequiredActionDescriptors.ts:210
 msgid "We need one verification step before you continue. This helps protect accounts and keep spam off {productName}."
@@ -36848,13 +37046,8 @@ msgstr "{username}さん、ようこそ！ここから新しい会話を始め�
 msgid "Welcome, {username}. We're happy to have you here."
 msgstr "{username}さん、ようこそ."
 
-#. IAR modal: accessible label (aria-label only — not shown visually) for the primary-path radio group on step 1.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:36
-msgid "What do you need?"
-msgstr "ご用件は何ですか？"
-
 #. IAR modal: category-step title for the platform-report path. User picks a broad area before drilling in.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:49
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:31
 msgid "What kind of rule was broken?"
 msgstr "どのようなルール違反ですか？"
 
@@ -36961,7 +37154,7 @@ msgid "Which conversations"
 msgstr "会話の種類"
 
 #. IAR modal: reason-step title for the platform-report path after a category has been picked.
-#: src/features/moderation/components/report_modal/IARModalCopy.ts:53
+#: src/features/moderation/components/report_modal/IARModalCopy.ts:35
 msgid "Which rule was broken?"
 msgstr "どのルールに違反しましたか？"
 
@@ -37111,6 +37304,11 @@ msgstr "エラーあり"
 msgid "Withdraw"
 msgstr "脱退"
 
+#. Permission description in the channel-scoped permissions editor for the Use Voice Activity permission. Explains the inverse: without it, the user must use push-to-talk in this voice channel.
+#: src/features/permissions/utils/PermissionLabelDescriptors.ts:295
+msgid "Without this permission, push-to-talk is required in this channel."
+msgstr "この権限がない場合、このチャンネルではプッシュトゥトークが必要です。"
+
 #. Permission description in the role/permission editor for the Use Voice Activity permission. Explains the inverse: without it, the user must use push-to-talk in voice channels.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:103
 msgid "Without this permission, push-to-talk is required."
@@ -37161,15 +37359,15 @@ msgstr "年間 {yearlyPrice}"
 msgid "Yearly gift"
 msgstr "年間ギフト"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:529
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:616
 msgid "Yearly upgrade scheduled for <0>{pendingChangeDate}</0>."
 msgstr "<0>{pendingChangeDate}</0>に年次アップグレードが予定されています。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:514
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:601
 msgid "Yearly upgrade scheduled for <0>{pendingChangeDate}</0>. First yearly charge: {pendingInitialPriceLabel} after a {pendingCreditPriceLabel} credit. Future yearly renewals: {pendingRecurringPriceLabel}/year."
 msgstr "<0>{pendingChangeDate}</0>に年額プランへのアップグレードを予定しています。初回請求額: {pendingCreditPriceLabel}のクレジット適用後、{pendingInitialPriceLabel}。次年度以降の更新料: 年額{pendingRecurringPriceLabel}。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:521
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:608
 msgid "Yearly upgrade scheduled for <0>{pendingChangeDate}</0>. First yearly charge: {pendingInitialPriceLabel}. Future yearly renewals: {pendingRecurringPriceLabel}/year."
 msgstr "<0>{pendingChangeDate}</0>に年間プランへのアップグレードを予定しています。初回請求額: {pendingInitialPriceLabel}。次回の年間更新料: {pendingRecurringPriceLabel}/年。"
 
@@ -37815,12 +38013,12 @@ msgstr "アカウント削除後、送信済みのメッセージを削除する
 msgid "You will still need to finish the email step."
 msgstr "メールでの確認も完了させる必要があります。"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:94
+#: src/features/app/components/floating/UserAreaPopout.tsx:92
 #: src/features/user/components/modals/StatusChangeBottomSheet.tsx:40
 msgid "You won't receive notifications on desktop"
 msgstr "デスクトップでは通知を受け取りません"
 
-#: src/features/app/components/floating/UserAreaPopout.tsx:95
+#: src/features/app/components/floating/UserAreaPopout.tsx:93
 #: src/features/user/components/modals/StatusChangeBottomSheet.tsx:41
 msgid "You'll appear offline"
 msgstr "オフラインと表示されます"
@@ -37958,12 +38156,12 @@ msgid "You're in the voice channel"
 msgstr "ボイスチャンネルに参加中"
 
 #. Plutonium subscription card tooltip shown when the user is on a grandfathered price that is no longer offered.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:37
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:40
 msgid "You're on a legacy rate no longer available to new subscribers."
 msgstr "現在ご利用の料金プランは、新規登録者には提供されていません。"
 
 #. Plutonium subscription card tooltip shown when the user is on a grandfathered price; current list price is interpolated.
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:32
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:35
 msgid "You're on a legacy rate. The current price for this plan is {currentSubscriptionListPriceLabel}."
 msgstr "お客様はレガシー料金をご利用中です。このプランの現在の価格は{currentSubscriptionListPriceLabel}です。"
 
@@ -37987,7 +38185,7 @@ msgid "You're timed out. Messaging, reactions, and voice are paused until the ti
 msgstr "タイムアウト中です。タイムアウト期間が終了するまで、メッセージ送信、リアクション、音声が一時停止されます。"
 
 #. Label in the channel and chat messages.
-#: src/features/channel/components/ChannelMessages.tsx:79
+#: src/features/channel/components/ChannelMessages.tsx:85
 msgid "You're viewing older messages"
 msgstr "過去のメッセージを表示しています"
 
@@ -38032,7 +38230,7 @@ msgstr "コミュニティ数の上限に達しました"
 #. Label in the saved messages content popout.
 #. Short label in the shared app channel pins content.
 #: src/features/app/components/shared/ChannelPinsContent.tsx:63
-#: src/features/messaging/components/pages/MessageListPage.tsx:26
+#: src/features/messaging/components/pages/MessageListPage.tsx:27
 #: src/features/messaging/components/popouts/RecentMentionsContent.tsx:411
 #: src/features/messaging/components/popouts/SavedMessagesContent.tsx:38
 msgid "You've reached the end"
@@ -38244,7 +38442,7 @@ msgid "Your GPU encodes this in hardware."
 msgstr "お使いのGPUはこれをハードウェアでエンコードします。"
 
 #. Body text in the Plutonium subscription actions. Keep the tone plain and specific.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:32
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:34
 msgid "Your grace period has ended."
 msgstr "猶予期間が終了しました。"
 
@@ -38344,7 +38542,7 @@ msgid "Your payment was successful. You can now close this tab and return to the
 msgstr "支払いが完了しました。このタブを閉じてアプリに戻ることができます。"
 
 #. Toast success shown after a scheduled Plutonium billing cycle change is canceled.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:72
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:74
 msgid "Your pending billing change has been canceled."
 msgstr "保留中の請求変更がキャンセルされました。"
 
@@ -38394,7 +38592,12 @@ msgstr "互換性のあるビデオコーデックで画面共有を公開でき
 msgid "Your stream is still live"
 msgstr "ストリーミングは継続中"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:393
+#. Toast error shown when the server refuses to move a Plutonium subscription down to the current price, whatever the reason.
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:106
+msgid "Your subscription can't move to the new price right now."
+msgstr "現在、サブスクリプションを新しい価格に変更することはできません。"
+
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:468
 msgid "Your subscription ended but <0/> stay active until <1>{graceDate}</1>. Resubscribe before then to keep your subscriber history."
 msgstr "サブスクリプションは終了しましたが、<0/> <1>{graceDate}</1>までは有効です。それまでに再登録して、サブスクリプション履歴を保持してください。"
 
@@ -38404,26 +38607,26 @@ msgid "Your subscription failed to renew, but you still have access to {premiumP
 msgstr "サブスクリプションの更新に失敗しましたが、{formattedGraceDate}まで{premiumProductName}の特典をご利用いただけます。今すぐ手続きしないと、すべての特典が失われます。"
 
 #. Body text in the Plutonium subscription actions. Keep the tone plain and specific.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:44
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:46
 msgid "Your subscription has been reactivated."
 msgstr "サブスクリプションが再開されました。"
 
 #. Toast success shown after a Plutonium subscription is set to cancel at the end of the billing period.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:20
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:22
 msgid "Your subscription has been set to cancel at the end of your billing period."
 msgstr "現在の請求期間の終了時に、サブスクリプションがキャンセルされるように設定されました。"
 
 #. Toast success shown after a Plutonium subscription is switched from yearly to monthly billing.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:60
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:62
 msgid "Your subscription has been switched to monthly billing."
 msgstr "月額プランに切り替わりました。"
 
 #. Toast success shown after a Plutonium subscription is switched from monthly to yearly billing.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:56
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:58
 msgid "Your subscription has been switched to yearly billing."
 msgstr "サブスクリプションが年間請求に切り替わりました。"
 
-#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:435
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:510
 msgid "Your subscription is active but perks are temporarily paused."
 msgstr "サブスクリプションは有効ですが、特典は一時停止されています。"
 
@@ -38437,13 +38640,23 @@ msgstr "お客様のサブスクリプションは、請求期間の終了時に
 msgid "Your subscription isn't set to cancel, so there's nothing to reactivate."
 msgstr "サブスクリプションは解約されていません。再開するものはありません。"
 
+#. Toast success shown after a Plutonium subscription is scheduled to move down to the current price. {effectiveDate} is the localized date the new price starts.
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:96
+msgid "Your subscription moves to the new price on {effectiveDate}."
+msgstr "サブスクリプションは {effectiveDate} に新しい価格に移行します。"
+
+#. Plutonium subscription card line shown to a subscriber on a legacy price whose subscription is already set to cancel. {cancelDate} is a date and {listPriceNewLabel} is a currency amount, both already formatted and localized by code; never write a date or an amount into the translation.
+#: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:664
+msgid "Your subscription still ends on <0>{cancelDate}</0>. The current price is now {listPriceNewLabel}. If you reactivate, you can switch to it from here."
+msgstr "サブスクリプションは<0>{cancelDate}</0>に終了します。現在の料金は{listPriceNewLabel}です。再開すると、ここから切り替えることができます。"
+
 #. Toast success shown after a Plutonium subscription is scheduled to switch to monthly billing.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:68
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:70
 msgid "Your subscription will switch to monthly billing at the next renewal."
 msgstr "次回の更新時に、月額課金に切り替わります。"
 
 #. Toast success shown after a Plutonium subscription is scheduled to switch to yearly billing.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:64
+#: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:66
 msgid "Your subscription will switch to yearly billing at the next renewal."
 msgstr "次回の更新時に、サブスクリプションが年間請求に切り替わります。"
 

@@ -17,7 +17,7 @@ import {
 	StorageObjectRangeNotSatisfiableError,
 } from '../infrastructure/IStorageService';
 import {Logger} from '../Logger';
-import {isJsonRecord, parseJsonUnknown} from '../utils/JsonBoundaryUtils';
+import {isJsonRecord, parseJsonRecord, parseJsonUnknown} from '../utils/JsonBoundaryUtils';
 import {
 	parseDesktopArtifactScope,
 	parseDesktopReleaseDescriptor,
@@ -61,7 +61,6 @@ const MAX_DESKTOP_OBJECTS_PER_PREFIX = 10_000;
 const DESKTOP_BUCKET_PREFIX = 'desktop';
 const DESKTOP_TEST_BUCKET_PREFIX = 'desktop-test';
 const DOWNLOAD_KEY_ALLOWED_PREFIXES = [`${DESKTOP_BUCKET_PREFIX}/`, `${DESKTOP_TEST_BUCKET_PREFIX}/`];
-const DEFAULT_API_CLIENT_BASE_URL = 'https://api.fluxer.app';
 const GITHUB_RELEASE_DOWNLOAD_BASE_URL = 'https://github.com/fluxerapp/fluxer/releases/download';
 const GITHUB_RELEASE_MARKER_DIRECTORY = 'github-releases';
 
@@ -687,11 +686,7 @@ export class DownloadService {
 	}
 
 	private buildBaseUrl(baseUrl?: string): string {
-		const configuredBaseUrl = (baseUrl ?? Config.endpoints.apiClient).trim();
-		if (configuredBaseUrl.length > 0) {
-			return configuredBaseUrl.replace(/\/+$/u, '');
-		}
-		return DEFAULT_API_CLIENT_BASE_URL;
+		return (baseUrl ?? Config.endpoints.apiClient).trim().replace(/\/+$/u, '');
 	}
 
 	private buildDesktopVersionUrl(params: {
@@ -736,7 +731,7 @@ export class DownloadService {
 
 	private async readJsonObjectFromStorage(key: string): Promise<unknown | null> {
 		const text = await this.readTextFromStorage(key);
-		return text == null ? null : parseJsonUnknown(text);
+		return text == null ? null : parseJsonRecord(text);
 	}
 
 	private async readTextFromStorage(key: string): Promise<string | null> {

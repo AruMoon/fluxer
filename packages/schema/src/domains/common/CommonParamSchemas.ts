@@ -129,18 +129,6 @@ export const SuccessResponse = z.object({
 
 export type SuccessResponse = z.infer<typeof SuccessResponse>;
 
-export const EnabledToggleRequest = z.object({
-	enabled: z.boolean().describe('Whether to enable or disable the feature'),
-});
-
-export type EnabledToggleRequest = z.infer<typeof EnabledToggleRequest>;
-
-export const DisabledToggleRequest = z.object({
-	disabled: z.boolean().describe('Whether the feature should be in the disabled state'),
-});
-
-export type DisabledToggleRequest = z.infer<typeof DisabledToggleRequest>;
-
 export const EmojiIdParam = z.object({
 	emoji_id: SnowflakeType.describe('The ID of the emoji'),
 });
@@ -203,7 +191,7 @@ export const ReportIdParam = z.object({
 export type ReportIdParam = z.infer<typeof ReportIdParam>;
 
 export const KeyIdParam = z.object({
-	keyId: createStringType(1, 64).describe('The ID of the key'),
+	key_id: SnowflakeType.describe('The ID of the key'),
 });
 
 export type KeyIdParam = z.infer<typeof KeyIdParam>;
@@ -231,12 +219,18 @@ const ArchiveSubjectTypeEnum = z
 	.describe('Type of entity being archived: user for user data archives, guild for guild data archives');
 
 export const ArchivePathParam = z.object({
-	subjectType: ArchiveSubjectTypeEnum.describe('The type of subject (user or guild)'),
-	subjectId: SnowflakeType.describe('The ID of the subject'),
-	archiveId: SnowflakeType.describe('The ID of the archive'),
+	subject_type: ArchiveSubjectTypeEnum.describe('The type of subject (user or guild)'),
+	subject_id: SnowflakeType.describe('The ID of the subject'),
+	archive_id: SnowflakeType.describe('The ID of the archive'),
 });
 
 export type ArchivePathParam = z.infer<typeof ArchivePathParam>;
+
+export const JobIdParam = z.object({
+	job_id: SnowflakeType.describe('The ID of the job'),
+});
+
+export type JobIdParam = z.infer<typeof JobIdParam>;
 
 export const HarvestIdParam = z.object({
 	harvestId: SnowflakeType.describe('The ID of the harvest request'),

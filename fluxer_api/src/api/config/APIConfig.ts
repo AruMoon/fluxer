@@ -153,7 +153,6 @@ export interface APIConfig {
 			reports: string;
 			harvests: string;
 			downloads: string;
-			static: string;
 		};
 	};
 	s3Downloads: ResolvedDownloadsProvider;
@@ -249,6 +248,7 @@ export interface APIConfig {
 			gift1YearPln?: string;
 			gift1YearTry?: string;
 		};
+		legacyPrices?: Record<string, Array<string> | undefined>;
 	};
 	bunny: {
 		purgeEnabled: boolean;

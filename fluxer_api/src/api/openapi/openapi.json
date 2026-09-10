@@ -1064,6 +1064,14 @@
 						"description": "Bad Request - The request was malformed or contained invalid data",
 						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
 					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
 					"429": {
 						"description": "Too Many Requests - You are being rate limited",
 						"content": {
@@ -1105,8 +1113,8 @@
 					}
 				},
 				"x-mint": {"metadata": {"title": "Logout account"}},
-				"description": "Invalidate the current authentication token and end the session. The auth token in the Authorization header will no longer be valid.",
-				"security": [{"sessionToken": []}]
+				"description": "Invalidate the current authentication token and end the session. The auth token in the Authorization header will no longer be valid. A bot token has no session to end, so the call answers 204 and the token stays valid.",
+				"security": [{"botToken": []}, {"sessionToken": []}]
 			}
 		},
 		"/auth/register": {
@@ -5674,7 +5682,7 @@
 				},
 				"x-mint": {"metadata": {"title": "List discovery categories"}},
 				"description": "Returns the list of available discovery categories.",
-				"security": [{"sessionToken": []}]
+				"security": [{"botToken": []}, {"sessionToken": []}]
 			}
 		},
 		"/discovery/guilds": {
@@ -5741,7 +5749,7 @@
 				},
 				"x-mint": {"metadata": {"title": "Search discoverable guilds"}},
 				"description": "Search for guilds listed in the discovery directory.",
-				"security": [{"sessionToken": []}],
+				"security": [{"botToken": []}, {"sessionToken": []}],
 				"parameters": [
 					{
 						"name": "query",
@@ -5880,6 +5888,353 @@
 						"required": true,
 						"schema": {"$ref": "#/components/schemas/SnowflakeType"},
 						"description": "The ID of the guild"
+					}
+				]
+			}
+		},
+		"/dl/desktop/{channel}/{plat}/{arch}/latest": {
+			"get": {
+				"operationId": "get_latest_desktop_version",
+				"summary": "Get latest desktop version",
+				"tags": ["Downloads"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/VersionInfoResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get latest desktop version"}},
+				"description": "Returns metadata for the latest desktop version including download URLs and SHA-256 checksums for all available formats. Pass ?test=1 to resolve against unreleased test builds.",
+				"parameters": [
+					{
+						"name": "channel",
+						"in": "path",
+						"required": true,
+						"schema": {"type": "string"},
+						"description": "The channel"
+					},
+					{"name": "plat", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The plat"},
+					{"name": "arch", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The arch"},
+					{
+						"name": "test",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "When set to 1/true, resolve against the desktop-test/ bucket prefix instead of desktop/."
+						}
+					}
+				]
+			}
+		},
+		"/dl/desktop/{channel}/{plat}/{arch}/latest/{format}": {
+			"get": {
+				"operationId": "download_latest_desktop_version",
+				"summary": "Download latest desktop version",
+				"tags": ["Downloads"],
+				"responses": {
+					"204": {"description": "No Content"},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Download latest desktop version"}},
+				"description": "Streams the latest available desktop application version for the specified platform and architecture. Pass ?test=1 to download an unreleased test build.",
+				"parameters": [
+					{
+						"name": "channel",
+						"in": "path",
+						"required": true,
+						"schema": {"type": "string"},
+						"description": "The channel"
+					},
+					{"name": "plat", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The plat"},
+					{"name": "arch", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The arch"},
+					{"name": "format", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The format"},
+					{
+						"name": "test",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "When set to 1/true, resolve against the desktop-test/ bucket prefix instead of desktop/."
+						}
+					}
+				]
+			}
+		},
+		"/dl/desktop/{channel}/{plat}/{arch}/versions": {
+			"get": {
+				"operationId": "list_desktop_versions",
+				"summary": "List desktop versions",
+				"tags": ["Downloads"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/DesktopVersionsResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "List desktop versions"}},
+				"description": "Lists available desktop versions with pagination for the specified platform and architecture.",
+				"parameters": [
+					{
+						"name": "channel",
+						"in": "path",
+						"required": true,
+						"schema": {"type": "string"},
+						"description": "The channel"
+					},
+					{"name": "plat", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The plat"},
+					{"name": "arch", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The arch"},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"maximum": 100,
+							"format": "int32",
+							"description": "Maximum number of versions to return"
+						}
+					},
+					{
+						"name": "before",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"pattern": "^\\d+\\.\\d+\\.\\d+$",
+							"description": "Return versions before this version"
+						}
+					},
+					{
+						"name": "after",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"pattern": "^\\d+\\.\\d+\\.\\d+$",
+							"description": "Return versions after this version"
+						}
+					},
+					{
+						"name": "test",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "When set to 1/true, resolve against the desktop-test/ bucket prefix instead of desktop/."
+						}
+					}
+				]
+			}
+		},
+		"/dl/desktop/{channel}/{plat}/{arch}/{version}/{format}": {
+			"get": {
+				"operationId": "download_desktop_version",
+				"summary": "Download desktop version",
+				"tags": ["Downloads"],
+				"responses": {
+					"204": {"description": "No Content"},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Download desktop version"}},
+				"description": "Streams a specific desktop application version for the given platform and architecture. Pass ?test=1 to download an unreleased test build.",
+				"parameters": [
+					{
+						"name": "channel",
+						"in": "path",
+						"required": true,
+						"schema": {"type": "string"},
+						"description": "The channel"
+					},
+					{"name": "plat", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The plat"},
+					{"name": "arch", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The arch"},
+					{
+						"name": "version",
+						"in": "path",
+						"required": true,
+						"schema": {"type": "string"},
+						"description": "The version"
+					},
+					{"name": "format", "in": "path", "required": true, "schema": {"type": "string"}, "description": "The format"},
+					{
+						"name": "test",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "When set to 1/true, resolve against the desktop-test/ bucket prefix instead of desktop/."
+						}
 					}
 				]
 			}
@@ -6207,6 +6562,370 @@
 				"description": "Retrieves gateway connection information and recommended shard count for establishing WebSocket connections."
 			}
 		},
+		"/gifs/featured": {
+			"get": {
+				"operationId": "get_featured_gifs",
+				"summary": "Get featured GIFs",
+				"tags": ["GIFs"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifFeaturedResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get featured GIFs"}},
+				"description": "Retrieves currently featured GIFs and category tags from the active provider.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/gifs/register-share": {
+			"post": {
+				"operationId": "register_gifs_share",
+				"summary": "Register a GIF share",
+				"tags": ["GIFs"],
+				"responses": {
+					"204": {"description": "No Content"},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Register a GIF share"}},
+				"description": "Notifies the active GIF provider that the caller is sharing one of its GIFs.",
+				"security": [{"sessionToken": []}],
+				"requestBody": {
+					"required": true,
+					"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifRegisterShareRequest"}}}
+				}
+			}
+		},
+		"/gifs/search": {
+			"get": {
+				"operationId": "search_gifs",
+				"summary": "Search GIFs",
+				"tags": ["GIFs"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Search GIFs"}},
+				"description": "Searches the active GIF provider for GIFs matching the given query. The provider name is returned in the X-Fluxer-GIF-Provider response header so clients can adapt without refetching .well-known.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/gifs/suggest": {
+			"get": {
+				"operationId": "get_gifs_search_suggestions",
+				"summary": "Get GIF search suggestions",
+				"tags": ["GIFs"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"type": "array", "items": {"type": "string"}}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get GIF search suggestions"}},
+				"description": "Returns search-term suggestions from the active GIF provider for the given partial query.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/gifs/trending": {
+			"get": {
+				"operationId": "get_trending_gifs",
+				"summary": "Get trending GIFs",
+				"tags": ["GIFs"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get trending GIFs"}},
+				"description": "Retrieves trending GIFs from the active provider.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
 		"/gifts/{code}": {
 			"get": {
 				"operationId": "get_gift_code",
@@ -6399,7 +7118,7 @@
 				},
 				"x-mint": {"metadata": {"title": "Create guild"}},
 				"description": "Only claimed, email-verified non-bot users can create guilds.",
-				"security": [{"botToken": []}, {"sessionToken": []}],
+				"security": [{"sessionToken": []}],
 				"requestBody": {
 					"required": true,
 					"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GuildCreateRequest"}}}
@@ -10502,6 +11221,370 @@
 				"description": "Resolves the approximate location of the requesting client from its IP address, together with the locations where age restricted content is gated or unavailable."
 			}
 		},
+		"/klipy/featured": {
+			"get": {
+				"operationId": "get_featured_klipy",
+				"summary": "Get featured GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifFeaturedResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get featured GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/featured.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/klipy/register-share": {
+			"post": {
+				"operationId": "register_klipy_share",
+				"summary": "Register a GIF share (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"204": {"description": "No Content"},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Register a GIF share (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/register-share.",
+				"security": [{"sessionToken": []}],
+				"requestBody": {
+					"required": true,
+					"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifRegisterShareRequest"}}}
+				}
+			}
+		},
+		"/klipy/search": {
+			"get": {
+				"operationId": "search_klipy",
+				"summary": "Search GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Search GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/search.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/klipy/suggest": {
+			"get": {
+				"operationId": "get_klipy_search_suggestions",
+				"summary": "Get GIF search suggestions (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"type": "array", "items": {"type": "string"}}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get GIF search suggestions (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/suggest.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/klipy/trending-gifs": {
+			"get": {
+				"operationId": "get_trending_klipy",
+				"summary": "Get trending GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get trending GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/trending.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
 		"/oauth2/@me": {
 			"get": {
 				"operationId": "get_current_user_oauth2",
@@ -12545,6 +13628,73 @@
 				]
 			}
 		},
+		"/premium/switch-to-list-price": {
+			"post": {
+				"operationId": "switch_subscription_to_list_price",
+				"summary": "Switch subscription to the current list price",
+				"tags": ["Premium"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SwitchToListPriceResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Switch subscription to the current list price"}},
+				"description": "Moves the authenticated user's grandfathered premium subscription down to the current list price for the same currency and billing cycle, effective at the end of the current billing period. The target price is resolved on the server and the switch is refused unless it lowers the amount charged.",
+				"security": [{"sessionToken": []}]
+			}
+		},
 		"/premium/visionary/rejoin": {
 			"post": {
 				"operationId": "rejoin_visionary_guild",
@@ -13211,7 +14361,7 @@
 				},
 				"x-mint": {"metadata": {"title": "Search messages"}},
 				"description": "Searches for messages across guilds and channels accessible to the authenticated user. Bots must supply a context guild or channel and may only use the current scope.",
-				"security": [{"sessionToken": []}],
+				"security": [{"botToken": []}, {"sessionToken": []}],
 				"requestBody": {
 					"required": true,
 					"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GlobalSearchMessagesRequest"}}}
@@ -14007,6 +15157,370 @@
 				},
 				"x-mint": {"metadata": {"title": "Process Stripe webhook"}},
 				"description": "Handles incoming Stripe webhook events for payment processing and subscription management."
+			}
+		},
+		"/tenor/featured": {
+			"get": {
+				"operationId": "get_featured_tenor",
+				"summary": "Get featured GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifFeaturedResponse"}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get featured GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/featured.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/tenor/register-share": {
+			"post": {
+				"operationId": "register_tenor_share",
+				"summary": "Register a GIF share (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"204": {"description": "No Content"},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Register a GIF share (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/register-share.",
+				"security": [{"sessionToken": []}],
+				"requestBody": {
+					"required": true,
+					"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GifRegisterShareRequest"}}}
+				}
+			}
+		},
+		"/tenor/search": {
+			"get": {
+				"operationId": "search_tenor",
+				"summary": "Search GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Search GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/search.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/tenor/suggest": {
+			"get": {
+				"operationId": "get_tenor_search_suggestions",
+				"summary": "Get GIF search suggestions (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {"application/json": {"schema": {"type": "array", "items": {"type": "string"}}}}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get GIF search suggestions (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/suggest.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{
+						"name": "q",
+						"in": "query",
+						"required": true,
+						"schema": {"type": "string", "description": "The search query"}
+					},
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
+			}
+		},
+		"/tenor/trending-gifs": {
+			"get": {
+				"operationId": "get_trending_tenor",
+				"summary": "Get trending GIFs (deprecated alias)",
+				"tags": ["GIFs (Deprecated)"],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/GifResponse"}}}
+						}
+					},
+					"400": {
+						"description": "Bad Request - The request was malformed or contained invalid data",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"401": {
+						"description": "Unauthorized - Authentication is required or the token is invalid",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"403": {
+						"description": "Forbidden - You do not have permission to perform this action",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					},
+					"429": {
+						"description": "Too Many Requests - You are being rate limited",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {"type": "string", "enum": ["RATE_LIMITED"]},
+										"message": {"type": "string"},
+										"retry_after": {"type": "number", "description": "Seconds to wait before retrying"},
+										"global": {"type": "boolean", "description": "Whether this is a global rate limit"}
+									},
+									"required": ["code", "message", "retry_after"]
+								}
+							}
+						},
+						"headers": {
+							"Retry-After": {
+								"description": "Number of seconds to wait before retrying (only on 429)",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Limit": {
+								"description": "The number of requests that can be made in the current window",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Remaining": {
+								"description": "The number of remaining requests that can be made",
+								"schema": {"type": "integer"}
+							},
+							"X-RateLimit-Reset": {
+								"description": "Unix timestamp when the rate limit resets",
+								"schema": {"type": "integer"}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error - An unexpected error occurred",
+						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+					}
+				},
+				"x-mint": {"metadata": {"title": "Get trending GIFs (deprecated alias)"}},
+				"description": "Use /gifs/* instead - these vendor-specific paths are deprecated and will be removed. Routes to the active provider; identical behaviour to /gifs/trending.",
+				"security": [{"sessionToken": []}],
+				"parameters": [
+					{"name": "locale", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/Locale"}}
+				]
 			}
 		},
 		"/unfurl": {
@@ -21258,7 +22772,8 @@
 							"type": "string",
 							"description": "Maximum number of saved messages to return (1-100, default 25)"
 						}
-					}
+					},
+					{"name": "before", "in": "query", "required": false, "schema": {"$ref": "#/components/schemas/SnowflakeType"}}
 				]
 			},
 			"post": {
@@ -23485,29 +25000,23 @@
 				"type": "string",
 				"enum": [
 					"ACCESS_DENIED",
-					"ACCOUNT_DISABLED",
 					"BAD_GATEWAY",
 					"BAD_REQUEST",
 					"BLUESKY_OAUTH_AUTHORIZATION_FAILED",
 					"BLUESKY_OAUTH_CALLBACK_FAILED",
 					"BLUESKY_OAUTH_NOT_ENABLED",
-					"BLUESKY_OAUTH_SESSION_EXPIRED",
 					"BLUESKY_OAUTH_STATE_INVALID",
-					"ACCOUNT_SCHEDULED_FOR_DELETION",
 					"ACCOUNT_SUSPENDED_PERMANENTLY",
 					"ACCOUNT_SUSPENDED_TEMPORARILY",
 					"ACCOUNT_SUSPICIOUS_ACTIVITY",
 					"ACCOUNT_TOO_NEW_FOR_GUILD",
 					"ACLS_MUST_BE_NON_EMPTY",
 					"ADMIN_API_KEY_NOT_FOUND",
-					"APPLICATION_NOT_FOUND",
 					"APPLICATION_NOT_OWNED",
 					"ALREADY_FRIENDS",
-					"AUDIT_LOG_INDEXING",
 					"BOTS_CANNOT_CREATE_GUILDS",
 					"BOTS_CANNOT_SEND_FRIEND_REQUESTS",
 					"BOT_ALREADY_IN_GUILD",
-					"BOT_APPLICATION_NOT_FOUND",
 					"BOT_IS_PRIVATE",
 					"BOT_USER_AUTH_ENDPOINT_ACCESS_DENIED",
 					"BOT_USER_AUTH_SESSION_CREATION_DENIED",
@@ -23518,7 +25027,6 @@
 					"CANNOT_EXECUTE_ON_DM",
 					"CANNOT_BLOCK_SYSTEM_USER",
 					"CANNOT_MODIFY_SYSTEM_WEBHOOK",
-					"CANNOT_MODIFY_VOICE_STATE",
 					"CANNOT_REDEEM_PLUTONIUM_WITH_VISIONARY",
 					"CANNOT_REPORT_GUILD",
 					"CANNOT_REPORT_OWN_GUILD",
@@ -23532,27 +25040,21 @@
 					"CANNOT_TRANSFER_OWNERSHIP_TO_BOT",
 					"CANNOT_SHRINK_RESERVED_SLOTS",
 					"CAPTCHA_REQUIRED",
-					"CHANNEL_INDEXING",
 					"COMMUNICATION_DISABLED",
 					"CONNECTION_ALREADY_EXISTS",
 					"CONNECTION_INITIATION_TOKEN_INVALID",
-					"CONNECTION_INVALID_IDENTIFIER",
 					"CONNECTION_INVALID_TYPE",
 					"CONNECTION_LIMIT_REACHED",
 					"CONNECTION_NOT_FOUND",
 					"CONNECTION_VERIFICATION_FAILED",
 					"CONFLICT",
 					"CONTENT_BLOCKED",
-					"CREATION_FAILED",
-					"DECRYPTION_FAILED",
 					"DELETION_FAILED",
 					"DISCOVERY_ALREADY_APPLIED",
 					"DISCOVERY_APPLICATION_ALREADY_REVIEWED",
 					"DISCOVERY_APPLICATION_NOT_FOUND",
-					"DISCOVERY_DESCRIPTION_REQUIRED",
 					"DISCOVERY_DISABLED",
 					"DISCOVERY_INSUFFICIENT_MEMBERS",
-					"DISCOVERY_INVALID_CATEGORY",
 					"DISCOVERY_NOT_DISCOVERABLE",
 					"DISCRIMINATOR_REQUIRED",
 					"EMAIL_SERVICE_NOT_TESTABLE",
@@ -23570,9 +25072,6 @@
 					"REGISTRATION_PENDING_APPROVAL",
 					"REGISTRATION_REJECTED",
 					"REGISTRATION_URL_INVALID",
-					"EMPTY_ENCRYPTED_BODY",
-					"ENCRYPTION_FAILED",
-					"EU_WITHDRAWAL_WAIVER_REQUIRED",
 					"EXPLICIT_CONTENT_CANNOT_BE_SENT",
 					"FEATURE_NOT_AVAILABLE_SELF_HOSTED",
 					"FEATURE_TEMPORARILY_DISABLED",
@@ -23584,15 +25083,12 @@
 					"GONE",
 					"GIFT_CODE_ALREADY_REDEEMED",
 					"GUILD_PHONE_VERIFICATION_REQUIRED",
-					"GUILD_TEMPLATE_FETCH_FAILED",
 					"GUILD_TEMPLATE_INVALID",
 					"GUILD_VERIFICATION_REQUIRED",
 					"HANDOFF_CODE_EXPIRED",
 					"HARVEST_EXPIRED",
 					"HARVEST_FAILED",
 					"HARVEST_NOT_READY",
-					"HTTP_GET_AUTHORIZE_NOT_SUPPORTED",
-					"INSTANCE_VERSION_MISMATCH",
 					"INTERNAL_SERVER_ERROR",
 					"INVALID_ACLS_FORMAT",
 					"INVALID_API_ORIGIN",
@@ -23601,29 +25097,19 @@
 					"INVALID_CAPTCHA",
 					"INVALID_CHANNEL_TYPE_FOR_CALL",
 					"INVALID_CHANNEL_TYPE",
-					"INVALID_CLIENT",
-					"INVALID_CLIENT_SECRET",
 					"INVALID_DSA_REPORT_TARGET",
 					"INVALID_DSA_TICKET",
 					"INVALID_DSA_VERIFICATION_CODE",
-					"INVALID_DECRYPTED_JSON",
-					"INVALID_EPHEMERAL_KEY",
 					"INVALID_FLAGS_FORMAT",
-					"INVALID_IV",
 					"INVALID_FORM_BODY",
-					"INVALID_GRANT",
 					"INVALID_HANDOFF_CODE",
 					"INVALID_PERMISSIONS_INTEGER",
 					"INVALID_PERMISSIONS_NEGATIVE",
 					"INVALID_PHONE_NUMBER",
 					"INVALID_PHONE_VERIFICATION_CODE",
-					"INVALID_REDIRECT_URI",
 					"INVALID_REQUEST",
-					"INVALID_RESPONSE_TYPE_FOR_NON_BOT",
-					"INVALID_SCOPE",
 					"INVALID_STREAM_KEY_FORMAT",
 					"INVALID_STREAM_THUMBNAIL_PAYLOAD",
-					"INVALID_SUDO_TOKEN",
 					"INVALID_SUSPICIOUS_FLAGS_FORMAT",
 					"INVALID_SYSTEM_FLAG",
 					"INVALID_TIMESTAMP",
@@ -23638,8 +25124,7 @@
 					"IP_AUTHORIZATION_RESEND_LIMIT_EXCEEDED",
 					"GLOBAL_IP_BANNED",
 					"GLOBAL_IP_TEMPORARILY_BANNED",
-					"IP_BANNED",
-					"MAX_ANIMATED_EMOJIS",
+					"IP_BAN_DECLINED",
 					"MAX_APPLICATIONS",
 					"MAX_BOOKMARKS",
 					"MAX_CATEGORY_CHANNELS",
@@ -23653,15 +25138,11 @@
 					"MAX_GUILD_MEMBERS",
 					"MAX_GUILD_ROLES",
 					"MAX_GUILDS",
-					"NEW_ACCOUNT_GUILD_JOIN_RATE_LIMITED",
 					"MAX_INVITES",
-					"MAX_PINS_PER_CHANNEL",
-					"MESSAGE_TOTAL_ATTACHMENT_SIZE_TOO_LARGE",
 					"MAX_REACTIONS",
 					"MAX_STICKERS",
 					"MAX_WEBHOOKS_PER_CHANNEL",
 					"MAX_WEBHOOKS_PER_GUILD",
-					"MAX_WEBHOOKS",
 					"NCMEC_ALREADY_SUBMITTED",
 					"NCMEC_SUBMISSION_FAILED",
 					"MEDIA_METADATA_ERROR",
@@ -23669,13 +25150,8 @@
 					"MISSING_ACCESS",
 					"MISSING_ACL",
 					"MISSING_AUTHORIZATION",
-					"MISSING_CLIENT_SECRET",
-					"MISSING_EPHEMERAL_KEY",
-					"MISSING_IV",
-					"MISSING_OAUTH_FIELDS",
 					"MISSING_OAUTH_SCOPE",
 					"MISSING_PERMISSIONS",
-					"MISSING_REDIRECT_URI",
 					"NO_ACTIVE_CALL",
 					"NO_ACTIVE_SUBSCRIPTION",
 					"NOT_FOUND",
@@ -23683,13 +25159,10 @@
 					"NO_PASSKEYS_REGISTERED",
 					"NO_PENDING_DELETION",
 					"NO_USERS_WITH_FLUXERTAG_EXIST",
-					"NO_VISIONARY_SLOTS_AVAILABLE",
 					"NOT_A_BOT_APPLICATION",
 					"NOT_FRIENDS_WITH_USER",
-					"NOT_OWNER_OF_ADMIN_API_KEY",
 					"NSFW_CONTENT_AGE_RESTRICTED",
 					"PASSKEY_AUTHENTICATION_FAILED",
-					"PASSKEYS_DISABLED",
 					"PHONE_ADD_NOT_ELIGIBLE",
 					"PHONE_ALREADY_USED",
 					"PHONE_COUNTRY_NOT_SUPPORTED",
@@ -23705,7 +25178,6 @@
 					"PREVIEW_MUST_BE_JPEG",
 					"PROCESSING_FAILED",
 					"RATE_LIMITED",
-					"REDIRECT_URI_REQUIRED_FOR_NON_BOT",
 					"REPORT_ALREADY_RESOLVED",
 					"REPORT_BANNED",
 					"RESPONSE_VALIDATION_ERROR",
@@ -23721,7 +25193,6 @@
 					"SSO_REQUIRED",
 					"STREAM_KEY_CHANNEL_MISMATCH",
 					"STREAM_KEY_SCOPE_MISMATCH",
-					"STREAM_THUMBNAIL_PAYLOAD_EMPTY",
 					"STRIPE_ERROR",
 					"STRIPE_GIFT_REDEMPTION_IN_PROGRESS",
 					"STRIPE_INVALID_PRODUCT",
@@ -23734,7 +25205,6 @@
 					"STRIPE_PAYMENT_NOT_AVAILABLE",
 					"STRIPE_SUBSCRIPTION_ALREADY_CANCELING",
 					"STRIPE_SUBSCRIPTION_NOT_CANCELING",
-					"STRIPE_SUBSCRIPTION_PERIOD_END_MISSING",
 					"STRIPE_WEBHOOK_NOT_AVAILABLE",
 					"STRIPE_WEBHOOK_SIGNATURE_INVALID",
 					"STRIPE_WEBHOOK_SIGNATURE_MISSING",
@@ -23743,7 +25213,6 @@
 					"DONATION_MAGIC_LINK_EXPIRED",
 					"DONATION_MAGIC_LINK_INVALID",
 					"DONATION_MAGIC_LINK_USED",
-					"DONOR_NOT_FOUND",
 					"SUDO_MODE_REQUIRED",
 					"TAG_ALREADY_TAKEN",
 					"TEMPORARY_INVITE_REQUIRES_PRESENCE",
@@ -23784,8 +25253,6 @@
 					"UNKNOWN_WEBAUTHN_CREDENTIAL",
 					"UNKNOWN_APPLICATION",
 					"UNKNOWN_WEBHOOK",
-					"UNFURL_STREAM_TOO_LARGE",
-					"UNSUPPORTED_RESPONSE_TYPE",
 					"USERNAME_NOT_AVAILABLE",
 					"UPDATE_FAILED",
 					"USER_BANNED_FROM_GUILD",
@@ -23795,34 +25262,27 @@
 					"VALIDATION_ERROR",
 					"VOICE_CHANNEL_FULL",
 					"WEBAUTHN_CREDENTIAL_LIMIT_REACHED",
-					"AGE_VERIFICATION_ALREADY_VERIFIED",
-					"AGE_VERIFICATION_INVALID_CARD_TYPE"
+					"AGE_VERIFICATION_ALREADY_VERIFIED"
 				],
 				"x-enumDescriptions": [
 					"You don't have access to this resource or feature.",
-					"This account has been disabled.",
 					"Bad gateway.",
 					"Bad request.",
 					"We couldn't resolve that Bluesky handle. Please check it and try again.",
 					"We couldn't complete the Bluesky connection. Please try again.",
 					"Bluesky connections are not enabled on this instance.",
-					"Your Bluesky session has expired. Please reconnect your account.",
 					"The authorization request has expired or is invalid. Please try again.",
-					"This account is scheduled for deletion.",
 					"This account has been permanently suspended.",
 					"This account has been temporarily suspended.",
 					"Your account is locked due to suspicious activity.",
 					"Your account is too new to send messages in this community.",
 					"ACLs must be non-empty.",
 					"Admin API key wasn't found.",
-					"Application wasn't found.",
 					"You don't own this application.",
 					"You're already friends with this user.",
-					"Audit logs are being indexed. Please try again in a moment.",
 					"Bots can't create communities.",
 					"Bots can't send friend requests.",
 					"This bot is already in the community.",
-					"Bot application wasn't found.",
 					"This bot is private.",
 					"Bot users can't use auth endpoints.",
 					"Bot users can't create auth sessions.",
@@ -23833,7 +25293,6 @@
 					"This action can't be performed in a DM.",
 					"You can't block the system user.",
 					"You can't edit system messages.",
-					"You can't modify voice state.",
 					"You can't redeem {premium_tier_name} with Visionary.",
 					"You can't report this community.",
 					"You can't report your own community.",
@@ -23847,27 +25306,21 @@
 					"Community ownership can't be transferred to a bot.",
 					"You can't shrink reserved slots.",
 					"Captcha is required.",
-					"Channels are being indexed. Please try again in a moment.",
 					"Communication is disabled.",
 					"A connection of this type with this identifier already exists.",
 					"The connection initiation token is invalid or has expired.",
-					"The connection identifier is invalid.",
 					"The connection type is not supported.",
 					"You've reached the maximum number of connections ({limit}).",
 					"Unknown connection.",
 					"Connection verification failed. Make sure the verification token is correctly placed.",
 					"Conflict.",
 					"This content was blocked by safety systems.",
-					"We couldn't create the resource. Please try again.",
-					"We couldn't decrypt the message. The encryption keys may be invalid or corrupted.",
 					"We couldn't delete the resource. Please try again.",
 					"This community has already applied for discovery.",
 					"This discovery application has already been reviewed.",
 					"Discovery application wasn't found.",
-					"A description is required for discovery listing.",
 					"Discovery isn't available on this instance.",
 					"This community doesn't meet the minimum member count for discovery.",
-					"Invalid discovery category.",
 					"This community isn't listed in discovery.",
 					"Discriminator is required.",
 					"Email service is temporarily unavailable. Please try again later.",
@@ -23885,9 +25338,6 @@
 					"This registration is waiting for admin approval.",
 					"This registration request was rejected.",
 					"This registration link is invalid or has expired.",
-					"Empty encrypted body.",
-					"We couldn't encrypt the message. The encryption keys may be invalid or corrupted.",
-					"Please confirm the EU/EEA digital content withdrawal waiver before starting checkout.",
 					"Explicit content can't be sent.",
 					"This feature isn't available on self-hosted instances.",
 					"This feature is temporarily disabled.",
@@ -23899,15 +25349,12 @@
 					"Gone.",
 					"Gift code is already redeemed.",
 					"You need to add a phone number to send messages in this community.",
-					"Failed to fetch the community template. The template may not exist or the external service is unavailable.",
 					"The community template data is invalid or malformed.",
 					"Community verification is required.",
 					"Handoff code expired.",
 					"Your data export request has expired. Please request a new export.",
 					"Your data export request failed. Please try again.",
 					"Your data export is still being prepared. Please check back in a few moments.",
-					"GET /oauth2/authorize isn't supported. Use POST /oauth2/authorize/consent.",
-					"Invalid request.",
 					"Internal server error.",
 					"Invalid ACLs format.",
 					"Invalid API origin.",
@@ -23916,29 +25363,19 @@
 					"Invalid captcha.",
 					"Calls can only be made in direct messages or group DMs.",
 					"Invalid channel type.",
-					"Invalid client.",
-					"Invalid client secret.",
 					"Invalid DSA report target.",
 					"Invalid DSA ticket.",
 					"Invalid DSA verification code.",
-					"Invalid decrypted JSON.",
-					"Invalid ephemeral key.",
 					"Invalid flags format.",
-					"Invalid initialization vector.",
 					"Invalid form body.",
-					"The authorization grant is invalid, expired, or has been revoked.",
 					"Invalid handoff code.",
 					"Permissions must be a valid integer.",
 					"Permissions must be non-negative.",
 					"Invalid phone number.",
 					"Invalid phone verification code.",
-					"Invalid redirect URI.",
 					"Invalid request.",
-					"Response type must be code for non-bot scopes.",
-					"The requested scope isn't supported or you don't have permission to request it.",
 					"Invalid stream key format.",
 					"Invalid stream thumbnail payload.",
-					"Invalid sudo token.",
 					"Invalid suspicious flags format.",
 					"Invalid system flag.",
 					"Invalid timestamp.",
@@ -23953,8 +25390,7 @@
 					"IP authorization resend limit exceeded.",
 					"Your IP address {ipAddress} has been permanently blocked from the Fluxer API by platform administrators. If you believe this is a mistake, contact support@fluxer.app to appeal. Include this IP address in your appeal.",
 					"Your IP address {ipAddress} has been temporarily blocked from the Fluxer API for 24 hours because of abusive or unusual access patterns. We usually do not provide appeals for temporary API bans. Change IP addresses or wait for the ban to expire, and review the Fluxer API access patterns coming from your client.",
-					"Your IP address {ipAddress} has been permanently blocked from the Fluxer API by platform administrators. If you believe this is a mistake, contact support@fluxer.app to appeal. Include this IP address in your appeal.",
-					"You've reached the maximum of {count, plural, one {# animated emoji} other {# animated emojis}}.",
+					"This IP address cannot be added to the blocklist.",
 					"You've reached the maximum of {limit, plural, one {# application} other {# applications}}.",
 					"You've reached the maximum of {count, plural, one {# bookmark} other {# bookmarks}}.",
 					"You've reached the maximum of {count, plural, one {# category channel} other {# category channels}}.",
@@ -23968,15 +25404,11 @@
 					"You've reached the maximum of {count, plural, one {# community member} other {# community members}}.",
 					"You've reached the maximum of {count, plural, one {# community role} other {# community roles}}.",
 					"You've reached the maximum of {count, plural, one {# community} other {# communities}}.",
-					"New accounts are limited to joining 10 communities in the first 24 hours. Please try again later.",
 					"You've reached the maximum of {count, plural, one {# invite} other {# invites}}.",
-					"You've reached the maximum of {count, plural, one {# pin} other {# pins}} per channel.",
-					"File size is too large. Maximum file size is {maxSize}.",
 					"You've reached the maximum of {count, plural, one {# reaction} other {# reactions}}.",
 					"You've reached the maximum of {count, plural, one {# sticker} other {# stickers}}.",
 					"You've reached the maximum of {count, plural, one {# webhook} other {# webhooks}} per channel.",
 					"You've reached the maximum of {count, plural, one {# webhook} other {# webhooks}} per community.",
-					"You've reached the maximum of {count, plural, one {# webhook} other {# webhooks}}.",
 					"This content has already been submitted to NCMEC.",
 					"We couldn't submit the report to NCMEC. Please try again later.",
 					"Media metadata error.",
@@ -23984,13 +25416,8 @@
 					"You don't have access to this resource or feature.",
 					"Missing ACL.",
 					"Missing or invalid authorization header.",
-					"Missing client secret.",
-					"Missing ephemeral key.",
-					"Missing initialization vector.",
-					"Missing OAuth fields.",
 					"The requested scope isn't supported or you don't have permission to request it.",
 					"You don't have the permissions required to perform this action.",
-					"Missing redirect URI.",
 					"No active call.",
 					"No active subscription.",
 					"Not found.",
@@ -23998,13 +25425,10 @@
 					"No passkeys are registered.",
 					"Invalid request.",
 					"There are too many users with this username.",
-					"No Visionary slots are available.",
 					"This application isn't a bot.",
 					"You're not friends with this user.",
-					"You don't have permission to modify this admin API key.",
 					"NSFW content is age restricted.",
 					"Passkey authentication failed.",
-					"Passkeys are disabled.",
 					"You are not eligible to add a phone number to your account.",
 					"Phone number is already in use.",
 					"We don't send verification texts to this country. Use a mobile number from another country, or email support@fluxer.app and a person will review your account.",
@@ -24020,7 +25444,6 @@
 					"Preview must be JPEG.",
 					"We couldn't process the request. Please try again.",
 					"You're being rate limited.",
-					"Redirect URI is required for non-bot scopes.",
 					"Report already resolved.",
 					"You've been banned from submitting reports.",
 					"Response validation failed: {errors}.",
@@ -24036,7 +25459,6 @@
 					"Invalid request.",
 					"Stream key channel mismatch.",
 					"Stream key scope mismatch.",
-					"Stream thumbnail payload is empty.",
 					"Payment processing encountered an error. Please try again or contact support.",
 					"Gift code redemption is in progress. Try again in a moment.",
 					"Invalid product selection.",
@@ -24049,7 +25471,6 @@
 					"Payment processing is temporarily unavailable. Please try again later.",
 					"Subscription is already set to cancel at period end.",
 					"Subscription isn't set to cancel.",
-					"Subscription current_period_end is missing.",
 					"Webhook processing isn't available.",
 					"Stripe webhook signature is invalid.",
 					"Stripe webhook signature is missing.",
@@ -24058,7 +25479,6 @@
 					"Magic link has expired.",
 					"Magic link is invalid.",
 					"Magic link has already been used.",
-					"Donor not found.",
 					"Sudo mode is required.",
 					"This tag is already taken.",
 					"Temporary invite requires presence.",
@@ -24099,8 +25519,6 @@
 					"Unknown WebAuthn credential.",
 					"Unknown application.",
 					"Unknown webhook.",
-					"The link preview response is too large to process.",
-					"Unsupported response type.",
 					"This username is not available.",
 					"We couldn't update the resource. Please try again.",
 					"This user is banned from this community.",
@@ -24110,8 +25528,7 @@
 					"Validation failed.",
 					"Voice channel is full.",
 					"You've reached the maximum of {count, plural, one {# WebAuthn credential} other {# WebAuthn credentials}}.",
-					"You've already completed age verification.",
-					"Only credit cards are accepted for age verification. Debit and prepaid cards can't be used."
+					"You've already completed age verification."
 				],
 				"description": "Error codes returned by API operations"
 			},
@@ -24212,7 +25629,7 @@
 					"redirect_uris": {
 						"type": "array",
 						"items": {"type": "string"},
-						"maxItems": 20,
+						"maxItems": 10,
 						"description": "The registered redirect URIs for OAuth2"
 					}
 				},
@@ -25844,7 +27261,6 @@
 					"permission_overwrites": {
 						"type": "array",
 						"items": {"$ref": "#/components/schemas/ChannelOverwriteResponse"},
-						"maxItems": 500,
 						"description": "The permission overwrites for this channel"
 					},
 					"recipients": {
@@ -26707,7 +28123,7 @@
 							"properties": {"username": {"type": "string", "description": "The username of the recipient"}},
 							"required": ["username"]
 						},
-						"maxItems": 49,
+						"maxItems": 50,
 						"description": "The recipients of the DM channel"
 					}
 				},
@@ -27658,6 +29074,49 @@
 				},
 				"required": ["guilds", "total", "category_counts"]
 			},
+			"VersionInfoResponse": {
+				"type": "object",
+				"properties": {
+					"version": {"type": "string", "description": "Semantic version string (e.g., 1.0.0)"},
+					"pub_date": {"type": "string", "description": "ISO 8601 date when this version was published"},
+					"minimum_system_version": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Minimum operating system version required by this release, when applicable"
+					},
+					"files": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "object",
+							"properties": {
+								"url": {"type": "string", "description": "Download URL for this file"},
+								"sha256": {
+									"anyOf": [{"type": "string"}, {"type": "null"}],
+									"description": "SHA-256 hash of the file for verification"
+								},
+								"checksum_url": {
+									"anyOf": [{"type": "string"}, {"type": "null"}],
+									"description": "Plain text .sha256 checksum file URL for this file"
+								}
+							},
+							"required": ["url", "sha256", "checksum_url"]
+						},
+						"description": "Map of package format to download files"
+					}
+				},
+				"required": ["version", "pub_date", "files"]
+			},
+			"DesktopVersionsResponse": {
+				"type": "object",
+				"properties": {
+					"versions": {
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/VersionInfoResponse"},
+						"description": "Array of available versions"
+					},
+					"has_more": {"type": "boolean", "description": "Whether more versions are available to fetch"}
+				},
+				"required": ["versions", "has_more"]
+			},
 			"DonationCheckoutResponse": {
 				"type": "object",
 				"properties": {
@@ -27758,6 +29217,213 @@
 					}
 				},
 				"required": ["url", "shards", "session_start_limit"]
+			},
+			"GifFeaturedResponse": {
+				"type": "object",
+				"properties": {
+					"gifs": {
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/GifResponse"},
+						"description": "Array of featured GIFs."
+					},
+					"categories": {
+						"type": "array",
+						"items": {"$ref": "#/components/schemas/GifCategoryTagResponse"},
+						"description": "Array of GIF categories."
+					}
+				},
+				"required": ["gifs", "categories"]
+			},
+			"GifResponse": {
+				"type": "object",
+				"properties": {
+					"id": {"type": "string", "description": "Provider-stable identifier for this GIF."},
+					"slug": {
+						"type": "string",
+						"description": "Canonical slug (or slug-id token) used to share / re-resolve this GIF."
+					},
+					"provider": {"type": "string", "description": "Name of the provider that produced this GIF."},
+					"title": {"type": "string", "description": "Title or description of the GIF."},
+					"url": {"type": "string", "description": "Provider page URL for the GIF."},
+					"src": {
+						"type": "string",
+						"description": "Direct URL to the GIF media file (best format chosen by the server)."
+					},
+					"proxy_src": {
+						"type": "string",
+						"description": "Proxied URL to the GIF media file (best format chosen by the server)."
+					},
+					"width": {
+						"type": "integer",
+						"minimum": 0,
+						"maximum": 2147483647,
+						"format": "int32",
+						"description": "Width of the GIF in pixels (best format)."
+					},
+					"height": {
+						"type": "integer",
+						"minimum": 0,
+						"maximum": 2147483647,
+						"format": "int32",
+						"description": "Height of the GIF in pixels (best format)."
+					},
+					"media": {
+						"type": "object",
+						"additionalProperties": {"$ref": "#/components/schemas/GifMediaFormat"},
+						"description": "Map of format-name → media descriptor. Keys are a size prefix (none for full size, \"medium\", \"tiny\", \"nano\") joined to a codec name (\"webm\", \"mp4\", \"webp\", \"gif\"), plus \"loopedmp4\". Video keys are \"webm\" / \"mp4\" / \"loopedmp4\" / \"mediumwebm\" / \"mediummp4\" / \"tinywebm\" / \"tinymp4\" / \"nanowebm\" / \"nanomp4\"; image keys are \"webp\" / \"gif\" / \"mediumwebp\" / \"mediumgif\" / \"tinywebp\" / \"tinygif\" / \"nanowebp\" / \"nanogif\". Every key is optional, so clients must walk a priority list rather than index a single key. Clients that cannot decode the video keys should prefer \"tinywebp\" / \"tinygif\" / \"mediumwebp\" / \"mediumgif\" / \"webp\" / \"gif\" / \"nanowebp\" / \"nanogif\" in that order."
+					},
+					"placeholder": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Compact thumbhash placeholder produced by the media proxy. Clients render it as a low-res preview while the GIF loads, and persist it on favourites so the picker has a fallback if the source URL later disappears."
+					}
+				},
+				"required": ["id", "slug", "provider", "title", "url", "src", "proxy_src", "width", "height", "media"]
+			},
+			"GifCategoryTagResponse": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "Category search term (locale-translated label suitable for display)."
+					},
+					"src": {
+						"type": "string",
+						"description": "Category preview image URL from the top GIF for this category search term."
+					},
+					"proxy_src": {
+						"type": "string",
+						"description": "Proxied category preview image URL from the top GIF for this category search term."
+					},
+					"gif": {
+						"anyOf": [{"$ref": "#/components/schemas/GifResponse"}, {"type": "null"}],
+						"description": "Enriched category preview GIF from the top search result for this category. Null only when no preview GIF was available."
+					}
+				},
+				"required": ["name", "src", "proxy_src", "gif"]
+			},
+			"Locale": {
+				"type": "string",
+				"enum": [
+					"ar",
+					"bg",
+					"cs",
+					"da",
+					"de",
+					"el",
+					"en-GB",
+					"en-US",
+					"es-ES",
+					"es-419",
+					"fi",
+					"fr",
+					"he",
+					"hi",
+					"hr",
+					"hu",
+					"id",
+					"it",
+					"ja",
+					"ko",
+					"lt",
+					"nl",
+					"no",
+					"pl",
+					"pt-BR",
+					"ro",
+					"ru",
+					"sv-SE",
+					"th",
+					"tr",
+					"uk",
+					"vi",
+					"zh-CN",
+					"zh-TW"
+				],
+				"x-enumNames": [
+					"AR",
+					"BG",
+					"CS",
+					"DA",
+					"DE",
+					"EL",
+					"EN_GB",
+					"EN_US",
+					"ES_ES",
+					"ES_419",
+					"FI",
+					"FR",
+					"HE",
+					"HI",
+					"HR",
+					"HU",
+					"ID",
+					"IT",
+					"JA",
+					"KO",
+					"LT",
+					"NL",
+					"NO",
+					"PL",
+					"PT_BR",
+					"RO",
+					"RU",
+					"SV_SE",
+					"TH",
+					"TR",
+					"UK",
+					"VI",
+					"ZH_CN",
+					"ZH_TW"
+				],
+				"x-enumDescriptions": [
+					"Arabic",
+					"Bulgarian",
+					"Czech",
+					"Danish",
+					"German",
+					"Greek",
+					"English (United Kingdom)",
+					"English (United States)",
+					"Spanish (Spain)",
+					"Spanish (Latin America)",
+					"Finnish",
+					"French",
+					"Hebrew",
+					"Hindi",
+					"Croatian",
+					"Hungarian",
+					"Indonesian",
+					"Italian",
+					"Japanese",
+					"Korean",
+					"Lithuanian",
+					"Dutch",
+					"Norwegian",
+					"Polish",
+					"Portuguese (Brazil)",
+					"Romanian",
+					"Russian",
+					"Swedish",
+					"Thai",
+					"Turkish",
+					"Ukrainian",
+					"Vietnamese",
+					"Chinese (Simplified)",
+					"Chinese (Traditional)"
+				],
+				"description": "The locale code for the user interface language"
+			},
+			"GifRegisterShareRequest": {
+				"type": "object",
+				"properties": {
+					"id": {"type": "string", "description": "Provider-issued share identifier (slug or slug-id token)."},
+					"q": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Optional search query that produced the GIF."
+					},
+					"locale": {"$ref": "#/components/schemas/Locale"}
+				},
+				"required": ["id"]
 			},
 			"GiftCodeResponse": {
 				"type": "object",
@@ -28095,7 +29761,7 @@
 					"tags": {
 						"type": "array",
 						"items": {"type": "string"},
-						"maxItems": 100,
+						"maxItems": 10,
 						"description": "Autocomplete/suggestion tags for the sticker"
 					},
 					"animated": {"type": "boolean", "description": "Whether this sticker is animated"},
@@ -29434,8 +31100,8 @@
 					"roles": {
 						"type": "array",
 						"items": {"$ref": "#/components/schemas/SnowflakeType"},
-						"maxItems": 100,
-						"description": "Array of role IDs to assign to the member (max 100)"
+						"maxItems": 250,
+						"description": "Array of role IDs to assign to the member (max 250)"
 					},
 					"avatar": {
 						"anyOf": [{"$ref": "#/components/schemas/Base64ImageType"}, {"type": "null"}],
@@ -29587,7 +31253,7 @@
 					"tags": {
 						"type": "array",
 						"items": {"type": "string"},
-						"maxItems": 100,
+						"maxItems": 10,
 						"description": "Autocomplete/suggestion tags for the sticker"
 					},
 					"animated": {"type": "boolean", "description": "Whether this sticker is animated"},
@@ -30013,7 +31679,7 @@
 					"redirect_uris": {
 						"type": "array",
 						"items": {"type": "string"},
-						"maxItems": 20,
+						"maxItems": 10,
 						"description": "The registered redirect URIs for OAuth2"
 					},
 					"bot_public": {"type": "boolean", "description": "Whether the bot can be invited by anyone"},
@@ -30171,7 +31837,7 @@
 					"redirect_uris": {
 						"type": "array",
 						"items": {"type": "string"},
-						"maxItems": 20,
+						"maxItems": 10,
 						"description": "The registered redirect URIs for OAuth2"
 					},
 					"scopes": {
@@ -30206,13 +31872,6 @@
 										"description": "The bio or description of the bot"
 									},
 									"token": {"type": "string", "description": "The bot token for authentication"},
-									"mfa_enabled": {"type": "boolean", "description": "Whether the bot has MFA enabled"},
-									"authenticator_types": {
-										"type": "array",
-										"items": {"$ref": "#/components/schemas/AuthenticatorType"},
-										"maxItems": 10,
-										"description": "The types of authenticators enabled"
-									},
 									"flags": {"$ref": "#/components/schemas/BotFlags"}
 								},
 								"required": ["id", "username", "discriminator", "bio", "flags"],
@@ -30602,6 +32261,7 @@
 							"pending_subscription_change": {
 								"anyOf": [{"$ref": "#/components/schemas/PendingSubscriptionChangeResponse"}, {"type": "null"}]
 							},
+							"list_price_switch": {"$ref": "#/components/schemas/ListPriceSwitchState"},
 							"subscription": {
 								"anyOf": [{"$ref": "#/components/schemas/PremiumBillingSubscriptionResponse"}, {"type": "null"}]
 							},
@@ -30617,6 +32277,7 @@
 							"stripe_customer_id",
 							"current_subscription_price",
 							"pending_subscription_change",
+							"list_price_switch",
 							"subscription",
 							"invoices",
 							"invoices_has_more",
@@ -30649,6 +32310,12 @@
 								"type": "string",
 								"description": "Stripe subscription schedule ID managing the pending change"
 							},
+							"change_kind": {
+								"enum": ["billing_cycle", "price"],
+								"type": "string",
+								"x-enumNames": ["billing_cycle", "price"],
+								"description": "Whether the pending change moves the billing cycle or only the price within the same cycle"
+							},
 							"current_billing_cycle": {
 								"anyOf": [
 									{"enum": ["monthly", "yearly"], "type": "string", "x-enumNames": ["monthly", "yearly"]},
@@ -30670,6 +32337,10 @@
 							"target_price_id": {
 								"anyOf": [{"type": "string"}, {"type": "null"}],
 								"description": "Stripe price ID that will be used after the change"
+							},
+							"target_amount_minor": {
+								"anyOf": [{"type": "integer", "format": "int53"}, {"type": "null"}],
+								"description": "Unit amount of the price that will be used after the change, in the currency minor unit"
 							},
 							"currency": {
 								"anyOf": [
@@ -30697,11 +32368,13 @@
 						},
 						"required": [
 							"schedule_id",
+							"change_kind",
 							"current_billing_cycle",
 							"target_billing_cycle",
 							"effective_at",
 							"current_price_id",
 							"target_price_id",
+							"target_amount_minor",
 							"currency",
 							"initial_amount_minor",
 							"recurring_amount_minor",
@@ -30709,6 +32382,104 @@
 						]
 					},
 					{"type": "null"}
+				]
+			},
+			"ListPriceSwitchState": {
+				"type": "object",
+				"properties": {
+					"available": {
+						"type": "boolean",
+						"description": "Whether the authenticated user can move their subscription down to the current list price right now"
+					},
+					"reason": {
+						"anyOf": [{"$ref": "#/components/schemas/ListPriceSwitchIneligibilityReason"}, {"type": "null"}],
+						"description": "Why the switch is unavailable, when available is false"
+					},
+					"pending": {
+						"type": "boolean",
+						"description": "Whether a switch to the current list price is already scheduled"
+					},
+					"current_price_id": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Stripe price ID the subscription is billed against today"
+					},
+					"current_amount_minor": {
+						"anyOf": [{"type": "integer", "format": "int53"}, {"type": "null"}],
+						"description": "Amount the subscription is billed today, in the currency minor unit"
+					},
+					"list_price_id": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "Current list Stripe price ID for the same cycle and currency"
+					},
+					"list_amount_minor": {
+						"anyOf": [{"type": "integer", "format": "int53"}, {"type": "null"}],
+						"description": "Current list price for the same cycle and currency, in the currency minor unit"
+					},
+					"currency": {
+						"anyOf": [
+							{
+								"enum": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"],
+								"type": "string",
+								"x-enumNames": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"]
+							},
+							{"type": "null"}
+						],
+						"description": "Currency of both the current and the list amount"
+					},
+					"billing_cycle": {
+						"anyOf": [
+							{"enum": ["monthly", "yearly"], "type": "string", "x-enumNames": ["monthly", "yearly"]},
+							{"type": "null"}
+						],
+						"description": "Recurring billing cycle the switch applies to"
+					},
+					"effective_at": {
+						"anyOf": [{"type": "string"}, {"type": "null"}],
+						"description": "ISO timestamp the switch takes effect, which is the end of the current billing period"
+					}
+				},
+				"required": [
+					"available",
+					"reason",
+					"pending",
+					"current_price_id",
+					"current_amount_minor",
+					"list_price_id",
+					"list_amount_minor",
+					"currency",
+					"billing_cycle",
+					"effective_at"
+				]
+			},
+			"ListPriceSwitchIneligibilityReason": {
+				"enum": [
+					"feature_unavailable",
+					"no_active_subscription",
+					"subscription_not_chargeable",
+					"unsupported_subscription",
+					"no_list_price",
+					"already_on_list_price",
+					"not_a_price_decrease",
+					"subscription_cancelling",
+					"cancellation_managed_by_schedule",
+					"conflicting_pending_change",
+					"missing_period_end",
+					"switch_in_progress"
+				],
+				"type": "string",
+				"x-enumNames": [
+					"feature_unavailable",
+					"no_active_subscription",
+					"subscription_not_chargeable",
+					"unsupported_subscription",
+					"no_list_price",
+					"already_on_list_price",
+					"not_a_price_decrease",
+					"subscription_cancelling",
+					"cancellation_managed_by_schedule",
+					"conflicting_pending_change",
+					"missing_period_end",
+					"switch_in_progress"
 				]
 			},
 			"PremiumBillingSubscriptionResponse": {
@@ -30951,6 +32722,134 @@
 					"subscription_id",
 					"status"
 				]
+			},
+			"SwitchToListPriceResponse": {
+				"oneOf": [
+					{"$ref": "#/components/schemas/ScheduledSwitchToListPriceResponse"},
+					{"$ref": "#/components/schemas/AlreadyScheduledSwitchToListPriceResponse"},
+					{"$ref": "#/components/schemas/IneligibleSwitchToListPriceResponse"}
+				]
+			},
+			"ScheduledSwitchToListPriceResponse": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["scheduled"],
+						"description": "The switch was scheduled for the end of the current billing period"
+					},
+					"effective_at": {"type": "string", "description": "ISO timestamp the switch takes effect"},
+					"target_price_id": {
+						"type": "string",
+						"description": "Stripe price ID the subscription will be billed against after the switch"
+					},
+					"target_amount_minor": {
+						"type": "integer",
+						"format": "int53",
+						"description": "Amount billed after the switch, in the currency minor unit"
+					},
+					"current_amount_minor": {
+						"type": "integer",
+						"format": "int53",
+						"description": "Amount billed before the switch, in the currency minor unit"
+					},
+					"currency": {
+						"enum": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"],
+						"type": "string",
+						"x-enumNames": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"],
+						"description": "Currency of both amounts"
+					}
+				},
+				"required": [
+					"status",
+					"effective_at",
+					"target_price_id",
+					"target_amount_minor",
+					"current_amount_minor",
+					"currency"
+				]
+			},
+			"AlreadyScheduledSwitchToListPriceResponse": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["already_scheduled"],
+						"description": "The switch was already scheduled by an earlier request"
+					},
+					"effective_at": {"type": "string", "description": "ISO timestamp the switch takes effect"},
+					"target_price_id": {
+						"type": "string",
+						"description": "Stripe price ID the subscription will be billed against after the switch"
+					},
+					"target_amount_minor": {
+						"type": "integer",
+						"format": "int53",
+						"description": "Amount billed after the switch, in the currency minor unit"
+					},
+					"current_amount_minor": {
+						"type": "integer",
+						"format": "int53",
+						"description": "Amount billed before the switch, in the currency minor unit"
+					},
+					"currency": {
+						"enum": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"],
+						"type": "string",
+						"x-enumNames": ["USD", "EUR", "BRL", "INR", "PLN", "TRY"],
+						"description": "Currency of both amounts"
+					}
+				},
+				"required": [
+					"status",
+					"effective_at",
+					"target_price_id",
+					"target_amount_minor",
+					"current_amount_minor",
+					"currency"
+				]
+			},
+			"IneligibleSwitchToListPriceResponse": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["ineligible"],
+						"description": "The subscription cannot be moved to the current list price"
+					},
+					"reason": {
+						"enum": [
+							"feature_unavailable",
+							"no_active_subscription",
+							"subscription_not_chargeable",
+							"unsupported_subscription",
+							"no_list_price",
+							"already_on_list_price",
+							"not_a_price_decrease",
+							"subscription_cancelling",
+							"cancellation_managed_by_schedule",
+							"conflicting_pending_change",
+							"missing_period_end",
+							"switch_in_progress"
+						],
+						"type": "string",
+						"x-enumNames": [
+							"feature_unavailable",
+							"no_active_subscription",
+							"subscription_not_chargeable",
+							"unsupported_subscription",
+							"no_list_price",
+							"already_on_list_price",
+							"not_a_price_decrease",
+							"subscription_cancelling",
+							"cancellation_managed_by_schedule",
+							"conflicting_pending_change",
+							"missing_period_end",
+							"switch_in_progress"
+						],
+						"description": "Why the switch was refused"
+					}
+				},
+				"required": ["status", "reason"]
 			},
 			"ReadStateAckResponse": {
 				"type": "object",
@@ -34591,118 +36490,6 @@
 					"default_share_voice_activity"
 				]
 			},
-			"Locale": {
-				"type": "string",
-				"enum": [
-					"ar",
-					"bg",
-					"cs",
-					"da",
-					"de",
-					"el",
-					"en-GB",
-					"en-US",
-					"es-ES",
-					"es-419",
-					"fi",
-					"fr",
-					"he",
-					"hi",
-					"hr",
-					"hu",
-					"id",
-					"it",
-					"ja",
-					"ko",
-					"lt",
-					"nl",
-					"no",
-					"pl",
-					"pt-BR",
-					"ro",
-					"ru",
-					"sv-SE",
-					"th",
-					"tr",
-					"uk",
-					"vi",
-					"zh-CN",
-					"zh-TW"
-				],
-				"x-enumNames": [
-					"AR",
-					"BG",
-					"CS",
-					"DA",
-					"DE",
-					"EL",
-					"EN_GB",
-					"EN_US",
-					"ES_ES",
-					"ES_419",
-					"FI",
-					"FR",
-					"HE",
-					"HI",
-					"HR",
-					"HU",
-					"ID",
-					"IT",
-					"JA",
-					"KO",
-					"LT",
-					"NL",
-					"NO",
-					"PL",
-					"PT_BR",
-					"RO",
-					"RU",
-					"SV_SE",
-					"TH",
-					"TR",
-					"UK",
-					"VI",
-					"ZH_CN",
-					"ZH_TW"
-				],
-				"x-enumDescriptions": [
-					"Arabic",
-					"Bulgarian",
-					"Czech",
-					"Danish",
-					"German",
-					"Greek",
-					"English (United Kingdom)",
-					"English (United States)",
-					"Spanish (Spain)",
-					"Spanish (Latin America)",
-					"Finnish",
-					"French",
-					"Hebrew",
-					"Hindi",
-					"Croatian",
-					"Hungarian",
-					"Indonesian",
-					"Italian",
-					"Japanese",
-					"Korean",
-					"Lithuanian",
-					"Dutch",
-					"Norwegian",
-					"Polish",
-					"Portuguese (Brazil)",
-					"Romanian",
-					"Russian",
-					"Swedish",
-					"Thai",
-					"Turkish",
-					"Ukrainian",
-					"Vietnamese",
-					"Chinese (Simplified)",
-					"Chinese (Traditional)"
-				],
-				"description": "The locale code for the user interface language"
-			},
 			"StickerAnimationOptions": {
 				"type": "integer",
 				"format": "int32",
@@ -36088,6 +37875,7 @@
 		{"name": "Read States", "description": "Message read state tracking"},
 		{"name": "Saved Media", "description": "User saved media management"},
 		{"name": "Themes", "description": "User interface themes"},
+		{"name": "Downloads", "description": "App downloads"},
 		{"name": "Reports", "description": "Content reporting"},
 		{"name": "Instance", "description": "Instance configuration and info"},
 		{"name": "Billing", "description": "Subscription and payment management via Stripe"},
@@ -36097,6 +37885,8 @@
 		{"name": "Messages"},
 		{"name": "Donations"},
 		{"name": "Geolocation"},
+		{"name": "GIFs"},
+		{"name": "GIFs (Deprecated)"},
 		{"name": "Discovery"},
 		{"name": "Emojis"},
 		{"name": "Stickers"},

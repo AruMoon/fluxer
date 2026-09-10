@@ -10,6 +10,8 @@ import {
 import {
 	AVATAR_MAX_SIZE,
 	EMOJI_MAX_SIZE,
+	MAX_GUILD_ROLES,
+	MAX_GUILD_STICKER_TAGS,
 	MAX_TEMP_BAN_DURATION_SECONDS,
 	MIN_TEMP_BAN_DURATION_SECONDS,
 	STICKER_MAX_SIZE,
@@ -18,7 +20,7 @@ import {SudoVerificationSchema} from '@fluxer/schema/src/domains/auth/AuthSchema
 import {GuildFeatureSchema} from '@fluxer/schema/src/domains/guild/GuildResponseSchemas';
 import {TemplateSerializedGuild} from '@fluxer/schema/src/domains/guild/GuildTemplateSchemas';
 import {VanityURLCodeType} from '@fluxer/schema/src/primitives/ChannelValidators';
-import {createBase64StringType} from '@fluxer/schema/src/primitives/FileValidators';
+import {base64LengthForBytes, createBase64StringType} from '@fluxer/schema/src/primitives/FileValidators';
 import {
 	ContentWarningLevelSchema,
 	DefaultMessageNotificationsSchema,
@@ -50,7 +52,7 @@ function coerceBlankStringToNull(value: unknown): unknown {
 
 export const GuildCreateRequest = z.object({
 	name: createStringType(1, 100).describe('The name of the guild (1-100 characters)'),
-	icon: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+	icon: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 		.nullish()
 		.describe('Base64-encoded image data for the guild icon'),
 	empty_features: z.boolean().optional().describe('Whether to create the guild without default features'),
@@ -62,7 +64,7 @@ export type GuildCreateRequest = z.infer<typeof GuildCreateRequest>;
 export const GuildUpdateRequest = z
 	.object({
 		name: createStringType(1, 100).describe('The name of the guild (1-100 characters)'),
-		icon: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+		icon: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 			.nullish()
 			.describe('Base64-encoded image data for the guild icon'),
 		system_channel_id: SnowflakeType.nullish().describe('The ID of the channel where system messages are sent'),
@@ -106,13 +108,13 @@ export const GuildUpdateRequest = z
 			GuildExplicitContentFilterSchema,
 			'Level of content filtering for explicit media',
 		),
-		banner: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+		banner: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 			.nullish()
 			.describe('Base64-encoded image data for the guild banner'),
-		splash: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+		splash: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 			.nullish()
 			.describe('Base64-encoded image data for the guild splash screen'),
-		embed_splash: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+		embed_splash: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 			.nullish()
 			.describe('Base64-encoded image data for the embedded invite splash'),
 		splash_card_alignment: SplashCardAlignmentSchema.optional().describe(
@@ -142,14 +144,14 @@ export const GuildMemberUpdateRequest = z.object({
 		.describe('The nickname to set for the member (1-32 characters)'),
 	roles: z
 		.array(SnowflakeType)
-		.max(100, 'Maximum 100 roles allowed')
+		.max(MAX_GUILD_ROLES, `Maximum ${MAX_GUILD_ROLES} roles allowed`)
 		.optional()
 		.transform((ids) => (ids ? new Set(ids) : undefined))
-		.describe('Array of role IDs to assign to the member (max 100)'),
-	avatar: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+		.describe(`Array of role IDs to assign to the member (max ${MAX_GUILD_ROLES})`),
+	avatar: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 		.nullish()
 		.describe('Base64-encoded image data for the member guild avatar'),
-	banner: createBase64StringType(1, Math.ceil(AVATAR_MAX_SIZE * (4 / 3)))
+	banner: createBase64StringType(1, base64LengthForBytes(AVATAR_MAX_SIZE))
 		.nullish()
 		.describe('Base64-encoded image data for the member guild banner'),
 	bio: createStringType(1, 320).nullish().describe('The member guild profile bio (1-320 characters)'),
@@ -206,7 +208,7 @@ export const GuildEmojiCreateRequest = z.object({
 	name: createStringType(2, 32)
 		.refine((value) => /^[a-zA-Z0-9_]+$/.test(value), 'Emoji name can only contain letters, numbers, and underscores')
 		.describe('The name of the emoji (2-32 characters, alphanumeric and underscores only)'),
-	image: createBase64StringType(1, Math.ceil(EMOJI_MAX_SIZE * (4 / 3))).describe(
+	image: createBase64StringType(1, base64LengthForBytes(EMOJI_MAX_SIZE)).describe(
 		'Base64-encoded image data for the emoji',
 	),
 });
@@ -241,11 +243,11 @@ export const GuildStickerCreateRequest = z.object({
 	tags: z
 		.array(createStringType(1, 30))
 		.min(0)
-		.max(10)
+		.max(MAX_GUILD_STICKER_TAGS)
 		.optional()
 		.default([])
-		.describe('Array of autocomplete/suggestion tags (max 10 tags, each 1-30 characters)'),
-	image: createBase64StringType(1, Math.ceil(STICKER_MAX_SIZE * (4 / 3))).describe(
+		.describe(`Array of autocomplete/suggestion tags (max ${MAX_GUILD_STICKER_TAGS} tags, each 1-30 characters)`),
+	image: createBase64StringType(1, base64LengthForBytes(STICKER_MAX_SIZE)).describe(
 		'Base64-encoded image data for the sticker',
 	),
 });
