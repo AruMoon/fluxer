@@ -20,7 +20,7 @@ msgstr "... 開啟精簡模式。讚喔！"
 
 #. Button or menu action label in the channel and chat user message. Keep it concise.
 #: src/features/channel/components/MessageAttachments.tsx:358
-#: src/features/channel/components/UserMessage.tsx:59
+#: src/features/channel/components/UserMessage.tsx:61
 msgid "(edited)"
 msgstr "(已編輯)"
 
@@ -440,7 +440,7 @@ msgstr "{count, plural, one {展開（# 行）} other {展開（# 行）}}"
 msgid "{count, plural, one {Expand (# row)} other {Expand (# rows)}}"
 msgstr "{count, plural, one {展開 (# 列)} other {展開 (# 列)}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:315
+#: src/features/voice/components/VoiceParticipantTile.tsx:317
 msgid "{count, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{count, plural, one {展開其他 {count} 個裝置} other {展開其他 {count} 個裝置}}"
 
@@ -461,7 +461,7 @@ msgstr "{count, plural, one {通話中} other {# 人通話中}}"
 msgid "{count, plural, one {Join video call (# participant)} other {Join video call (# participants)}}"
 msgstr "{count, plural, one {加入視訊通話（#位參與者）} other {加入視訊通話（#位參與者）}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:655
+#: src/features/voice/components/VoiceParticipantTile.tsx:669
 msgid "{count, plural, one {Keep watching # stream and add this one} other {Keep watching # streams and add this one}}"
 msgstr "{count, plural, one {繼續觀看 # 個直播並新增這個} other {繼續觀看 # 個直播並新增這個}}"
 
@@ -1092,7 +1092,7 @@ msgid "{productName} needs camera access to list your devices."
 msgstr "{productName} 需要相機存取權限才能列出您的裝置。"
 
 #. Voice settings notice shown when microphone permission has not been granted.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:135
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:136
 msgid "{productName} needs microphone access to list your devices."
 msgstr "{productName} 需要麥克風存取權限才能列出您的裝置。"
 
@@ -1637,6 +1637,11 @@ msgstr "12 個月 (1 年)"
 msgid "12-hour"
 msgstr "12 小時制"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+msgid "128 kbps voice quality"
+msgstr "128 kbps 語音品質"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:241
 msgid "1440p"
@@ -1685,6 +1690,11 @@ msgstr "24 小時制"
 msgid "25 uses"
 msgstr "25 次使用"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:151
+msgid "256 kbps voice quality"
+msgstr "256 kbps 語音品質"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AccountSecuritySections.ts:37
 msgid "2FA"
@@ -1730,6 +1740,11 @@ msgstr "30 分鐘"
 #: src/features/user/components/modals/tabs/component_gallery_tab/IndicatorsTab.tsx:300
 msgid "32px, 2 members"
 msgstr "32px，2 位成員"
+
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:156
+msgid "384 kbps voice quality"
+msgstr "384 kbps 語音品質"
 
 #: src/features/app/components/pages/NotFoundPage.tsx:19
 msgid "404: page not found"
@@ -2236,7 +2251,7 @@ msgid "Activity sharing"
 msgstr "活動分享"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:473
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:454
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:97
 msgid "Activity threshold"
 msgstr "語音偵測靈敏度"
@@ -2271,7 +2286,7 @@ msgid "Add a bot to a community with requested permissions"
 msgstr "新增機器人至社群並授予所需權限"
 
 #. Placeholder text in the optional comment field of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:90
+#: src/features/messaging/components/modals/ForwardModal.tsx:91
 msgid "Add a comment (optional)"
 msgstr "新增留言（選填）"
 
@@ -2311,7 +2326,7 @@ msgstr "新增標籤"
 msgid "Add a tag and press Enter"
 msgstr "新增標籤後按下 Enter 鍵"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
 msgid "Add a topic to this channel"
 msgstr "新增頻道主題"
 
@@ -2673,7 +2688,7 @@ msgid "Adds H.264 for mixed clients. Uses more encode work."
 msgstr "新增 H.264 以支援混合型客戶端。會增加更多編碼工作量。"
 
 #. Description for the custom profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:81
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:94
 msgid "Adjust each setting yourself: noise suppression, echo cancellation, and gain."
 msgstr "自行調整每個設定：雜訊抑制、回音消除和增益。"
 
@@ -2719,7 +2734,7 @@ msgstr "管理員已暫停邀請 — 您目前無法加入。"
 #. Collapsed-by-default group at the end of the community overview tab holding less common settings.
 #. Disclosure button label in the voice connection status popout. Reveals technical bandwidth and network stats.
 #. User settings tab for power-user and experimental application preferences.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:337
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:344
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/index.tsx:28
 #: src/features/user/components/settings_utils/SettingsConstants.tsx:140
 #: src/features/voice/components/voice_connection_status/VoiceDetailsPopout.tsx:60
@@ -2924,11 +2939,11 @@ msgstr "允許 {everyoneMention} 和 {hereMention}"
 msgid "Allow {PRODUCT_NAME} to access your camera in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 msgstr "在「{MACOS_SYSTEM_SETTINGS_NAME}」→「{MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME}」→「{MACOS_CAMERA_PERMISSION_NAME}」中允許 {PRODUCT_NAME} 存取您的相機。"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:529
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:522
 msgid "Allow {PRODUCT_NAME} to access your microphone in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 msgstr "請在「{MACOS_SYSTEM_SETTINGS_NAME}」→「{MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME}」→「{MACOS_MICROPHONE_PERMISSION_NAME}」中允許 {PRODUCT_NAME} 存取您的麥克風。"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:534
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:527
 msgid "Allow {PRODUCT_NAME} to access your microphone. Check your browser's address bar or settings."
 msgstr "允許 {PRODUCT_NAME} 存取您的麥克風。請檢查瀏覽器的網址列或設定。"
 
@@ -3030,7 +3045,7 @@ msgstr "允許沒有「{readMessageHistoryPermissionLabel}」權限的成員查�
 msgid "Allow mentions for this role"
 msgstr "允許提及此身分組"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:554
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:547
 msgid "Allow microphone"
 msgstr "允許麥克風"
 
@@ -3747,7 +3762,7 @@ msgid "Apply theme"
 msgstr "套用主題"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:145
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:148
 msgid "Apply to all communities"
 msgstr "套用到所有社群"
 
@@ -4075,7 +4090,7 @@ msgid "Audio output"
 msgstr "音訊輸出"
 
 #. Field label in the voice connection status popout. Shows received audio packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:109
+#: src/features/voice/components/voice_connection_status/shared.ts:107
 msgid "Audio packet loss:"
 msgstr "音訊封包遺失："
 
@@ -4090,32 +4105,32 @@ msgid "Audio preview"
 msgstr "音訊預覽"
 
 #. Voice settings modal title for microphone processing options.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:60
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:50
 msgid "Audio processing"
 msgstr "音訊處理中"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with enhanced (DeepFilterNet3) noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:21
+#: src/features/voice/components/voice_connection_status/shared.ts:19
 msgid "Audio processing (custom, enhanced)"
 msgstr "音訊處理 (自訂、增強)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with no noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:31
+#: src/features/voice/components/voice_connection_status/shared.ts:29
 msgid "Audio processing (custom, no suppression)"
 msgstr "音訊處理中 (自訂，無抑制)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with browser-built-in noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:26
+#: src/features/voice/components/voice_connection_status/shared.ts:24
 msgid "Audio processing (custom)"
 msgstr "音訊處理 (自訂)"
 
 #. Tooltip in the voice status popout. Describes the studio / direct-input mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:13
+#: src/features/voice/components/voice_connection_status/shared.ts:11
 msgid "Audio processing (direct input, raw)"
 msgstr "音訊處理（直接輸入，原始）"
 
 #. Tooltip in the voice status popout. Describes the focused-voice mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:17
+#: src/features/voice/components/voice_connection_status/shared.ts:15
 msgid "Audio processing (focused voice)"
 msgstr "音訊處理中 (語音聚焦)"
 
@@ -4125,12 +4140,12 @@ msgid "Audio progress"
 msgstr "音訊播放進度"
 
 #. Field label in the voice connection status popout. Shows current inbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:97
+#: src/features/voice/components/voice_connection_status/shared.ts:95
 msgid "Audio receive:"
 msgstr "音訊接收："
 
 #. Field label in the voice connection status popout. Shows current outbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:93
+#: src/features/voice/components/voice_connection_status/shared.ts:91
 msgid "Audio send:"
 msgstr "音訊傳送："
 
@@ -4305,8 +4320,8 @@ msgid "Auto sensitivity"
 msgstr "自動靈敏度"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:113
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:460
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:114
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:441
 msgid "Auto-set activity threshold"
 msgstr "自動設定活動閾值"
 
@@ -4439,7 +4454,7 @@ msgstr "從選取器自動傳送 GIF，不需確認"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF behavior preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:37
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:40
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:11
 msgid "Automatically send GIFs when selected"
 msgstr "選取後自動傳送 GIF"
@@ -4527,7 +4542,7 @@ msgid "Avatars"
 msgstr "虛擬替身"
 
 #. Field label in the voice connection status popout. Shows the average RTT in ms over the recent window.
-#: src/features/voice/components/voice_connection_status/shared.ts:52
+#: src/features/voice/components/voice_connection_status/shared.ts:50
 msgid "Average ping:"
 msgstr "平均 Ping："
 
@@ -4702,6 +4717,12 @@ msgstr "徽章"
 msgid "Balanced"
 msgstr "平衡"
 
+#. Noise suppression option label for the RNNoise backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:50
+msgctxt "noise-suppression-option"
+msgid "Balanced"
+msgstr "平衡"
+
 #. IAR modal: quick-action card button label for opening the ban dialog.
 #. Short moderation action label. Ban a member from a community by removing them and preventing rejoining.
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:129
@@ -4760,7 +4781,7 @@ msgid "Ban this user"
 msgstr "停用此使用者"
 
 #. Section heading in the voice connection status popout for current media bitrate usage.
-#: src/features/voice/components/voice_connection_status/shared.ts:68
+#: src/features/voice/components/voice_connection_status/shared.ts:66
 msgid "Bandwidth"
 msgstr "頻寬"
 
@@ -5337,6 +5358,11 @@ msgstr "內建搜尋引擎"
 msgid "Built-in shortcuts"
 msgstr "內建捷徑"
 
+#. Description for the standard noise suppression option, which uses the platform suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:19
+msgid "Built-in suppression from your browser or system."
+msgstr "內建的抑制功能，來自你的瀏覽器或系統。"
+
 #. Short label in the search engines tab. Keep it concise.
 #: src/features/user/components/modals/tabs/chat_settings_tab/SearchEnginesTab.tsx:85
 msgid "Built-in translators"
@@ -5657,7 +5683,7 @@ msgstr "無法在這裡上傳檔案"
 #: src/features/messaging/components/modals/AttachmentEditModal.tsx:133
 #: src/features/messaging/components/modals/EditAltTextModal.tsx:190
 #: src/features/messaging/components/modals/ExternalLinkWarningModal.tsx:111
-#: src/features/messaging/components/modals/ForwardModal.tsx:635
+#: src/features/messaging/components/modals/ForwardModal.tsx:636
 #: src/features/messaging/components/modals/ImageCropModal.tsx:925
 #: src/features/messaging/components/modals/MessageHistoryThresholdModal.tsx:107
 #: src/features/moderation/components/modals/BanMemberModal.tsx:262
@@ -5879,7 +5905,7 @@ msgstr "已複製類別 ID"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Form field label for the name of a favorites category.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:55
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:57
 #: src/features/expressions/components/modals/CreateFavoriteCategoryModal.tsx:20
 msgid "Category name"
 msgstr "類別名稱"
@@ -6278,7 +6304,7 @@ msgstr "頻道管理"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Short label in the channel duplicate modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:60
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:62
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:32
 msgid "Channel name"
 msgstr "頻道名稱"
@@ -6338,7 +6364,7 @@ msgid "Channel synced with parent category"
 msgstr "頻道已與父類別同步"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:46
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:48
 msgid "Channel topic is too long."
 msgstr "頻道主題過長。"
 
@@ -6361,8 +6387,8 @@ msgstr "頻道類型：{0}。"
 
 #. Audit log entry label. Past-tense action describing that a channel was edited.
 #: src/features/app/config/AuditLogConstants.ts:16
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:206
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:225
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:209
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:228
 msgid "Channel updated"
 msgstr "頻道已更新"
 
@@ -6644,7 +6670,7 @@ msgid "Choose hCaptcha or Cloudflare Turnstile for signup challenges."
 msgstr "選擇 hCaptcha 或 Cloudflare Turnstile 來進行註冊驗證。"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
 msgid "Choose how chat moves after you send a message"
 msgstr "選擇在您傳送訊息後，聊天視窗如何移動"
 
@@ -6931,13 +6957,19 @@ msgstr "兌換您的禮品以啟用您的 {premiumProductName} 訂閱！"
 msgid "Claiming to be another person, brand, or organization."
 msgstr "假冒他人、品牌或組織。"
 
+#. Noise suppression option label for the Speex backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:41
+msgctxt "noise-suppression-option"
+msgid "Classic"
+msgstr "經典"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:175
 msgid "Clean link"
 msgstr "清除連結"
 
 #. Description for the focused-voice option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:30
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:33
 msgid "Cleans up your mic for clear speech."
 msgstr "清理麥克風，讓語音更清晰。"
 
@@ -6982,7 +7014,7 @@ msgstr "清除附件模擬資料"
 
 #. Accessible label for the button that clears the slash command being composed in the message box.
 #. Accessible label for the composer button that clears the slash command currently being composed.
-#: src/features/channel/components/LexicalChannelTextareaContent.tsx:131
+#: src/features/channel/components/LexicalChannelTextareaContent.tsx:135
 #: src/features/channel/components/SlashCommandParamBar.tsx:16
 msgid "Clear command"
 msgstr "清除指令"
@@ -7004,6 +7036,11 @@ msgstr "要清除此訊息的所有心情回應嗎？"
 #: src/features/search/components/bottomsheets/QuickSwitcherBottomSheet.tsx:86
 msgid "Clear friends search"
 msgstr "清除好友搜尋"
+
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+msgid "Clear message text"
+msgstr "清除訊息文字"
 
 #. Developer-mode action that removes a mock for one attachment.
 #: src/features/ui/action_menu/MediaContextMenu.tsx:42
@@ -7098,6 +7135,11 @@ msgstr "已清除話題。"
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:244
 msgid "Clearer text"
 msgstr "清晰文字"
+
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+msgid "Clearing the text of a message with attachments asks to delete the message unless this is on"
+msgstr "關閉此選項後，刪除含有附件的訊息文字時，系統會詢問是否刪除該訊息"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx:108
@@ -7454,7 +7496,7 @@ msgstr "收合頻道主題"
 #. Tooltip / aria label on a voice participant tile button that collapses expanded device tiles for one user.
 #. Voice menu action that collapses expanded device tiles back into a single tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts:122
-#: src/features/voice/components/VoiceParticipantTile.tsx:176
+#: src/features/voice/components/VoiceParticipantTile.tsx:178
 msgid "Collapse devices"
 msgstr "收合裝置"
 
@@ -7557,17 +7599,17 @@ msgid "Commands"
 msgstr "指令"
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled when at least one selected target has slowmode active.
-#: src/features/messaging/components/modals/ForwardModal.tsx:63
+#: src/features/messaging/components/modals/ForwardModal.tsx:64
 msgid "Comments are disabled because one or more selected channels have slowmode on. The comment would be blocked by slowmode right after the forward."
 msgstr "由於您選擇的頻道已開啟慢速模式，留言功能已停用。轉傳後，您的留言會立即被慢速模式阻擋。"
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled for a single selected channel with slowmode.
-#: src/features/messaging/components/modals/ForwardModal.tsx:57
+#: src/features/messaging/components/modals/ForwardModal.tsx:58
 msgid "Comments are disabled because slowmode is on in {forwardChannelDisplayName}. The comment would be blocked by slowmode right after the forward."
 msgstr "因為「{forwardChannelDisplayName}」已開啟慢速模式，所以無法使用留言功能。留言在轉發後會立即被慢速模式阻擋。"
 
 #. Tooltip on the disabled comment field in the forward modal when slowmode blocks comments.
-#: src/features/messaging/components/modals/ForwardModal.tsx:86
+#: src/features/messaging/components/modals/ForwardModal.tsx:87
 msgid "Comments are unavailable while slowmode is on."
 msgstr "慢速模式開啟時無法留言。"
 
@@ -7741,7 +7783,7 @@ msgstr "社群名稱"
 
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:125
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:126
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:113
 msgid "Community nickname"
 msgstr "社群暱稱"
@@ -7794,7 +7836,7 @@ msgid "Community profile"
 msgstr "社群個人檔案"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:72
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:73
 msgid "Community profile updated"
 msgstr "社群檔案已更新"
 
@@ -7916,7 +7958,7 @@ msgstr "訊息輸入框按鈕"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:190
 msgid "Composer buttons"
 msgstr "輸入框按鈕"
@@ -7928,7 +7970,7 @@ msgstr "輸入框自動對焦"
 
 #. Button label that opens a dedicated advanced settings modal for configuring screen-share encoder controls.
 #. Button label that opens a dedicated advanced settings modal.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:161
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:164
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:160
 msgid "Configure"
 msgstr "設定"
@@ -8002,7 +8044,7 @@ msgstr "設定您的個人檔案徽章"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/channel/components/MentionEveryonePopout.tsx:181
 #: src/features/user/components/modals/EmailChangeModal.tsx:340
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
 msgid "Confirm"
 msgstr "確定"
 
@@ -8054,7 +8096,7 @@ msgid "Confirm voice join"
 msgstr "確認語音加入"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
 msgid "Confirmation"
 msgstr "確認"
 
@@ -8080,7 +8122,7 @@ msgstr "請連接相機或虛擬擷取裝置，然後再試一次。"
 msgid "Connect a display, then try again."
 msgstr "請連接顯示器後再試一次。"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:539
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:532
 msgid "Connect a microphone and try again."
 msgstr "請連接麥克風後再試一次。"
 
@@ -8545,7 +8587,7 @@ msgid "Copy emoji URL"
 msgstr "複製表情符號網址"
 
 #. Tooltip / button label that copies the voice endpoint hostname to the clipboard.
-#: src/features/voice/components/voice_connection_status/shared.ts:60
+#: src/features/voice/components/voice_connection_status/shared.ts:58
 msgid "Copy endpoint"
 msgstr "複製端點"
 
@@ -9152,7 +9194,7 @@ msgid "Couldn't ring this person"
 msgstr "無法撥打給此人"
 
 #. Error message in the use textarea submit hook. Preserve {detail}; it is inserted by code.
-#: src/features/messaging/hooks/useTextareaSubmit.ts:46
+#: src/features/messaging/hooks/useTextareaSubmit.ts:48
 msgid "Couldn't run that command: {detail}"
 msgstr "無法執行該指令：「{detail}」"
 
@@ -9710,7 +9752,7 @@ msgid "Current DM"
 msgstr "目前私訊"
 
 #. Field label in the voice connection status popout. Shows the latest RTT in ms.
-#: src/features/voice/components/voice_connection_status/shared.ts:43
+#: src/features/voice/components/voice_connection_status/shared.ts:41
 msgid "Current ping:"
 msgstr "目前 Ping："
 
@@ -9743,7 +9785,7 @@ msgstr "目前：{mutedText}"
 #. Streaming preset label in the stream settings menu. Lets user pick resolution and frame rate manually.
 #. Voice processing profile option label (mobile voice settings). User configures processing manually.
 #: src/features/user/components/modals/tabs/notifications_tab/NotificationsTabSounds.tsx:180
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:77
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:90
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:94
 #: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx:44
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:236
@@ -9754,7 +9796,7 @@ msgstr "自訂"
 
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:38
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:41
 #: src/features/voice/components/VoiceSettingsMenus.tsx:69
 msgctxt "voice-processing-profile"
 msgid "Custom"
@@ -10014,6 +10056,11 @@ msgstr "在個別社群中自訂你的虛擬替身、個人檔案橫幅、主題
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:46
 msgid "Cut"
 msgstr "剪下"
+
+#. Description for the noise gate suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:37
+msgid "Cuts audio below a loudness threshold, lowest CPU cost."
+msgstr "降低音量低於響度閾值的音訊，CPU 負擔最低。"
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts:127
@@ -10567,6 +10614,11 @@ msgstr "刪除其他成員的訊息。釘選功能是獨立控制的。"
 msgid "Delete passkey"
 msgstr "刪除通行密鑰"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+msgid "Delete prompt"
+msgstr "刪除提示"
+
 #. Button or menu action label in the application info section. Keep it concise. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/ApplicationInfoSection.tsx:56
 msgid "Delete redirect URI"
@@ -11009,7 +11061,7 @@ msgid "Device volume"
 msgstr "裝置音量"
 
 #. Field label in the voice connection status popout. Shows the connected voice region / device.
-#: src/features/voice/components/voice_connection_status/shared.ts:39
+#: src/features/voice/components/voice_connection_status/shared.ts:37
 msgid "Device:"
 msgstr "裝置："
 
@@ -11513,7 +11565,7 @@ msgstr "顯示模式"
 #. Short label in the inputs tab. Keep it concise.
 #. Short label in the my profile tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:22
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:137
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:138
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:61
 msgid "Display name"
 msgstr "顯示名稱"
@@ -11646,7 +11698,7 @@ msgstr "您也想封鎖來自現有社群成員的私訊嗎？"
 #. Label in the accessibility tab.
 #. Label in the my profile tab.
 #: src/features/user/components/modals/tabs/AccessibilityTab.tsx:53
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:145
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:146
 msgid "Doc, I'm from the future. I came here in a time machine that you invented. Now, I need your help to get back to the year 1985."
 msgstr "醫生，我來自未來。我搭乘您發明的時光機來到這裡。現在，我需要您的幫助才能回到 1985 年。"
 
@@ -11798,7 +11850,7 @@ msgid "Download button"
 msgstr "下載按鈕"
 
 #. Button or menu action label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:101
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:102
 msgid "Download desktop app"
 msgstr "下載電腦版應用程式"
 
@@ -12037,7 +12089,7 @@ msgid "Duplicate role"
 msgstr "複製角色"
 
 #. Field label in the voice connection status popout. Shows how long the current voice session has been connected.
-#: src/features/voice/components/voice_connection_status/shared.ts:76
+#: src/features/voice/components/voice_connection_status/shared.ts:74
 msgid "Duration:"
 msgstr "持續時間："
 
@@ -12280,7 +12332,7 @@ msgid "Edit translation provider"
 msgstr "編輯翻譯服務供應商"
 
 #. Button or menu action label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:92
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:93
 msgid "Edit your profile appearance and see a live preview"
 msgstr "編輯個人檔案外觀並查看即時預覽"
 
@@ -12501,7 +12553,7 @@ msgid "Emoji autocomplete"
 msgstr "表情符號自動完成功能"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
 msgid "Emoji button"
 msgstr "表情符號按鈕"
 
@@ -12581,6 +12633,11 @@ msgstr "表情符號"
 msgid "Emoticons"
 msgstr "表情符號"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+msgid "Empty edit"
+msgstr "清空編輯"
+
 #. Short label in the app layout favorites channel list content.
 #: src/features/app/components/layout/FavoritesChannelListContent.tsx:70
 msgid "Empty favorites"
@@ -12599,7 +12656,7 @@ msgid "Enable"
 msgstr "啟用"
 
 #. Voice settings CTA label for opening a platform permission prompt.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:121
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:122
 msgid "Enable {permissionName} permission"
 msgstr "啟用「{permissionName}」權限"
 
@@ -12794,7 +12851,7 @@ msgid "Enable self-hosted mode client-side. Hides all premium and billing UI."
 msgstr "啟用用戶端自託管模式。隱藏所有付費版和帳單使用者介面。"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:57
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:60
 msgid "Enable Shift to expand"
 msgstr "啟用 Shift 鍵展開"
 
@@ -12957,7 +13014,7 @@ msgid "Endpoint"
 msgstr "端點"
 
 #. Field label in the voice connection status popout. Shows the voice server endpoint hostname.
-#: src/features/voice/components/voice_connection_status/shared.ts:56
+#: src/features/voice/components/voice_connection_status/shared.ts:54
 msgid "Endpoint:"
 msgstr "端點："
 
@@ -12973,10 +13030,8 @@ msgstr "英文（美國）"
 
 #. Generic radio / dropdown option label for an "enhanced" tier.
 #. Noise suppression option label in the voice tab (neural filter). Keep it concise.
-#. Noise suppression option using the enhanced neural filter (DeepFilterNet3). Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:779
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:85
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:47
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:7
 msgid "Enhanced"
 msgstr "加強"
 
@@ -13249,7 +13304,7 @@ msgstr "整個系統音訊"
 #. Voice menu submenu label that contains per-user entrance sound mute and volume controls.
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:179
 #: src/features/ui/action_menu/items/VoiceParticipantMenuItems.tsx:309
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:186
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:187
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:145
 msgid "Entrance sound"
 msgstr "進場音效"
@@ -13358,8 +13413,8 @@ msgstr "晚上"
 
 #. Description for the automatic gain control toggle in the voice processing settings.
 #. Description for the automatic gain control toggle in the voice processing settings.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:170
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:72
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:171
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:62
 msgid "Evens out your mic volume so you are not too quiet."
 msgstr "讓你的麥克風音量更平均，避免太小聲。"
 
@@ -13937,12 +13992,12 @@ msgid "Failed to send code. Try again."
 msgstr "傳送驗證碼失敗。請再試一次。"
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:67
+#: src/features/channel/components/UserMessage.tsx:69
 msgid "Failed to send message."
 msgstr "訊息傳送失敗。"
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:63
+#: src/features/channel/components/UserMessage.tsx:65
 msgid "Failed to send message. Hold for options."
 msgstr "訊息傳送失敗。長按可顯示選項。"
 
@@ -14441,6 +14496,12 @@ msgstr "聚焦此人"
 msgid "Focus window"
 msgstr "將視窗移至前景"
 
+#. Noise suppression option label for the GTCRN speech backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:59
+msgctxt "noise-suppression-option"
+msgid "Focused"
+msgstr "專注"
+
 #. Voice input processing profile optimized for spoken voice.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:197
 msgid "Focused voice"
@@ -14714,7 +14775,7 @@ msgstr "轉寄媒體"
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #. Title of the forward message modal.
 #: src/features/input/state/input_keybind/shared.ts:25
-#: src/features/messaging/components/modals/ForwardModal.tsx:78
+#: src/features/messaging/components/modals/ForwardModal.tsx:79
 msgid "Forward message"
 msgstr "轉寄訊息"
 
@@ -15112,7 +15173,7 @@ msgid "GIF"
 msgstr "GIF"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
 msgid "GIF button"
 msgstr "GIF 按鈕"
 
@@ -15968,7 +16029,7 @@ msgid "Hide avatars"
 msgstr "隱藏大頭貼"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:507
 msgid "Hide channels you've muted from community sidebars"
 msgstr "在社群側邊欄中隱藏你已設為靜音的頻道"
 
@@ -16020,7 +16081,7 @@ msgid "Hide members"
 msgstr "隱藏成員"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:499
 msgid "Hide muted"
 msgstr "隱藏已靜音的對話"
 
@@ -16031,13 +16092,13 @@ msgstr "隱藏靜音的頻道"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced sidebar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:137
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:140
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:487
 msgid "Hide muted channels by default"
 msgstr "預設隱藏已靜音的頻道"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:141
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:144
 msgid "Hide muted channels by default?"
 msgstr "預設隱藏已靜音的頻道？"
 
@@ -16128,7 +16189,7 @@ msgid "Higher quality can cost more CPU and latency."
 msgstr "較高的品質可能會增加 CPU 使用量和延遲。"
 
 #. Description for the DeepFilterNet3 noise suppression strength slider.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:80
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:70
 msgid "Higher values remove more noise but can affect speech texture."
 msgstr "數值越高，消除的雜訊越多，但可能會影響語音質感。"
 
@@ -16315,7 +16376,7 @@ msgstr "我需要其他方式"
 
 #. Short label in the voice tab. Keep it concise.
 #: src/features/channel/components/MatureContentChannelGate.tsx:207
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:105
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:106
 msgid "I understand"
 msgstr "我了解了"
 
@@ -16738,7 +16799,7 @@ msgstr "在"
 msgid "In \"Operating system\" mode, dictionaries listed above are advisory. {PRODUCT_NAME} will pass these language tags to your OS spellchecker when supported. Tags it doesn't recognize are ignored."
 msgstr "在「作業系統」模式中，上方列出的字典僅供參考。如果支援，{PRODUCT_NAME} 會將這些語言標籤傳遞給您的作業系統拼字檢查工具。無法辨識的標籤將會被忽略。"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:318
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:299
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "在瀏覽器中，只有當「{PRODUCT_NAME}」分頁為焦點時，按下通話功能才能運作。請安裝桌面版應用程式以使用全系統的按下通話功能。"
 
@@ -16884,7 +16945,7 @@ msgid "Incoming calls: nobody"
 msgstr "來電：無人"
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available incoming bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:125
+#: src/features/voice/components/voice_connection_status/shared.ts:123
 msgid "Incoming capacity:"
 msgstr "傳入容量："
 
@@ -17023,7 +17084,7 @@ msgid "Input access was changed. Fully quit and restart {productName} so system-
 msgstr "輸入權限已變更。請完全結束並重新啟動 {productName}，以便系統範圍的快捷鍵可以使用它。"
 
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:174
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:175
 msgid "Input and output"
 msgstr "輸入和輸出"
 
@@ -17071,7 +17132,7 @@ msgstr "輸入與文字"
 msgid "Inputs with icons"
 msgstr "含圖示的輸入框"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:36
 msgid "Insert emoji"
 msgstr "插入表情符號"
 
@@ -17101,7 +17162,7 @@ msgid "Installing desktop update…"
 msgstr "正在安裝桌面版更新…"
 
 #. Audit log operation flag label for invite creation.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:170
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:185
 msgid "Instant invites"
 msgstr "即時邀請"
 
@@ -17578,7 +17639,7 @@ msgid "Jitter"
 msgstr "抖動"
 
 #. Field label in the voice connection status popout. Shows audio jitter in milliseconds.
-#: src/features/voice/components/voice_connection_status/shared.ts:117
+#: src/features/voice/components/voice_connection_status/shared.ts:115
 msgid "Jitter:"
 msgstr "抖動："
 
@@ -17641,7 +17702,7 @@ msgid "Join method"
 msgstr "加入方式"
 
 #. Audit log system-channel flag label for member join notification posts.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:182
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:197
 msgid "Join notifications"
 msgstr "加入通知"
 
@@ -17749,7 +17810,7 @@ msgid "Jump to message"
 msgstr "跳到訊息"
 
 #. Label in the channel and chat user message. Preserve {displayName}, {formattedDate}; they are inserted by code.
-#: src/features/channel/components/UserMessage.tsx:54
+#: src/features/channel/components/UserMessage.tsx:56
 msgid "Jump to message from {displayName}, sent {formattedDate}"
 msgstr "跳到{displayName}在{formattedDate}傳送的訊息"
 
@@ -17831,6 +17892,18 @@ msgstr "關閉視窗時，讓 {productName} 保持執行"
 msgid "Keep animations, GIF playback, hover effects, and tooltips running while the window is unfocused."
 msgstr "在視窗失去焦點時，仍保持動畫、GIF 播放、懸停效果和工具提示執行。"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+msgid "Keep attachments"
+msgstr "保留附件"
+
+#. Label for an advanced message editing preference.
+#. Settings search entry label. Names the settings search entry in the settings UI.
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:15
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+msgid "Keep attachments when clearing an edit"
+msgstr "清除編輯時保留附件"
+
 #. Description for the mirror premium model.
 #: src/features/app/components/setup/SetupWizardSteps.tsx:314
 msgid "Keep Free and Premium tiers. You can customize the tiers later."
@@ -17860,7 +17933,7 @@ msgid "Keep these safe. Regenerating will break existing integrations."
 msgstr "請妥善保管。重新產生金鑰會導致現有的整合服務中斷。"
 
 #. Description for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:65
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:78
 msgid "Keep transmitting briefly after release."
 msgstr "釋放按鈕後繼續傳輸一段時間。"
 
@@ -18017,7 +18090,7 @@ msgid "Latency {latency} milliseconds"
 msgstr "延遲 {latency} 毫秒"
 
 #. Aria label for the latency graph chart in the voice connection status popout.
-#: src/features/voice/components/voice_connection_status/shared.ts:35
+#: src/features/voice/components/voice_connection_status/shared.ts:33
 msgid "Latency graph"
 msgstr "延遲圖表"
 
@@ -18276,6 +18349,11 @@ msgstr "淺色模式"
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:46
 msgid "Light theme"
 msgstr "淺色主題"
+
+#. Description for the Speex noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:46
+msgid "Lightweight classic filter, works on any device."
+msgstr "輕量級經典濾鏡，適用於任何裝置。"
 
 #. Singular external-post stat label on a social post embed. Lowercase to appear after the count.
 #: src/features/channel/components/embeds/channel_embed/ChannelEmbedShared.ts:76
@@ -18641,7 +18719,7 @@ msgid "Look and feel"
 msgstr "外觀和風格"
 
 #. placeholder {0}: externalProcessor.name
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:648
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:641
 msgid "Looks like you're using {0}. Stacking {PRODUCT_NAME}'s processing on top can cause pumping or distortion. Direct input passes your audio through untouched."
 msgstr "看來您正在使用 {0}。在 {PRODUCT_NAME} 的處理上再疊加一層可能會導致聲音過強或失真。直接輸入會讓您的音訊不受影響地通過。"
 
@@ -18863,7 +18941,7 @@ msgstr "手動更新桌面版"
 #. Action label in the inbox popout overflow menu. Marks every inbox channel as read.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/messaging/components/popouts/InboxPopout.tsx:42
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
 msgid "Mark all as read"
 msgstr "全部標示為已讀"
 
@@ -18885,7 +18963,7 @@ msgid "Mark all inbox channels as read"
 msgstr "將收件匣中的所有頻道標示為已讀"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:483
 msgid "Mark all unread inbox channels as read immediately, without asking to confirm"
 msgstr "立即將所有未讀的收件匣頻道標示為已讀，不需確認"
 
@@ -19190,7 +19268,7 @@ msgid "Measuring latency..."
 msgstr "測量延遲中…"
 
 #. Placeholder shown while voice latency is still being sampled. Trailing ellipsis indicates ongoing measurement.
-#: src/features/voice/components/voice_connection_status/shared.ts:47
+#: src/features/voice/components/voice_connection_status/shared.ts:45
 msgid "Measuring…"
 msgstr "正在測量…"
 
@@ -19315,7 +19393,7 @@ msgid "Member list unavailable"
 msgstr "成員列表無法使用"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:178
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:193
 msgid "Member list updates"
 msgstr "成員名單更新"
 
@@ -19628,7 +19706,12 @@ msgstr "訊息顯示模式"
 msgid "Message display settings are only available on desktop."
 msgstr "訊息顯示設定僅供桌面版使用。"
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:306
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+msgid "Message editing"
+msgstr "編輯訊息"
+
+#: src/features/messaging/components/modals/ForwardModal.tsx:307
 msgid "Message forwarded"
 msgstr "訊息已轉傳"
 
@@ -19670,14 +19753,14 @@ msgstr "訊息輸入"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:194
 msgid "Message input buttons"
 msgstr "訊息輸入按鈕"
 
 #. Error modal title in the forward modal when the optional comment exceeds the message length limit.
 #. Form validation error indicating the message exceeds the allowed length.
-#: src/features/messaging/components/modals/ForwardModal.tsx:49
+#: src/features/messaging/components/modals/ForwardModal.tsx:50
 #: src/features/ui/character_counter/CharacterCountMessages.ts:15
 msgid "Message is too long"
 msgstr "訊息過長"
@@ -19839,7 +19922,7 @@ msgstr "麥克風"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:182
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:183
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:137
 msgid "Mic test"
 msgstr "麥克風測試"
@@ -20503,7 +20586,7 @@ msgstr "已關閉通知"
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:23
 #: src/features/app/components/layout/VoiceStateIcons.tsx:19
 #: src/features/ui/avatars/AvatarWithPresence.tsx:20
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:491
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:73
 #: src/features/voice/components/voice_participant_tile/shared.ts:98
 #: src/lib/overlay/OverlayContextMenu.tsx:24
@@ -20517,7 +20600,7 @@ msgstr "遭管理員靜音"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:495
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:69
 msgid "Muted channels"
 msgstr "已關閉通知的頻道"
@@ -20608,7 +20691,7 @@ msgid "My awesome sticker"
 msgstr "我的超讚貼圖"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:65
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:67
 msgid "My category"
 msgstr "我的類別"
 
@@ -20815,7 +20898,7 @@ msgid "Netherlands"
 msgstr "荷蘭"
 
 #. Section heading in the voice connection status popout for WebRTC network quality stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:72
+#: src/features/voice/components/voice_connection_status/shared.ts:70
 msgid "Network"
 msgstr "網路"
 
@@ -20828,6 +20911,16 @@ msgstr "網路錯誤"
 #: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:83
 msgid "Networking and performance"
 msgstr "網路與效能"
+
+#. Description for the enhanced (DeepFilterNet3) noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:11
+msgid "Neural filter that removes most background noise."
+msgstr "神經濾波器，可移除大部分背景噪音。"
+
+#. Description for the RNNoise noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:55
+msgid "Neural filter, full audio bandwidth."
+msgstr "神經濾波器，完整音訊頻寬。"
 
 #. Short label in the settings dialog permission components.
 #: src/features/app/components/dialogs/shared/PermissionComponents.tsx:20
@@ -20884,20 +20977,20 @@ msgid "New category"
 msgstr "新增分類"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:149
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:152
 msgid "New communities only"
 msgstr "僅限新社群"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:640
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:650
 msgid "New communities you join will automatically have muted channels hidden. Would you also like to apply this setting to all your existing communities?"
 msgstr "您新加入的社群會自動隱藏已靜音的頻道。您想將此設定套用到所有現有社群嗎？"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:671
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:681
 msgid "New communities you join will no longer have muted channels hidden automatically. Would you also like to show muted channels in all your existing communities?"
 msgstr "您新加入的社群將不再自動隱藏已設為靜音的頻道。您是否也想在所有現有社群中顯示已設為靜音的頻道？"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:503
 msgid "New community muted"
 msgstr "新社群已靜音"
 
@@ -21184,7 +21277,7 @@ msgstr "沒有要儲存的變更"
 msgid "No channels available"
 msgstr "沒有可用的頻道"
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:425
+#: src/features/messaging/components/modals/ForwardModal.tsx:426
 #: src/features/search/components/search/ChannelFilterSheet.tsx:120
 msgid "No channels found"
 msgstr "找不到任何頻道"
@@ -21356,7 +21449,7 @@ msgstr "沒有找到符合的項目"
 msgid "No mentions yet"
 msgstr "還沒有提及內容"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:524
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:517
 msgid "No microphone found"
 msgstr "找不到麥克風"
 
@@ -21655,6 +21748,12 @@ msgstr "沒有符合搜尋條件的結果。"
 msgid "Noise"
 msgstr "噪音"
 
+#. Noise suppression option label for the noise gate backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:32
+msgctxt "noise-suppression-option"
+msgid "Noise gate"
+msgstr "降噪閘"
+
 #. Voice setting label for microphone background-noise filtering.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:205
 msgid "Noise suppression"
@@ -21669,20 +21768,18 @@ msgstr "非動態表情符號 ({emojiCount})"
 #. Library picker entry meaning no sound is selected for this scope.
 #. Member verification level option in the community moderation settings tab. Short standalone label for the lowest level (no verification).
 #. Short label in the visual tab. Keep it concise.
-#. Short label in the voice tab. Keep it concise.
 #. Summary row value on the confirm step when no items in the category were selected.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:41
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:47
 #: src/features/user/components/modals/tabs/accessibility_tab/VisualTab.tsx:36
 #: src/features/user/components/modals/tabs/components/EntranceSoundSection.tsx:143
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx:219
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:93
 #: src/features/voice/components/AudioSourcePickerLinux.tsx:261
 msgid "None"
 msgstr "無"
 
 #. Noise suppression option that disables suppression.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:55
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:23
 msgctxt "noise-suppression-option"
 msgid "None"
 msgstr "無"
@@ -22113,7 +22210,7 @@ msgstr "僅限選取的社群"
 msgid "Only Visionary members can join this community. Your access may have changed since this screen was opened."
 msgstr "只有 Visionary 會員才能加入此社群。您的權限可能已在開啟此畫面後變更。"
 
-#: src/features/channel/components/UserMessage.tsx:427
+#: src/features/channel/components/UserMessage.tsx:429
 msgid "Only you can see this message. <0>Dismiss</0>"
 msgstr "只有您能看見此訊息。<0>關閉</0>"
 
@@ -22176,7 +22273,7 @@ msgid "Open {settingsMenuName} settings"
 msgstr "開啟{settingsMenuName}設定"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:36
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:37
 msgid "Open {title}"
 msgstr "開啟「{title}」"
 
@@ -22352,7 +22449,7 @@ msgid "Open emoji in browser"
 msgstr "在瀏覽器中開啟表情符號"
 
 #. Accessible label for the emoji picker trigger button in the forward modal comment field.
-#: src/features/messaging/components/modals/ForwardModal.tsx:94
+#: src/features/messaging/components/modals/ForwardModal.tsx:95
 #: src/features/user/components/modals/tabs/my_profile_tab/BioEditor.tsx:27
 msgid "Open emoji picker"
 msgstr "開啟表情符號選取器"
@@ -22779,7 +22876,7 @@ msgid "Our safety team is reviewing it. We'll send you a DM and email once we've
 msgstr "我們的安全團隊正在審核。一旦有結果，我們會透過私訊和電子郵件通知您。"
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available outgoing bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:121
+#: src/features/voice/components/voice_connection_status/shared.ts:119
 msgid "Outgoing capacity:"
 msgstr "外送容量："
 
@@ -22915,7 +23012,7 @@ msgid "Participants"
 msgstr "參與者"
 
 #. Field label in the voice connection status popout. Shows the current LiveKit participant count.
-#: src/features/voice/components/voice_connection_status/shared.ts:81
+#: src/features/voice/components/voice_connection_status/shared.ts:79
 msgid "Participants:"
 msgstr "參與者："
 
@@ -23402,7 +23499,7 @@ msgid "Pick what appears when you type a colon in the message input"
 msgstr "選擇當您在訊息輸入欄中輸入冒號時，要顯示的內容"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
 msgid "Pick which buttons show in the message input"
 msgstr "選擇要在訊息輸入欄中顯示哪些按鈕"
 
@@ -24174,18 +24271,18 @@ msgstr "個人檔案顏色"
 
 #. Settings section label for editing profile appearance and identity.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:104
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:105
 #: src/features/user/components/settings_utils/section_registry/GeneralSettingsSections.ts:6
 msgid "Profile customization"
 msgstr "個人檔案設定"
 
 #. Label in the my profile tab. Preserve {selectedGuildName}; it is inserted by code.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:100
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:101
 msgid "Profile customization for {selectedGuildName}"
 msgstr "{selectedGuildName} 的個人檔案自訂"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:96
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:97
 msgid "Profile customization form"
 msgstr "個人檔案設定表單"
 
@@ -24250,7 +24347,7 @@ msgid "Profile type"
 msgstr "個人檔案類型"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:76
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:77
 msgid "Profile updated"
 msgstr "個人檔案已更新"
 
@@ -24275,7 +24372,7 @@ msgid "Promotion or instructions encouraging self-harm or eating disorders."
 msgstr "宣傳或指示自殘或飲食失調。"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
 msgid "Prompt"
 msgstr "提示"
 
@@ -24287,7 +24384,7 @@ msgstr "提示新的音訊裝置"
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:141
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:142
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:177
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:160
 msgid "Pronouns"
@@ -24349,7 +24446,7 @@ msgid "Public registration is closed."
 msgstr "公開註冊已關閉。"
 
 #. Field label in the voice connection status popout. Shows technical WebRTC publisher ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:129
+#: src/features/voice/components/voice_connection_status/shared.ts:127
 msgid "Publisher transport:"
 msgstr "發佈者傳輸："
 
@@ -24438,7 +24535,7 @@ msgid "Push notification inactive timeout"
 msgstr "推播通知閒置逾時"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:162
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:177
 msgid "Push notifications"
 msgstr "推播通知"
 
@@ -24487,18 +24584,18 @@ msgid "Push to talk key"
 msgstr "按鍵通話"
 
 #. Switch label in the voice tab toggling push-to-talk mode. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:109
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:357
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:110
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:338
 #: src/features/voice/components/VoiceSettingsMenus.tsx:417
 msgid "Push-to-talk"
 msgstr "Push-to-talk"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:97
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:98
 msgid "Push-to-talk (limited)"
 msgstr "按住說話 (限制)"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:670
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:663
 msgid "Push-to-talk is ignored in direct input. Switch to focused voice or custom to use it."
 msgstr "在直接輸入模式中，按鍵通話會被忽略。請切換到語音焦點或自訂模式以使用此功能。"
 
@@ -24508,12 +24605,12 @@ msgid "Push-to-talk is on. Hold {pushToTalkHint} to speak."
 msgstr "已開啟按鍵通話。按住 {pushToTalkHint} 即可說話。"
 
 #. Voice settings warning shown when macOS Input Monitoring is required for system-wide push-to-talk. {productName} is the app name and {permissionName} is the macOS permission name.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:129
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:130
 msgid "Push-to-talk only works while {productName} is focused until {permissionName} is enabled. After changing the permission, fully quit and restart {productName} so system-wide hotkeys can use it."
 msgstr "啟用「{permissionName}」之前，按鍵通話功能僅在「{productName}」為焦點時有效。變更權限後，請完全退出並重新啟動「{productName}」，以便系統範圍的快捷鍵可以使用此功能。"
 
 #. Voice settings warning shown when push-to-talk is enabled in a browser.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:125
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:126
 msgid "Push-to-talk only works while the browser tab is focused."
 msgstr "按下通話功能僅在瀏覽器分頁為焦點時有效。"
 
@@ -24775,7 +24872,7 @@ msgid "Receive notifications when someone mentions you"
 msgstr "當有人提及你時接收通知"
 
 #. Field label in the voice connection status popout. Shows total current inbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:89
+#: src/features/voice/components/voice_connection_status/shared.ts:87
 msgid "Receive:"
 msgstr "接收："
 
@@ -24819,7 +24916,7 @@ msgid "Recommended"
 msgstr "推薦"
 
 #. Description for the focused voice profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:69
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:82
 msgid "Recommended. Cleans up your mic for clear speech."
 msgstr "建議使用。讓你的麥克風更清晰地收音。"
 
@@ -25085,7 +25182,7 @@ msgstr "相對"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:61
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:74
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:89
 msgid "Release delay"
 msgstr "延遲釋放"
@@ -26802,7 +26899,7 @@ msgstr "儲存到我的最愛"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF storage preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:41
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:44
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:47
 msgid "Save GIF favorites as saved media"
 msgstr "將 GIF 收藏儲存為已儲存的媒體"
@@ -26953,7 +27050,7 @@ msgid "Screen share encoder controls"
 msgstr "螢幕分享編碼器控制項"
 
 #. Title of a modal shown when an active screen share stops unexpectedly.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:104
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:113
 msgctxt "screen-share"
 msgid "Screen share ended"
 msgstr "螢幕分享已結束"
@@ -27105,15 +27202,15 @@ msgstr "向下捲動以查看 {premiumProductName} 隨附的所有福利"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the whats new modal.
 #: src/features/app/components/whats_new/WhatsNewModal.tsx:29
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:178
 msgid "Scroll to bottom"
 msgstr "滑到底部"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:129
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:132
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
 msgid "Scroll to bottom when sending a message"
 msgstr "傳送訊息時捲動至底部"
 
@@ -27182,7 +27279,7 @@ msgid "Search channels"
 msgstr "搜尋頻道"
 
 #. Placeholder text in the channel picker search input of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:82
+#: src/features/messaging/components/modals/ForwardModal.tsx:83
 msgid "Search channels or DMs"
 msgstr "搜尋頻道或私訊"
 
@@ -27646,7 +27743,7 @@ msgid "Select friends"
 msgstr "選擇朋友"
 
 #. Button label in the gif picker grid item when picking a GIF for an avatar, banner, or video background. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:50
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:51
 msgid "Select GIF {title}"
 msgstr "選取 GIF {title}"
 
@@ -27672,7 +27769,7 @@ msgid "Select the account you want to sign in with on the desktop app."
 msgstr "請選擇您想登入桌面版應用程式的帳號。"
 
 #. Aria label for the voice processing radio group in the voice settings tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:117
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:118
 msgid "Select voice processing mode"
 msgstr "選取語音處理模式"
 
@@ -27776,7 +27873,7 @@ msgid "Send"
 msgstr "傳送"
 
 #. Primary button label in the forward message modal. selectedCount is the number of selected destinations; selectionLimit is the maximum allowed.
-#: src/features/messaging/components/modals/ForwardModal.tsx:98
+#: src/features/messaging/components/modals/ForwardModal.tsx:99
 msgid "Send ({selectedCount}/{selectionLimit})"
 msgstr "傳送 ({selectedCount}/{selectionLimit})"
 
@@ -27826,7 +27923,7 @@ msgstr "傳送其他檢舉"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:170
 msgid "Send button"
 msgstr "傳送按鈕"
@@ -27844,7 +27941,7 @@ msgstr "傳送 DSA 報告"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:113
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:116
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:127
 msgid "Send file messages in order"
 msgstr "依序傳送檔案訊息"
@@ -27860,7 +27957,7 @@ msgid "Send friend request"
 msgstr "傳送好友邀請"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:45
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:46
 msgid "Send GIF {title}"
 msgstr "傳送 GIF {title}"
 
@@ -27882,7 +27979,7 @@ msgstr "傳送訊息"
 
 #. Audit log operation flag label for message sending.
 #. Permission name: allows sending chat messages.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:174
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:189
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:400
 msgid "Send messages"
 msgstr "傳送訊息"
@@ -27971,7 +28068,7 @@ msgid "Send voice message"
 msgstr "傳送語音訊息"
 
 #. Field label in the voice connection status popout. Shows total current outbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:85
+#: src/features/voice/components/voice_connection_status/shared.ts:83
 msgid "Send:"
 msgstr "傳送："
 
@@ -27994,15 +28091,25 @@ msgstr "傳送惡意軟體或危險連結"
 msgid "Sending messages is disabled in this community"
 msgstr "此社群已停用訊息傳送功能"
 
+#. Description for the stereo microphone switch in the voice settings.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:72
+msgid "Sends both channels of a stereo microphone. Works only with no suppression or standard suppression."
+msgstr "將立體聲麥克風的兩個聲道都傳送出去。僅在未啟用或啟用標準降噪時有效。"
+
 #. Description for the studio / direct-input option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:34
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:37
 msgid "Sends raw mic audio with no processing."
 msgstr "傳送未經處理的原始麥克風音訊。"
 
 #. Description for the direct input profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:73
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:86
 msgid "Sends your audio untouched. Best if you're using external audio software."
 msgstr "直接傳送您的音訊。如果您使用外部音訊軟體，此為最佳選擇。"
+
+#. Description for the noise suppression option that disables suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:28
+msgid "Sends your microphone audio with no suppression."
+msgstr "將您的麥克風音訊傳送出去，不進行任何降噪處理。"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the privacy dashboard. Keep it concise.
@@ -28049,7 +28156,7 @@ msgstr "傳送了內嵌訊息"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:182
 msgid "Sent messages"
 msgstr "已傳送的訊息"
@@ -28074,7 +28181,7 @@ msgid "Service error"
 msgstr "服務錯誤"
 
 #. Section heading in the voice connection status popout for current call/session debug stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:64
+#: src/features/voice/components/voice_connection_status/shared.ts:62
 msgid "Session"
 msgstr "工作階段"
 
@@ -28561,7 +28668,7 @@ msgstr "短代碼"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:372
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:353
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:105
 msgid "Shortcut"
@@ -28589,12 +28696,12 @@ msgid "Shortcuts"
 msgstr "捷徑"
 
 #. Body of the error modal shown when the forward modal comment exceeds the message length limit.
-#: src/features/messaging/components/modals/ForwardModal.tsx:53
+#: src/features/messaging/components/modals/ForwardModal.tsx:54
 msgid "Shorten the message and try again."
 msgstr "請縮短訊息後再試一次。"
 
 #. Body of the error modal shown when the channel topic exceeds the maximum length.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:51
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:53
 msgid "Shorten the topic and try again."
 msgstr "縮短主題後再試一次。"
 
@@ -28647,7 +28754,7 @@ msgid "Show active now on the home screen to surface friends active in voice. Yo
 msgstr "在主畫面顯示「目前在線上」狀態，讓您看到正在語音聊天的朋友。您會看到預覽、頻道內容、誰已在裡面，以及快速加入的方式。"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:65
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:68
 msgid "Show attachment expiry indicator"
 msgstr "顯示附件到期指示"
 
@@ -28698,7 +28805,7 @@ msgid "Show creation date instead of expiration date"
 msgstr "顯示建立日期而非到期日"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:89
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:92
 msgid "Show custom emojis in expression autocomplete"
 msgstr "在表情符號自動完成中顯示自訂表情符號"
 
@@ -28708,17 +28815,17 @@ msgid "Show default avatar, ignoring your global profile"
 msgstr "顯示預設大頭貼，忽略你的全球個人檔案設定"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:85
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:88
 msgid "Show default emojis in expression autocomplete"
 msgstr "在表情符號自動完成中顯示預設表情符號"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:69
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:72
 msgid "Show delete button"
 msgstr "顯示刪除按鈕"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:73
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:76
 msgid "Show download button"
 msgstr "顯示下載按鈕"
 
@@ -28745,7 +28852,7 @@ msgstr "顯示內嵌內容和網站連結預覽"
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:55
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:121
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:124
 msgid "Show emoji button"
 msgstr "顯示表情符號按鈕"
 
@@ -28755,7 +28862,7 @@ msgid "Show emoji reactions on messages"
 msgstr "在訊息上顯示表情回應"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:77
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:80
 msgid "Show favorite button"
 msgstr "顯示我的最愛按鈕"
 
@@ -28777,14 +28884,14 @@ msgid "Show focus ring on chat textarea"
 msgstr "在聊天文字輸入區顯示焦點框"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:61
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:64
 msgid "Show GIF indicator"
 msgstr "顯示 GIF 指示器"
 
 #. Plus menu submenu toggle that shows the GIFs button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:43
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:101
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:104
 msgid "Show GIFs button"
 msgstr "顯示 GIF 按鈕"
 
@@ -28794,7 +28901,7 @@ msgid "Show icon when collapsed"
 msgstr "收合時顯示圖示"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:157
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:160
 msgid "Show in all communities"
 msgstr "在所有社群中顯示"
 
@@ -28833,7 +28940,7 @@ msgstr "顯示最多 5 個（+5 徽章）"
 #. Plus menu submenu toggle that shows the saved media (memes) button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:47
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:105
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:108
 msgid "Show media button"
 msgstr "顯示媒體按鈕"
 
@@ -28854,7 +28961,7 @@ msgid "Show menu bar icon"
 msgstr "顯示選單列圖示"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:45
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:48
 msgid "Show message action bar"
 msgstr "顯示訊息操作列"
 
@@ -28937,7 +29044,7 @@ msgid "Show oldest messages first"
 msgstr "顯示最舊訊息優先"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:49
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:52
 msgid "Show only more button"
 msgstr "只顯示「更多」按鈕"
 
@@ -28962,7 +29069,7 @@ msgid "Show profile timezone settings"
 msgstr "顯示個人檔案時區設定"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:53
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:56
 msgid "Show quick reactions"
 msgstr "顯示快速回應"
 
@@ -28972,7 +29079,7 @@ msgid "Show rich previews for YouTube links."
 msgstr "顯示 YouTube 連結的豐富預覽。"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:97
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:100
 msgid "Show saved media in expression autocomplete"
 msgstr "在表情符號自動完成中顯示儲存的媒體"
 
@@ -28981,7 +29088,7 @@ msgstr "在表情符號自動完成中顯示儲存的媒體"
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:102
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:59
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:125
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:128
 msgid "Show send button"
 msgstr "顯示傳送按鈕"
 
@@ -28993,12 +29100,12 @@ msgstr "點擊後顯示劇透內容"
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:51
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:117
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:120
 msgid "Show stickers button"
 msgstr "顯示貼圖按鈕"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:93
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:96
 msgid "Show stickers in expression autocomplete"
 msgstr "在表情符號自動完成中顯示貼圖"
 
@@ -29008,7 +29115,7 @@ msgid "Show strikethrough markdown text in a slightly muted color."
 msgstr "以稍微柔和的顏色顯示刪除線 Markdown 文字。"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:81
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:84
 msgid "Show suppress embeds button"
 msgstr "顯示隱藏嵌入內容按鈕"
 
@@ -29298,14 +29405,14 @@ msgid "Size selection"
 msgstr "選擇尺寸"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
 msgid "Skip"
 msgstr "略過"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced inbox preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:133
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:136
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
 msgid "Skip \"Mark all as read\" confirmation"
 msgstr "跳過「全部標示為已讀」的確認步驟"
 
@@ -29343,7 +29450,7 @@ msgid "Skip this step"
 msgstr "略過此步驟"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx:70
+#: src/app/App.tsx:69
 msgid "Skip to content"
 msgstr "跳到內容"
 
@@ -30095,9 +30202,7 @@ msgid "Staff controls"
 msgstr "內部人員控制選項"
 
 #. Noise suppression option label in the voice tab (browser default). Keep it concise.
-#. Noise suppression option using the browser built-in engine. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:89
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:51
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:15
 msgid "Standard"
 msgstr "標準"
 
@@ -30301,6 +30406,11 @@ msgstr "步驟 3"
 msgid "Step 4"
 msgstr "步驟 4"
 
+#. Switch label in the voice settings that sends both channels of a stereo microphone. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:68
+msgid "Stereo microphone"
+msgstr "立體聲麥克風"
+
 #. Label for the has:sticker filter option in the mobile channel search sheet.
 #. Screen-reader fragment listing one sticker on a message. Lowercase because it appears inside a longer sentence.
 #. has:sticker chip label. Always lowercase; matches the typed query value 1:1.
@@ -30451,7 +30561,7 @@ msgid "Stop"
 msgstr "停止"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:153
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:156
 msgid "Stop hiding muted channels by default?"
 msgstr "要停止預設隱藏已設為靜音的頻道嗎？"
 
@@ -30520,7 +30630,7 @@ msgid "Stop."
 msgstr "停止。"
 
 #. Description for the echo cancellation toggle in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:68
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:58
 msgid "Stops your speakers from looping back into your mic."
 msgstr "避免喇叭的聲音回傳到你的麥克風。"
 
@@ -30654,6 +30764,11 @@ msgstr "Stripe 偵測到一張發卡國家為 {countryName} 的卡片。若要�
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
 msgstr "畫質佳，CPU 耗用中等。Chromium 螢幕分享的理想備用方案。"
 
+#. Description for the GTCRN noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:64
+msgid "Strongest neural filter for speech, limits audio to the speech range."
+msgstr "最強的神經濾鏡，將音訊限制在語音範圍內。"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:130
 msgid "Styling"
@@ -30669,7 +30784,7 @@ msgid "Submitting"
 msgstr "正在送出"
 
 #. Field label in the voice connection status popout. Shows technical WebRTC subscriber ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:133
+#: src/features/voice/components/voice_connection_status/shared.ts:131
 msgid "Subscriber transport:"
 msgstr "訂閱者傳輸："
 
@@ -30764,7 +30879,7 @@ msgid "Suppression"
 msgstr "隱藏"
 
 #. Label for the DeepFilterNet3 noise suppression strength slider in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:76
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:66
 msgid "Suppression strength"
 msgstr "抑制強度"
 
@@ -30851,7 +30966,7 @@ msgstr "切換成舒適版面配置"
 msgid "Switch to dense layout"
 msgstr "切換為緊湊版面配置"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:643
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:636
 msgid "Switch to direct input"
 msgstr "切換為直接輸入"
 
@@ -31635,7 +31750,7 @@ msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "提供的 redirect_uri 必須使用 HTTP 或 HTTPS。"
 
 #. Body of a modal shown when a browser screen share track ends outside the app, for example from the browser sharing controls.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:109
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:118
 msgctxt "screen-share"
 msgid "The screen share source stopped sending video, so your screen share was stopped."
 msgstr "螢幕分享來源已停止傳送視訊，因此您的螢幕分享已停止。"
@@ -32333,7 +32448,7 @@ msgid "This message no longer exists."
 msgstr "此訊息已不存在。"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:129
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:130
 msgid "This nickname will only be visible in this community"
 msgstr "這個暱稱只會在此社群中顯示"
 
@@ -32540,7 +32655,7 @@ msgid "This voice channel is no longer available."
 msgstr "此語音頻道已無法使用。"
 
 #. Description text in the channel and chat user message. Preserve {silentMention}; it is inserted by code.
-#: src/features/channel/components/UserMessage.tsx:71
+#: src/features/channel/components/UserMessage.tsx:73
 msgid "This was a {silentMention} message."
 msgstr "這是一則{silentMention}訊息。"
 
@@ -32970,7 +33085,7 @@ msgstr "熱門"
 msgid "Top tooltip"
 msgstr "頂端工具提示"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:33
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
 msgid "Topic"
 msgstr "主題"
 
@@ -33280,7 +33395,7 @@ msgid "TTS speed"
 msgstr "TTS 語速"
 
 #. Description for the custom option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:43
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:46
 msgid "Tune the processing yourself."
 msgstr "自行調整處理方式。"
 
@@ -33373,7 +33488,7 @@ msgstr "開啟直播隱私設定"
 
 #. Label in the input tab.
 #. Settings search entry label. Names the settings search entry in the settings UI.
-#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:10
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:11
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:363
 msgid "Turn text smileys into emoji"
 msgstr "將文字表情符號轉換為表情符號"
@@ -33479,7 +33594,7 @@ msgid "Typing avatars"
 msgstr "打字頭像"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:166
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:181
 msgid "Typing events"
 msgstr "輸入事件"
 
@@ -33609,12 +33724,12 @@ msgid "Unavailable"
 msgstr "無法使用"
 
 #. Audit log community feature label meaning the community is unavailable to all users.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:150
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:165
 msgid "Unavailable for everyone"
 msgstr "所有人皆無法使用"
 
 #. Audit log community feature label meaning only staff can access the community.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:154
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:169
 msgid "Unavailable for everyone but staff"
 msgstr "除了管理員以外，其他人都無法使用"
 
@@ -33923,7 +34038,7 @@ msgstr "不明使用者"
 #: src/features/devtools/utils/CommandUtils.ts:27
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTab.tsx:114
 #: src/features/voice/components/VoiceParticipantAvatarList.tsx:44
-#: src/features/voice/components/VoiceParticipantTile.tsx:172
+#: src/features/voice/components/VoiceParticipantTile.tsx:174
 #: src/features/webhook/components/WebhookListItem.tsx:30
 msgid "Unknown user"
 msgstr "不明使用者"
@@ -34447,7 +34562,7 @@ msgid "Updater state"
 msgstr "更新器狀態"
 
 #. Short label in the channel and chat gif picker grid item. Keep it concise.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:41
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:42
 msgid "Updating favorites…"
 msgstr "正在更新我的最愛…"
 
@@ -34506,7 +34621,7 @@ msgstr "上傳素材"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input privacy preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:109
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:112
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:107
 msgid "Upload attachments before sending"
 msgstr "在傳送前上傳附件"
@@ -34658,7 +34773,7 @@ msgstr "正在上傳表情符號"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for the URL input in the embed debugger.
 #. Short label in the channel create modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:70
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:72
 #: src/features/channel/components/modals/ChannelCreateModal.tsx:37
 #: src/features/user/components/modals/tabs/EmbedDebuggerTab.tsx:34
 #: src/features/user/components/settings_utils/search_index/EmbedDebuggerIndex.ts:19
@@ -35509,22 +35624,22 @@ msgid "Verify your email before adding an authenticator app."
 msgstr "請先驗證您的電子郵件，然後再新增驗證器應用程式。"
 
 #. Description text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:116
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:117
 msgid "Verify your email before changing your community nickname, avatar, banner, bio, pronouns, or accent color."
 msgstr "請先驗證你的電子郵件，才能更改社群暱稱、大頭貼、封面、個人簡介、代名詞或主題顏色。"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:120
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:121
 msgid "Verify your email before changing your username, display name, avatar, banner, bio, pronouns, timezone, or {premiumProductName} badge privacy."
 msgstr "請先驗證你的電子郵件，然後再變更你的使用者名稱、顯示名稱、大頭貼、橫幅、個人簡介、代名詞、時區或{premiumProductName}徽章隱私設定。"
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:84
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:85
 msgid "Verify your email before editing this community profile. You can still preview it here."
 msgstr "請先驗證你的電子郵件，才能編輯這個社群個人檔案。你仍然可以在這裡預覽。"
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:88
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:89
 msgid "Verify your email before editing your profile. You can still preview it here."
 msgstr "請先驗證你的電子郵件，然後再編輯個人檔案。你仍然可以在這裡預覽。"
 
@@ -35556,12 +35671,12 @@ msgid "Verify your email to continue using {productName}."
 msgstr "請驗證您的電子郵件，以繼續使用 {productName}。"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:108
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:109
 msgid "Verify your email to edit this community profile"
 msgstr "請驗證你的電子郵件以編輯此社群個人檔案"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:112
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:113
 msgid "Verify your email to edit your profile"
 msgstr "驗證電子郵件以編輯個人檔案"
 
@@ -35666,7 +35781,7 @@ msgid "Video options"
 msgstr "影片選項"
 
 #. Field label in the voice connection status popout. Shows received video packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:113
+#: src/features/voice/components/voice_connection_status/shared.ts:111
 msgid "Video packet loss:"
 msgstr "視訊封包遺失："
 
@@ -35690,7 +35805,7 @@ msgid "Video quality"
 msgstr "視訊畫質"
 
 #. Field label in the voice connection status popout. Shows current inbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:105
+#: src/features/voice/components/voice_connection_status/shared.ts:103
 msgid "Video receive:"
 msgstr "視訊接收："
 
@@ -35700,7 +35815,7 @@ msgid "Video scrubbing"
 msgstr "影片快進/倒退"
 
 #. Field label in the voice connection status popout. Shows current outbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:101
+#: src/features/voice/components/voice_connection_status/shared.ts:99
 msgid "Video send:"
 msgstr "視訊傳送："
 
@@ -35983,7 +36098,7 @@ msgid "Violent or graphic content"
 msgstr "暴力或血腥內容"
 
 #. Audit log community feature label for elevated voice capacity/quality.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:161
 msgid "VIP voice"
 msgstr "VIP 語音"
 
@@ -35994,7 +36109,7 @@ msgstr "誰能看見"
 
 #. Audit log community feature label for the Visionary premium feature.
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:416
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:158
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:173
 msgid "Visionary"
 msgstr "遠見者"
 
@@ -36239,8 +36354,8 @@ msgid "Voice participants"
 msgstr "語音聊天成員"
 
 #. Voice settings radio group label for microphone processing profile.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:638
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:64
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:631
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:54
 msgid "Voice processing"
 msgstr "語音處理"
 
@@ -36295,7 +36410,7 @@ msgstr "已作廢"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:373
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:178
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:179
 #: src/features/user/components/settings_utils/search_index/NotificationsIndex.ts:86
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:174
 msgid "Volume"
@@ -36342,12 +36457,12 @@ msgid "Waiting for passkey…"
 msgstr "正在等候通行密鑰…"
 
 #. Inline notice in the forward modal when slowmode is active in the selected target channel. forwardChannelDisplayName is the channel name.
-#: src/features/messaging/components/modals/ForwardModal.tsx:69
+#: src/features/messaging/components/modals/ForwardModal.tsx:70
 msgid "Waiting for slowmode in {forwardChannelDisplayName} to expire."
 msgstr "正在等待「{forwardChannelDisplayName}」的慢速模式結束。"
 
 #. Inline notice in the forward modal when slowmode is active in one or more selected target channels.
-#: src/features/messaging/components/modals/ForwardModal.tsx:74
+#: src/features/messaging/components/modals/ForwardModal.tsx:75
 msgid "Waiting for slowmode in one or more selected channels to expire."
 msgstr "等待一個或多個所選頻道的慢速模式結束。"
 
@@ -36925,7 +37040,7 @@ msgstr "哪些對話"
 msgid "Which rule was broken?"
 msgstr "違反了哪條規則？"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:366
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:347
 msgid "While push-to-talk is on, your shortcut controls your microphone, so the mute button is disabled."
 msgstr "啟用按住說話功能時，您的快捷鍵會控制麥克風，因此靜音按鈕會停用。"
 
@@ -37322,7 +37437,7 @@ msgid "You can't befriend yourself"
 msgstr "你不能加自己為好友"
 
 #. Label in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:133
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:134
 msgid "You can't change your nickname here"
 msgstr "你無法在這裡更改暱稱"
 
@@ -37572,7 +37687,7 @@ msgid "You have unsaved changes."
 msgstr "您有未儲存的變更。"
 
 #. Warning text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:80
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:81
 msgid "You have unsaved changes. Save or reset before leaving."
 msgstr "您有未儲存的變更。請先儲存或重設，再離開。"
 
@@ -38336,7 +38451,7 @@ msgid "Your registration needs an extra anti-spam check before you can continue.
 msgstr "您的註冊需要額外的防垃圾訊息驗證，才能繼續。"
 
 #. Body of a modal shown when the video codec the browser negotiated for an active screen share is outside the codecs the app allows and no allowed codec could be published, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:115
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:124
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "由於無法使用相容的視訊轉碼器發布您的螢幕畫面，因此已停止分享。請再試一次。"
@@ -38435,7 +38550,7 @@ msgid "Your vanity URL has been set to {inviteEndpoint}/{vanitySlug}"
 msgstr "您的自訂網址已設為 {inviteEndpoint}/{vanitySlug}"
 
 #. Body of a modal shown when the local video encoder produces no frames for an active screen share, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:122
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:131
 msgctxt "screen-share"
 msgid "Your video encoder stopped encoding frames, so your screen share was stopped. Try sharing again."
 msgstr "您的視訊編碼器停止編碼影格，因此您的螢幕分享已停止。請再試一次分享。"

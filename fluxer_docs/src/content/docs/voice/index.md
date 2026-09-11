@@ -79,6 +79,8 @@ A call never acks. A refused placement into a direct message or group direct mes
 
 A guild voice channel stores its `bitrate`, `user_limit`, `voice_connection_limit`, and `rtc_region` on the [channel object](/http-api/channels/#channel-object). It also has ordinary messages, pins, and slowmode, so its text history is read and written through the [Messages resource](/http-api/messages/).
 
+A new voice channel stores a `bitrate` of 64000. The ceiling is 96000, and the `AUDIO_BITRATE_128_KBPS`, `AUDIO_BITRATE_256_KBPS`, and `AUDIO_BITRATE_384_KBPS` [guild features](/http-api/guilds/#guild-features) raise it to 128000, 256000, and 384000. A direct message and a group direct message call carry no `bitrate` and always run at 64000.
+
 ### Permissions
 
 | Permission | Effect on voice |
@@ -134,6 +136,8 @@ A member whose `communication_disabled_until` is still in the future is refused 
 `rtc_region` is written by [Modify channel](/http-api/channels/#modify-channel) and requires UPDATE_RTC_REGION. A null value selects automatic routing, and so does a stored value the placing account cannot reach.
 
 The first placement in the channel pins one voice server for it, and every later placement inherits that pinned server whatever its own coordinates are. A placement that finds no usable pin takes the accessible server nearest to the `latitude` and `longitude` the placement command supplied. Where the command supplied no usable coordinates, the placement falls back to the deployment's default region, and then to the first accessible region.
+
+A voice server can have a soft connection limit. A placement that has to choose a server prefers the servers below their limit and uses one that is at or above its limit only when no other server can take the placement. [Soft connection limits](/admin-api/voice/#soft-connection-limits) describes the rule in full.
 
 The pin drops when the channel's `rtc_region` changes, when a call changes region, when the pinned server stops being accessible, or when the media server reports the room finished. That last case also disconnects every connection in a guild voice channel.
 

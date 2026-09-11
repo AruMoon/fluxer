@@ -20,7 +20,7 @@ msgstr "... aktivera kompakt läge. Snyggt!"
 
 #. Button or menu action label in the channel and chat user message. Keep it concise.
 #: src/features/channel/components/MessageAttachments.tsx:358
-#: src/features/channel/components/UserMessage.tsx:59
+#: src/features/channel/components/UserMessage.tsx:61
 msgid "(edited)"
 msgstr "(redigerat)"
 
@@ -440,7 +440,7 @@ msgstr "{count, plural, one {Visa fler (# rad)} other {Visa fler (# rader)}}"
 msgid "{count, plural, one {Expand (# row)} other {Expand (# rows)}}"
 msgstr "{count, plural, one {Visa (# rad)} other {Visa (# rader)}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:315
+#: src/features/voice/components/VoiceParticipantTile.tsx:317
 msgid "{count, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{count, plural, one {Visa # annan enhet} other {Visa # andra enheter}}"
 
@@ -461,7 +461,7 @@ msgstr "{count, plural, one {I samtal} other {# i samtal}}"
 msgid "{count, plural, one {Join video call (# participant)} other {Join video call (# participants)}}"
 msgstr "{count, plural, one {Gå med i videosamtal (# deltagare)} other {Gå med i videosamtal (# deltagare)}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:655
+#: src/features/voice/components/VoiceParticipantTile.tsx:669
 msgid "{count, plural, one {Keep watching # stream and add this one} other {Keep watching # streams and add this one}}"
 msgstr "Fortsätt titta på {count, plural, one {# stream} other {# streams}} och lägg till den här"
 
@@ -1092,7 +1092,7 @@ msgid "{productName} needs camera access to list your devices."
 msgstr "{productName} behöver åtkomst till kameran för att visa dina enheter."
 
 #. Voice settings notice shown when microphone permission has not been granted.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:135
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:136
 msgid "{productName} needs microphone access to list your devices."
 msgstr "{productName} behöver mikrofonåtkomst för att visa dina enheter."
 
@@ -1637,6 +1637,11 @@ msgstr "12 månader (1 år)"
 msgid "12-hour"
 msgstr "12-timmars"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+msgid "128 kbps voice quality"
+msgstr "128 kbit/s röstkvalitet"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:241
 msgid "1440p"
@@ -1685,6 +1690,11 @@ msgstr "24-timmars"
 msgid "25 uses"
 msgstr "25 användningar"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:151
+msgid "256 kbps voice quality"
+msgstr "256 kbit/s röstkvalitet"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AccountSecuritySections.ts:37
 msgid "2FA"
@@ -1730,6 +1740,11 @@ msgstr "30 minuter"
 #: src/features/user/components/modals/tabs/component_gallery_tab/IndicatorsTab.tsx:300
 msgid "32px, 2 members"
 msgstr "32 px, 2 medlemmar"
+
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:156
+msgid "384 kbps voice quality"
+msgstr "384 kbit/s röstkvalitet"
 
 #: src/features/app/components/pages/NotFoundPage.tsx:19
 msgid "404: page not found"
@@ -2236,7 +2251,7 @@ msgid "Activity sharing"
 msgstr "Delning av aktivitet"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:473
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:454
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:97
 msgid "Activity threshold"
 msgstr "Aktivitetströskel"
@@ -2271,7 +2286,7 @@ msgid "Add a bot to a community with requested permissions"
 msgstr "Lägg till en bot i en community med begärda behörigheter"
 
 #. Placeholder text in the optional comment field of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:90
+#: src/features/messaging/components/modals/ForwardModal.tsx:91
 msgid "Add a comment (optional)"
 msgstr "Lägg till en kommentar (valfritt)"
 
@@ -2311,7 +2326,7 @@ msgstr "Lägg till en tagg"
 msgid "Add a tag and press Enter"
 msgstr "Lägg till en tagg och tryck på Retur"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
 msgid "Add a topic to this channel"
 msgstr "Lägg till ett ämne i den här kanalen"
 
@@ -2673,7 +2688,7 @@ msgid "Adds H.264 for mixed clients. Uses more encode work."
 msgstr "Lägger till H.264 för blandade klienter. Använder mer beräkningskraft vid kodning."
 
 #. Description for the custom profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:81
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:94
 msgid "Adjust each setting yourself: noise suppression, echo cancellation, and gain."
 msgstr "Justera varje inställning själv: brusreducering, ekoreducering och förstärkning."
 
@@ -2719,7 +2734,7 @@ msgstr "Administratörer pausade inbjudningar – du kan inte gå med just nu."
 #. Collapsed-by-default group at the end of the community overview tab holding less common settings.
 #. Disclosure button label in the voice connection status popout. Reveals technical bandwidth and network stats.
 #. User settings tab for power-user and experimental application preferences.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:337
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:344
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/index.tsx:28
 #: src/features/user/components/settings_utils/SettingsConstants.tsx:140
 #: src/features/voice/components/voice_connection_status/VoiceDetailsPopout.tsx:60
@@ -2924,11 +2939,11 @@ msgstr "Tillåt {everyoneMention} och {hereMention}"
 msgid "Allow {PRODUCT_NAME} to access your camera in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 msgstr "Tillåt {PRODUCT_NAME} att komma åt din kamera i {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:529
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:522
 msgid "Allow {PRODUCT_NAME} to access your microphone in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 msgstr "Tillåt att {PRODUCT_NAME} får åtkomst till din mikrofon i {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:534
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:527
 msgid "Allow {PRODUCT_NAME} to access your microphone. Check your browser's address bar or settings."
 msgstr "Tillåt {PRODUCT_NAME} att komma åt din mikrofon. Kontrollera webbläsarens adressfält eller inställningar."
 
@@ -3030,7 +3045,7 @@ msgstr "Tillåt medlemmar utan behörigheten {readMessageHistoryPermissionLabel}
 msgid "Allow mentions for this role"
 msgstr "Tillåt omnämnanden för den här rollen"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:554
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:547
 msgid "Allow microphone"
 msgstr "Tillåt mikrofon"
 
@@ -3747,7 +3762,7 @@ msgid "Apply theme"
 msgstr "Använd tema"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:145
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:148
 msgid "Apply to all communities"
 msgstr "Tillämpa på alla grupper"
 
@@ -4075,7 +4090,7 @@ msgid "Audio output"
 msgstr "Ljudutgång"
 
 #. Field label in the voice connection status popout. Shows received audio packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:109
+#: src/features/voice/components/voice_connection_status/shared.ts:107
 msgid "Audio packet loss:"
 msgstr "Förlorade ljudpaket:"
 
@@ -4090,32 +4105,32 @@ msgid "Audio preview"
 msgstr "Ljudförhandsgranskning"
 
 #. Voice settings modal title for microphone processing options.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:60
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:50
 msgid "Audio processing"
 msgstr "Ljudbehandling"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with enhanced (DeepFilterNet3) noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:21
+#: src/features/voice/components/voice_connection_status/shared.ts:19
 msgid "Audio processing (custom, enhanced)"
 msgstr "Ljudbehandling (anpassad, förbättrad)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with no noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:31
+#: src/features/voice/components/voice_connection_status/shared.ts:29
 msgid "Audio processing (custom, no suppression)"
 msgstr "Ljudbehandling (anpassad, ingen brusreducering)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with browser-built-in noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:26
+#: src/features/voice/components/voice_connection_status/shared.ts:24
 msgid "Audio processing (custom)"
 msgstr "Ljudbehandling (anpassad)"
 
 #. Tooltip in the voice status popout. Describes the studio / direct-input mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:13
+#: src/features/voice/components/voice_connection_status/shared.ts:11
 msgid "Audio processing (direct input, raw)"
 msgstr "Ljudbehandling (direkt inmatning, rådata)"
 
 #. Tooltip in the voice status popout. Describes the focused-voice mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:17
+#: src/features/voice/components/voice_connection_status/shared.ts:15
 msgid "Audio processing (focused voice)"
 msgstr "Ljudbehandling (fokuserat röstläge)"
 
@@ -4125,12 +4140,12 @@ msgid "Audio progress"
 msgstr "Ljudförlopp"
 
 #. Field label in the voice connection status popout. Shows current inbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:97
+#: src/features/voice/components/voice_connection_status/shared.ts:95
 msgid "Audio receive:"
 msgstr "Ljudmottagning:"
 
 #. Field label in the voice connection status popout. Shows current outbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:93
+#: src/features/voice/components/voice_connection_status/shared.ts:91
 msgid "Audio send:"
 msgstr "Ljud skickas:"
 
@@ -4305,8 +4320,8 @@ msgid "Auto sensitivity"
 msgstr "Automatisk känslighet"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:113
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:460
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:114
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:441
 msgid "Auto-set activity threshold"
 msgstr "Ställ in aktivitetströskel automatiskt"
 
@@ -4439,7 +4454,7 @@ msgstr "Skicka GIF:ar automatiskt från väljaren utan bekräftelse"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF behavior preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:37
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:40
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:11
 msgid "Automatically send GIFs when selected"
 msgstr "Skicka GIF automatiskt när vald"
@@ -4527,7 +4542,7 @@ msgid "Avatars"
 msgstr "Avatarer"
 
 #. Field label in the voice connection status popout. Shows the average RTT in ms over the recent window.
-#: src/features/voice/components/voice_connection_status/shared.ts:52
+#: src/features/voice/components/voice_connection_status/shared.ts:50
 msgid "Average ping:"
 msgstr "Genomsnittlig ping:"
 
@@ -4702,6 +4717,12 @@ msgstr "Märke"
 msgid "Balanced"
 msgstr "Balanserad"
 
+#. Noise suppression option label for the RNNoise backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:50
+msgctxt "noise-suppression-option"
+msgid "Balanced"
+msgstr "Balanserad"
+
 #. IAR modal: quick-action card button label for opening the ban dialog.
 #. Short moderation action label. Ban a member from a community by removing them and preventing rejoining.
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:129
@@ -4760,7 +4781,7 @@ msgid "Ban this user"
 msgstr "Banna den här användaren"
 
 #. Section heading in the voice connection status popout for current media bitrate usage.
-#: src/features/voice/components/voice_connection_status/shared.ts:68
+#: src/features/voice/components/voice_connection_status/shared.ts:66
 msgid "Bandwidth"
 msgstr "Bandbredd"
 
@@ -5337,6 +5358,11 @@ msgstr "Inbyggda sökmotorer"
 msgid "Built-in shortcuts"
 msgstr "Inbyggda genvägar"
 
+#. Description for the standard noise suppression option, which uses the platform suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:19
+msgid "Built-in suppression from your browser or system."
+msgstr "Inbyggd brusreducering från din webbläsare eller system."
+
 #. Short label in the search engines tab. Keep it concise.
 #: src/features/user/components/modals/tabs/chat_settings_tab/SearchEnginesTab.tsx:85
 msgid "Built-in translators"
@@ -5657,7 +5683,7 @@ msgstr "Kan inte ladda upp filer här"
 #: src/features/messaging/components/modals/AttachmentEditModal.tsx:133
 #: src/features/messaging/components/modals/EditAltTextModal.tsx:190
 #: src/features/messaging/components/modals/ExternalLinkWarningModal.tsx:111
-#: src/features/messaging/components/modals/ForwardModal.tsx:635
+#: src/features/messaging/components/modals/ForwardModal.tsx:636
 #: src/features/messaging/components/modals/ImageCropModal.tsx:925
 #: src/features/messaging/components/modals/MessageHistoryThresholdModal.tsx:107
 #: src/features/moderation/components/modals/BanMemberModal.tsx:262
@@ -5879,7 +5905,7 @@ msgstr "Kategori-ID kopierat"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Form field label for the name of a favorites category.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:55
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:57
 #: src/features/expressions/components/modals/CreateFavoriteCategoryModal.tsx:20
 msgid "Category name"
 msgstr "Kategorinamn"
@@ -6278,7 +6304,7 @@ msgstr "Kanalhantering"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Short label in the channel duplicate modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:60
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:62
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:32
 msgid "Channel name"
 msgstr "Kanalnamn"
@@ -6338,7 +6364,7 @@ msgid "Channel synced with parent category"
 msgstr "Kanalen är synkroniserad med den överordnade kategorin"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:46
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:48
 msgid "Channel topic is too long."
 msgstr "Kanalämnet är för långt."
 
@@ -6361,8 +6387,8 @@ msgstr "Kanaltyp: {0}."
 
 #. Audit log entry label. Past-tense action describing that a channel was edited.
 #: src/features/app/config/AuditLogConstants.ts:16
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:206
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:225
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:209
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:228
 msgid "Channel updated"
 msgstr "Kanalen uppdaterades"
 
@@ -6644,7 +6670,7 @@ msgid "Choose hCaptcha or Cloudflare Turnstile for signup challenges."
 msgstr "Välj hCaptcha eller Cloudflare Turnstile för registreringsutmaningar."
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
 msgid "Choose how chat moves after you send a message"
 msgstr "Välj hur du vill att konversationen ska fortsätta efter att du har skickat ett meddelande"
 
@@ -6931,13 +6957,19 @@ msgstr "Aktivera din gåva för att få tillgång till ditt {premiumProductName}
 msgid "Claiming to be another person, brand, or organization."
 msgstr "Utger sig för att vara en annan person, ett varumärke eller en organisation."
 
+#. Noise suppression option label for the Speex backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:41
+msgctxt "noise-suppression-option"
+msgid "Classic"
+msgstr "Klassisk"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:175
 msgid "Clean link"
 msgstr "Rensa länk"
 
 #. Description for the focused-voice option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:30
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:33
 msgid "Cleans up your mic for clear speech."
 msgstr "Rensar upp din mikrofon för tydligt tal."
 
@@ -6982,7 +7014,7 @@ msgstr "Rensa bilagemockar"
 
 #. Accessible label for the button that clears the slash command being composed in the message box.
 #. Accessible label for the composer button that clears the slash command currently being composed.
-#: src/features/channel/components/LexicalChannelTextareaContent.tsx:131
+#: src/features/channel/components/LexicalChannelTextareaContent.tsx:135
 #: src/features/channel/components/SlashCommandParamBar.tsx:16
 msgid "Clear command"
 msgstr "Rensa kommando"
@@ -7004,6 +7036,11 @@ msgstr "Rensa alla reaktioner från det här meddelandet?"
 #: src/features/search/components/bottomsheets/QuickSwitcherBottomSheet.tsx:86
 msgid "Clear friends search"
 msgstr "Rensa vänners sökning"
+
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+msgid "Clear message text"
+msgstr "Rensa meddelandetext"
 
 #. Developer-mode action that removes a mock for one attachment.
 #: src/features/ui/action_menu/MediaContextMenu.tsx:42
@@ -7098,6 +7135,11 @@ msgstr "Tog bort ämnet."
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:244
 msgid "Clearer text"
 msgstr "Tydligare text"
+
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+msgid "Clearing the text of a message with attachments asks to delete the message unless this is on"
+msgstr "Att rensa texten i ett meddelande med bilagor frågar om att ta bort meddelandet om detta inte är aktiverat"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx:108
@@ -7454,7 +7496,7 @@ msgstr "Fäll ihop kanalämne"
 #. Tooltip / aria label on a voice participant tile button that collapses expanded device tiles for one user.
 #. Voice menu action that collapses expanded device tiles back into a single tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts:122
-#: src/features/voice/components/VoiceParticipantTile.tsx:176
+#: src/features/voice/components/VoiceParticipantTile.tsx:178
 msgid "Collapse devices"
 msgstr "Fäll ihop enheter"
 
@@ -7557,17 +7599,17 @@ msgid "Commands"
 msgstr "Kommandon"
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled when at least one selected target has slowmode active.
-#: src/features/messaging/components/modals/ForwardModal.tsx:63
+#: src/features/messaging/components/modals/ForwardModal.tsx:64
 msgid "Comments are disabled because one or more selected channels have slowmode on. The comment would be blocked by slowmode right after the forward."
 msgstr "Kommentarer är inaktiverade eftersom en eller flera valda kanaler har långsamt läge aktiverat. Kommentaren skulle blockeras av långsamt läge direkt efter vidarebefordran."
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled for a single selected channel with slowmode.
-#: src/features/messaging/components/modals/ForwardModal.tsx:57
+#: src/features/messaging/components/modals/ForwardModal.tsx:58
 msgid "Comments are disabled because slowmode is on in {forwardChannelDisplayName}. The comment would be blocked by slowmode right after the forward."
 msgstr "Kommentarer är inaktiverade eftersom långsamt läge är aktiverat i {forwardChannelDisplayName}. Kommentaren skulle blockeras av långsamt läge direkt efter vidarebefordran."
 
 #. Tooltip on the disabled comment field in the forward modal when slowmode blocks comments.
-#: src/features/messaging/components/modals/ForwardModal.tsx:86
+#: src/features/messaging/components/modals/ForwardModal.tsx:87
 msgid "Comments are unavailable while slowmode is on."
 msgstr "Kommentarer är inte tillgängliga när långsamt läge är aktiverat."
 
@@ -7741,7 +7783,7 @@ msgstr "Namn på community"
 
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:125
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:126
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:113
 msgid "Community nickname"
 msgstr "Smeknamn i communityt"
@@ -7794,7 +7836,7 @@ msgid "Community profile"
 msgstr "Communityprofil"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:72
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:73
 msgid "Community profile updated"
 msgstr "Gemenskapsprofilen uppdaterad"
 
@@ -7916,7 +7958,7 @@ msgstr "Skrivarknapp"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:190
 msgid "Composer buttons"
 msgstr "Kompositionsknappar"
@@ -7928,7 +7970,7 @@ msgstr "Kompositörsfokus"
 
 #. Button label that opens a dedicated advanced settings modal for configuring screen-share encoder controls.
 #. Button label that opens a dedicated advanced settings modal.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:161
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:164
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:160
 msgid "Configure"
 msgstr "Konfigurera"
@@ -8002,7 +8044,7 @@ msgstr "Konfigurera din profilbricka"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/channel/components/MentionEveryonePopout.tsx:181
 #: src/features/user/components/modals/EmailChangeModal.tsx:340
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
 msgid "Confirm"
 msgstr "Bekräfta"
 
@@ -8054,7 +8096,7 @@ msgid "Confirm voice join"
 msgstr "Bekräfta röstanslutning"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
 msgid "Confirmation"
 msgstr "Bekräftelse"
 
@@ -8080,7 +8122,7 @@ msgstr "Anslut en kamera eller virtuell inspelningsenhet och försök igen."
 msgid "Connect a display, then try again."
 msgstr "Anslut en skärm och försök igen."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:539
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:532
 msgid "Connect a microphone and try again."
 msgstr "Anslut en mikrofon och försök igen."
 
@@ -8545,7 +8587,7 @@ msgid "Copy emoji URL"
 msgstr "Kopiera emoji-URL"
 
 #. Tooltip / button label that copies the voice endpoint hostname to the clipboard.
-#: src/features/voice/components/voice_connection_status/shared.ts:60
+#: src/features/voice/components/voice_connection_status/shared.ts:58
 msgid "Copy endpoint"
 msgstr "Kopiera slutpunkt"
 
@@ -9152,7 +9194,7 @@ msgid "Couldn't ring this person"
 msgstr "Kunde inte ringa den här personen"
 
 #. Error message in the use textarea submit hook. Preserve {detail}; it is inserted by code.
-#: src/features/messaging/hooks/useTextareaSubmit.ts:46
+#: src/features/messaging/hooks/useTextareaSubmit.ts:48
 msgid "Couldn't run that command: {detail}"
 msgstr "Kunde inte köra kommandot: {detail}"
 
@@ -9710,7 +9752,7 @@ msgid "Current DM"
 msgstr "Nuvarande DM"
 
 #. Field label in the voice connection status popout. Shows the latest RTT in ms.
-#: src/features/voice/components/voice_connection_status/shared.ts:43
+#: src/features/voice/components/voice_connection_status/shared.ts:41
 msgid "Current ping:"
 msgstr "Aktuell ping:"
 
@@ -9743,7 +9785,7 @@ msgstr "Nuvarande: {mutedText}"
 #. Streaming preset label in the stream settings menu. Lets user pick resolution and frame rate manually.
 #. Voice processing profile option label (mobile voice settings). User configures processing manually.
 #: src/features/user/components/modals/tabs/notifications_tab/NotificationsTabSounds.tsx:180
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:77
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:90
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:94
 #: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx:44
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:236
@@ -9754,7 +9796,7 @@ msgstr "Anpassad"
 
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:38
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:41
 #: src/features/voice/components/VoiceSettingsMenus.tsx:69
 msgctxt "voice-processing-profile"
 msgid "Custom"
@@ -10014,6 +10056,11 @@ msgstr "För att kunna anpassa din avatar, banner, accentfärg och biografi för
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:46
 msgid "Cut"
 msgstr "Klipp ut"
+
+#. Description for the noise gate suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:37
+msgid "Cuts audio below a loudness threshold, lowest CPU cost."
+msgstr "Klipper bort ljud under en ljudnivåtröskel, lägst CPU-kostnad."
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts:127
@@ -10567,6 +10614,11 @@ msgstr "Ta bort andra medlemmars meddelanden. Fästning styrs separat."
 msgid "Delete passkey"
 msgstr "Ta bort lösennyckel"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+msgid "Delete prompt"
+msgstr "Radera prompt"
+
 #. Button or menu action label in the application info section. Keep it concise. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/ApplicationInfoSection.tsx:56
 msgid "Delete redirect URI"
@@ -11009,7 +11061,7 @@ msgid "Device volume"
 msgstr "Enhetsvolym"
 
 #. Field label in the voice connection status popout. Shows the connected voice region / device.
-#: src/features/voice/components/voice_connection_status/shared.ts:39
+#: src/features/voice/components/voice_connection_status/shared.ts:37
 msgid "Device:"
 msgstr "Enhet:"
 
@@ -11513,7 +11565,7 @@ msgstr "Visningsläge"
 #. Short label in the inputs tab. Keep it concise.
 #. Short label in the my profile tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:22
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:137
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:138
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:61
 msgid "Display name"
 msgstr "Visningsnamn"
@@ -11646,7 +11698,7 @@ msgstr "Vill du även blockera direktmeddelanden från medlemmar i dina befintli
 #. Label in the accessibility tab.
 #. Label in the my profile tab.
 #: src/features/user/components/modals/tabs/AccessibilityTab.tsx:53
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:145
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:146
 msgid "Doc, I'm from the future. I came here in a time machine that you invented. Now, I need your help to get back to the year 1985."
 msgstr "Doktor, jag är från framtiden. Jag kom hit i en tidsmaskin som du uppfann. Nu behöver jag din hjälp för att komma tillbaka till år 1985."
 
@@ -11798,7 +11850,7 @@ msgid "Download button"
 msgstr "Ladda ner-knapp"
 
 #. Button or menu action label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:101
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:102
 msgid "Download desktop app"
 msgstr "Ladda ner datorappen"
 
@@ -12037,7 +12089,7 @@ msgid "Duplicate role"
 msgstr "Duplicera roll"
 
 #. Field label in the voice connection status popout. Shows how long the current voice session has been connected.
-#: src/features/voice/components/voice_connection_status/shared.ts:76
+#: src/features/voice/components/voice_connection_status/shared.ts:74
 msgid "Duration:"
 msgstr "Varaktighet:"
 
@@ -12280,7 +12332,7 @@ msgid "Edit translation provider"
 msgstr "Redigera översättningsleverantör"
 
 #. Button or menu action label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:92
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:93
 msgid "Edit your profile appearance and see a live preview"
 msgstr "Redigera din profil och se en förhandsvisning"
 
@@ -12501,7 +12553,7 @@ msgid "Emoji autocomplete"
 msgstr "emoji-förslag"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
 msgid "Emoji button"
 msgstr "emoji-knapp"
 
@@ -12581,6 +12633,11 @@ msgstr "Emotikon"
 msgid "Emoticons"
 msgstr "Emotikoner"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+msgid "Empty edit"
+msgstr "Tom redigering"
+
 #. Short label in the app layout favorites channel list content.
 #: src/features/app/components/layout/FavoritesChannelListContent.tsx:70
 msgid "Empty favorites"
@@ -12599,7 +12656,7 @@ msgid "Enable"
 msgstr "Aktivera"
 
 #. Voice settings CTA label for opening a platform permission prompt.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:121
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:122
 msgid "Enable {permissionName} permission"
 msgstr "Aktivera behörigheten {permissionName}"
 
@@ -12794,7 +12851,7 @@ msgid "Enable self-hosted mode client-side. Hides all premium and billing UI."
 msgstr "Aktivera klientbaserat läge för egen värd. Döljer allt premiuminnehåll och faktureringsgränssnitt."
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:57
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:60
 msgid "Enable Shift to expand"
 msgstr "Aktivera Skift för att expandera"
 
@@ -12957,7 +13014,7 @@ msgid "Endpoint"
 msgstr "Slutpunkt"
 
 #. Field label in the voice connection status popout. Shows the voice server endpoint hostname.
-#: src/features/voice/components/voice_connection_status/shared.ts:56
+#: src/features/voice/components/voice_connection_status/shared.ts:54
 msgid "Endpoint:"
 msgstr "Slutpunkt:"
 
@@ -12973,10 +13030,8 @@ msgstr "Engelska (USA)"
 
 #. Generic radio / dropdown option label for an "enhanced" tier.
 #. Noise suppression option label in the voice tab (neural filter). Keep it concise.
-#. Noise suppression option using the enhanced neural filter (DeepFilterNet3). Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:779
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:85
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:47
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:7
 msgid "Enhanced"
 msgstr "Förbättrad"
 
@@ -13249,7 +13304,7 @@ msgstr "Hela systemljudet"
 #. Voice menu submenu label that contains per-user entrance sound mute and volume controls.
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:179
 #: src/features/ui/action_menu/items/VoiceParticipantMenuItems.tsx:309
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:186
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:187
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:145
 msgid "Entrance sound"
 msgstr "Ljud vid inträde"
@@ -13358,8 +13413,8 @@ msgstr "Kvällstid"
 
 #. Description for the automatic gain control toggle in the voice processing settings.
 #. Description for the automatic gain control toggle in the voice processing settings.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:170
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:72
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:171
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:62
 msgid "Evens out your mic volume so you are not too quiet."
 msgstr "Jämnar ut din mikrofonvolym så att du inte är för tyst."
 
@@ -13937,12 +13992,12 @@ msgid "Failed to send code. Try again."
 msgstr "Det gick inte att skicka koden. Försök igen."
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:67
+#: src/features/channel/components/UserMessage.tsx:69
 msgid "Failed to send message."
 msgstr "Kunde inte skicka meddelandet."
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:63
+#: src/features/channel/components/UserMessage.tsx:65
 msgid "Failed to send message. Hold for options."
 msgstr "Kunde inte skicka meddelande. Håll ned för alternativ."
 
@@ -14441,6 +14496,12 @@ msgstr "Fokusera på den här personen"
 msgid "Focus window"
 msgstr "Fokusera fönstret"
 
+#. Noise suppression option label for the GTCRN speech backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:59
+msgctxt "noise-suppression-option"
+msgid "Focused"
+msgstr "Fokuserad"
+
 #. Voice input processing profile optimized for spoken voice.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:197
 msgid "Focused voice"
@@ -14714,7 +14775,7 @@ msgstr "Vidarebefordra media"
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #. Title of the forward message modal.
 #: src/features/input/state/input_keybind/shared.ts:25
-#: src/features/messaging/components/modals/ForwardModal.tsx:78
+#: src/features/messaging/components/modals/ForwardModal.tsx:79
 msgid "Forward message"
 msgstr "Vidarebefordra meddelande"
 
@@ -15112,7 +15173,7 @@ msgid "GIF"
 msgstr "GIF"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
 msgid "GIF button"
 msgstr "GIF-knapp"
 
@@ -15968,7 +16029,7 @@ msgid "Hide avatars"
 msgstr "Dölj avatarer"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:507
 msgid "Hide channels you've muted from community sidebars"
 msgstr "Dölj kanaler du har tystat från sidopaneler i grupper"
 
@@ -16020,7 +16081,7 @@ msgid "Hide members"
 msgstr "Dölj medlemmar"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:499
 msgid "Hide muted"
 msgstr "Dölj tystade"
 
@@ -16031,13 +16092,13 @@ msgstr "Dölj tystade kanaler"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced sidebar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:137
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:140
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:487
 msgid "Hide muted channels by default"
 msgstr "Dölj tystade kanaler som standard"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:141
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:144
 msgid "Hide muted channels by default?"
 msgstr "Dölj tystade kanaler som standard?"
 
@@ -16128,7 +16189,7 @@ msgid "Higher quality can cost more CPU and latency."
 msgstr "Högre kvalitet kan kräva mer CPU-kraft och öka latensen."
 
 #. Description for the DeepFilterNet3 noise suppression strength slider.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:80
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:70
 msgid "Higher values remove more noise but can affect speech texture."
 msgstr "Högre värden tar bort mer brus men kan påverka talets textur."
 
@@ -16315,7 +16376,7 @@ msgstr "Jag behöver ett annat sätt"
 
 #. Short label in the voice tab. Keep it concise.
 #: src/features/channel/components/MatureContentChannelGate.tsx:207
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:105
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:106
 msgid "I understand"
 msgstr "Jag förstår"
 
@@ -16738,7 +16799,7 @@ msgstr "I"
 msgid "In \"Operating system\" mode, dictionaries listed above are advisory. {PRODUCT_NAME} will pass these language tags to your OS spellchecker when supported. Tags it doesn't recognize are ignored."
 msgstr "I läget \"Operativsystem\" är ordlistorna ovan vägledande. {PRODUCT_NAME} skickar dessa språktaggar till din OS-stavningskontroll om det stöds. Taggar som inte känns igen ignoreras."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:318
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:299
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "I en webbläsare fungerar push-to-talk bara när fliken {PRODUCT_NAME} är i fokus. Installera datorappen för push-to-talk i hela systemet."
 
@@ -16884,7 +16945,7 @@ msgid "Incoming calls: nobody"
 msgstr "Inkommande samtal: ingen"
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available incoming bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:125
+#: src/features/voice/components/voice_connection_status/shared.ts:123
 msgid "Incoming capacity:"
 msgstr "Inkommande kapacitet:"
 
@@ -17023,7 +17084,7 @@ msgid "Input access was changed. Fully quit and restart {productName} so system-
 msgstr "Inmatningsåtkomst ändrades. Avsluta och starta om {productName} helt så att genvägar för hela systemet kan använda det."
 
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:174
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:175
 msgid "Input and output"
 msgstr "In- och utdata"
 
@@ -17071,7 +17132,7 @@ msgstr "Inmatning och text"
 msgid "Inputs with icons"
 msgstr "Inmatningsfält med ikoner"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:36
 msgid "Insert emoji"
 msgstr "Infoga emoji"
 
@@ -17101,7 +17162,7 @@ msgid "Installing desktop update…"
 msgstr "Installerar skrivbordsuppdatering…"
 
 #. Audit log operation flag label for invite creation.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:170
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:185
 msgid "Instant invites"
 msgstr "Direktinbjudningar"
 
@@ -17578,7 +17639,7 @@ msgid "Jitter"
 msgstr "Jitter"
 
 #. Field label in the voice connection status popout. Shows audio jitter in milliseconds.
-#: src/features/voice/components/voice_connection_status/shared.ts:117
+#: src/features/voice/components/voice_connection_status/shared.ts:115
 msgid "Jitter:"
 msgstr "Jitter:"
 
@@ -17641,7 +17702,7 @@ msgid "Join method"
 msgstr "Gå med-metod"
 
 #. Audit log system-channel flag label for member join notification posts.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:182
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:197
 msgid "Join notifications"
 msgstr "Gå med-aviseringar"
 
@@ -17749,7 +17810,7 @@ msgid "Jump to message"
 msgstr "Gå till meddelande"
 
 #. Label in the channel and chat user message. Preserve {displayName}, {formattedDate}; they are inserted by code.
-#: src/features/channel/components/UserMessage.tsx:54
+#: src/features/channel/components/UserMessage.tsx:56
 msgid "Jump to message from {displayName}, sent {formattedDate}"
 msgstr "Hoppa till meddelande från {displayName}, skickat {formattedDate}"
 
@@ -17831,6 +17892,18 @@ msgstr "Behåll {productName} igång när fönstret stängs"
 msgid "Keep animations, GIF playback, hover effects, and tooltips running while the window is unfocused."
 msgstr "Behåll animationer, GIF-uppspelning, hovringseffekter och verktygstips aktiva när fönstret är i bakgrunden."
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+msgid "Keep attachments"
+msgstr "Behåll bilagor"
+
+#. Label for an advanced message editing preference.
+#. Settings search entry label. Names the settings search entry in the settings UI.
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:15
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+msgid "Keep attachments when clearing an edit"
+msgstr "Behåll bilagor vid rensning av en redigering"
+
 #. Description for the mirror premium model.
 #: src/features/app/components/setup/SetupWizardSteps.tsx:314
 msgid "Keep Free and Premium tiers. You can customize the tiers later."
@@ -17860,7 +17933,7 @@ msgid "Keep these safe. Regenerating will break existing integrations."
 msgstr "Håll dessa säkra. Om du återskapar dem kommer befintliga integrationer att sluta fungera."
 
 #. Description for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:65
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:78
 msgid "Keep transmitting briefly after release."
 msgstr "Fortsätt sända en kort stund efter att knappen släppts."
 
@@ -18017,7 +18090,7 @@ msgid "Latency {latency} milliseconds"
 msgstr "Latens {latency} millisekunder"
 
 #. Aria label for the latency graph chart in the voice connection status popout.
-#: src/features/voice/components/voice_connection_status/shared.ts:35
+#: src/features/voice/components/voice_connection_status/shared.ts:33
 msgid "Latency graph"
 msgstr "Latensgraf"
 
@@ -18276,6 +18349,11 @@ msgstr "Ljust tema"
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:46
 msgid "Light theme"
 msgstr "Ljust tema"
+
+#. Description for the Speex noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:46
+msgid "Lightweight classic filter, works on any device."
+msgstr "Lättviktsklassiskt filter, fungerar på alla enheter."
 
 #. Singular external-post stat label on a social post embed. Lowercase to appear after the count.
 #: src/features/channel/components/embeds/channel_embed/ChannelEmbedShared.ts:76
@@ -18641,7 +18719,7 @@ msgid "Look and feel"
 msgstr "Utseende och känsla"
 
 #. placeholder {0}: externalProcessor.name
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:648
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:641
 msgid "Looks like you're using {0}. Stacking {PRODUCT_NAME}'s processing on top can cause pumping or distortion. Direct input passes your audio through untouched."
 msgstr "Det verkar som att du använder {0}. Att lägga {PRODUCT_NAME}s bearbetning ovanpå kan orsaka pumpning eller distorsion. Direkt inmatning skickar ditt ljud oförändrat."
 
@@ -18863,7 +18941,7 @@ msgstr "Manuell skrivbordsuppdatering"
 #. Action label in the inbox popout overflow menu. Marks every inbox channel as read.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/messaging/components/popouts/InboxPopout.tsx:42
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
 msgid "Mark all as read"
 msgstr "Markera alla som lästa"
 
@@ -18885,7 +18963,7 @@ msgid "Mark all inbox channels as read"
 msgstr "Markera alla inkorgskanaler som lästa"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:483
 msgid "Mark all unread inbox channels as read immediately, without asking to confirm"
 msgstr "Markera alla olästa inkorgskanaler som lästa direkt, utan att fråga om bekräftelse"
 
@@ -19190,7 +19268,7 @@ msgid "Measuring latency..."
 msgstr "Mäter latens..."
 
 #. Placeholder shown while voice latency is still being sampled. Trailing ellipsis indicates ongoing measurement.
-#: src/features/voice/components/voice_connection_status/shared.ts:47
+#: src/features/voice/components/voice_connection_status/shared.ts:45
 msgid "Measuring…"
 msgstr "Mäter…"
 
@@ -19315,7 +19393,7 @@ msgid "Member list unavailable"
 msgstr "Medlemslistan är inte tillgänglig"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:178
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:193
 msgid "Member list updates"
 msgstr "Uppdateringar av medlemslista"
 
@@ -19628,7 +19706,12 @@ msgstr "Visningsläge för meddelanden"
 msgid "Message display settings are only available on desktop."
 msgstr "Inställningar för meddelandevisning är bara tillgängliga på datorn."
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:306
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+msgid "Message editing"
+msgstr "Redigera meddelande"
+
+#: src/features/messaging/components/modals/ForwardModal.tsx:307
 msgid "Message forwarded"
 msgstr "Meddelande vidarebefordrat"
 
@@ -19670,14 +19753,14 @@ msgstr "Meddelandefält"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:194
 msgid "Message input buttons"
 msgstr "Knappar för meddelandeinmatning"
 
 #. Error modal title in the forward modal when the optional comment exceeds the message length limit.
 #. Form validation error indicating the message exceeds the allowed length.
-#: src/features/messaging/components/modals/ForwardModal.tsx:49
+#: src/features/messaging/components/modals/ForwardModal.tsx:50
 #: src/features/ui/character_counter/CharacterCountMessages.ts:15
 msgid "Message is too long"
 msgstr "Meddelandet är för långt"
@@ -19839,7 +19922,7 @@ msgstr "Mikrofon"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:182
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:183
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:137
 msgid "Mic test"
 msgstr "Mikrofontest"
@@ -20503,7 +20586,7 @@ msgstr "tystad"
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:23
 #: src/features/app/components/layout/VoiceStateIcons.tsx:19
 #: src/features/ui/avatars/AvatarWithPresence.tsx:20
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:491
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:73
 #: src/features/voice/components/voice_participant_tile/shared.ts:98
 #: src/lib/overlay/OverlayContextMenu.tsx:24
@@ -20517,7 +20600,7 @@ msgstr "Avstängd av moderatorer"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:495
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:69
 msgid "Muted channels"
 msgstr "Tystade kanaler"
@@ -20608,7 +20691,7 @@ msgid "My awesome sticker"
 msgstr "Mitt snygga klistermärke"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:65
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:67
 msgid "My category"
 msgstr "Min kategori"
 
@@ -20815,7 +20898,7 @@ msgid "Netherlands"
 msgstr "Nederländerna"
 
 #. Section heading in the voice connection status popout for WebRTC network quality stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:72
+#: src/features/voice/components/voice_connection_status/shared.ts:70
 msgid "Network"
 msgstr "Nätverk"
 
@@ -20828,6 +20911,16 @@ msgstr "Nätverksfel"
 #: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:83
 msgid "Networking and performance"
 msgstr "Nätverk och prestanda"
+
+#. Description for the enhanced (DeepFilterNet3) noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:11
+msgid "Neural filter that removes most background noise."
+msgstr "Neuralt filter som tar bort det mesta bakgrundsljudet."
+
+#. Description for the RNNoise noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:55
+msgid "Neural filter, full audio bandwidth."
+msgstr "Neuralfilter, full bandbredd för ljudet."
 
 #. Short label in the settings dialog permission components.
 #: src/features/app/components/dialogs/shared/PermissionComponents.tsx:20
@@ -20884,20 +20977,20 @@ msgid "New category"
 msgstr "Ny kategori"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:149
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:152
 msgid "New communities only"
 msgstr "Endast nya grupper"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:640
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:650
 msgid "New communities you join will automatically have muted channels hidden. Would you also like to apply this setting to all your existing communities?"
 msgstr "Nya communityn du går med i kommer automatiskt att dölja tystade kanaler. Vill du även använda den här inställningen för alla dina befintliga communityn?"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:671
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:681
 msgid "New communities you join will no longer have muted channels hidden automatically. Would you also like to show muted channels in all your existing communities?"
 msgstr "Nya communityn du går med i kommer inte längre att dölja tystade kanaler automatiskt. Vill du även visa tystade kanaler i alla dina befintliga communityn?"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:503
 msgid "New community muted"
 msgstr "Ny community tystad"
 
@@ -21184,7 +21277,7 @@ msgstr "Inga ändringar att spara"
 msgid "No channels available"
 msgstr "Inga kanaler tillgängliga"
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:425
+#: src/features/messaging/components/modals/ForwardModal.tsx:426
 #: src/features/search/components/search/ChannelFilterSheet.tsx:120
 msgid "No channels found"
 msgstr "Inga kanaler hittades"
@@ -21356,7 +21449,7 @@ msgstr "Inga träffar"
 msgid "No mentions yet"
 msgstr "Inga omnämnanden än"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:524
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:517
 msgid "No microphone found"
 msgstr "Ingen mikrofon hittades"
 
@@ -21655,6 +21748,12 @@ msgstr "Ingen matchar sökningen."
 msgid "Noise"
 msgstr "Brus"
 
+#. Noise suppression option label for the noise gate backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:32
+msgctxt "noise-suppression-option"
+msgid "Noise gate"
+msgstr "Brusgrind"
+
 #. Voice setting label for microphone background-noise filtering.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:205
 msgid "Noise suppression"
@@ -21669,20 +21768,18 @@ msgstr "Icke-animerade emojier ({emojiCount})"
 #. Library picker entry meaning no sound is selected for this scope.
 #. Member verification level option in the community moderation settings tab. Short standalone label for the lowest level (no verification).
 #. Short label in the visual tab. Keep it concise.
-#. Short label in the voice tab. Keep it concise.
 #. Summary row value on the confirm step when no items in the category were selected.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:41
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:47
 #: src/features/user/components/modals/tabs/accessibility_tab/VisualTab.tsx:36
 #: src/features/user/components/modals/tabs/components/EntranceSoundSection.tsx:143
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx:219
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:93
 #: src/features/voice/components/AudioSourcePickerLinux.tsx:261
 msgid "None"
 msgstr "Ingen"
 
 #. Noise suppression option that disables suppression.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:55
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:23
 msgctxt "noise-suppression-option"
 msgid "None"
 msgstr "Ingen"
@@ -22113,7 +22210,7 @@ msgstr "Endast de valda"
 msgid "Only Visionary members can join this community. Your access may have changed since this screen was opened."
 msgstr "Endast Visionary-medlemmar kan gå med i det här communityt. Din åtkomst kan ha ändrats sedan den här skärmen öppnades."
 
-#: src/features/channel/components/UserMessage.tsx:427
+#: src/features/channel/components/UserMessage.tsx:429
 msgid "Only you can see this message. <0>Dismiss</0>"
 msgstr "Bara du kan se det här meddelandet. <0>Stäng</0>"
 
@@ -22176,7 +22273,7 @@ msgid "Open {settingsMenuName} settings"
 msgstr "Öppna inställningar för {settingsMenuName}"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:36
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:37
 msgid "Open {title}"
 msgstr "Öppna {title}"
 
@@ -22352,7 +22449,7 @@ msgid "Open emoji in browser"
 msgstr "Öppna emoji i webbläsaren"
 
 #. Accessible label for the emoji picker trigger button in the forward modal comment field.
-#: src/features/messaging/components/modals/ForwardModal.tsx:94
+#: src/features/messaging/components/modals/ForwardModal.tsx:95
 #: src/features/user/components/modals/tabs/my_profile_tab/BioEditor.tsx:27
 msgid "Open emoji picker"
 msgstr "Öppna emoji-väljaren"
@@ -22779,7 +22876,7 @@ msgid "Our safety team is reviewing it. We'll send you a DM and email once we've
 msgstr "Vårt säkerhetsteam granskar det. Vi skickar ett DM och e-postmeddelande till dig när vi har fattat ett beslut."
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available outgoing bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:121
+#: src/features/voice/components/voice_connection_status/shared.ts:119
 msgid "Outgoing capacity:"
 msgstr "Utgående kapacitet:"
 
@@ -22915,7 +23012,7 @@ msgid "Participants"
 msgstr "Deltagare"
 
 #. Field label in the voice connection status popout. Shows the current LiveKit participant count.
-#: src/features/voice/components/voice_connection_status/shared.ts:81
+#: src/features/voice/components/voice_connection_status/shared.ts:79
 msgid "Participants:"
 msgstr "Deltagare:"
 
@@ -23402,7 +23499,7 @@ msgid "Pick what appears when you type a colon in the message input"
 msgstr "Välj vad som visas när du skriver ett kolon i meddelandefältet"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
 msgid "Pick which buttons show in the message input"
 msgstr "Välj vilka knappar som ska visas i meddelandeinmatningsfältet"
 
@@ -24174,18 +24271,18 @@ msgstr "Profilfärg"
 
 #. Settings section label for editing profile appearance and identity.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:104
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:105
 #: src/features/user/components/settings_utils/section_registry/GeneralSettingsSections.ts:6
 msgid "Profile customization"
 msgstr "Anpassa profil"
 
 #. Label in the my profile tab. Preserve {selectedGuildName}; it is inserted by code.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:100
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:101
 msgid "Profile customization for {selectedGuildName}"
 msgstr "Profilanpassning för {selectedGuildName}"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:96
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:97
 msgid "Profile customization form"
 msgstr "Anpassa profil"
 
@@ -24250,7 +24347,7 @@ msgid "Profile type"
 msgstr "Profiltyp"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:76
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:77
 msgid "Profile updated"
 msgstr "Profilen uppdaterad"
 
@@ -24275,7 +24372,7 @@ msgid "Promotion or instructions encouraging self-harm or eating disorders."
 msgstr "Marknadsföring eller instruktioner som uppmuntrar till självskadebeteende eller ätstörningar."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
 msgid "Prompt"
 msgstr "Fråga"
 
@@ -24287,7 +24384,7 @@ msgstr "Prompt för nya ljudenheter"
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:141
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:142
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:177
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:160
 msgid "Pronouns"
@@ -24349,7 +24446,7 @@ msgid "Public registration is closed."
 msgstr "Offentlig registrering är stängd."
 
 #. Field label in the voice connection status popout. Shows technical WebRTC publisher ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:129
+#: src/features/voice/components/voice_connection_status/shared.ts:127
 msgid "Publisher transport:"
 msgstr "Avsändartransport:"
 
@@ -24438,7 +24535,7 @@ msgid "Push notification inactive timeout"
 msgstr "Tidsgräns för inaktiva push-aviseringar"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:162
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:177
 msgid "Push notifications"
 msgstr "Push-meddelanden"
 
@@ -24487,18 +24584,18 @@ msgid "Push to talk key"
 msgstr "Push-to-talk-knapp"
 
 #. Switch label in the voice tab toggling push-to-talk mode. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:109
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:357
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:110
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:338
 #: src/features/voice/components/VoiceSettingsMenus.tsx:417
 msgid "Push-to-talk"
 msgstr "Push-to-talk"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:97
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:98
 msgid "Push-to-talk (limited)"
 msgstr "Push-to-talk (begränsad)"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:670
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:663
 msgid "Push-to-talk is ignored in direct input. Switch to focused voice or custom to use it."
 msgstr "Push-to-talk ignoreras vid direktinmatning. Växla till fokuserad röst eller anpassad för att använda det."
 
@@ -24508,12 +24605,12 @@ msgid "Push-to-talk is on. Hold {pushToTalkHint} to speak."
 msgstr "Push-to-talk är på. Håll ned {pushToTalkHint} för att prata."
 
 #. Voice settings warning shown when macOS Input Monitoring is required for system-wide push-to-talk. {productName} is the app name and {permissionName} is the macOS permission name.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:129
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:130
 msgid "Push-to-talk only works while {productName} is focused until {permissionName} is enabled. After changing the permission, fully quit and restart {productName} so system-wide hotkeys can use it."
 msgstr "Push-to-talk fungerar bara när {productName} är i fokus tills {permissionName} har aktiverats. När du har ändrat behörigheten måste du avsluta och starta om {productName} helt så att systemomfattande snabbtangenter kan användas."
 
 #. Voice settings warning shown when push-to-talk is enabled in a browser.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:125
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:126
 msgid "Push-to-talk only works while the browser tab is focused."
 msgstr "Push-to-talk fungerar bara när webbläsarfliken är aktiv."
 
@@ -24775,7 +24872,7 @@ msgid "Receive notifications when someone mentions you"
 msgstr "Få aviseringar när någon nämner dig"
 
 #. Field label in the voice connection status popout. Shows total current inbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:89
+#: src/features/voice/components/voice_connection_status/shared.ts:87
 msgid "Receive:"
 msgstr "Ta emot:"
 
@@ -24819,7 +24916,7 @@ msgid "Recommended"
 msgstr "Rekommenderas"
 
 #. Description for the focused voice profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:69
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:82
 msgid "Recommended. Cleans up your mic for clear speech."
 msgstr "Rekommenderas. Rensar upp din mikrofon för tydligt tal."
 
@@ -25085,7 +25182,7 @@ msgstr "Relativ"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:61
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:74
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:89
 msgid "Release delay"
 msgstr "Fördröjning"
@@ -26802,7 +26899,7 @@ msgstr "Spara favorit"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF storage preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:41
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:44
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:47
 msgid "Save GIF favorites as saved media"
 msgstr "Spara GIF-favoriter som sparad media"
@@ -26953,7 +27050,7 @@ msgid "Screen share encoder controls"
 msgstr "Inställningar för skärmdelningskodare"
 
 #. Title of a modal shown when an active screen share stops unexpectedly.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:104
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:113
 msgctxt "screen-share"
 msgid "Screen share ended"
 msgstr "Skärmdelningen avslutades"
@@ -27105,15 +27202,15 @@ msgstr "Skrolla ned för att se alla förmåner som ingår i {premiumProductName
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the whats new modal.
 #: src/features/app/components/whats_new/WhatsNewModal.tsx:29
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:178
 msgid "Scroll to bottom"
 msgstr "Skrolla till botten"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:129
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:132
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
 msgid "Scroll to bottom when sending a message"
 msgstr "Skrolla till botten när ett meddelande skickas"
 
@@ -27182,7 +27279,7 @@ msgid "Search channels"
 msgstr "Sök kanaler"
 
 #. Placeholder text in the channel picker search input of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:82
+#: src/features/messaging/components/modals/ForwardModal.tsx:83
 msgid "Search channels or DMs"
 msgstr "Sök kanaler eller direktmeddelanden"
 
@@ -27646,7 +27743,7 @@ msgid "Select friends"
 msgstr "Välj vänner"
 
 #. Button label in the gif picker grid item when picking a GIF for an avatar, banner, or video background. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:50
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:51
 msgid "Select GIF {title}"
 msgstr "Välj GIF {title}"
 
@@ -27672,7 +27769,7 @@ msgid "Select the account you want to sign in with on the desktop app."
 msgstr "Välj kontot du vill logga in med i datorappen."
 
 #. Aria label for the voice processing radio group in the voice settings tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:117
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:118
 msgid "Select voice processing mode"
 msgstr "Välj röstbehandlingsläge"
 
@@ -27776,7 +27873,7 @@ msgid "Send"
 msgstr "Skicka"
 
 #. Primary button label in the forward message modal. selectedCount is the number of selected destinations; selectionLimit is the maximum allowed.
-#: src/features/messaging/components/modals/ForwardModal.tsx:98
+#: src/features/messaging/components/modals/ForwardModal.tsx:99
 msgid "Send ({selectedCount}/{selectionLimit})"
 msgstr "Skicka ({selectedCount}/{selectionLimit})"
 
@@ -27826,7 +27923,7 @@ msgstr "Skicka en till anmälan"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:170
 msgid "Send button"
 msgstr "Skicka-knapp"
@@ -27844,7 +27941,7 @@ msgstr "Skicka DSA-rapport"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:113
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:116
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:127
 msgid "Send file messages in order"
 msgstr "Skicka filmeddelanden i ordning"
@@ -27860,7 +27957,7 @@ msgid "Send friend request"
 msgstr "Skicka vänförfrågan"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:45
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:46
 msgid "Send GIF {title}"
 msgstr "Skicka GIF {title}"
 
@@ -27882,7 +27979,7 @@ msgstr "Skicka meddelande"
 
 #. Audit log operation flag label for message sending.
 #. Permission name: allows sending chat messages.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:174
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:189
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:400
 msgid "Send messages"
 msgstr "Skicka meddelanden"
@@ -27971,7 +28068,7 @@ msgid "Send voice message"
 msgstr "Skicka röstmeddelande"
 
 #. Field label in the voice connection status popout. Shows total current outbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:85
+#: src/features/voice/components/voice_connection_status/shared.ts:83
 msgid "Send:"
 msgstr "Skicka:"
 
@@ -27994,15 +28091,25 @@ msgstr "Skickar skadlig programvara eller farliga länkar"
 msgid "Sending messages is disabled in this community"
 msgstr "Det går inte att skicka meddelanden i den här gruppen"
 
+#. Description for the stereo microphone switch in the voice settings.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:72
+msgid "Sends both channels of a stereo microphone. Works only with no suppression or standard suppression."
+msgstr "Skickar båda kanalerna från en stereomikrofon. Fungerar endast utan brusreducering eller med standardbrusreducering."
+
 #. Description for the studio / direct-input option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:34
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:37
 msgid "Sends raw mic audio with no processing."
 msgstr "Skickar rått mikrofonljud utan bearbetning."
 
 #. Description for the direct input profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:73
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:86
 msgid "Sends your audio untouched. Best if you're using external audio software."
 msgstr "Skickar ditt ljud oförändrat. Bäst om du använder extern ljudprogramvara."
+
+#. Description for the noise suppression option that disables suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:28
+msgid "Sends your microphone audio with no suppression."
+msgstr "Skickar din mikrofonljud utan brusreducering."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the privacy dashboard. Keep it concise.
@@ -28049,7 +28156,7 @@ msgstr "skickade en inbäddning"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:182
 msgid "Sent messages"
 msgstr "Skickade meddelanden"
@@ -28074,7 +28181,7 @@ msgid "Service error"
 msgstr "Tjänstefel"
 
 #. Section heading in the voice connection status popout for current call/session debug stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:64
+#: src/features/voice/components/voice_connection_status/shared.ts:62
 msgid "Session"
 msgstr "Session"
 
@@ -28561,7 +28668,7 @@ msgstr "Kortkoder"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:372
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:353
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:105
 msgid "Shortcut"
@@ -28589,12 +28696,12 @@ msgid "Shortcuts"
 msgstr "Genvägar"
 
 #. Body of the error modal shown when the forward modal comment exceeds the message length limit.
-#: src/features/messaging/components/modals/ForwardModal.tsx:53
+#: src/features/messaging/components/modals/ForwardModal.tsx:54
 msgid "Shorten the message and try again."
 msgstr "Korta ner meddelandet och försök igen."
 
 #. Body of the error modal shown when the channel topic exceeds the maximum length.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:51
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:53
 msgid "Shorten the topic and try again."
 msgstr "Korta ner ämnet och försök igen."
 
@@ -28647,7 +28754,7 @@ msgid "Show active now on the home screen to surface friends active in voice. Yo
 msgstr "Visa \"aktiv nu\" på hemskärmen för att se vänner som är aktiva i röstchatt. Du får se en förhandsvisning, kanalens sammanhang, vem som redan är där och ett snabbt sätt att ansluta."
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:65
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:68
 msgid "Show attachment expiry indicator"
 msgstr "Visa indikator för bilagors utgångsdatum"
 
@@ -28698,7 +28805,7 @@ msgid "Show creation date instead of expiration date"
 msgstr "Visa skapandedatum istället för utgångsdatum"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:89
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:92
 msgid "Show custom emojis in expression autocomplete"
 msgstr "Visa anpassade emojier i förslag för uttryck"
 
@@ -28708,17 +28815,17 @@ msgid "Show default avatar, ignoring your global profile"
 msgstr "Visa standardavatar, ignorera din globala profil"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:85
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:88
 msgid "Show default emojis in expression autocomplete"
 msgstr "Visa standard-emojis i förslag för uttryck"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:69
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:72
 msgid "Show delete button"
 msgstr "Visa radera-knapp"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:73
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:76
 msgid "Show download button"
 msgstr "Visa nedladdningsknapp"
 
@@ -28745,7 +28852,7 @@ msgstr "Visa inbäddningar och förhandsgranska webblänkar"
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:55
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:121
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:124
 msgid "Show emoji button"
 msgstr "Visa emoji-knapp"
 
@@ -28755,7 +28862,7 @@ msgid "Show emoji reactions on messages"
 msgstr "Visa emoji-reaktioner på meddelanden"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:77
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:80
 msgid "Show favorite button"
 msgstr "Visa favoritknapp"
 
@@ -28777,14 +28884,14 @@ msgid "Show focus ring on chat textarea"
 msgstr "Visa fokusring på chattens textruta"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:61
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:64
 msgid "Show GIF indicator"
 msgstr "Visa GIF-indikator"
 
 #. Plus menu submenu toggle that shows the GIFs button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:43
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:101
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:104
 msgid "Show GIFs button"
 msgstr "Visa GIF-knapp"
 
@@ -28794,7 +28901,7 @@ msgid "Show icon when collapsed"
 msgstr "Visa ikon när komprimerad"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:157
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:160
 msgid "Show in all communities"
 msgstr "Visa i alla grupper"
 
@@ -28833,7 +28940,7 @@ msgstr "Visa max 5 (+5 märke)"
 #. Plus menu submenu toggle that shows the saved media (memes) button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:47
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:105
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:108
 msgid "Show media button"
 msgstr "Visa medieknapp"
 
@@ -28854,7 +28961,7 @@ msgid "Show menu bar icon"
 msgstr "Visa menyradsikon"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:45
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:48
 msgid "Show message action bar"
 msgstr "Visa åtgärdsfält för meddelanden"
 
@@ -28937,7 +29044,7 @@ msgid "Show oldest messages first"
 msgstr "Visa äldsta meddelanden först"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:49
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:52
 msgid "Show only more button"
 msgstr "Visa bara mer-knappen"
 
@@ -28962,7 +29069,7 @@ msgid "Show profile timezone settings"
 msgstr "Visa inställningar för profilens tidszon"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:53
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:56
 msgid "Show quick reactions"
 msgstr "Visa snabbreaktioner"
 
@@ -28972,7 +29079,7 @@ msgid "Show rich previews for YouTube links."
 msgstr "Visa rika förhandsvisningar för YouTube-länkar."
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:97
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:100
 msgid "Show saved media in expression autocomplete"
 msgstr "Visa sparad media i autofyll för uttryck"
 
@@ -28981,7 +29088,7 @@ msgstr "Visa sparad media i autofyll för uttryck"
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:102
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:59
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:125
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:128
 msgid "Show send button"
 msgstr "Visa skicka-knapp"
 
@@ -28993,12 +29100,12 @@ msgstr "Visa spoilervarning vid klick"
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:51
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:117
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:120
 msgid "Show stickers button"
 msgstr "Visa sticker-knapp"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:93
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:96
 msgid "Show stickers in expression autocomplete"
 msgstr "Visa stickers i förslag för uttryck"
 
@@ -29008,7 +29115,7 @@ msgid "Show strikethrough markdown text in a slightly muted color."
 msgstr "Visa genomstruken markdown-text i en något dämpad färg."
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:81
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:84
 msgid "Show suppress embeds button"
 msgstr "Visa knapp för att dölja inbäddningar"
 
@@ -29298,14 +29405,14 @@ msgid "Size selection"
 msgstr "Välj storlek"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
 msgid "Skip"
 msgstr "Hoppa över"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced inbox preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:133
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:136
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
 msgid "Skip \"Mark all as read\" confirmation"
 msgstr "Hoppa över bekräftelse för \"Markera alla som lästa\""
 
@@ -29343,7 +29450,7 @@ msgid "Skip this step"
 msgstr "Hoppa över det här steget"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx:70
+#: src/app/App.tsx:69
 msgid "Skip to content"
 msgstr "Hoppa till innehåll"
 
@@ -30095,9 +30202,7 @@ msgid "Staff controls"
 msgstr "Personalinställningar"
 
 #. Noise suppression option label in the voice tab (browser default). Keep it concise.
-#. Noise suppression option using the browser built-in engine. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:89
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:51
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:15
 msgid "Standard"
 msgstr "Standard"
 
@@ -30301,6 +30406,11 @@ msgstr "Steg 3"
 msgid "Step 4"
 msgstr "Steg 4"
 
+#. Switch label in the voice settings that sends both channels of a stereo microphone. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:68
+msgid "Stereo microphone"
+msgstr "Stereomikrofon"
+
 #. Label for the has:sticker filter option in the mobile channel search sheet.
 #. Screen-reader fragment listing one sticker on a message. Lowercase because it appears inside a longer sentence.
 #. has:sticker chip label. Always lowercase; matches the typed query value 1:1.
@@ -30451,7 +30561,7 @@ msgid "Stop"
 msgstr "Stoppa"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:153
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:156
 msgid "Stop hiding muted channels by default?"
 msgstr "Sluta dölja tystade kanaler som standard?"
 
@@ -30520,7 +30630,7 @@ msgid "Stop."
 msgstr "Stoppa."
 
 #. Description for the echo cancellation toggle in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:68
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:58
 msgid "Stops your speakers from looping back into your mic."
 msgstr "Stoppar ljudet från dina högtalare att loopas tillbaka till din mikrofon."
 
@@ -30654,6 +30764,11 @@ msgstr "Stripe rapporterade ett kort utgivet i {countryName}. För att betala i 
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
 msgstr "Hög kvalitet till måttlig CPU-kostnad. Bra Chromium-reservlösning för skärmdelning."
 
+#. Description for the GTCRN noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:64
+msgid "Strongest neural filter for speech, limits audio to the speech range."
+msgstr "Starkaste neurala filtret för tal, begränsar ljudet till talområdet."
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:130
 msgid "Styling"
@@ -30669,7 +30784,7 @@ msgid "Submitting"
 msgstr "Skickar"
 
 #. Field label in the voice connection status popout. Shows technical WebRTC subscriber ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:133
+#: src/features/voice/components/voice_connection_status/shared.ts:131
 msgid "Subscriber transport:"
 msgstr "Prenumeranttransport:"
 
@@ -30764,7 +30879,7 @@ msgid "Suppression"
 msgstr "Undertryckning"
 
 #. Label for the DeepFilterNet3 noise suppression strength slider in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:76
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:66
 msgid "Suppression strength"
 msgstr "Styrka på brusreducering"
 
@@ -30851,7 +30966,7 @@ msgstr "Byt till bekväm layout"
 msgid "Switch to dense layout"
 msgstr "Växla till kompakt layout"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:643
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:636
 msgid "Switch to direct input"
 msgstr "Byt till direktinmatning"
 
@@ -31635,7 +31750,7 @@ msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "Den angivna redirect_uri måste använda HTTP eller HTTPS."
 
 #. Body of a modal shown when a browser screen share track ends outside the app, for example from the browser sharing controls.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:109
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:118
 msgctxt "screen-share"
 msgid "The screen share source stopped sending video, so your screen share was stopped."
 msgstr "Skärmdelningskällan slutade skicka video, så din skärmdelning har stoppats."
@@ -32333,7 +32448,7 @@ msgid "This message no longer exists."
 msgstr "Det här meddelandet finns inte längre."
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:129
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:130
 msgid "This nickname will only be visible in this community"
 msgstr "Det här smeknamnet kommer bara att synas i den här gruppen"
 
@@ -32540,7 +32655,7 @@ msgid "This voice channel is no longer available."
 msgstr "Röstkanalen är inte längre tillgänglig."
 
 #. Description text in the channel and chat user message. Preserve {silentMention}; it is inserted by code.
-#: src/features/channel/components/UserMessage.tsx:71
+#: src/features/channel/components/UserMessage.tsx:73
 msgid "This was a {silentMention} message."
 msgstr "Det här var ett {silentMention}-meddelande."
 
@@ -32970,7 +33085,7 @@ msgstr "Topp"
 msgid "Top tooltip"
 msgstr "Övre verktygstips"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:33
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
 msgid "Topic"
 msgstr "Ämne"
 
@@ -33280,7 +33395,7 @@ msgid "TTS speed"
 msgstr "TTS-hastighet"
 
 #. Description for the custom option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:43
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:46
 msgid "Tune the processing yourself."
 msgstr "Justera bearbetningen själv."
 
@@ -33373,7 +33488,7 @@ msgstr "Aktivera streamingsekretess"
 
 #. Label in the input tab.
 #. Settings search entry label. Names the settings search entry in the settings UI.
-#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:10
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:11
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:363
 msgid "Turn text smileys into emoji"
 msgstr "Aktivera emoji istället för textansikten"
@@ -33479,7 +33594,7 @@ msgid "Typing avatars"
 msgstr "Skrivande avatarer"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:166
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:181
 msgid "Typing events"
 msgstr "Skrivhändelser"
 
@@ -33609,12 +33724,12 @@ msgid "Unavailable"
 msgstr "Ej tillgänglig"
 
 #. Audit log community feature label meaning the community is unavailable to all users.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:150
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:165
 msgid "Unavailable for everyone"
 msgstr "Otillgänglig för alla"
 
 #. Audit log community feature label meaning only staff can access the community.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:154
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:169
 msgid "Unavailable for everyone but staff"
 msgstr "Inte tillgänglig för någon annan än personalen"
 
@@ -33923,7 +34038,7 @@ msgstr "okänd användare"
 #: src/features/devtools/utils/CommandUtils.ts:27
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTab.tsx:114
 #: src/features/voice/components/VoiceParticipantAvatarList.tsx:44
-#: src/features/voice/components/VoiceParticipantTile.tsx:172
+#: src/features/voice/components/VoiceParticipantTile.tsx:174
 #: src/features/webhook/components/WebhookListItem.tsx:30
 msgid "Unknown user"
 msgstr "Okänd användare"
@@ -34447,7 +34562,7 @@ msgid "Updater state"
 msgstr "Uppdateringsstatus"
 
 #. Short label in the channel and chat gif picker grid item. Keep it concise.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:41
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:42
 msgid "Updating favorites…"
 msgstr "Uppdaterar favoriter…"
 
@@ -34506,7 +34621,7 @@ msgstr "Ladda upp tillgångar"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input privacy preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:109
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:112
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:107
 msgid "Upload attachments before sending"
 msgstr "Ladda upp bilagor innan du skickar"
@@ -34658,7 +34773,7 @@ msgstr "Laddar upp emojier"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for the URL input in the embed debugger.
 #. Short label in the channel create modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:70
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:72
 #: src/features/channel/components/modals/ChannelCreateModal.tsx:37
 #: src/features/user/components/modals/tabs/EmbedDebuggerTab.tsx:34
 #: src/features/user/components/settings_utils/search_index/EmbedDebuggerIndex.ts:19
@@ -35509,22 +35624,22 @@ msgid "Verify your email before adding an authenticator app."
 msgstr "Verifiera din e-postadress innan du lägger till en autentiseringsapp."
 
 #. Description text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:116
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:117
 msgid "Verify your email before changing your community nickname, avatar, banner, bio, pronouns, or accent color."
 msgstr "Verifiera din e-postadress innan du ändrar ditt community-smeknamn, din avatar, banner, biografi, pronomen eller accentfärg."
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:120
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:121
 msgid "Verify your email before changing your username, display name, avatar, banner, bio, pronouns, timezone, or {premiumProductName} badge privacy."
 msgstr "Verifiera din e-postadress innan du ändrar ditt användarnamn, visningsnamn, avatar, banner, biografi, pronomen, tidszon eller sekretess för din {premiumProductName}-bricka."
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:84
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:85
 msgid "Verify your email before editing this community profile. You can still preview it here."
 msgstr "Verifiera din e-postadress innan du redigerar den här communityprofilen. Du kan fortfarande förhandsgranska den här."
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:88
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:89
 msgid "Verify your email before editing your profile. You can still preview it here."
 msgstr "Verifiera din e-postadress innan du redigerar din profil. Du kan fortfarande förhandsgranska den här."
 
@@ -35556,12 +35671,12 @@ msgid "Verify your email to continue using {productName}."
 msgstr "Verifiera din e-post för att fortsätta använda {productName}."
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:108
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:109
 msgid "Verify your email to edit this community profile"
 msgstr "Verifiera din e-post för att redigera den här communityprofilen"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:112
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:113
 msgid "Verify your email to edit your profile"
 msgstr "Verifiera din e-post för att redigera din profil"
 
@@ -35666,7 +35781,7 @@ msgid "Video options"
 msgstr "Videoalternativ"
 
 #. Field label in the voice connection status popout. Shows received video packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:113
+#: src/features/voice/components/voice_connection_status/shared.ts:111
 msgid "Video packet loss:"
 msgstr "Videopaketförlust:"
 
@@ -35690,7 +35805,7 @@ msgid "Video quality"
 msgstr "Videokvalitet"
 
 #. Field label in the voice connection status popout. Shows current inbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:105
+#: src/features/voice/components/voice_connection_status/shared.ts:103
 msgid "Video receive:"
 msgstr "Video, mottaget:"
 
@@ -35700,7 +35815,7 @@ msgid "Video scrubbing"
 msgstr "Videospolning"
 
 #. Field label in the voice connection status popout. Shows current outbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:101
+#: src/features/voice/components/voice_connection_status/shared.ts:99
 msgid "Video send:"
 msgstr "Videosändning:"
 
@@ -35983,7 +36098,7 @@ msgid "Violent or graphic content"
 msgstr "Våldsamt eller stötande innehåll"
 
 #. Audit log community feature label for elevated voice capacity/quality.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:161
 msgid "VIP voice"
 msgstr "VIP-röst"
 
@@ -35994,7 +36109,7 @@ msgstr "Synlighet"
 
 #. Audit log community feature label for the Visionary premium feature.
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:416
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:158
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:173
 msgid "Visionary"
 msgstr "Visionär"
 
@@ -36239,8 +36354,8 @@ msgid "Voice participants"
 msgstr "Röstdeltagare"
 
 #. Voice settings radio group label for microphone processing profile.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:638
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:64
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:631
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:54
 msgid "Voice processing"
 msgstr "Röstbearbetning"
 
@@ -36295,7 +36410,7 @@ msgstr "Ogiltig"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:373
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:178
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:179
 #: src/features/user/components/settings_utils/search_index/NotificationsIndex.ts:86
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:174
 msgid "Volume"
@@ -36342,12 +36457,12 @@ msgid "Waiting for passkey…"
 msgstr "Väntar på lösennyckel…"
 
 #. Inline notice in the forward modal when slowmode is active in the selected target channel. forwardChannelDisplayName is the channel name.
-#: src/features/messaging/components/modals/ForwardModal.tsx:69
+#: src/features/messaging/components/modals/ForwardModal.tsx:70
 msgid "Waiting for slowmode in {forwardChannelDisplayName} to expire."
 msgstr "Väntar på att långsamt läge i {forwardChannelDisplayName} ska upphöra."
 
 #. Inline notice in the forward modal when slowmode is active in one or more selected target channels.
-#: src/features/messaging/components/modals/ForwardModal.tsx:74
+#: src/features/messaging/components/modals/ForwardModal.tsx:75
 msgid "Waiting for slowmode in one or more selected channels to expire."
 msgstr "Väntar på att slowmode ska upphöra i en eller flera valda kanaler."
 
@@ -36925,7 +37040,7 @@ msgstr "Vilka konversationer"
 msgid "Which rule was broken?"
 msgstr "Vilken regel bröts?"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:366
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:347
 msgid "While push-to-talk is on, your shortcut controls your microphone, so the mute button is disabled."
 msgstr "När push-to-talk är aktiverat styr din genväg mikrofonen, så mute-knappen är inaktiverad."
 
@@ -37322,7 +37437,7 @@ msgid "You can't befriend yourself"
 msgstr "Du kan inte bli vän med dig själv"
 
 #. Label in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:133
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:134
 msgid "You can't change your nickname here"
 msgstr "Du kan inte ändra ditt smeknamn här"
 
@@ -37572,7 +37687,7 @@ msgid "You have unsaved changes."
 msgstr "Du har osparade ändringar."
 
 #. Warning text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:80
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:81
 msgid "You have unsaved changes. Save or reset before leaving."
 msgstr "Du har osparade ändringar. Spara eller återställ innan du lämnar."
 
@@ -38336,7 +38451,7 @@ msgid "Your registration needs an extra anti-spam check before you can continue.
 msgstr "Din registrering behöver en extra antispamkontroll innan du kan fortsätta."
 
 #. Body of a modal shown when the video codec the browser negotiated for an active screen share is outside the codecs the app allows and no allowed codec could be published, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:115
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:124
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "Din skärmdelning kunde inte publiceras med en kompatibel videokodare, så den stoppades. Försök dela igen."
@@ -38435,7 +38550,7 @@ msgid "Your vanity URL has been set to {inviteEndpoint}/{vanitySlug}"
 msgstr "Din anpassade URL har ställts in till {inviteEndpoint}/{vanitySlug}"
 
 #. Body of a modal shown when the local video encoder produces no frames for an active screen share, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:122
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:131
 msgctxt "screen-share"
 msgid "Your video encoder stopped encoding frames, so your screen share was stopped. Try sharing again."
 msgstr "Din videokodare slutade koda bildrutor, så din skärmdelning stoppades. Försök dela igen."

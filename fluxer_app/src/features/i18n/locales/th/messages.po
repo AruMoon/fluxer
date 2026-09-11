@@ -20,7 +20,7 @@ msgstr "... เปิดโหมดกระชับแล้ว เยี่�
 
 #. Button or menu action label in the channel and chat user message. Keep it concise.
 #: src/features/channel/components/MessageAttachments.tsx:358
-#: src/features/channel/components/UserMessage.tsx:59
+#: src/features/channel/components/UserMessage.tsx:61
 msgid "(edited)"
 msgstr "(แก้ไขแล้ว)"
 
@@ -440,7 +440,7 @@ msgstr "{count, plural, one {ขยาย (# บรรทัด)} other {ขย�
 msgid "{count, plural, one {Expand (# row)} other {Expand (# rows)}}"
 msgstr "{count, plural, one {ขยาย (# แถว)} other {ขยาย (# แถว)}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:315
+#: src/features/voice/components/VoiceParticipantTile.tsx:317
 msgid "{count, plural, one {Expand # other device} other {Expand # other devices}}"
 msgstr "{count, plural, one {ขยายอุปกรณ์อื่น # เครื่อง} other {ขยายอุปกรณ์อื่น # เครื่อง}}"
 
@@ -461,7 +461,7 @@ msgstr "{count, plural, one {กำลังคุยสาย} other {# คน�
 msgid "{count, plural, one {Join video call (# participant)} other {Join video call (# participants)}}"
 msgstr "{count, plural, one {เข้าร่วมวิดีโอคอล (# ผู้เข้าร่วม)} other {เข้าร่วมวิดีโอคอล (# ผู้เข้าร่วม)}}"
 
-#: src/features/voice/components/VoiceParticipantTile.tsx:655
+#: src/features/voice/components/VoiceParticipantTile.tsx:669
 msgid "{count, plural, one {Keep watching # stream and add this one} other {Keep watching # streams and add this one}}"
 msgstr "ดูสตรีม # {count, plural, one {} other {อื่นๆ }}ต่อไปและเพิ่มสตรีมนี้"
 
@@ -1092,7 +1092,7 @@ msgid "{productName} needs camera access to list your devices."
 msgstr "{productName} ต้องเข้าถึงกล้องเพื่อแสดงรายการอุปกรณ์ของคุณ"
 
 #. Voice settings notice shown when microphone permission has not been granted.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:135
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:136
 msgid "{productName} needs microphone access to list your devices."
 msgstr "{productName} ต้องได้รับอนุญาตให้เข้าถึงไมโครโฟนเพื่อแสดงรายการอุปกรณ์ของคุณ"
 
@@ -1637,6 +1637,11 @@ msgstr "12 เดือน (1 ปี)"
 msgid "12-hour"
 msgstr "12 ชั่วโมง"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+msgid "128 kbps voice quality"
+msgstr "คุณภาพเสียง 128 kbps"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:241
 msgid "1440p"
@@ -1685,6 +1690,11 @@ msgstr "24 ชั่วโมง"
 msgid "25 uses"
 msgstr "ใช้แล้ว 25 ครั้ง"
 
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:151
+msgid "256 kbps voice quality"
+msgstr "คุณภาพเสียง 256 kbps"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AccountSecuritySections.ts:37
 msgid "2FA"
@@ -1730,6 +1740,11 @@ msgstr "30 นาที"
 #: src/features/user/components/modals/tabs/component_gallery_tab/IndicatorsTab.tsx:300
 msgid "32px, 2 members"
 msgstr "32px, 2 คน"
+
+#. Audit log community feature label for a raised voice channel bitrate ceiling. kbps means kilobits per second.
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:156
+msgid "384 kbps voice quality"
+msgstr "คุณภาพเสียง 384 kbps"
 
 #: src/features/app/components/pages/NotFoundPage.tsx:19
 msgid "404: page not found"
@@ -2236,7 +2251,7 @@ msgid "Activity sharing"
 msgstr "การแชร์กิจกรรม"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:473
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:454
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:97
 msgid "Activity threshold"
 msgstr "เกณฑ์กิจกรรม"
@@ -2271,7 +2286,7 @@ msgid "Add a bot to a community with requested permissions"
 msgstr "เพิ่มบอทเข้าสู่คอมมูนิตี้พร้อมสิทธิ์ที่ร้องขอ"
 
 #. Placeholder text in the optional comment field of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:90
+#: src/features/messaging/components/modals/ForwardModal.tsx:91
 msgid "Add a comment (optional)"
 msgstr "เพิ่มความคิดเห็น (ไม่บังคับ)"
 
@@ -2311,7 +2326,7 @@ msgstr "เพิ่มแท็ก"
 msgid "Add a tag and press Enter"
 msgstr "เพิ่มแท็กแล้วกด Enter"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
 msgid "Add a topic to this channel"
 msgstr "เพิ่มหัวข้อในช่องนี้"
 
@@ -2673,7 +2688,7 @@ msgid "Adds H.264 for mixed clients. Uses more encode work."
 msgstr "เพิ่ม H.264 สำหรับอุปกรณ์ที่หลากหลาย ใช้ทรัพยากรในการเข้ารหัสมากขึ้น"
 
 #. Description for the custom profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:81
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:94
 msgid "Adjust each setting yourself: noise suppression, echo cancellation, and gain."
 msgstr "ปรับการตั้งค่าแต่ละรายการด้วยตัวเอง: การลดเสียงรบกวน, การตัดเสียงสะท้อน และเกน"
 
@@ -2719,7 +2734,7 @@ msgstr "ผู้ดูแลระบบหยุดการเชิญชั
 #. Collapsed-by-default group at the end of the community overview tab holding less common settings.
 #. Disclosure button label in the voice connection status popout. Reveals technical bandwidth and network stats.
 #. User settings tab for power-user and experimental application preferences.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:337
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:344
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/index.tsx:28
 #: src/features/user/components/settings_utils/SettingsConstants.tsx:140
 #: src/features/voice/components/voice_connection_status/VoiceDetailsPopout.tsx:60
@@ -2924,11 +2939,11 @@ msgstr "อนุญาต {everyoneMention} และ {hereMention}"
 msgid "Allow {PRODUCT_NAME} to access your camera in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 msgstr "อนุญาตให้ {PRODUCT_NAME} เข้าถึงกล้องของคุณในการตั้งค่าระบบ {MACOS_SYSTEM_SETTINGS_NAME} → ความเป็นส่วนตัวและความปลอดภัย {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → สิทธิ์การเข้าถึงกล้อง {MACOS_CAMERA_PERMISSION_NAME}"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:529
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:522
 msgid "Allow {PRODUCT_NAME} to access your microphone in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 msgstr "อนุญาตให้ {PRODUCT_NAME} เข้าถึงไมโครโฟนของคุณได้ในการตั้งค่า {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:534
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:527
 msgid "Allow {PRODUCT_NAME} to access your microphone. Check your browser's address bar or settings."
 msgstr "อนุญาตให้ {PRODUCT_NAME} เข้าถึงไมโครโฟนของคุณ ตรวจสอบแถบที่อยู่หรือการตั้งค่าของเบราว์เซอร์ของคุณ"
 
@@ -3030,7 +3045,7 @@ msgstr "อนุญาตให้สมาชิกที่ไม่มีส
 msgid "Allow mentions for this role"
 msgstr "อนุญาตให้กล่าวถึงสำหรับบทบาทนี้"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:554
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:547
 msgid "Allow microphone"
 msgstr "อนุญาตให้ใช้ไมโครโฟน"
 
@@ -3747,7 +3762,7 @@ msgid "Apply theme"
 msgstr "ใช้ธีม"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:145
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:148
 msgid "Apply to all communities"
 msgstr "ใช้กับการตั้งค่าชุมชนทั้งหมด"
 
@@ -4075,7 +4090,7 @@ msgid "Audio output"
 msgstr "ช่องสัญญาณเสียงออก"
 
 #. Field label in the voice connection status popout. Shows received audio packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:109
+#: src/features/voice/components/voice_connection_status/shared.ts:107
 msgid "Audio packet loss:"
 msgstr "แพ็กเก็ตเสียงขาดหาย:"
 
@@ -4090,32 +4105,32 @@ msgid "Audio preview"
 msgstr "ตัวอย่างเสียง"
 
 #. Voice settings modal title for microphone processing options.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:60
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:50
 msgid "Audio processing"
 msgstr "กำลังประมวลผลเสียง"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with enhanced (DeepFilterNet3) noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:21
+#: src/features/voice/components/voice_connection_status/shared.ts:19
 msgid "Audio processing (custom, enhanced)"
 msgstr "กำลังประมวลผลเสียง (กำหนดเอง, ปรับปรุง)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with no noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:31
+#: src/features/voice/components/voice_connection_status/shared.ts:29
 msgid "Audio processing (custom, no suppression)"
 msgstr "กำลังประมวลผลเสียง (กำหนดเอง, ไม่มีการตัดเสียงรบกวน)"
 
 #. Tooltip in the voice status popout. Describes the custom mic processing profile with browser-built-in noise suppression.
-#: src/features/voice/components/voice_connection_status/shared.ts:26
+#: src/features/voice/components/voice_connection_status/shared.ts:24
 msgid "Audio processing (custom)"
 msgstr "กำลังประมวลผลเสียง (กำหนดเอง)"
 
 #. Tooltip in the voice status popout. Describes the studio / direct-input mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:13
+#: src/features/voice/components/voice_connection_status/shared.ts:11
 msgid "Audio processing (direct input, raw)"
 msgstr "กำลังประมวลผลเสียง (อินพุตโดยตรง, ดิบ)"
 
 #. Tooltip in the voice status popout. Describes the focused-voice mic processing profile.
-#: src/features/voice/components/voice_connection_status/shared.ts:17
+#: src/features/voice/components/voice_connection_status/shared.ts:15
 msgid "Audio processing (focused voice)"
 msgstr "กำลังประมวลผลเสียง (เสียงหลัก)"
 
@@ -4125,12 +4140,12 @@ msgid "Audio progress"
 msgstr "ความคืบหน้าเสียง"
 
 #. Field label in the voice connection status popout. Shows current inbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:97
+#: src/features/voice/components/voice_connection_status/shared.ts:95
 msgid "Audio receive:"
 msgstr "รับเสียง:"
 
 #. Field label in the voice connection status popout. Shows current outbound audio bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:93
+#: src/features/voice/components/voice_connection_status/shared.ts:91
 msgid "Audio send:"
 msgstr "ส่งเสียง:"
 
@@ -4305,8 +4320,8 @@ msgid "Auto sensitivity"
 msgstr "ความไวอัตโนมัติ"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:113
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:460
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:114
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:441
 msgid "Auto-set activity threshold"
 msgstr "ตั้งค่าเกณฑ์กิจกรรมอัตโนมัติ"
 
@@ -4439,7 +4454,7 @@ msgstr "ส่ง GIF อัตโนมัติจากตัวเลือ�
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF behavior preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:37
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:40
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:11
 msgid "Automatically send GIFs when selected"
 msgstr "ส่ง GIF อัตโนมัติเมื่อเลือก"
@@ -4527,7 +4542,7 @@ msgid "Avatars"
 msgstr "อวตาร"
 
 #. Field label in the voice connection status popout. Shows the average RTT in ms over the recent window.
-#: src/features/voice/components/voice_connection_status/shared.ts:52
+#: src/features/voice/components/voice_connection_status/shared.ts:50
 msgid "Average ping:"
 msgstr "ค่า ping เฉลี่ย:"
 
@@ -4702,6 +4717,12 @@ msgstr "ป้ายกำกับ"
 msgid "Balanced"
 msgstr "สมดุล"
 
+#. Noise suppression option label for the RNNoise backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:50
+msgctxt "noise-suppression-option"
+msgid "Balanced"
+msgstr "สมดุล"
+
 #. IAR modal: quick-action card button label for opening the ban dialog.
 #. Short moderation action label. Ban a member from a community by removing them and preventing rejoining.
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:129
@@ -4760,7 +4781,7 @@ msgid "Ban this user"
 msgstr "แบนผู้ใช้นี้"
 
 #. Section heading in the voice connection status popout for current media bitrate usage.
-#: src/features/voice/components/voice_connection_status/shared.ts:68
+#: src/features/voice/components/voice_connection_status/shared.ts:66
 msgid "Bandwidth"
 msgstr "แบนด์วิดท์"
 
@@ -5337,6 +5358,11 @@ msgstr "เครื่องมือค้นหาในตัว"
 msgid "Built-in shortcuts"
 msgstr "ปุ่มลัดในตัว"
 
+#. Description for the standard noise suppression option, which uses the platform suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:19
+msgid "Built-in suppression from your browser or system."
+msgstr "การระงับสัญญาณรบกวนในตัวจากเบราว์เซอร์หรือระบบของคุณ"
+
 #. Short label in the search engines tab. Keep it concise.
 #: src/features/user/components/modals/tabs/chat_settings_tab/SearchEnginesTab.tsx:85
 msgid "Built-in translators"
@@ -5657,7 +5683,7 @@ msgstr "อัปโหลดไฟล์ที่นี่ไม่ได้"
 #: src/features/messaging/components/modals/AttachmentEditModal.tsx:133
 #: src/features/messaging/components/modals/EditAltTextModal.tsx:190
 #: src/features/messaging/components/modals/ExternalLinkWarningModal.tsx:111
-#: src/features/messaging/components/modals/ForwardModal.tsx:635
+#: src/features/messaging/components/modals/ForwardModal.tsx:636
 #: src/features/messaging/components/modals/ImageCropModal.tsx:925
 #: src/features/messaging/components/modals/MessageHistoryThresholdModal.tsx:107
 #: src/features/moderation/components/modals/BanMemberModal.tsx:262
@@ -5879,7 +5905,7 @@ msgstr "คัดลอก ID หมวดหมู่แล้ว"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Form field label for the name of a favorites category.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:55
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:57
 #: src/features/expressions/components/modals/CreateFavoriteCategoryModal.tsx:20
 msgid "Category name"
 msgstr "ชื่อหมวดหมู่"
@@ -6278,7 +6304,7 @@ msgstr "การจัดการช่อง"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
 #. Short label in the channel duplicate modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:60
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:62
 #: src/features/channel/components/modals/ChannelDuplicateModal.tsx:32
 msgid "Channel name"
 msgstr "ชื่อช่อง"
@@ -6338,7 +6364,7 @@ msgid "Channel synced with parent category"
 msgstr "ช่องซิงค์กับหมวดหมู่หลักแล้ว"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:46
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:48
 msgid "Channel topic is too long."
 msgstr "หัวข้อช่องยาวเกินไป"
 
@@ -6361,8 +6387,8 @@ msgstr "ประเภทช่อง: {0}"
 
 #. Audit log entry label. Past-tense action describing that a channel was edited.
 #: src/features/app/config/AuditLogConstants.ts:16
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:206
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:225
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:209
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:228
 msgid "Channel updated"
 msgstr "อัปเดตช่องแล้ว"
 
@@ -6644,7 +6670,7 @@ msgid "Choose hCaptcha or Cloudflare Turnstile for signup challenges."
 msgstr "เลือก hCaptcha หรือ Cloudflare Turnstile สำหรับการท้าทายการสมัครสมาชิก"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
 msgid "Choose how chat moves after you send a message"
 msgstr "เลือกวิธีที่แชทจะเลื่อนหลังจากที่คุณส่งข้อความ"
 
@@ -6931,13 +6957,19 @@ msgstr "รับรหัสของขวัญของคุณเพื่
 msgid "Claiming to be another person, brand, or organization."
 msgstr "แอบอ้างเป็นบุคคลอื่น แบรนด์ หรือองค์กร"
 
+#. Noise suppression option label for the Speex backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:41
+msgctxt "noise-suppression-option"
+msgid "Classic"
+msgstr "คลาสสิก"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:175
 msgid "Clean link"
 msgstr "ล้างลิงก์"
 
 #. Description for the focused-voice option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:30
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:33
 msgid "Cleans up your mic for clear speech."
 msgstr "ปรับปรุงไมโครโฟนของคุณเพื่อให้เสียงพูดชัดเจน"
 
@@ -6982,7 +7014,7 @@ msgstr "ล้างข้อมูลจำลองไฟล์แนบ"
 
 #. Accessible label for the button that clears the slash command being composed in the message box.
 #. Accessible label for the composer button that clears the slash command currently being composed.
-#: src/features/channel/components/LexicalChannelTextareaContent.tsx:131
+#: src/features/channel/components/LexicalChannelTextareaContent.tsx:135
 #: src/features/channel/components/SlashCommandParamBar.tsx:16
 msgid "Clear command"
 msgstr "ล้างคำสั่ง"
@@ -7004,6 +7036,11 @@ msgstr "ลบทุกรีแอ็กชันออกจากข้อค
 #: src/features/search/components/bottomsheets/QuickSwitcherBottomSheet.tsx:86
 msgid "Clear friends search"
 msgstr "ล้างการค้นหาเพื่อน"
+
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+msgid "Clear message text"
+msgstr "ล้างข้อความแชท"
 
 #. Developer-mode action that removes a mock for one attachment.
 #: src/features/ui/action_menu/MediaContextMenu.tsx:42
@@ -7098,6 +7135,11 @@ msgstr "ล้างหัวข้อแล้ว"
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:244
 msgid "Clearer text"
 msgstr "ข้อความชัดเจนขึ้น"
+
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+msgid "Clearing the text of a message with attachments asks to delete the message unless this is on"
+msgstr "การลบข้อความที่มีไฟล์แนบจะถามเพื่อยืนยันการลบข้อความ เว้นแต่จะเปิดใช้งานตัวเลือกนี้"
 
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx:108
@@ -7454,7 +7496,7 @@ msgstr "ยุบหัวข้อช่อง"
 #. Tooltip / aria label on a voice participant tile button that collapses expanded device tiles for one user.
 #. Voice menu action that collapses expanded device tiles back into a single tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts:122
-#: src/features/voice/components/VoiceParticipantTile.tsx:176
+#: src/features/voice/components/VoiceParticipantTile.tsx:178
 msgid "Collapse devices"
 msgstr "ยุบอุปกรณ์"
 
@@ -7557,17 +7599,17 @@ msgid "Commands"
 msgstr "คำสั่ง"
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled when at least one selected target has slowmode active.
-#: src/features/messaging/components/modals/ForwardModal.tsx:63
+#: src/features/messaging/components/modals/ForwardModal.tsx:64
 msgid "Comments are disabled because one or more selected channels have slowmode on. The comment would be blocked by slowmode right after the forward."
 msgstr "ปิดการแสดงความคิดเห็นเนื่องจากช่องทางที่เลือกเปิดโหมดหน่วงเวลาไว้ ระบบจะบล็อกความคิดเห็นทันทีที่ส่งต่อข้อความ"
 
 #. Helper text in the forward modal explaining why the optional comment field is disabled for a single selected channel with slowmode.
-#: src/features/messaging/components/modals/ForwardModal.tsx:57
+#: src/features/messaging/components/modals/ForwardModal.tsx:58
 msgid "Comments are disabled because slowmode is on in {forwardChannelDisplayName}. The comment would be blocked by slowmode right after the forward."
 msgstr "ปิดใช้งานความคิดเห็นเนื่องจากเปิดโหมดหน่วงเวลาไว้ใน {forwardChannelDisplayName} ความคิดเห็นจะถูกบล็อกโดยโหมดหน่วงเวลาทันทีหลังจากส่งต่อ"
 
 #. Tooltip on the disabled comment field in the forward modal when slowmode blocks comments.
-#: src/features/messaging/components/modals/ForwardModal.tsx:86
+#: src/features/messaging/components/modals/ForwardModal.tsx:87
 msgid "Comments are unavailable while slowmode is on."
 msgstr "ไม่สามารถแสดงความคิดเห็นได้เมื่อเปิดโหมดจำกัดเวลา"
 
@@ -7741,7 +7783,7 @@ msgstr "ชื่อคอมมูนิตี้"
 
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:125
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:126
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:113
 msgid "Community nickname"
 msgstr "ชื่อเล่นในคอมมูนิตี้"
@@ -7794,7 +7836,7 @@ msgid "Community profile"
 msgstr "โปรไฟล์ชุมชน"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:72
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:73
 msgid "Community profile updated"
 msgstr "อัปเดตโปรไฟล์ชุมชนแล้ว"
 
@@ -7916,7 +7958,7 @@ msgstr "ปุ่มเขียนข้อความ"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:190
 msgid "Composer buttons"
 msgstr "ปุ่มเขียนข้อความ"
@@ -7928,7 +7970,7 @@ msgstr "โฟกัสช่องพิมพ์ข้อความ"
 
 #. Button label that opens a dedicated advanced settings modal for configuring screen-share encoder controls.
 #. Button label that opens a dedicated advanced settings modal.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:161
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:164
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx:160
 msgid "Configure"
 msgstr "กำหนดค่า"
@@ -8002,7 +8044,7 @@ msgstr "ตั้งค่าป้ายโปรไฟล์"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/channel/components/MentionEveryonePopout.tsx:181
 #: src/features/user/components/modals/EmailChangeModal.tsx:340
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
 msgid "Confirm"
 msgstr "ยืนยัน"
 
@@ -8054,7 +8096,7 @@ msgid "Confirm voice join"
 msgstr "ยืนยันการเข้าร่วมด้วยเสียง"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
 msgid "Confirmation"
 msgstr "ยืนยัน"
 
@@ -8080,7 +8122,7 @@ msgstr "เชื่อมต่อกล้องหรืออุปกรณ
 msgid "Connect a display, then try again."
 msgstr "เชื่อมต่อจอแสดงผล แล้วลองอีกครั้ง"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:539
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:532
 msgid "Connect a microphone and try again."
 msgstr "เชื่อมต่อไมโครโฟนแล้วลองอีกครั้ง"
 
@@ -8545,7 +8587,7 @@ msgid "Copy emoji URL"
 msgstr "คัดลอก URL ของอิโมจิ"
 
 #. Tooltip / button label that copies the voice endpoint hostname to the clipboard.
-#: src/features/voice/components/voice_connection_status/shared.ts:60
+#: src/features/voice/components/voice_connection_status/shared.ts:58
 msgid "Copy endpoint"
 msgstr "คัดลอกปลายทาง"
 
@@ -9152,7 +9194,7 @@ msgid "Couldn't ring this person"
 msgstr "ไม่สามารถโทรหาบุคคลนี้ได้"
 
 #. Error message in the use textarea submit hook. Preserve {detail}; it is inserted by code.
-#: src/features/messaging/hooks/useTextareaSubmit.ts:46
+#: src/features/messaging/hooks/useTextareaSubmit.ts:48
 msgid "Couldn't run that command: {detail}"
 msgstr "ไม่สามารถเรียกใช้คำสั่งนั้นได้: {detail}"
 
@@ -9710,7 +9752,7 @@ msgid "Current DM"
 msgstr "แชทส่วนตัวปัจจุบัน"
 
 #. Field label in the voice connection status popout. Shows the latest RTT in ms.
-#: src/features/voice/components/voice_connection_status/shared.ts:43
+#: src/features/voice/components/voice_connection_status/shared.ts:41
 msgid "Current ping:"
 msgstr "Ping ปัจจุบัน:"
 
@@ -9743,7 +9785,7 @@ msgstr "ปัจจุบัน: {mutedText}"
 #. Streaming preset label in the stream settings menu. Lets user pick resolution and frame rate manually.
 #. Voice processing profile option label (mobile voice settings). User configures processing manually.
 #: src/features/user/components/modals/tabs/notifications_tab/NotificationsTabSounds.tsx:180
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:77
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:90
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:94
 #: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx:44
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx:236
@@ -9754,7 +9796,7 @@ msgstr "กำหนดเอง"
 
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:38
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:41
 #: src/features/voice/components/VoiceSettingsMenus.tsx:69
 msgctxt "voice-processing-profile"
 msgid "Custom"
@@ -10014,6 +10056,11 @@ msgstr "การปรับแต่งอวาตาร์, แบนเน�
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:46
 msgid "Cut"
 msgstr "ตัด"
+
+#. Description for the noise gate suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:37
+msgid "Cuts audio below a loudness threshold, lowest CPU cost."
+msgstr "ตัดเสียงที่เบากว่าเกณฑ์ที่กำหนด ใช้ CPU น้อยที่สุด"
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts:127
@@ -10567,6 +10614,11 @@ msgstr "ลบข้อความของสมาชิกคนอื่น
 msgid "Delete passkey"
 msgstr "ลบพาสคีย์"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+msgid "Delete prompt"
+msgstr "ลบการแจ้งเตือน"
+
 #. Button or menu action label in the application info section. Keep it concise. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/ApplicationInfoSection.tsx:56
 msgid "Delete redirect URI"
@@ -11009,7 +11061,7 @@ msgid "Device volume"
 msgstr "ระดับเสียงอุปกรณ์"
 
 #. Field label in the voice connection status popout. Shows the connected voice region / device.
-#: src/features/voice/components/voice_connection_status/shared.ts:39
+#: src/features/voice/components/voice_connection_status/shared.ts:37
 msgid "Device:"
 msgstr "อุปกรณ์:"
 
@@ -11513,7 +11565,7 @@ msgstr "โหมดการแสดงผล"
 #. Short label in the inputs tab. Keep it concise.
 #. Short label in the my profile tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabInputsTab.tsx:22
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:137
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:138
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:61
 msgid "Display name"
 msgstr "ชื่อที่แสดง"
@@ -11646,7 +11698,7 @@ msgstr "คุณต้องการบล็อกข้อความโด
 #. Label in the accessibility tab.
 #. Label in the my profile tab.
 #: src/features/user/components/modals/tabs/AccessibilityTab.tsx:53
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:145
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:146
 msgid "Doc, I'm from the future. I came here in a time machine that you invented. Now, I need your help to get back to the year 1985."
 msgstr "ด็อก ผมมาจากอนาคต ผมมาที่นี่ด้วยไทม์แมชชีนที่คุณเป็นคนประดิษฐ์ขึ้นมา ตอนนี้ผมต้องการความช่วยเหลือจากคุณเพื่อกลับไปยังปี 1985"
 
@@ -11798,7 +11850,7 @@ msgid "Download button"
 msgstr "ปุ่มดาวน์โหลด"
 
 #. Button or menu action label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:101
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:102
 msgid "Download desktop app"
 msgstr "ดาวน์โหลดแอปบนเดสก์ท็อป"
 
@@ -12037,7 +12089,7 @@ msgid "Duplicate role"
 msgstr "คัดลอกบทบาท"
 
 #. Field label in the voice connection status popout. Shows how long the current voice session has been connected.
-#: src/features/voice/components/voice_connection_status/shared.ts:76
+#: src/features/voice/components/voice_connection_status/shared.ts:74
 msgid "Duration:"
 msgstr "ระยะเวลา:"
 
@@ -12280,7 +12332,7 @@ msgid "Edit translation provider"
 msgstr "แก้ไขผู้ให้บริการแปลภาษา"
 
 #. Button or menu action label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:92
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:93
 msgid "Edit your profile appearance and see a live preview"
 msgstr "แก้ไขโปรไฟล์และดูตัวอย่าง"
 
@@ -12501,7 +12553,7 @@ msgid "Emoji autocomplete"
 msgstr "การเติมข้อความอัตโนมัติของอีโมจิ"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:403
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
 msgid "Emoji button"
 msgstr "ปุ่มอีโมจิ"
 
@@ -12581,6 +12633,11 @@ msgstr "อิโมติคอน"
 msgid "Emoticons"
 msgstr "อิโมติคอน"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:395
+msgid "Empty edit"
+msgstr "แก้ไขว่างเปล่า"
+
 #. Short label in the app layout favorites channel list content.
 #: src/features/app/components/layout/FavoritesChannelListContent.tsx:70
 msgid "Empty favorites"
@@ -12599,7 +12656,7 @@ msgid "Enable"
 msgstr "เปิดใช้งาน"
 
 #. Voice settings CTA label for opening a platform permission prompt.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:121
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:122
 msgid "Enable {permissionName} permission"
 msgstr "เปิดใช้งานการอนุญาต {permissionName}"
 
@@ -12794,7 +12851,7 @@ msgid "Enable self-hosted mode client-side. Hides all premium and billing UI."
 msgstr "เปิดใช้งานโหมดโฮสต์เองฝั่งไคลเอ็นต์ ซ่อน UI พรีเมียมและการเรียกเก็บเงินทั้งหมด"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:57
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:60
 msgid "Enable Shift to expand"
 msgstr "เปิดใช้ Shift เพื่อขยาย"
 
@@ -12957,7 +13014,7 @@ msgid "Endpoint"
 msgstr "ปลายทาง"
 
 #. Field label in the voice connection status popout. Shows the voice server endpoint hostname.
-#: src/features/voice/components/voice_connection_status/shared.ts:56
+#: src/features/voice/components/voice_connection_status/shared.ts:54
 msgid "Endpoint:"
 msgstr "ปลายทาง:"
 
@@ -12973,10 +13030,8 @@ msgstr "อังกฤษ (สหรัฐอเมริกา)"
 
 #. Generic radio / dropdown option label for an "enhanced" tier.
 #. Noise suppression option label in the voice tab (neural filter). Keep it concise.
-#. Noise suppression option using the enhanced neural filter (DeepFilterNet3). Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:779
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:85
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:47
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:7
 msgid "Enhanced"
 msgstr "ปรับปรุงแล้ว"
 
@@ -13249,7 +13304,7 @@ msgstr "เสียงทั้งระบบ"
 #. Voice menu submenu label that contains per-user entrance sound mute and volume controls.
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:179
 #: src/features/ui/action_menu/items/VoiceParticipantMenuItems.tsx:309
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:186
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:187
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:145
 msgid "Entrance sound"
 msgstr "เสียงเข้าห้อง"
@@ -13358,8 +13413,8 @@ msgstr "ช่วงเย็น"
 
 #. Description for the automatic gain control toggle in the voice processing settings.
 #. Description for the automatic gain control toggle in the voice processing settings.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:170
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:72
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:171
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:62
 msgid "Evens out your mic volume so you are not too quiet."
 msgstr "ปรับระดับเสียงไมโครโฟนของคุณให้สม่ำเสมอ เพื่อไม่ให้เสียงเบาเกินไป"
 
@@ -13937,12 +13992,12 @@ msgid "Failed to send code. Try again."
 msgstr "ส่งรหัสไม่สำเร็จ ลองอีกครั้ง"
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:67
+#: src/features/channel/components/UserMessage.tsx:69
 msgid "Failed to send message."
 msgstr "ส่งข้อความไม่สำเร็จ"
 
 #. Error message in the channel and chat user message.
-#: src/features/channel/components/UserMessage.tsx:63
+#: src/features/channel/components/UserMessage.tsx:65
 msgid "Failed to send message. Hold for options."
 msgstr "ส่งข้อความไม่สำเร็จ แตะค้างไว้เพื่อดูตัวเลือก"
 
@@ -14441,6 +14496,12 @@ msgstr "โฟกัสคนนี้"
 msgid "Focus window"
 msgstr "นำหน้าต่างกลับมา"
 
+#. Noise suppression option label for the GTCRN speech backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:59
+msgctxt "noise-suppression-option"
+msgid "Focused"
+msgstr "เน้น"
+
 #. Voice input processing profile optimized for spoken voice.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:197
 msgid "Focused voice"
@@ -14714,7 +14775,7 @@ msgstr "ส่งต่อสื่อ"
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #. Title of the forward message modal.
 #: src/features/input/state/input_keybind/shared.ts:25
-#: src/features/messaging/components/modals/ForwardModal.tsx:78
+#: src/features/messaging/components/modals/ForwardModal.tsx:79
 msgid "Forward message"
 msgstr "ส่งต่อข้อความ"
 
@@ -15112,7 +15173,7 @@ msgid "GIF"
 msgstr "GIF"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:399
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:427
 msgid "GIF button"
 msgstr "ปุ่ม GIF"
 
@@ -15968,7 +16029,7 @@ msgid "Hide avatars"
 msgstr "ซ่อนรูปโปรไฟล์"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:507
 msgid "Hide channels you've muted from community sidebars"
 msgstr "ซ่อนช่องที่คุณปิดเสียงจากแถบด้านข้างของคอมมูนิตี้"
 
@@ -16020,7 +16081,7 @@ msgid "Hide members"
 msgstr "ซ่อนสมาชิก"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:471
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:499
 msgid "Hide muted"
 msgstr "ซ่อนที่ปิดเสียง"
 
@@ -16031,13 +16092,13 @@ msgstr "ซ่อนช่องที่ปิดเสียง"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced sidebar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:137
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:140
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:487
 msgid "Hide muted channels by default"
 msgstr "ซ่อนช่องที่ปิดเสียงไว้เป็นค่าเริ่มต้น"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:141
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:144
 msgid "Hide muted channels by default?"
 msgstr "ซ่อนช่องที่ปิดเสียงไว้เป็นค่าเริ่มต้นหรือไม่"
 
@@ -16128,7 +16189,7 @@ msgid "Higher quality can cost more CPU and latency."
 msgstr "คุณภาพที่สูงขึ้นอาจทำให้ใช้ CPU มากขึ้นและเกิดความหน่วงได้"
 
 #. Description for the DeepFilterNet3 noise suppression strength slider.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:80
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:70
 msgid "Higher values remove more noise but can affect speech texture."
 msgstr "ค่าที่สูงขึ้นจะช่วยลดเสียงรบกวนได้มากขึ้น แต่อาจส่งผลต่อคุณภาพเสียงพูด"
 
@@ -16315,7 +16376,7 @@ msgstr "ฉันต้องการวิธีอื่น"
 
 #. Short label in the voice tab. Keep it concise.
 #: src/features/channel/components/MatureContentChannelGate.tsx:207
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:105
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:106
 msgid "I understand"
 msgstr "ฉันเข้าใจ"
 
@@ -16738,7 +16799,7 @@ msgstr "ใน"
 msgid "In \"Operating system\" mode, dictionaries listed above are advisory. {PRODUCT_NAME} will pass these language tags to your OS spellchecker when supported. Tags it doesn't recognize are ignored."
 msgstr "ในโหมด \"ระบบปฏิบัติการ\" พจนานุกรมที่แสดงด้านบนเป็นเพียงคำแนะนำ {PRODUCT_NAME} จะส่งแท็กภาษาเหล่านี้ไปยังโปรแกรมตรวจการสะกดของระบบปฏิบัติการของคุณ หากระบบปฏิบัติการรองรับ แท็กที่ระบบไม่รู้จักจะถูกละเว้น"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:318
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:299
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "ในเบราว์เซอร์ การกดเพื่อพูดจะทำงานเมื่อแท็บ {PRODUCT_NAME} โฟกัสอยู่เท่านั้น ติดตั้งแอปเดสก์ท็อปเพื่อใช้การกดเพื่อพูดได้ทั่วทั้งระบบ"
 
@@ -16884,7 +16945,7 @@ msgid "Incoming calls: nobody"
 msgstr "สายเรียกเข้า: ไม่มี"
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available incoming bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:125
+#: src/features/voice/components/voice_connection_status/shared.ts:123
 msgid "Incoming capacity:"
 msgstr "ความจุขาเข้า:"
 
@@ -17023,7 +17084,7 @@ msgid "Input access was changed. Fully quit and restart {productName} so system-
 msgstr "การเข้าถึงอินพุตมีการเปลี่ยนแปลง โปรดออกจาก {productName} โดยสมบูรณ์แล้วเริ่มใหม่ เพื่อให้สามารถใช้ปุ่มลัดทั่วทั้งระบบได้"
 
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:174
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:175
 msgid "Input and output"
 msgstr "อินพุตและเอาต์พุต"
 
@@ -17071,7 +17132,7 @@ msgstr "การป้อนข้อมูลและข้อความ"
 msgid "Inputs with icons"
 msgstr "ช่องกรอกข้อมูลพร้อมไอคอน"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:35
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:36
 msgid "Insert emoji"
 msgstr "แทรกอิโมจิ"
 
@@ -17101,7 +17162,7 @@ msgid "Installing desktop update…"
 msgstr "กำลังติดตั้งการอัปเดตเดสก์ท็อป…"
 
 #. Audit log operation flag label for invite creation.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:170
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:185
 msgid "Instant invites"
 msgstr "คำเชิญทันที"
 
@@ -17578,7 +17639,7 @@ msgid "Jitter"
 msgstr "ความผันผวนของสัญญาณ"
 
 #. Field label in the voice connection status popout. Shows audio jitter in milliseconds.
-#: src/features/voice/components/voice_connection_status/shared.ts:117
+#: src/features/voice/components/voice_connection_status/shared.ts:115
 msgid "Jitter:"
 msgstr "จิตเตอร์:"
 
@@ -17641,7 +17702,7 @@ msgid "Join method"
 msgstr "วิธีเข้าร่วม"
 
 #. Audit log system-channel flag label for member join notification posts.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:182
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:197
 msgid "Join notifications"
 msgstr "การแจ้งเตือนการเข้าร่วม"
 
@@ -17749,7 +17810,7 @@ msgid "Jump to message"
 msgstr "ไปยังข้อความ"
 
 #. Label in the channel and chat user message. Preserve {displayName}, {formattedDate}; they are inserted by code.
-#: src/features/channel/components/UserMessage.tsx:54
+#: src/features/channel/components/UserMessage.tsx:56
 msgid "Jump to message from {displayName}, sent {formattedDate}"
 msgstr "ข้ามไปที่ข้อความจาก {displayName} ที่ส่งเมื่อ {formattedDate}"
 
@@ -17831,6 +17892,18 @@ msgstr "เปิด {productName} ทำงานอยู่เบื้อง
 msgid "Keep animations, GIF playback, hover effects, and tooltips running while the window is unfocused."
 msgstr "แสดงภาพเคลื่อนไหว, เล่น GIF, เอฟเฟกต์โฮเวอร์ และคำแนะนำต่างๆ ต่อไป แม้ว่าหน้าต่างจะไม่ได้โฟกัส"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+msgid "Keep attachments"
+msgstr "เก็บไฟล์แนบ"
+
+#. Label for an advanced message editing preference.
+#. Settings search entry label. Names the settings search entry in the settings UI.
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:15
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+msgid "Keep attachments when clearing an edit"
+msgstr "เก็บไฟล์แนบเมื่อล้างการแก้ไข"
+
 #. Description for the mirror premium model.
 #: src/features/app/components/setup/SetupWizardSteps.tsx:314
 msgid "Keep Free and Premium tiers. You can customize the tiers later."
@@ -17860,7 +17933,7 @@ msgid "Keep these safe. Regenerating will break existing integrations."
 msgstr "เก็บข้อมูลนี้ไว้ให้ปลอดภัย การสร้างใหม่จะทำให้การเชื่อมต่อที่มีอยู่เสียหาย"
 
 #. Description for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:65
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:78
 msgid "Keep transmitting briefly after release."
 msgstr "ยังคงส่งสัญญาณต่อสักครู่หลังปล่อยปุ่มค้างไว้"
 
@@ -18017,7 +18090,7 @@ msgid "Latency {latency} milliseconds"
 msgstr "เวลาแฝง {latency} มิลลิวินาที"
 
 #. Aria label for the latency graph chart in the voice connection status popout.
-#: src/features/voice/components/voice_connection_status/shared.ts:35
+#: src/features/voice/components/voice_connection_status/shared.ts:33
 msgid "Latency graph"
 msgstr "กราฟเวลาแฝง"
 
@@ -18276,6 +18349,11 @@ msgstr "โหมดสว่าง"
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:46
 msgid "Light theme"
 msgstr "ธีมสว่าง"
+
+#. Description for the Speex noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:46
+msgid "Lightweight classic filter, works on any device."
+msgstr "ตัวกรองคลาสสิกน้ำหนักเบา ใช้ได้กับทุกอุปกรณ์"
 
 #. Singular external-post stat label on a social post embed. Lowercase to appear after the count.
 #: src/features/channel/components/embeds/channel_embed/ChannelEmbedShared.ts:76
@@ -18641,7 +18719,7 @@ msgid "Look and feel"
 msgstr "รูปลักษณ์และการแสดงผล"
 
 #. placeholder {0}: externalProcessor.name
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:648
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:641
 msgid "Looks like you're using {0}. Stacking {PRODUCT_NAME}'s processing on top can cause pumping or distortion. Direct input passes your audio through untouched."
 msgstr "ดูเหมือนว่าคุณกำลังใช้ {0} การประมวลผลของ {PRODUCT_NAME} เพิ่มเติมอาจทำให้เกิดเสียงปั๊มหรือเสียงผิดเพี้ยนได้ การป้อนข้อมูลโดยตรงจะส่งสัญญาณเสียงของคุณไปโดยไม่มีการเปลี่ยนแปลง"
 
@@ -18863,7 +18941,7 @@ msgstr "อัปเดตเดสก์ท็อปด้วยตนเอง
 #. Action label in the inbox popout overflow menu. Marks every inbox channel as read.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/messaging/components/popouts/InboxPopout.tsx:42
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
 msgid "Mark all as read"
 msgstr "ทำเครื่องหมายว่าอ่านแล้วทั้งหมด"
 
@@ -18885,7 +18963,7 @@ msgid "Mark all inbox channels as read"
 msgstr "ทำเครื่องหมายว่าอ่านแล้วทั้งหมด"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:455
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:483
 msgid "Mark all unread inbox channels as read immediately, without asking to confirm"
 msgstr "ทำเครื่องหมายช่องที่ยังไม่ได้อ่านทั้งหมดในกล่องข้อความเป็นอ่านแล้วทันที โดยไม่ต้องยืนยัน"
 
@@ -19190,7 +19268,7 @@ msgid "Measuring latency..."
 msgstr "กำลังวัดเวลาแฝง..."
 
 #. Placeholder shown while voice latency is still being sampled. Trailing ellipsis indicates ongoing measurement.
-#: src/features/voice/components/voice_connection_status/shared.ts:47
+#: src/features/voice/components/voice_connection_status/shared.ts:45
 msgid "Measuring…"
 msgstr "กำลังวัด…"
 
@@ -19315,7 +19393,7 @@ msgid "Member list unavailable"
 msgstr "ไม่สามารถดูรายชื่อสมาชิกได้"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:178
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:193
 msgid "Member list updates"
 msgstr "อัปเดตรายชื่อสมาชิก"
 
@@ -19628,7 +19706,12 @@ msgstr "โหมดการแสดงข้อความ"
 msgid "Message display settings are only available on desktop."
 msgstr "การตั้งค่าการแสดงข้อความใช้ได้เฉพาะบนเดสก์ท็อปเท่านั้น"
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:306
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+msgid "Message editing"
+msgstr "แก้ไขข้อความ"
+
+#: src/features/messaging/components/modals/ForwardModal.tsx:307
 msgid "Message forwarded"
 msgstr "ส่งต่อข้อความแล้ว"
 
@@ -19670,14 +19753,14 @@ msgstr "ช่องป้อนข้อความ"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:391
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:194
 msgid "Message input buttons"
 msgstr "ปุ่มป้อนข้อความ"
 
 #. Error modal title in the forward modal when the optional comment exceeds the message length limit.
 #. Form validation error indicating the message exceeds the allowed length.
-#: src/features/messaging/components/modals/ForwardModal.tsx:49
+#: src/features/messaging/components/modals/ForwardModal.tsx:50
 #: src/features/ui/character_counter/CharacterCountMessages.ts:15
 msgid "Message is too long"
 msgstr "ข้อความยาวเกินไป"
@@ -19839,7 +19922,7 @@ msgstr "ไมโครโฟน"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:182
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:183
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:137
 msgid "Mic test"
 msgstr "ทดสอบไมโครโฟน"
@@ -20503,7 +20586,7 @@ msgstr "ปิดเสียง"
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:23
 #: src/features/app/components/layout/VoiceStateIcons.tsx:19
 #: src/features/ui/avatars/AvatarWithPresence.tsx:20
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:463
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:491
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:73
 #: src/features/voice/components/voice_participant_tile/shared.ts:98
 #: src/lib/overlay/OverlayContextMenu.tsx:24
@@ -20517,7 +20600,7 @@ msgstr "ปิดเสียงโดยผู้ดูแล"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:467
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:495
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:69
 msgid "Muted channels"
 msgstr "ช่องที่ปิดเสียง"
@@ -20608,7 +20691,7 @@ msgid "My awesome sticker"
 msgstr "สติกเกอร์สุดเจ๋งของฉัน"
 
 #. Channel overview settings tab label, control, or validation message (name, topic, slowmode, voice region, mature content gate).
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:65
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:67
 msgid "My category"
 msgstr "หมวดหมู่ของฉัน"
 
@@ -20815,7 +20898,7 @@ msgid "Netherlands"
 msgstr "เนเธอร์แลนด์"
 
 #. Section heading in the voice connection status popout for WebRTC network quality stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:72
+#: src/features/voice/components/voice_connection_status/shared.ts:70
 msgid "Network"
 msgstr "เครือข่าย"
 
@@ -20828,6 +20911,16 @@ msgstr "ข้อผิดพลาดเครือข่าย"
 #: src/features/devtools/components/DeveloperOptionsToggleGroups.ts:83
 msgid "Networking and performance"
 msgstr "เครือข่ายและประสิทธิภาพ"
+
+#. Description for the enhanced (DeepFilterNet3) noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:11
+msgid "Neural filter that removes most background noise."
+msgstr "ฟิลเตอร์แบบโครงข่ายประสาทเทียมที่ช่วยลดเสียงรบกวนรอบข้างส่วนใหญ่"
+
+#. Description for the RNNoise noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:55
+msgid "Neural filter, full audio bandwidth."
+msgstr "ฟิลเตอร์แบบโครงข่าย, แบนด์วิดท์เสียงเต็ม"
 
 #. Short label in the settings dialog permission components.
 #: src/features/app/components/dialogs/shared/PermissionComponents.tsx:20
@@ -20884,20 +20977,20 @@ msgid "New category"
 msgstr "หมวดหมู่ใหม่"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:149
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:152
 msgid "New communities only"
 msgstr "เฉพาะคอมมูนิตี้ใหม่"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:640
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:650
 msgid "New communities you join will automatically have muted channels hidden. Would you also like to apply this setting to all your existing communities?"
 msgstr "ช่องที่ปิดเสียงในคอมมูนิตี้ใหม่ที่คุณเข้าร่วมจะถูกซ่อนโดยอัตโนมัติ คุณต้องการใช้การตั้งค่านี้กับคอมมูนิตี้ปัจจุบันทั้งหมดของคุณด้วยหรือไม่"
 
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:671
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:681
 msgid "New communities you join will no longer have muted channels hidden automatically. Would you also like to show muted channels in all your existing communities?"
 msgstr "คอมมูนิตี้ใหม่ที่คุณเข้าร่วมจะไม่ซ่อนช่องที่ปิดเสียงโดยอัตโนมัติอีกต่อไป คุณต้องการแสดงช่องที่ปิดเสียงในคอมมูนิตี้ที่มีอยู่ทั้งหมดของคุณด้วยหรือไม่"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:503
 msgid "New community muted"
 msgstr "ปิดเสียงคอมมูนิตี้ใหม่แล้ว"
 
@@ -21184,7 +21277,7 @@ msgstr "ไม่มีการเปลี่ยนแปลงที่ต้
 msgid "No channels available"
 msgstr "ไม่มีช่องให้เลือก"
 
-#: src/features/messaging/components/modals/ForwardModal.tsx:425
+#: src/features/messaging/components/modals/ForwardModal.tsx:426
 #: src/features/search/components/search/ChannelFilterSheet.tsx:120
 msgid "No channels found"
 msgstr "ไม่พบช่อง"
@@ -21356,7 +21449,7 @@ msgstr "ไม่พบผลลัพธ์"
 msgid "No mentions yet"
 msgstr "ยังไม่มีการกล่าวถึง"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:524
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:517
 msgid "No microphone found"
 msgstr "ไม่พบไมโครโฟน"
 
@@ -21655,6 +21748,12 @@ msgstr "ไม่มีใครตรงกับการค้นหานั
 msgid "Noise"
 msgstr "เสียงรบกวน"
 
+#. Noise suppression option label for the noise gate backend. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:32
+msgctxt "noise-suppression-option"
+msgid "Noise gate"
+msgstr "การตัดเสียงรบกวน"
+
 #. Voice setting label for microphone background-noise filtering.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts:205
 msgid "Noise suppression"
@@ -21669,20 +21768,18 @@ msgstr "อิโมจิแบบไม่เคลื่อนไหว ({emo
 #. Library picker entry meaning no sound is selected for this scope.
 #. Member verification level option in the community moderation settings tab. Short standalone label for the lowest level (no verification).
 #. Short label in the visual tab. Keep it concise.
-#. Short label in the voice tab. Keep it concise.
 #. Summary row value on the confirm step when no items in the category were selected.
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:41
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:47
 #: src/features/user/components/modals/tabs/accessibility_tab/VisualTab.tsx:36
 #: src/features/user/components/modals/tabs/components/EntranceSoundSection.tsx:143
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx:219
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:93
 #: src/features/voice/components/AudioSourcePickerLinux.tsx:261
 msgid "None"
 msgstr "ไม่มี"
 
 #. Noise suppression option that disables suppression.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:55
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:23
 msgctxt "noise-suppression-option"
 msgid "None"
 msgstr "ไม่มี"
@@ -22113,7 +22210,7 @@ msgstr "เฉพาะที่เลือกไว้"
 msgid "Only Visionary members can join this community. Your access may have changed since this screen was opened."
 msgstr "เฉพาะสมาชิก Visionary เท่านั้นที่สามารถเข้าร่วมชุมชนนี้ได้ สิทธิ์การเข้าถึงของคุณอาจมีการเปลี่ยนแปลงไปตั้งแต่หน้าจอนี้เปิดขึ้น"
 
-#: src/features/channel/components/UserMessage.tsx:427
+#: src/features/channel/components/UserMessage.tsx:429
 msgid "Only you can see this message. <0>Dismiss</0>"
 msgstr "คุณเท่านั้นที่เห็นข้อความนี้ได้ <0>ปิด</0>"
 
@@ -22176,7 +22273,7 @@ msgid "Open {settingsMenuName} settings"
 msgstr "เปิดการตั้งค่า {settingsMenuName}"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:36
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:37
 msgid "Open {title}"
 msgstr "เปิด {title}"
 
@@ -22352,7 +22449,7 @@ msgid "Open emoji in browser"
 msgstr "เปิดอิโมจิในเบราว์เซอร์"
 
 #. Accessible label for the emoji picker trigger button in the forward modal comment field.
-#: src/features/messaging/components/modals/ForwardModal.tsx:94
+#: src/features/messaging/components/modals/ForwardModal.tsx:95
 #: src/features/user/components/modals/tabs/my_profile_tab/BioEditor.tsx:27
 msgid "Open emoji picker"
 msgstr "เปิดแป้นพิมพ์อีโมจิ"
@@ -22779,7 +22876,7 @@ msgid "Our safety team is reviewing it. We'll send you a DM and email once we've
 msgstr "ทีมความปลอดภัยของเรากำลังตรวจสอบอยู่ เราจะส่งข้อความส่วนตัวและอีเมลถึงคุณเมื่อเราได้ข้อสรุปแล้ว"
 
 #. Field label in the voice connection status popout. Shows WebRTC estimated available outgoing bandwidth.
-#: src/features/voice/components/voice_connection_status/shared.ts:121
+#: src/features/voice/components/voice_connection_status/shared.ts:119
 msgid "Outgoing capacity:"
 msgstr "ความจุขาออก:"
 
@@ -22915,7 +23012,7 @@ msgid "Participants"
 msgstr "ผู้เข้าร่วม"
 
 #. Field label in the voice connection status popout. Shows the current LiveKit participant count.
-#: src/features/voice/components/voice_connection_status/shared.ts:81
+#: src/features/voice/components/voice_connection_status/shared.ts:79
 msgid "Participants:"
 msgstr "ผู้เข้าร่วม:"
 
@@ -23402,7 +23499,7 @@ msgid "Pick what appears when you type a colon in the message input"
 msgstr "เลือกสิ่งที่แสดงเมื่อคุณพิมพ์เครื่องหมายทวิภาคในช่องป้อนข้อความ"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:411
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:439
 msgid "Pick which buttons show in the message input"
 msgstr "เลือกปุ่มที่จะแสดงในช่องพิมพ์ข้อความ"
 
@@ -24174,18 +24271,18 @@ msgstr "สีโปรไฟล์"
 
 #. Settings section label for editing profile appearance and identity.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:104
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:105
 #: src/features/user/components/settings_utils/section_registry/GeneralSettingsSections.ts:6
 msgid "Profile customization"
 msgstr "ปรับแต่งโปรไฟล์"
 
 #. Label in the my profile tab. Preserve {selectedGuildName}; it is inserted by code.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:100
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:101
 msgid "Profile customization for {selectedGuildName}"
 msgstr "การปรับแต่งโปรไฟล์สำหรับ {selectedGuildName}"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:96
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:97
 msgid "Profile customization form"
 msgstr "แบบฟอร์มปรับแต่งโปรไฟล์"
 
@@ -24250,7 +24347,7 @@ msgid "Profile type"
 msgstr "ประเภทโปรไฟล์"
 
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:76
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:77
 msgid "Profile updated"
 msgstr "อัปเดตโปรไฟล์แล้ว"
 
@@ -24275,7 +24372,7 @@ msgid "Promotion or instructions encouraging self-harm or eating disorders."
 msgstr "การโปรโมตหรือคำแนะนำที่สนับสนุนการทำร้ายตัวเองหรือความผิดปกติในการกิน"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:475
 msgid "Prompt"
 msgstr "ข้อความแจ้ง"
 
@@ -24287,7 +24384,7 @@ msgstr "แจ้งเตือนเมื่อมีอุปกรณ์เ
 #. Settings search entry label. Also used as a search synonym in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the my profile tab. Keep it concise.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:141
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:142
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts:177
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:160
 msgid "Pronouns"
@@ -24349,7 +24446,7 @@ msgid "Public registration is closed."
 msgstr "การลงทะเบียนแบบสาธารณะปิดอยู่"
 
 #. Field label in the voice connection status popout. Shows technical WebRTC publisher ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:129
+#: src/features/voice/components/voice_connection_status/shared.ts:127
 msgid "Publisher transport:"
 msgstr "การส่งข้อมูลของผู้เผยแพร่:"
 
@@ -24438,7 +24535,7 @@ msgid "Push notification inactive timeout"
 msgstr "หมดเวลาการแจ้งเตือนแบบพุชเมื่อไม่ใช้งาน"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:162
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:177
 msgid "Push notifications"
 msgstr "การแจ้งเตือนแบบพุช"
 
@@ -24487,18 +24584,18 @@ msgid "Push to talk key"
 msgstr "ปุ่มกดเพื่อพูด"
 
 #. Switch label in the voice tab toggling push-to-talk mode. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:109
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:357
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:110
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:338
 #: src/features/voice/components/VoiceSettingsMenus.tsx:417
 msgid "Push-to-talk"
 msgstr "Push-to-talk"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:97
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:98
 msgid "Push-to-talk (limited)"
 msgstr "กดเพื่อพูด (จำกัด)"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:670
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:663
 msgid "Push-to-talk is ignored in direct input. Switch to focused voice or custom to use it."
 msgstr "การกดเพื่อพูดจะถูกละเว้นในการป้อนข้อมูลโดยตรง หากต้องการใช้งาน ให้เปลี่ยนเป็นเสียงที่เน้นหรือกำหนดเอง"
 
@@ -24508,12 +24605,12 @@ msgid "Push-to-talk is on. Hold {pushToTalkHint} to speak."
 msgstr "เปิดใช้งานกดเพื่อพูดค้างไว้ {pushToTalkHint} เพื่อพูด"
 
 #. Voice settings warning shown when macOS Input Monitoring is required for system-wide push-to-talk. {productName} is the app name and {permissionName} is the macOS permission name.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:129
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:130
 msgid "Push-to-talk only works while {productName} is focused until {permissionName} is enabled. After changing the permission, fully quit and restart {productName} so system-wide hotkeys can use it."
 msgstr "กดเพื่อพูดจะทำงานเมื่อ {productName} อยู่ในโฟกัสเท่านั้น จนกว่าจะเปิดใช้งาน {permissionName} หลังจากเปลี่ยนสิทธิ์แล้ว ให้ออกจาก {productName} และเริ่มใหม่ทั้งหมด เพื่อให้ปุ่มลัดทั่วทั้งระบบสามารถใช้งานได้"
 
 #. Voice settings warning shown when push-to-talk is enabled in a browser.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:125
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:126
 msgid "Push-to-talk only works while the browser tab is focused."
 msgstr "กดเพื่อพูดจะทำงานเมื่อแท็บเบราว์เซอร์อยู่ในโฟกัสเท่านั้น"
 
@@ -24775,7 +24872,7 @@ msgid "Receive notifications when someone mentions you"
 msgstr "รับการแจ้งเตือนเมื่อมีคนกล่าวถึงคุณ"
 
 #. Field label in the voice connection status popout. Shows total current inbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:89
+#: src/features/voice/components/voice_connection_status/shared.ts:87
 msgid "Receive:"
 msgstr "รับ:"
 
@@ -24819,7 +24916,7 @@ msgid "Recommended"
 msgstr "แนะนำ"
 
 #. Description for the focused voice profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:69
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:82
 msgid "Recommended. Cleans up your mic for clear speech."
 msgstr "แนะนำ: ปรับปรุงไมโครโฟนของคุณเพื่อให้เสียงพูดชัดเจน"
 
@@ -25085,7 +25182,7 @@ msgstr "สัมพัทธ์"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:61
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:74
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:89
 msgid "Release delay"
 msgstr "หน่วงเวลาปล่อยเสียง"
@@ -26802,7 +26899,7 @@ msgstr "บันทึกเป็นรายการโปรด"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced GIF storage preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:41
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:44
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:47
 msgid "Save GIF favorites as saved media"
 msgstr "บันทึก GIF ที่ชอบเป็นมีเดียที่บันทึกไว้"
@@ -26953,7 +27050,7 @@ msgid "Screen share encoder controls"
 msgstr "การควบคุมตัวเข้ารหัสสำหรับการแชร์หน้าจอ"
 
 #. Title of a modal shown when an active screen share stops unexpectedly.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:104
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:113
 msgctxt "screen-share"
 msgid "Screen share ended"
 msgstr "การแชร์หน้าจอสิ้นสุดลง"
@@ -27105,15 +27202,15 @@ msgstr "เลื่อนลงเพื่อดูสิทธิประโ
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the whats new modal.
 #: src/features/app/components/whats_new/WhatsNewModal.tsx:29
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:419
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:447
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:178
 msgid "Scroll to bottom"
 msgstr "เลื่อนไปล่างสุด"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:129
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:415
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:132
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:443
 msgid "Scroll to bottom when sending a message"
 msgstr "เลื่อนไปด้านล่างเมื่อส่งข้อความ"
 
@@ -27182,7 +27279,7 @@ msgid "Search channels"
 msgstr "ค้นหาช่อง"
 
 #. Placeholder text in the channel picker search input of the forward modal.
-#: src/features/messaging/components/modals/ForwardModal.tsx:82
+#: src/features/messaging/components/modals/ForwardModal.tsx:83
 msgid "Search channels or DMs"
 msgstr "ค้นหาช่องหรือแชทส่วนตัว"
 
@@ -27646,7 +27743,7 @@ msgid "Select friends"
 msgstr "เลือกเพื่อน"
 
 #. Button label in the gif picker grid item when picking a GIF for an avatar, banner, or video background. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:50
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:51
 msgid "Select GIF {title}"
 msgstr "เลือก GIF {title}"
 
@@ -27672,7 +27769,7 @@ msgid "Select the account you want to sign in with on the desktop app."
 msgstr "เลือกบัญชีที่คุณต้องการเข้าสู่ระบบบนแอปเดสก์ท็อป"
 
 #. Aria label for the voice processing radio group in the voice settings tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:117
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:118
 msgid "Select voice processing mode"
 msgstr "เลือกโหมดประมวลผลเสียง"
 
@@ -27776,7 +27873,7 @@ msgid "Send"
 msgstr "ส่ง"
 
 #. Primary button label in the forward message modal. selectedCount is the number of selected destinations; selectionLimit is the maximum allowed.
-#: src/features/messaging/components/modals/ForwardModal.tsx:98
+#: src/features/messaging/components/modals/ForwardModal.tsx:99
 msgid "Send ({selectedCount}/{selectionLimit})"
 msgstr "ส่ง ({selectedCount}/{selectionLimit})"
 
@@ -27826,7 +27923,7 @@ msgstr "ส่งรายงานอื่น"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:407
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:435
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:170
 msgid "Send button"
 msgstr "ปุ่มส่งข้อความ"
@@ -27844,7 +27941,7 @@ msgstr "ส่งรายงาน DSA"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:113
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:116
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:127
 msgid "Send file messages in order"
 msgstr "ส่งข้อความไฟล์ตามลำดับ"
@@ -27860,7 +27957,7 @@ msgid "Send friend request"
 msgstr "ส่งคำขอเป็นเพื่อน"
 
 #. Button or menu action label in the channel and chat gif picker grid item. Keep it concise. Preserve {title}; it is inserted by code.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:45
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:46
 msgid "Send GIF {title}"
 msgstr "ส่ง GIF {title}"
 
@@ -27882,7 +27979,7 @@ msgstr "ส่งข้อความ"
 
 #. Audit log operation flag label for message sending.
 #. Permission name: allows sending chat messages.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:174
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:189
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:400
 msgid "Send messages"
 msgstr "ส่งข้อความ"
@@ -27971,7 +28068,7 @@ msgid "Send voice message"
 msgstr "ส่งข้อความเสียง"
 
 #. Field label in the voice connection status popout. Shows total current outbound media bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:85
+#: src/features/voice/components/voice_connection_status/shared.ts:83
 msgid "Send:"
 msgstr "ส่ง:"
 
@@ -27994,15 +28091,25 @@ msgstr "ส่งมัลแวร์หรือลิงก์อันตร
 msgid "Sending messages is disabled in this community"
 msgstr "ปิดการส่งข้อความในคอมมูนิตี้นี้"
 
+#. Description for the stereo microphone switch in the voice settings.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:72
+msgid "Sends both channels of a stereo microphone. Works only with no suppression or standard suppression."
+msgstr "ส่งทั้งสองช่องสัญญาณของไมโครโฟนสเตอริโอ ใช้ได้เฉพาะเมื่อไม่มีการลดทอนสัญญาณหรือมีการลดทอนสัญญาณแบบมาตรฐาน"
+
 #. Description for the studio / direct-input option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:34
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:37
 msgid "Sends raw mic audio with no processing."
 msgstr "ส่งสัญญาณเสียงไมโครโฟนดิบโดยไม่มีการประมวลผล"
 
 #. Description for the direct input profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:73
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:86
 msgid "Sends your audio untouched. Best if you're using external audio software."
 msgstr "ส่งเสียงของคุณโดยไม่มีการปรับแต่ง เหมาะที่สุดหากคุณใช้ซอฟต์แวร์เสียงภายนอก"
+
+#. Description for the noise suppression option that disables suppression.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:28
+msgid "Sends your microphone audio with no suppression."
+msgstr "ส่งเสียงไมโครโฟนของคุณโดยไม่มีการปรับลด"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the privacy dashboard. Keep it concise.
@@ -28049,7 +28156,7 @@ msgstr "ส่ง Embed"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:423
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
 #: src/features/user/components/settings_utils/section_registry/ChatSettingsSections.ts:182
 msgid "Sent messages"
 msgstr "ข้อความที่ส่งแล้ว"
@@ -28074,7 +28181,7 @@ msgid "Service error"
 msgstr "ข้อผิดพลาดของบริการ"
 
 #. Section heading in the voice connection status popout for current call/session debug stats.
-#: src/features/voice/components/voice_connection_status/shared.ts:64
+#: src/features/voice/components/voice_connection_status/shared.ts:62
 msgid "Session"
 msgstr "เซสชัน"
 
@@ -28561,7 +28668,7 @@ msgstr "รหัสย่อ"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:372
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:353
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:105
 msgid "Shortcut"
@@ -28589,12 +28696,12 @@ msgid "Shortcuts"
 msgstr "ปุ่มลัด"
 
 #. Body of the error modal shown when the forward modal comment exceeds the message length limit.
-#: src/features/messaging/components/modals/ForwardModal.tsx:53
+#: src/features/messaging/components/modals/ForwardModal.tsx:54
 msgid "Shorten the message and try again."
 msgstr "ย่อข้อความแล้วลองอีกครั้ง"
 
 #. Body of the error modal shown when the channel topic exceeds the maximum length.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:51
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:53
 msgid "Shorten the topic and try again."
 msgstr "หัวข้อสั้นเกินไป โปรดลองอีกครั้ง"
 
@@ -28647,7 +28754,7 @@ msgid "Show active now on the home screen to surface friends active in voice. Yo
 msgstr "แสดงเพื่อนที่กำลังใช้งานอยู่บนหน้าจอหลัก เพื่อดูว่าใครกำลังใช้เสียงอยู่ คุณจะเห็นตัวอย่าง บริบทของช่อง ใครอยู่ในนั้นบ้าง และวิธีเข้าร่วมอย่างรวดเร็ว"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:65
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:68
 msgid "Show attachment expiry indicator"
 msgstr "แสดงตัวบ่งชี้วันหมดอายุของไฟล์แนบ"
 
@@ -28698,7 +28805,7 @@ msgid "Show creation date instead of expiration date"
 msgstr "แสดงวันที่สร้างแทนวันหมดอายุ"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:89
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:92
 msgid "Show custom emojis in expression autocomplete"
 msgstr "แสดงอิโมจิที่กำหนดเองในการเติมข้อความอัตโนมัติ"
 
@@ -28708,17 +28815,17 @@ msgid "Show default avatar, ignoring your global profile"
 msgstr "แสดงรูปโปรไฟล์เริ่มต้น ไม่ใช้รูปโปรไฟล์หลักของคุณ"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:85
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:88
 msgid "Show default emojis in expression autocomplete"
 msgstr "แสดงอิโมจิเริ่มต้นในการเติมข้อความอัตโนมัติของช่องแสดงอารมณ์"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:69
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:72
 msgid "Show delete button"
 msgstr "แสดงปุ่มลบ"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:73
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:76
 msgid "Show download button"
 msgstr "แสดงปุ่มดาวน์โหลด"
 
@@ -28745,7 +28852,7 @@ msgstr "แสดงตัวอย่างลิงก์เว็บไซต
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:55
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:121
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:124
 msgid "Show emoji button"
 msgstr "แสดงปุ่มอิโมจิ"
 
@@ -28755,7 +28862,7 @@ msgid "Show emoji reactions on messages"
 msgstr "แสดงอิโมจิแสดงความรู้สึกบนข้อความ"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:77
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:80
 msgid "Show favorite button"
 msgstr "แสดงปุ่มรายการโปรด"
 
@@ -28777,14 +28884,14 @@ msgid "Show focus ring on chat textarea"
 msgstr "แสดงวงแหวนโฟกัสบนช่องข้อความแชท"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:61
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:64
 msgid "Show GIF indicator"
 msgstr "แสดงตัวบ่งชี้ GIF"
 
 #. Plus menu submenu toggle that shows the GIFs button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:43
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:101
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:104
 msgid "Show GIFs button"
 msgstr "แสดงปุ่ม GIF"
 
@@ -28794,7 +28901,7 @@ msgid "Show icon when collapsed"
 msgstr "แสดงไอคอนเมื่อยุบ"
 
 #. Short confirmation button label in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:157
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:160
 msgid "Show in all communities"
 msgstr "แสดงในทุกคอมมูนิตี้"
 
@@ -28833,7 +28940,7 @@ msgstr "แสดงสูงสุด 5 (+5 ป้ายกำกับ)"
 #. Plus menu submenu toggle that shows the saved media (memes) button next to the textarea.
 #. Short label for an advanced message input preference.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:47
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:105
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:108
 msgid "Show media button"
 msgstr "แสดงปุ่มสื่อ"
 
@@ -28854,7 +28961,7 @@ msgid "Show menu bar icon"
 msgstr "แสดงไอคอนแถบเมนู"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:45
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:48
 msgid "Show message action bar"
 msgstr "แสดงแถบการทำงานของข้อความ"
 
@@ -28937,7 +29044,7 @@ msgid "Show oldest messages first"
 msgstr "แสดงข้อความเก่าสุดก่อน"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:49
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:52
 msgid "Show only more button"
 msgstr "แสดงเฉพาะปุ่มเพิ่มเติม"
 
@@ -28962,7 +29069,7 @@ msgid "Show profile timezone settings"
 msgstr "แสดงการตั้งค่าเขตเวลาในโปรไฟล์"
 
 #. Short label for an advanced message action bar preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:53
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:56
 msgid "Show quick reactions"
 msgstr "แสดงปฏิกิริยาด่วน"
 
@@ -28972,7 +29079,7 @@ msgid "Show rich previews for YouTube links."
 msgstr "แสดงตัวอย่างแบบเต็มสำหรับลิงก์ YouTube"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:97
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:100
 msgid "Show saved media in expression autocomplete"
 msgstr "แสดงสื่อที่บันทึกไว้ในการเติมข้อความอัตโนมัติ"
 
@@ -28981,7 +29088,7 @@ msgstr "แสดงสื่อที่บันทึกไว้ในกา
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaContextMenu.tsx:102
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:59
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:125
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:128
 msgid "Show send button"
 msgstr "แสดงปุ่มส่ง"
 
@@ -28993,12 +29100,12 @@ msgstr "แสดงเนื้อหาที่ซ่อนเมื่อแ
 #. Short label for an advanced message input preference.
 #. Short label in the channel and chat textarea plus menu. Keep it concise.
 #: src/features/channel/components/textarea/TextareaPlusMenu.tsx:51
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:117
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:120
 msgid "Show stickers button"
 msgstr "แสดงปุ่มสติกเกอร์"
 
 #. Short label for an advanced message input preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:93
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:96
 msgid "Show stickers in expression autocomplete"
 msgstr "แสดงสติกเกอร์ในคำแนะนำการพิมพ์"
 
@@ -29008,7 +29115,7 @@ msgid "Show strikethrough markdown text in a slightly muted color."
 msgstr "แสดงข้อความ Markdown ที่ขีดฆ่าด้วยสีที่หม่นลงเล็กน้อย"
 
 #. Short label for an advanced media button preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:81
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:84
 msgid "Show suppress embeds button"
 msgstr "แสดงปุ่มซ่อนการฝัง"
 
@@ -29298,14 +29405,14 @@ msgid "Size selection"
 msgstr "เลือกขนาด"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:451
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:479
 msgid "Skip"
 msgstr "ข้าม"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced inbox preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:133
-#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:431
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:136
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:459
 msgid "Skip \"Mark all as read\" confirmation"
 msgstr "ข้ามการยืนยัน \"ทำเครื่องหมายว่าอ่านแล้วทั้งหมด\""
 
@@ -29343,7 +29450,7 @@ msgid "Skip this step"
 msgstr "ข้ามขั้นตอนนี้"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx:70
+#: src/app/App.tsx:69
 msgid "Skip to content"
 msgstr "ข้ามไปเนื้อหา"
 
@@ -30095,9 +30202,7 @@ msgid "Staff controls"
 msgstr "เครื่องมือสำหรับเจ้าหน้าที่"
 
 #. Noise suppression option label in the voice tab (browser default). Keep it concise.
-#. Noise suppression option using the browser built-in engine. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:89
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:51
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:15
 msgid "Standard"
 msgstr "มาตรฐาน"
 
@@ -30301,6 +30406,11 @@ msgstr "ขั้นตอนที่ 3"
 msgid "Step 4"
 msgstr "ขั้นตอนที่ 4"
 
+#. Switch label in the voice settings that sends both channels of a stereo microphone. Keep it concise.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:68
+msgid "Stereo microphone"
+msgstr "ไมโครโฟนสเตอริโอ"
+
 #. Label for the has:sticker filter option in the mobile channel search sheet.
 #. Screen-reader fragment listing one sticker on a message. Lowercase because it appears inside a longer sentence.
 #. has:sticker chip label. Always lowercase; matches the typed query value 1:1.
@@ -30451,7 +30561,7 @@ msgid "Stop"
 msgstr "หยุด"
 
 #. Confirmation prompt in advanced settings.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:153
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:156
 msgid "Stop hiding muted channels by default?"
 msgstr "หยุดซ่อนช่องที่ปิดเสียงไว้เป็นค่าเริ่มต้นหรือไม่"
 
@@ -30520,7 +30630,7 @@ msgid "Stop."
 msgstr "หยุด"
 
 #. Description for the echo cancellation toggle in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:68
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:58
 msgid "Stops your speakers from looping back into your mic."
 msgstr "ป้องกันเสียงจากลำโพงย้อนเข้าไมโครโฟนของคุณ"
 
@@ -30654,6 +30764,11 @@ msgstr "Stripe รายงานว่าบัตรออกในประ�
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
 msgstr "คุณภาพดีเยี่ยม ใช้ CPU ปานกลาง เหมาะสำหรับแชร์หน้าจอบน Chromium"
 
+#. Description for the GTCRN noise suppression option.
+#: src/features/voice/utils/noise_suppression/NoiseSuppressionLabels.ts:64
+msgid "Strongest neural filter for speech, limits audio to the speech range."
+msgstr "ตัวกรอง Neural ที่แรงที่สุดสำหรับคำพูด จำกัดเสียงให้อยู่ในช่วงคำพูด"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts:130
 msgid "Styling"
@@ -30669,7 +30784,7 @@ msgid "Submitting"
 msgstr "กำลังส่ง"
 
 #. Field label in the voice connection status popout. Shows technical WebRTC subscriber ICE transport details.
-#: src/features/voice/components/voice_connection_status/shared.ts:133
+#: src/features/voice/components/voice_connection_status/shared.ts:131
 msgid "Subscriber transport:"
 msgstr "การส่งข้อมูลของผู้ติดตาม:"
 
@@ -30764,7 +30879,7 @@ msgid "Suppression"
 msgstr "การบล็อก"
 
 #. Label for the DeepFilterNet3 noise suppression strength slider in the custom voice processing settings.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:76
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:66
 msgid "Suppression strength"
 msgstr "ความเข้มของการลดเสียงรบกวน"
 
@@ -30851,7 +30966,7 @@ msgstr "เปลี่ยนเป็นเลย์เอาต์สบาย
 msgid "Switch to dense layout"
 msgstr "เปลี่ยนเป็นเลย์เอาต์แบบกระชับ"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:643
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:636
 msgid "Switch to direct input"
 msgstr "เปลี่ยนเป็นพิมพ์ข้อความ"
 
@@ -31635,7 +31750,7 @@ msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "redirect_uri ที่ระบุต้องใช้ HTTP หรือ HTTPS"
 
 #. Body of a modal shown when a browser screen share track ends outside the app, for example from the browser sharing controls.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:109
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:118
 msgctxt "screen-share"
 msgid "The screen share source stopped sending video, so your screen share was stopped."
 msgstr "แหล่งที่มาของการแชร์หน้าจอหยุดส่งวิดีโอ ดังนั้นการแชร์หน้าจอก็จะหยุดลง"
@@ -32333,7 +32448,7 @@ msgid "This message no longer exists."
 msgstr "ข้อความนี้ไม่มีอยู่อีกต่อไปแล้ว"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:129
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:130
 msgid "This nickname will only be visible in this community"
 msgstr "ชื่อเล่นนี้จะแสดงในชุมชนนี้เท่านั้น"
 
@@ -32540,7 +32655,7 @@ msgid "This voice channel is no longer available."
 msgstr "ช่องเสียงนี้ไม่พร้อมใช้งานแล้ว"
 
 #. Description text in the channel and chat user message. Preserve {silentMention}; it is inserted by code.
-#: src/features/channel/components/UserMessage.tsx:71
+#: src/features/channel/components/UserMessage.tsx:73
 msgid "This was a {silentMention} message."
 msgstr "ข้อความนี้เป็นข้อความ {silentMention}"
 
@@ -32970,7 +33085,7 @@ msgstr "ยอดนิยม"
 msgid "Top tooltip"
 msgstr "คำแนะนำด้านบน"
 
-#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:33
+#: src/features/channel/components/modals/channel_tabs/channel_overview_tab/ChannelOverviewTopicEditor.tsx:34
 msgid "Topic"
 msgstr "หัวข้อ"
 
@@ -33280,7 +33395,7 @@ msgid "TTS speed"
 msgstr "ความเร็ว TTS"
 
 #. Description for the custom option in the voice processing settings radio group.
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:43
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:46
 msgid "Tune the processing yourself."
 msgstr "ปรับแต่งการประมวลผลได้เอง"
 
@@ -33373,7 +33488,7 @@ msgstr "เปิดความเป็นส่วนตัวขณะสต
 
 #. Label in the input tab.
 #. Settings search entry label. Names the settings search entry in the settings UI.
-#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:10
+#: src/features/user/components/modals/tabs/chat_settings_tab/ChatSettingsTabInputTab.tsx:11
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:363
 msgid "Turn text smileys into emoji"
 msgstr "เปลี่ยนอิโมจิให้เป็นอิโมจิ"
@@ -33479,7 +33594,7 @@ msgid "Typing avatars"
 msgstr "รูปโปรไฟล์กำลังพิมพ์"
 
 #. Audit log operation flag label.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:166
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:181
 msgid "Typing events"
 msgstr "กิจกรรมการพิมพ์"
 
@@ -33609,12 +33724,12 @@ msgid "Unavailable"
 msgstr "ไม่พร้อมใช้งาน"
 
 #. Audit log community feature label meaning the community is unavailable to all users.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:150
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:165
 msgid "Unavailable for everyone"
 msgstr "ไม่พร้อมใช้งานสำหรับทุกคน"
 
 #. Audit log community feature label meaning only staff can access the community.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:154
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:169
 msgid "Unavailable for everyone but staff"
 msgstr "ไม่พร้อมใช้งานสำหรับทุกคนยกเว้นเจ้าหน้าที่"
 
@@ -33923,7 +34038,7 @@ msgstr "ผู้ใช้ไม่ทราบชื่อ"
 #: src/features/devtools/utils/CommandUtils.ts:27
 #: src/features/guild/components/modals/guild_tabs/GuildAuditLogTab.tsx:114
 #: src/features/voice/components/VoiceParticipantAvatarList.tsx:44
-#: src/features/voice/components/VoiceParticipantTile.tsx:172
+#: src/features/voice/components/VoiceParticipantTile.tsx:174
 #: src/features/webhook/components/WebhookListItem.tsx:30
 msgid "Unknown user"
 msgstr "ผู้ใช้ไม่รู้จัก"
@@ -34447,7 +34562,7 @@ msgid "Updater state"
 msgstr "สถานะตัวอัปเดต"
 
 #. Short label in the channel and chat gif picker grid item. Keep it concise.
-#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:41
+#: src/features/channel/components/pickers/gif/GifPickerGridItem.tsx:42
 msgid "Updating favorites…"
 msgstr "กำลังอัปเดตรายการโปรด…"
 
@@ -34506,7 +34621,7 @@ msgstr "อัปโหลดรูปภาพ"
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced message input privacy preference.
-#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:109
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx:112
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts:107
 msgid "Upload attachments before sending"
 msgstr "อัปโหลดไฟล์แนบก่อนส่ง"
@@ -34658,7 +34773,7 @@ msgstr "กำลังอัปโหลดอิโมจิ"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for the URL input in the embed debugger.
 #. Short label in the channel create modal. Keep it concise.
-#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:70
+#: src/features/channel/components/modals/channel_tabs/ChannelOverviewTab.tsx:72
 #: src/features/channel/components/modals/ChannelCreateModal.tsx:37
 #: src/features/user/components/modals/tabs/EmbedDebuggerTab.tsx:34
 #: src/features/user/components/settings_utils/search_index/EmbedDebuggerIndex.ts:19
@@ -35509,22 +35624,22 @@ msgid "Verify your email before adding an authenticator app."
 msgstr "ยืนยันอีเมลของคุณก่อนเพิ่มแอปยืนยันตัวตน"
 
 #. Description text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:116
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:117
 msgid "Verify your email before changing your community nickname, avatar, banner, bio, pronouns, or accent color."
 msgstr "ยืนยันอีเมลของคุณก่อนเปลี่ยนชื่อเล่นชุมชน, อวตาร, แบนเนอร์, ประวัติ, คำสรรพนาม หรือสีที่เน้น"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:120
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:121
 msgid "Verify your email before changing your username, display name, avatar, banner, bio, pronouns, timezone, or {premiumProductName} badge privacy."
 msgstr "ยืนยันอีเมลของคุณก่อนเปลี่ยนชื่อผู้ใช้, ชื่อที่แสดง, อวตาร, แบนเนอร์, ประวัติ, คำสรรพนาม, เขตเวลา หรือความเป็นส่วนตัวของป้าย {premiumProductName} ของคุณ"
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:84
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:85
 msgid "Verify your email before editing this community profile. You can still preview it here."
 msgstr "ยืนยันอีเมลของคุณก่อนแก้ไขโปรไฟล์ชุมชนนี้ คุณยังดูตัวอย่างได้ที่นี่"
 
 #. Description text in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:88
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:89
 msgid "Verify your email before editing your profile. You can still preview it here."
 msgstr "ยืนยันอีเมลของคุณก่อนแก้ไขโปรไฟล์ คุณยังดูตัวอย่างได้ที่นี่"
 
@@ -35556,12 +35671,12 @@ msgid "Verify your email to continue using {productName}."
 msgstr "ยืนยันอีเมลของคุณเพื่อใช้งาน {productName} ต่อไป"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:108
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:109
 msgid "Verify your email to edit this community profile"
 msgstr "ยืนยันอีเมลเพื่อแก้ไขโปรไฟล์ชุมชนนี้"
 
 #. Label in the my profile tab.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:112
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:113
 msgid "Verify your email to edit your profile"
 msgstr "ยืนยันอีเมลเพื่อแก้ไขโปรไฟล์"
 
@@ -35666,7 +35781,7 @@ msgid "Video options"
 msgstr "ตัวเลือกวิดีโอ"
 
 #. Field label in the voice connection status popout. Shows received video packet loss percentage.
-#: src/features/voice/components/voice_connection_status/shared.ts:113
+#: src/features/voice/components/voice_connection_status/shared.ts:111
 msgid "Video packet loss:"
 msgstr "แพ็กเก็ตวิดีโอสูญหาย:"
 
@@ -35690,7 +35805,7 @@ msgid "Video quality"
 msgstr "คุณภาพวิดีโอ"
 
 #. Field label in the voice connection status popout. Shows current inbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:105
+#: src/features/voice/components/voice_connection_status/shared.ts:103
 msgid "Video receive:"
 msgstr "วิดีโอที่ได้รับ:"
 
@@ -35700,7 +35815,7 @@ msgid "Video scrubbing"
 msgstr "การเลื่อนวิดีโอ"
 
 #. Field label in the voice connection status popout. Shows current outbound video bitrate.
-#: src/features/voice/components/voice_connection_status/shared.ts:101
+#: src/features/voice/components/voice_connection_status/shared.ts:99
 msgid "Video send:"
 msgstr "ส่งวิดีโอ:"
 
@@ -35983,7 +36098,7 @@ msgid "Violent or graphic content"
 msgstr "เนื้อหารุนแรงหรือภาพที่น่าตกใจ"
 
 #. Audit log community feature label for elevated voice capacity/quality.
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:146
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:161
 msgid "VIP voice"
 msgstr "เสียง VIP"
 
@@ -35994,7 +36109,7 @@ msgstr "การมองเห็น"
 
 #. Audit log community feature label for the Visionary premium feature.
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionCard.tsx:416
-#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:158
+#: src/features/guild/utils/guild_tabs/GuildAuditLogTabUtils.ts:173
 msgid "Visionary"
 msgstr "ผู้มีวิสัยทัศน์"
 
@@ -36239,8 +36354,8 @@ msgid "Voice participants"
 msgstr "ผู้เข้าร่วมการโทรด้วยเสียง"
 
 #. Voice settings radio group label for microphone processing profile.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:638
-#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:64
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:631
+#: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:54
 msgid "Voice processing"
 msgstr "การประมวลผลเสียง"
 
@@ -36295,7 +36410,7 @@ msgstr "เป็นโมฆะ"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:373
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:178
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:179
 #: src/features/user/components/settings_utils/search_index/NotificationsIndex.ts:86
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:174
 msgid "Volume"
@@ -36342,12 +36457,12 @@ msgid "Waiting for passkey…"
 msgstr "กำลังรอพาสคีย์…"
 
 #. Inline notice in the forward modal when slowmode is active in the selected target channel. forwardChannelDisplayName is the channel name.
-#: src/features/messaging/components/modals/ForwardModal.tsx:69
+#: src/features/messaging/components/modals/ForwardModal.tsx:70
 msgid "Waiting for slowmode in {forwardChannelDisplayName} to expire."
 msgstr "กำลังรอให้โหมดหน่วงเวลาใน {forwardChannelDisplayName} หมดอายุ"
 
 #. Inline notice in the forward modal when slowmode is active in one or more selected target channels.
-#: src/features/messaging/components/modals/ForwardModal.tsx:74
+#: src/features/messaging/components/modals/ForwardModal.tsx:75
 msgid "Waiting for slowmode in one or more selected channels to expire."
 msgstr "รอ Slow Mode ในช่องทางที่เลือกหมดเวลา"
 
@@ -36925,7 +37040,7 @@ msgstr "การสนทนาใดบ้าง"
 msgid "Which rule was broken?"
 msgstr "ทำผิดกฎข้อไหน"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:366
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:347
 msgid "While push-to-talk is on, your shortcut controls your microphone, so the mute button is disabled."
 msgstr "ขณะที่เปิดใช้งานการกดเพื่อพูด ปุ่มลัดจะควบคุมไมโครโฟนของคุณ ดังนั้นปุ่มปิดเสียงจะถูกปิดใช้งาน"
 
@@ -37322,7 +37437,7 @@ msgid "You can't befriend yourself"
 msgstr "คุณไม่สามารถเป็นเพื่อนกับตัวเองได้"
 
 #. Label in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:133
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:134
 msgid "You can't change your nickname here"
 msgstr "คุณเปลี่ยนชื่อเล่นที่นี่ไม่ได้"
 
@@ -37572,7 +37687,7 @@ msgid "You have unsaved changes."
 msgstr "คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก"
 
 #. Warning text in the my profile tab. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/MyProfileTab.tsx:80
+#: src/features/user/components/modals/tabs/MyProfileTab.tsx:81
 msgid "You have unsaved changes. Save or reset before leaving."
 msgstr "คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก บันทึกหรือรีเซ็ตก่อนออกจากหน้านี้"
 
@@ -38336,7 +38451,7 @@ msgid "Your registration needs an extra anti-spam check before you can continue.
 msgstr "การลงทะเบียนของคุณต้องผ่านการตรวจสอบสแปมเพิ่มเติมก่อนดำเนินการต่อ"
 
 #. Body of a modal shown when the video codec the browser negotiated for an active screen share is outside the codecs the app allows and no allowed codec could be published, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:115
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:124
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "การแชร์หน้าจอของคุณไม่สามารถเผยแพร่ด้วยตัวแปลงสัญญาณวิดีโอที่เข้ากันได้ จึงถูกหยุดลง ลองแชร์อีกครั้ง"
@@ -38435,7 +38550,7 @@ msgid "Your vanity URL has been set to {inviteEndpoint}/{vanitySlug}"
 msgstr "URL ที่กำหนดเองของคุณถูกตั้งค่าเป็น {inviteEndpoint}/{vanitySlug} แล้ว"
 
 #. Body of a modal shown when the local video encoder produces no frames for an active screen share, which forces the share to stop.
-#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:122
+#: src/features/voice/engine/v2/VoiceEngineV2AppScreenShareExecutionAdapter.tsx:131
 msgctxt "screen-share"
 msgid "Your video encoder stopped encoding frames, so your screen share was stopped. Try sharing again."
 msgstr "ตัวเข้ารหัสวิดีโอของคุณหยุดการเข้ารหัสเฟรม จึงหยุดการแชร์หน้าจอของคุณแล้ว ลองแชร์อีกครั้ง"

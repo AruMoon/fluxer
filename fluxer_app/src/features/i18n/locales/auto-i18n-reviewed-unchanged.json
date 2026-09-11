@@ -1291,6 +1291,15 @@
     ],
     "en-GB": [
       {
+        "msgid": "128 kbps voice quality"
+      },
+      {
+        "msgid": "256 kbps voice quality"
+      },
+      {
+        "msgid": "384 kbps voice quality"
+      },
+      {
         "msgid": "<0>{targetUserTag}</0> is currently timed out. You can update their timeout duration or remove the timeout."
       },
       {
@@ -1381,6 +1390,9 @@
         "msgid": "Branding asset preview"
       },
       {
+        "msgid": "Built-in suppression from your browser or system."
+      },
+      {
         "msgid": "Camera access is needed for device previews"
       },
       {
@@ -1417,7 +1429,13 @@
         "msgid": "Clear command"
       },
       {
+        "msgid": "Clear message text"
+      },
+      {
         "msgid": "Clearer text"
+      },
+      {
+        "msgid": "Clearing the text of a message with attachments asks to delete the message unless this is on"
       },
       {
         "msgid": "Closed"
@@ -1474,6 +1492,9 @@
         "msgid": "Custom emoji {emojiName} from {communityName}"
       },
       {
+        "msgid": "Cuts audio below a loudness threshold, lowest CPU cost."
+      },
+      {
         "msgid": "Deafen other members in this voice channel, so they cannot hear or speak."
       },
       {
@@ -1481,6 +1502,9 @@
       },
       {
         "msgid": "Delete other members' messages in this channel. Pinning is controlled separately."
+      },
+      {
+        "msgid": "Delete prompt"
       },
       {
         "msgid": "Delete user"
@@ -1517,6 +1541,9 @@
       },
       {
         "msgid": "Email us and a person will review your account. Tell us you cannot verify by SMS and we will take it from there. Replies come by email, so this is not instant."
+      },
+      {
+        "msgid": "Empty edit"
       },
       {
         "msgid": "Emulate decode codec (testing)"
@@ -1642,6 +1669,12 @@
         "msgid": "Keep Neko still"
       },
       {
+        "msgid": "Keep attachments"
+      },
+      {
+        "msgid": "Keep attachments when clearing an edit"
+      },
+      {
         "msgid": "Kicked {targetUserTag} from the community"
       },
       {
@@ -1660,6 +1693,9 @@
         "msgid": "Let people search and send GIFs powered by Klipy."
       },
       {
+        "msgid": "Lightweight classic filter, works on any device."
+      },
+      {
         "msgid": "Loading instance configuration"
       },
       {
@@ -1673,6 +1709,9 @@
       },
       {
         "msgid": "Mention everyone or any role in this channel (even if the role isn't set to be mentionable)."
+      },
+      {
+        "msgid": "Message editing"
       },
       {
         "msgid": "Microphone ({deviceLabel})"
@@ -1691,6 +1730,12 @@
       },
       {
         "msgid": "Neko cat that chases your cursor"
+      },
+      {
+        "msgid": "Neural filter that removes most background noise."
+      },
+      {
+        "msgid": "Neural filter, full audio bandwidth."
       },
       {
         "msgid": "New price scheduled for <0>{pendingChangeDate}</0>."
@@ -1957,6 +2002,12 @@
         "msgid": "Send messages in this channel."
       },
       {
+        "msgid": "Sends both channels of a stereo microphone. Works only with no suppression or standard suppression."
+      },
+      {
+        "msgid": "Sends your microphone audio with no suppression."
+      },
+      {
         "msgid": "Sequential send"
       },
       {
@@ -2053,6 +2104,9 @@
         "msgid": "Static Neko"
       },
       {
+        "msgid": "Stereo microphone"
+      },
+      {
         "msgid": "Still Neko"
       },
       {
@@ -2066,6 +2120,9 @@
       },
       {
         "msgid": "Stream quality"
+      },
+      {
+        "msgid": "Strongest neural filter for speech, limits audio to the speech range."
       },
       {
         "msgid": "Switch price"
@@ -2294,6 +2351,22 @@
       },
       {
         "msgid": "{remaining, plural, one {+# more} other {+# more}}"
+      },
+      {
+        "msgctxt": "noise-suppression-option",
+        "msgid": "Balanced"
+      },
+      {
+        "msgctxt": "noise-suppression-option",
+        "msgid": "Classic"
+      },
+      {
+        "msgctxt": "noise-suppression-option",
+        "msgid": "Focused"
+      },
+      {
+        "msgctxt": "noise-suppression-option",
+        "msgid": "Noise gate"
       },
       {
         "msgctxt": "screen-share",
