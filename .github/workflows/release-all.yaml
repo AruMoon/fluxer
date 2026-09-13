@@ -109,6 +109,13 @@ jobs:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
+  build_recon:
+    needs: meta
+    uses: ./.github/workflows/build-recon.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
   build_snowflakes:
     needs: meta
     uses: ./.github/workflows/build-snowflakes.yaml
