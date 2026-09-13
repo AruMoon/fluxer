@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import {type ConfigObject, isConfigObject} from '@fluxer/config/src/config_loader/ConfigObject';
+
 type ConfigPathKey = string | number;
-type ConfigObject = Record<string, unknown>;
 type ConfigContainer = ConfigObject | Array<unknown>;
 
 type EnvValueParser = (raw: string) => unknown;
@@ -105,34 +106,6 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_API_WORKER_ENABLE_CRON_SCHEDULER: {
 		path: ['services', 'api', 'worker', 'enable_cron_scheduler'],
 		parse: parseEnvValue,
-	},
-	FLUXER_API_WORKER_ENABLE_VOICE_RECONCILIATION: {
-		path: ['services', 'api', 'worker', 'enable_voice_reconciliation'],
-		parse: parseEnvValue,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_INTERVAL_MS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'interval_ms'],
-		parse: parseInteger,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_STAGGER_DELAY_MS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'stagger_delay_ms'],
-		parse: parseInteger,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_LOCK_TTL_SECONDS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'lock_ttl_seconds'],
-		parse: parseInteger,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_CADENCE_TTL_SECONDS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'cadence_ttl_seconds'],
-		parse: parseInteger,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_GATEWAY_ONLY_GRACE_MS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'gateway_only_grace_ms'],
-		parse: parseInteger,
-	},
-	FLUXER_API_WORKER_VOICE_RECONCILIATION_LIVEKIT_ONLY_GRACE_MS: {
-		path: ['services', 'api', 'worker', 'voice_reconciliation', 'livekit_only_grace_ms'],
-		parse: parseInteger,
 	},
 	FLUXER_API_WORKER_LANE_CONCURRENCY_OVERRIDES: {
 		path: ['services', 'api', 'worker', 'lane_concurrency_overrides'],
@@ -436,12 +409,8 @@ const NAMED_FLUXER_ENV_OVERRIDES: Record<string, NamedEnvOverride> = {
 	FLUXER_GEOIP_DB_PATH: {path: ['geoip', 'maxmind_db_path']},
 };
 
-function isPlainObject(value: unknown): value is ConfigObject {
-	return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
 function isContainer(value: unknown): value is ConfigContainer {
-	return isPlainObject(value) || Array.isArray(value);
+	return isConfigObject(value) || Array.isArray(value);
 }
 
 function createChildContainer(nextKey: ConfigPathKey | undefined): ConfigContainer {

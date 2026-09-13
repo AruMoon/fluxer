@@ -34,7 +34,7 @@ Most guild-scoped Dispatches have a `guild_id` string. [Guild Create](#guild-cre
 
 The originating session is excluded from a Dispatch only for [Message Reaction Add](#message-reaction-add) and [Message Reaction Remove](#message-reaction-remove) in a guild channel, and only when the request supplied a `session_id`. That field is removed from the payload. The same field on a direct message or group direct message reaction is forwarded to every recipient unchanged and excludes nobody. The actor that issues any other mutation receives the resulting Dispatch like every other eligible session.
 
-A Dispatch is buffered for [Resume](/gateway/commands/#resume) replay unless it is [Guild Sync](#guild-sync), [Guild Member List Update](#guild-member-list-update), or [Guild Members Chunk](#guild-members-chunk). Those three are delivered live and never retained. A single oversized Dispatch is delivered but not retained, as [Limits and rate limits](/gateway/limits-and-rate-limits/#replay-and-backpressure) describes. [Ready](#ready) and the guild burst that follows it for a bot session are also sent outside the replay buffer. The initial [Call Create](#call-create) events are retained like any other Dispatch and are replayed on Resume.
+A Dispatch is buffered for [Resume](/gateway/commands/#resume) replay unless it is [Guild Sync](#guild-sync), [Guild Member List Update](#guild-member-list-update), or [Guild Members Chunk](#guild-members-chunk). Those are delivered live and never retained. A single oversized Dispatch is delivered but not retained, as [Limits and rate limits](/gateway/limits-and-rate-limits/#replay-and-backpressure) describes. [Ready](#ready) and the guild burst that follows it for a bot session are also sent outside the replay buffer. The initial [Call Create](#call-create) events are retained like any other Dispatch and are replayed on Resume.
 
 ## Dispatch events
 
@@ -105,7 +105,6 @@ A Dispatch is buffered for [Resume](/gateway/commands/#resume) replay unless it 
 | [Channel Pins Update](#channel-pins-update) | A channel's most recent pin time changes | Channel visibility |
 | [Channel Pins ACK](#channel-pins-ack) | The current user acknowledges a channel's pins | Current user |
 | [Voice State Update](#voice-state-update) | A guild or call participant's voice state changes | Channel visibility |
-| [Voice State Ack](#voice-state-ack) | The session's own voice mutation is applied or rejected | Current session |
 | [Voice Server Update](#voice-server-update) | The session receives or replaces its own voice grant | Current session |
 | [Entrance Sound Play](#entrance-sound-play) | A participant's entrance sound plays in a voice channel | Voice channel |
 | [Call Create](#call-create) | A private channel call begins or becomes visible | Call recipient |
@@ -619,7 +618,7 @@ A group whose count is `0` is omitted. The `offline` group is also omitted once 
 
 #### Member list item object
 
-Each item has exactly one of the two fields.
+Each item has exactly one of the fields.
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -810,7 +809,7 @@ In a guild channel the session named by the request's `session_id` is excluded a
 
 <sup>1</sup> Present only on the [Message Reaction Add](#message-reaction-add) that creates the first reaction with that emoji on the message. An addition to an emoji that already has a reactor, a [Message Reaction Remove](#message-reaction-remove), and a [Message Reaction Remove Emoji](#message-reaction-remove-emoji) omit the field
 
-Neither `id` nor `animated` is ever null. A Unicode reaction omits both, so a client distinguishes the two forms by the presence of `id`. A client MUST NOT read an absent `animated` as `false`.
+Neither `id` nor `animated` is ever null. A Unicode reaction omits both, so a client distinguishes the forms by the presence of `id`. A client MUST NOT read an absent `animated` as `false`.
 
 ### <span id="message-reaction-add-many"></span>MESSAGE_REACTION_ADD_MANY
 
@@ -942,71 +941,6 @@ A `channel_id` of null means the participant left.
 
 The broadcast form has no `region_id`, `server_id`, `latitude`, or `longitude`.
 
-### <span id="voice-state-ack"></span>VOICE_STATE_ACK
-
-Reports the outcome of the session's own [Voice State Update](/gateway/commands/#voice-state-update). Sent only when that command supplied `mutation_id`, and delivered to the requesting session alone.
-
-| Field | Type | Description |
-| --- | --- | --- |
-| mutation_id | string | The `mutation_id` the command supplied |
-| runtime_epoch<sup>1</sup> | string | The `runtime_epoch` the command supplied |
-| connection_id | ?string | Voice connection the mutation applied to |
-| guild_id | ?snowflake | Guild the mutation applied to |
-| channel_id | ?snowflake | Channel the mutation applied to |
-| status | string | `applied` or `rejected` |
-| server_version | integer | The voice state version after the mutation |
-| canonical_state<sup>2</sup> | [voice state object](#voice-state-object) | The authoritative voice state, an empty object when none exists |
-| error_code? | string | Stable rejection code, present only when `status` is `rejected` |
-| error_message? | string | Human-readable rejection message |
-
-<sup>1</sup> Echoed back unchanged. A command that omitted the field produces the literal string `undefined` here, so a client MUST compare the value against the epoch it sent
-
-<sup>2</sup> Also has the `region_id` and `server_id` fields a [Voice State Update](#voice-state-update) omits, and never has coordinates. Both extra fields are internal routing identity, and a client MUST NOT depend on them
-
-A mutation whose `base_version` is more than one behind the server's current version is rejected after the connection lookup and before the permission checks, with `error_code` and `error_message` both set to `stale_base_version`.
-
-Every other rejection has one of these codes, with `error_message` set to the registry text for the same code.
-
-#### `VOICE_CONNECTION_NOT_FOUND`
-
-The named voice connection does not exist and no matching pending connection could be restored.
-
-#### `VOICE_PENDING_EXPIRED`
-
-The pending voice connection expired before the mutation arrived.
-
-#### `VOICE_INVALID_STATE`
-
-A `viewer_stream_keys` entry is malformed, names another channel, or names a connection that is not in the channel.
-
-#### `VOICE_MEMBER_TIMED_OUT`<sup>1</sup>
-
-The member is timed out.
-
-#### `VOICE_PERMISSION_DENIED`<sup>1</sup>
-
-The user lacks `VIEW_CHANNEL` or `CONNECT` on the target channel.
-
-#### `VOICE_CHANNEL_FULL`<sup>1</sup>
-
-The channel is at its `user_limit`.
-
-#### `VOICE_CONNECTION_LIMIT_REACHED`<sup>1</sup>
-
-The user holds too many voice connections.
-
-#### `VOICE_CAMERA_USER_LIMIT`
-
-The channel already has 25 users with cameras enabled.
-
-#### `VOICE_E2EE_REQUIRED`<sup>1</sup>
-
-The channel is end-to-end encrypted and the client does not support it.
-
-<sup>1</sup> Checked only when the mutation moves the connection to a different channel. A mutation that keeps the connection in its current channel skips these checks and is applied
-
-Only a command that supplies `connection_id` can produce an ack. A command that omits it opens a new connection, and a `connection_id` that belongs to another user is rejected before any other check. A refusal of either kind produces no Dispatch. Without `mutation_id`, a refused voice state update also produces no Dispatch at all.
-
 ### <span id="voice-server-update"></span>VOICE_SERVER_UPDATE
 
 The session received or replaced its own voice grant. Delivered to the requesting session alone.
@@ -1063,7 +997,7 @@ A private channel call began, or became visible in the session's initial state.
 
 <sup>2</sup> Present only when the session pulled the call's state for itself
 
-A session pulls the call's state for itself in two cases. The first is the Call Create it receives shortly after [Ready](#ready) for a private channel that already has a call. The second is the Call Create that reattaches the session to a call it lost, whether or not that loss produced a [Call Delete](#call-delete).
+A session pulls the call's state for itself in the cases below. The first is the Call Create it receives shortly after [Ready](#ready) for a private channel that already has a call. The second is the Call Create that reattaches the session to a call it lost, whether or not that loss produced a [Call Delete](#call-delete).
 
 Recipients are every recipient of the channel, whether or not they joined the call. The same set receives [Call Update](#call-update) and [Call Delete](#call-delete).
 
@@ -1133,6 +1067,6 @@ A channel the session cannot view, and a channel on which it lacks `VIEW_CHANNEL
 
 Every resource object named on this page has the representation defined by the [HTTP API](/http-api/). A Dispatch payload with a resource object has the same fields, with the guild-scoped events adding `guild_id` and the message and reaction events adding `member`.
 
-Two reductions are specific to the Gateway and appear nowhere in the HTTP API. [Ready](#ready) strips `user` from each relationship and from each guild member and moves those accounts into its `users` array. The `member` added to a message event has its own `user` removed, and the account is in the message's `author`. A client MUST resolve those accounts from the surrounding payload.
+The reductions below are specific to the Gateway and appear nowhere in the HTTP API. [Ready](#ready) strips `user` from each relationship and from each guild member and moves those accounts into its `users` array. The `member` added to a message event has its own `user` removed, and the account is in the message's `author`. A client MUST resolve those accounts from the surrounding payload.
 
 Every Dispatch payload also drops the fields the Gateway keeps for its own indexing: `recipient_ids`, `role_index`, `channel_index`, `member_role_index`, `role_perms_cache`, and `overwrite_perms_cache`.
