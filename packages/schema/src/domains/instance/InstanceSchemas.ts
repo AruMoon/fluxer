@@ -33,6 +33,11 @@ export const InstanceBrandingSchema = z
 		wordmark_url: z.string().nullable().describe('Optional image URL for the application wordmark'),
 		favicon_url: z.string().nullable().describe('Optional favicon URL for browser metadata'),
 		theme_color: z.string().nullable().describe('Optional browser theme color'),
+		status_page_url: z.string().nullable().describe('Optional public status page URL'),
+		status_page_incident_history_url: z
+			.string()
+			.nullable()
+			.describe('Optional public status page incident history URL'),
 	})
 	.describe('Branding values safe to expose to clients');
 export type InstanceBranding = z.infer<typeof InstanceBrandingSchema>;
@@ -128,7 +133,6 @@ export const InstanceRegistrationModeSchema = createNamedStringLiteralUnion(
 	],
 	'Registration mode',
 );
-export type InstanceRegistrationMode = z.infer<typeof InstanceRegistrationModeSchema>;
 
 export const InstanceRegistrationSchema = z
 	.object({

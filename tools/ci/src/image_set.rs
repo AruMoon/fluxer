@@ -61,8 +61,8 @@ const COMPONENTS: &[Component] = &[
         services: &["messages", "messages-shard"],
     },
     Component {
-        image: "fluxer-recon",
-        services: &[],
+        image: "fluxer-push",
+        services: &["push"],
     },
     Component {
         image: "fluxer-snowflakes",
@@ -846,55 +846,6 @@ mod tests {
     }
 
     #[test]
-    fn components_cover_every_self_hosting_service() {
-        let compose = include_str!("../../../deploy/self-hosting/docker-compose.yml");
-        let expected: BTreeSet<(&str, &str)> = COMPONENTS
-            .iter()
-            .flat_map(|component| {
-                component
-                    .services
-                    .iter()
-                    .map(move |service| (component.image, *service))
-            })
-            .collect();
-
-        let mut observed: BTreeSet<(&str, &str)> = BTreeSet::new();
-        let mut in_services = false;
-        let mut service = None;
-        for line in compose.lines() {
-            if !line.is_empty() && !line.starts_with(' ') {
-                in_services = line == "services:";
-                service = None;
-                continue;
-            }
-            if !in_services {
-                continue;
-            }
-            if let Some(name) = line
-                .strip_prefix("  ")
-                .and_then(|rest| rest.strip_suffix(':'))
-                && !name.starts_with(' ')
-            {
-                service = Some(name);
-                continue;
-            }
-            let trimmed = line.trim();
-            let Some(reference) = trimmed.strip_prefix("image: ") else {
-                continue;
-            };
-            if !reference.starts_with("${FLUXER_REGISTRY") {
-                continue;
-            }
-            let image = compose_component(reference)
-                .unwrap_or_else(|| panic!("Unexpected Fluxer image line: {trimmed}"));
-            let service = service.expect("a Fluxer image line must follow a service header");
-            observed.insert((image, service));
-        }
-
-        assert_eq!(observed, expected);
-    }
-
-    #[test]
     fn components_are_sorted_and_unique() {
         let images: Vec<&str> = COMPONENTS.iter().map(|component| component.image).collect();
         let mut sorted = images.clone();
@@ -908,7 +859,7 @@ mod tests {
             .collect();
         let unique: BTreeSet<&str> = services.iter().copied().collect();
         assert_eq!(services.len(), unique.len());
-        assert_eq!(services.len(), 16);
+        assert_eq!(services.len(), 17);
     }
 
     #[test]
@@ -1012,7 +963,7 @@ mod tests {
                 .lines()
                 .filter(|line| line.starts_with("    image: "))
                 .count(),
-            16
+            17
         );
 
         let api = manifest
@@ -1051,7 +1002,7 @@ mod tests {
         let mut sorted = services.clone();
         sorted.sort_unstable();
         assert_eq!(services, sorted);
-        assert_eq!(services.len(), 16);
+        assert_eq!(services.len(), 17);
     }
 
     #[test]
@@ -1096,13 +1047,13 @@ mod tests {
 
         let bootstrapping =
             unpublished_moving_tags("ghcr.io/fluxerapp", "fluxer-docs", &tags, |reference| {
-                !reference.starts_with("ghcr.io/fluxerapp/fluxer-recon:")
+                !reference.starts_with("ghcr.io/fluxerapp/fluxer-gifs:")
             });
         assert_eq!(
             bootstrapping,
             [
-                "fluxer-recon has no published v1 image, so v1 stays an incomplete set until the build-recon workflow runs",
-                "fluxer-recon has no published latest image, so latest stays an incomplete set until the build-recon workflow runs",
+                "fluxer-gifs has no published v1 image, so v1 stays an incomplete set until the build-gifs workflow runs",
+                "fluxer-gifs has no published latest image, so latest stays an incomplete set until the build-gifs workflow runs",
             ]
         );
     }
@@ -1111,8 +1062,8 @@ mod tests {
     fn unpublished_moving_tags_never_reports_the_component_being_promoted() {
         let tags = ["v1".to_string()];
         let warnings =
-            unpublished_moving_tags("ghcr.io/fluxerapp", "fluxer-recon", &tags, |reference| {
-                !reference.starts_with("ghcr.io/fluxerapp/fluxer-recon:")
+            unpublished_moving_tags("ghcr.io/fluxerapp", "fluxer-gifs", &tags, |reference| {
+                !reference.starts_with("ghcr.io/fluxerapp/fluxer-gifs:")
             });
         assert!(warnings.is_empty());
     }

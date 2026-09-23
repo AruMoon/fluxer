@@ -6,6 +6,7 @@ import type {VoiceNoiseSuppressionAssignmentResponse} from '@fluxer/schema/src/d
 import {
 	type ExperimentAssignmentsResponse,
 	INERT_EXPERIMENT_ASSIGNMENTS_RESPONSE,
+	readScreenShareDeliveryAssignment,
 	readVoiceNoiseSuppressionAssignment,
 } from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -37,7 +38,6 @@ const CANARY_ASSIGNMENT: VoiceNoiseSuppressionAssignmentResponse = {
 	guild_overrides: [{guild_id: GUILD_ID, backend: 'speex'}],
 	enabled_backends: ['none', 'speex', 'rnnoise', 'gtcrn'],
 	allow_user_override: true,
-	stereo_enabled: false,
 	suppression_strength: 80,
 };
 
@@ -123,6 +123,8 @@ describe('ExperimentAssignments cold start', () => {
 		await settle();
 		expect(ExperimentAssignments.response).toBe(INERT_EXPERIMENT_ASSIGNMENTS_RESPONSE);
 		expect(ExperimentAssignments.response.assignments.voice_noise_suppression).toBeUndefined();
+		expect(ExperimentAssignments.response.assignments.screen_share_delivery).toBeUndefined();
+		expect(readScreenShareDeliveryAssignment(ExperimentAssignments.response).enabled).toBe(false);
 	});
 
 	it('keeps the inert envelope while unauthenticated and retries later', async () => {
@@ -164,6 +166,32 @@ describe('ExperimentAssignments response handling', () => {
 	it('discards a partial envelope rather than merging it', async () => {
 		await adopt(CANARY_ENVELOPE);
 		vi.mocked(http.get).mockResolvedValue(reply(200, {assignments: {}}));
+		await vi.advanceTimersByTimeAsync(400_000);
+		expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
+	});
+
+	it('adopts a screen share delivery assignment beside the voice one', async () => {
+		await adopt({
+			...CANARY_ENVELOPE,
+			assignments: {...CANARY_ENVELOPE.assignments, screen_share_delivery: {enabled: true}},
+		});
+		expect(readScreenShareDeliveryAssignment(ExperimentAssignments.response).enabled).toBe(true);
+		expect(readVoiceNoiseSuppressionAssignment(ExperimentAssignments.response)).toEqual(CANARY_ASSIGNMENT);
+	});
+
+	it('reads screen share delivery as disabled when the envelope omits it', async () => {
+		await adopt(CANARY_ENVELOPE);
+		expect(readScreenShareDeliveryAssignment(ExperimentAssignments.response).enabled).toBe(false);
+	});
+
+	it('discards an envelope with a malformed screen share delivery assignment', async () => {
+		await adopt(CANARY_ENVELOPE);
+		vi.mocked(http.get).mockResolvedValue(
+			reply(200, {
+				...CANARY_ENVELOPE,
+				assignments: {...CANARY_ENVELOPE.assignments, screen_share_delivery: {enabled: 'yes'}},
+			}),
+		);
 		await vi.advanceTimersByTimeAsync(400_000);
 		expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
 	});
@@ -332,31 +360,31 @@ describe('ExperimentAssignments visibility', () => {
 });
 
 describe('ExperimentAssignments lifecycle', () => {
-	it.each([
-		'stop',
-		'reset',
-	] as const)('aborts an active request on %s and starts a fresh request immediately', async (method) => {
-		const stale = deferredReply();
-		ExperimentAssignments.start();
-		await settle();
-		const signal = vi.mocked(http.get).mock.calls[0]?.[1]?.signal;
-		expect(signal).toBeDefined();
-		expect(signal!.aborted).toBe(false);
+	it.each(['stop', 'reset'] as const)(
+		'aborts an active request on %s and starts a fresh request immediately',
+		async (method) => {
+			const stale = deferredReply();
+			ExperimentAssignments.start();
+			await settle();
+			const signal = vi.mocked(http.get).mock.calls[0]?.[1]?.signal;
+			expect(signal).toBeDefined();
+			expect(signal!.aborted).toBe(false);
 
-		ExperimentAssignments[method]();
-		expect(signal!.aborted).toBe(true);
-		vi.mocked(http.get).mockResolvedValue(reply(200, CANARY_ENVELOPE, {etag: 'W/"fresh"'}));
-		ExperimentAssignments.start();
-		await settle();
-		expect(http.get).toHaveBeenCalledTimes(2);
-		expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
-		expect(vi.getTimerCount()).toBe(1);
+			ExperimentAssignments[method]();
+			expect(signal!.aborted).toBe(true);
+			vi.mocked(http.get).mockResolvedValue(reply(200, CANARY_ENVELOPE, {etag: 'W/"fresh"'}));
+			ExperimentAssignments.start();
+			await settle();
+			expect(http.get).toHaveBeenCalledTimes(2);
+			expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
+			expect(vi.getTimerCount()).toBe(1);
 
-		stale.resolve(reply(200, INERT_EXPERIMENT_ASSIGNMENTS_RESPONSE, {etag: 'W/"stale"'}));
-		await settle();
-		expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
-		expect(vi.getTimerCount()).toBe(1);
-	});
+			stale.resolve(reply(200, INERT_EXPERIMENT_ASSIGNMENTS_RESPONSE, {etag: 'W/"stale"'}));
+			await settle();
+			expect(ExperimentAssignments.response).toEqual(CANARY_ENVELOPE);
+			expect(vi.getTimerCount()).toBe(1);
+		},
+	);
 
 	it('keeps ownership of the replacement request when the stale request finishes first', async () => {
 		const stale = deferredReply();

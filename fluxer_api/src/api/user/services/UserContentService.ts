@@ -2,6 +2,34 @@
 
 import crypto from 'node:crypto';
 import type {Readable} from 'node:stream';
+import type {ApiContext} from '@app/api/ApiContext';
+import {type ChannelID, createChannelID, createUserID, type MessageID, type UserID} from '@app/api/BrandedTypes';
+import {Config} from '@app/api/Config';
+import type {IChannelRepository} from '@app/api/channel/IChannelRepository';
+import type {ChannelService} from '@app/api/channel/services/ChannelService';
+import {createMessageResponseDataService} from '@app/api/channel/services/message/MessageResponseDataService';
+import type {PushSubscriptionRow} from '@app/api/database/types/UserTypes';
+import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
+import type {ISnowflakeService} from '@app/api/infrastructure/ISnowflakeService';
+import type {IStorageService} from '@app/api/infrastructure/IStorageService';
+import type {KVBulkMessageDeletionQueueService} from '@app/api/infrastructure/KVBulkMessageDeletionQueueService';
+import type {UserCacheService} from '@app/api/infrastructure/UserCacheService';
+import {Logger} from '@app/api/Logger';
+import type {LimitConfigService} from '@app/api/limits/LimitConfigService';
+import {resolveLimitSafe} from '@app/api/limits/LimitConfigUtils';
+import {createLimitMatchContext} from '@app/api/limits/LimitMatchContextBuilder';
+import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
+import type {Message} from '@app/api/models/Message';
+import type {PushSubscription} from '@app/api/models/PushSubscription';
+import type {IUserAccountRepository} from '@app/api/user/repositories/IUserAccountRepository';
+import type {IUserContentRepository} from '@app/api/user/repositories/IUserContentRepository';
+import {BaseUserUpdatePropagator} from '@app/api/user/services/BaseUserUpdatePropagator';
+import {verifyHarvestDownloadToken} from '@app/api/user/services/HarvestDownloadToken';
+import {buildHarvestDownloadUrl} from '@app/api/user/services/HarvestDownloadUrl';
+import {UserHarvest} from '@app/api/user/UserHarvestModel';
+import {UserHarvestRepository} from '@app/api/user/UserHarvestRepository';
+import {serializeSelfMessageFilter} from '@app/api/worker/utils/SelfMessageFilterPayload';
+import type {WorkerTaskName} from '@app/api/worker/WorkerLaneConfig';
 import {MAX_BOOKMARKS_NON_PREMIUM} from '@fluxer/constants/src/LimitConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {UnknownChannelError} from '@fluxer/errors/src/domains/channel/UnknownChannelError';
@@ -30,34 +58,6 @@ import {snowflakeToDate} from '@fluxer/snowflake/src/Snowflake';
 import {isPubliclyRoutableUrlShape} from '@pkgs/http_client/src/PublicInternetRequestUrlPolicy';
 import type {IWorkerService} from '@pkgs/worker/src/contracts/IWorkerService';
 import {ms} from 'itty-time';
-import type {ApiContext} from '../../ApiContext';
-import {type ChannelID, createChannelID, createUserID, type MessageID, type UserID} from '../../BrandedTypes';
-import {Config} from '../../Config';
-import type {IChannelRepository} from '../../channel/IChannelRepository';
-import type {ChannelService} from '../../channel/services/ChannelService';
-import {createMessageResponseDataService} from '../../channel/services/message/MessageResponseDataService';
-import type {PushSubscriptionRow} from '../../database/types/UserTypes';
-import type {IGatewayService} from '../../infrastructure/IGatewayService';
-import type {ISnowflakeService} from '../../infrastructure/ISnowflakeService';
-import type {IStorageService} from '../../infrastructure/IStorageService';
-import type {KVBulkMessageDeletionQueueService} from '../../infrastructure/KVBulkMessageDeletionQueueService';
-import type {UserCacheService} from '../../infrastructure/UserCacheService';
-import {Logger} from '../../Logger';
-import type {LimitConfigService} from '../../limits/LimitConfigService';
-import {resolveLimitSafe} from '../../limits/LimitConfigUtils';
-import {createLimitMatchContext} from '../../limits/LimitMatchContextBuilder';
-import type {RequestCache} from '../../middleware/RequestCacheMiddleware';
-import type {Message} from '../../models/Message';
-import type {PushSubscription} from '../../models/PushSubscription';
-import {serializeSelfMessageFilter} from '../../worker/utils/SelfMessageFilterPayload';
-import type {WorkerTaskName} from '../../worker/WorkerLaneConfig';
-import type {IUserAccountRepository} from '../repositories/IUserAccountRepository';
-import type {IUserContentRepository} from '../repositories/IUserContentRepository';
-import {UserHarvest} from '../UserHarvestModel';
-import {UserHarvestRepository} from '../UserHarvestRepository';
-import {BaseUserUpdatePropagator} from './BaseUserUpdatePropagator';
-import {verifyHarvestDownloadToken} from './HarvestDownloadToken';
-import {buildHarvestDownloadUrl} from './HarvestDownloadUrl';
 
 export interface SavedMessageEntry {
 	channelId: ChannelID;
@@ -104,6 +104,33 @@ function assertPublicPushEndpoint(endpoint: string, fieldName: string): void {
 	}
 }
 
+function isPushEndpointUrl(token: string): boolean {
+	const normalized = token.trim().toLowerCase();
+	return normalized.startsWith('https://') || normalized.startsWith('http://');
+}
+
+function resolveMobileWebPushKeys(device: RegisterMobileDeviceRequest): {p256dh: string; auth: string} | null {
+	const p256dh = device.encryption_key;
+	const auth = device.auth_secret;
+	if (p256dh && auth) return {p256dh, auth};
+	if (p256dh || auth) {
+		throw InputValidationError.create(
+			p256dh ? 'auth_secret' : 'encryption_key',
+			'Web Push registrations require encryption_key and auth_secret',
+		);
+	}
+	if (device.platform === 'android_unified_push' || device.platform === 'ios_apns_voip') {
+		throw InputValidationError.create(
+			'encryption_key',
+			'Web Push registrations require encryption_key and auth_secret',
+		);
+	}
+	if (isPushEndpointUrl(device.token)) {
+		throw InputValidationError.create('token', 'Endpoint URL registrations require encryption_key and auth_secret');
+	}
+	return null;
+}
+
 function normalizeMobileAppId(appId: string | undefined): string {
 	const normalized = appId?.trim();
 	return normalized && normalized.length > 0 ? normalized : DEFAULT_MOBILE_APP_ID;
@@ -114,7 +141,7 @@ function normalizeProviderEnvironment(
 	environment: RegisterMobileDeviceRequest['provider_environment'],
 ): string | null {
 	if (environment) return environment;
-	return platform === 'ios_apns' ? DEFAULT_APNS_PROVIDER_ENVIRONMENT : null;
+	return platform === 'ios_apns' || platform === 'ios_apns_voip' ? DEFAULT_APNS_PROVIDER_ENVIRONMENT : null;
 }
 
 const isUnreachableEntityError = (error: unknown): boolean =>
@@ -400,7 +427,8 @@ export class UserContentService {
 
 	async registerMobileDevice(params: RegisterMobileDeviceParams): Promise<PushSubscription> {
 		const {userId, authSessionIdHash, device} = params;
-		if (device.platform === 'android_unified_push') {
+		const webPushKeys = resolveMobileWebPushKeys(device);
+		if (webPushKeys) {
 			assertPublicPushEndpoint(device.token, 'token');
 		}
 		const appId = normalizeMobileAppId(device.app_id);
@@ -411,8 +439,8 @@ export class UserContentService {
 			subscription_id: subscriptionId,
 			auth_session_id_hash: authSessionIdHash ?? null,
 			endpoint: device.token,
-			p256dh_key: device.platform === 'android_unified_push' ? (device.encryption_key ?? null) : null,
-			auth_key: device.platform === 'android_unified_push' ? (device.auth_secret ?? null) : null,
+			p256dh_key: webPushKeys?.p256dh ?? null,
+			auth_key: webPushKeys?.auth ?? null,
 			user_agent: device.user_agent ?? null,
 			platform: device.platform,
 			app_id: appId,
@@ -570,7 +598,7 @@ export class UserContentService {
 		}
 		const harvestRepository = new UserHarvestRepository();
 		const harvest = await harvestRepository.findByUserAndHarvestId(userId, params.harvestId);
-		if (!harvest || !harvest.completedAt || !harvest.storageKey || harvest.failedAt) {
+		if (!harvest?.completedAt || !harvest.storageKey || harvest.failedAt) {
 			return null;
 		}
 		if (harvest.downloadUrlExpiresAt && harvest.downloadUrlExpiresAt < new Date()) {

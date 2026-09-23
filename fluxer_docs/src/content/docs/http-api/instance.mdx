@@ -6,7 +6,7 @@ description: Instance discovery, client geolocation, the limit key registry, and
 
 import RouteHeader from '@/components/RouteHeader.astro';
 
-The Instance resource describes how one Fluxer deployment is set up. It publishes the discovery document, the client geolocation lookup, and the served OpenAPI document, and it owns the [limit key](#limit-keys) registry.
+Discover a deployment's endpoints, available features, and [limits](#limit-keys), look up the client's approximate location, or download its OpenAPI document.
 
 [Get instance discovery](#get-instance-discovery) is the entry point of the API. A client that knows only a Fluxer origin reads `/.well-known/fluxer` first, and that one unauthenticated response has every field of the [instance discovery object](#instance-discovery-object). Those values include the API base URLs, the [main Gateway](/gateway/overview/) WebSocket URL, and the [Media Proxy](/media-proxy/overview/) base URL. They override the [endpoint path defaults](#instance-endpoints-object) a deployment would otherwise serve from its canonical public origin.
 
@@ -61,7 +61,7 @@ Each value is an absolute URL supplied by the operator. A value can be a bare or
 
 <sup>2</sup> The value is the configured Gateway endpoint and its scheme is `ws` or `wss` as the operator configured it
 
-<sup>3</sup> A deployment that configures a separate static asset domain derives that value over `https` on the configured domain and without the port the other endpoints have
+<sup>3</sup> When a deployment configures a separate static asset domain, the value is `https://` followed by that domain, with no port
 
 Every value is the exact origin the deployment advertises, including its scheme and any explicit port, and a deliberately plain HTTP deployment publishes `http` and `ws` values here.
 
@@ -193,10 +193,10 @@ Whether this deployment runs as one community, and whether direct messages exist
 | Field | Type | Description |
 | --- | --- | --- |
 | single_community | boolean | Whether this deployment runs as one community that every account joins |
-| single_community_guild_id<sup>1</sup> | ?snowflake | The stock community guild ID, or null |
+| single_community_guild_id<sup>1</sup> | ?snowflake | The ID of the guild every account joins in single-community mode, or null |
 | direct_messages_disabled | boolean | Whether direct messages and friend requests are disabled for the whole deployment |
 
-<sup>1</sup> The identifier is published only while `single_community` is true and a stock community has been chosen
+<sup>1</sup> The identifier is published only while `single_community` is true and the deployment has designated a community guild
 
 ## Service availability object
 
@@ -258,10 +258,10 @@ The document lets a client present the correct bounds before it attempts an oper
 :::
 
 :::caution[An unauthenticated reader resolves only the unfiltered outcome]
-The document publishes neither the requesting account's traits nor any guild feature set. A client supplies that context from its own authenticated state.
+The document publishes neither the requesting account's traits nor any guild feature set. A client supplies the account's traits and the guild's feature names itself, from data it received while authenticated.
 :::
 
-Nothing validates a rule's `traits` filter against `traitDefinitions`, so a rule can filter on a name that collection omits. A self-hosted deployment whose premium mode grants every account the stock limits publishes an empty collection and has no rule that filters on `premium`.
+Nothing validates a rule's `traits` filter against `traitDefinitions`, so a rule can filter on a name that collection omits. A self-hosted deployment whose [premium mode](/admin-api/instance/#premium-modes) is `everyone` publishes an empty collection and has no rule that filters on `premium`.
 
 ## Limit rule object
 
@@ -353,7 +353,7 @@ Each key names one limit. A key whose name begins with `feature_` is a feature g
 | max_webhooks_per_guild | Maximum webhooks per guild, in guild scope |
 | sticker_max_size | Maximum file size for sticker uploads in bytes, in guild scope |
 
-<sup>1</sup> Emoji limits are enforced as one shared total against `max_guild_emojis`, and the aliases exist only so an older client reads a plausible value
+<sup>1</sup> Emoji limits are enforced as one shared total against `max_guild_emojis`, and the aliases exist only for older clients. The default of each alias equals the `max_guild_emojis` default
 
 <sup>2</sup> Sticker limits are enforced as one shared total against `max_guild_stickers`
 
@@ -374,7 +374,7 @@ Branding, setup state, legal documents, and registration fields a client reads b
 
 ## Public branding object
 
-The instance identity a client renders: its name, its images, and its theme colour. The image URLs customise browser metadata, install metadata, and link previews.
+The instance identity a client renders: its name, its images, its theme colour, and its status page links. The image URLs customise browser metadata, install metadata, and link previews.
 
 ### Structure
 
@@ -387,6 +387,8 @@ The instance identity a client renders: its name, its images, and its theme colo
 | wordmark_url | ?string | Application wordmark URL, or null |
 | favicon_url | ?string | Browser favicon URL, or null |
 | theme_color | ?string | Browser theme colour, or null |
+| status_page_url | ?string | Public status page URL, or null |
+| status_page_incident_history_url | ?string | Status page incident history URL, or null |
 
 ## Public setup state object
 
@@ -437,7 +439,7 @@ The approximate location Fluxer resolved for the request, together with the regi
 | ageRestrictedGeos | array[[geo entry](#geo-entry-object) object] | Locations where mature content requires an age check |
 | ageBlockedGeos | array[[geo entry](#geo-entry-object) object] | Locations where mature content is unavailable |
 
-<sup>1</sup> Every detected field is null when the deployment has configured no geolocation database, when the client address is not a valid IP address, when the database holds no record for it, or when the lookup fails. A record that resolves can still omit the subdivision code or the coordinate pair
+<sup>1</sup> All detected fields are null when the location is unknown. A known location can still omit the subdivision code or coordinates
 
 <sup>2</sup> The value is upper case
 
@@ -493,9 +495,7 @@ The path has no `/v1` prefix.
 
 Returns the [geolocation object](#geolocation-object) for the request's client address.
 
-The client address is the first hop of the deployment's configured client IP header, which defaults to `x-forwarded-for`. A lookup that resolves nothing still returns 200 with `countryCode`, `regionCode`, `latitude`, and `longitude` all null. A client MUST treat an all-null result as an unknown location.
-
-A resolved result is cached for ten minutes against the address. An IPv4 address is cached individually and an IPv6 address is cached by its `/64`.
+A lookup that resolves nothing still returns 200 with `countryCode`, `regionCode`, `latitude`, and `longitude` all null. Treat this as an unknown location.
 
 ### Response
 
@@ -513,7 +513,7 @@ A resolved result is cached for ten minutes against the address. An IPv4 address
 
 Returns the deployment's OpenAPI 3.1 document as JSON with `Content-Type: application/json; charset=utf-8`.
 
-The document has no `ETag`. It declares one server entry, the deployment's `api_client` value from the [instance endpoints object](#instance-endpoints-object) followed by `/v1`. Every path key is relative to that entry. The server entry is the only part that varies by deployment, and the rest is fixed when the document is generated.
+The document has no `ETag`. Its server URL is the deployment's `api_client` [endpoint](#instance-endpoints-object) followed by `/v1`. Every path is relative to that URL.
 
 ### Response
 

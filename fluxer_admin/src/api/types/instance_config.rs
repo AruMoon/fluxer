@@ -23,6 +23,10 @@ pub struct InstanceConfigResponse {
     #[serde(default)]
     pub voice_noise_suppression: VoiceNoiseSuppressionConfigResponse,
     #[serde(default)]
+    pub screen_share_delivery: ScreenShareDeliveryConfigResponse,
+    #[serde(default)]
+    pub push_service_delivery: PushServiceDeliveryConfigResponse,
+    #[serde(default)]
     pub experiment_delivery: ExperimentDeliveryConfigResponse,
 }
 
@@ -326,6 +330,8 @@ pub struct AppBrandingConfigResponse {
     pub wordmark_url: Option<String>,
     pub favicon_url: Option<String>,
     pub theme_color: Option<String>,
+    pub status_page_url: Option<String>,
+    pub status_page_incident_history_url: Option<String>,
 }
 
 impl Default for AppBrandingConfigResponse {
@@ -338,6 +344,8 @@ impl Default for AppBrandingConfigResponse {
             wordmark_url: None,
             favicon_url: None,
             theme_color: None,
+            status_page_url: None,
+            status_page_incident_history_url: None,
         }
     }
 }
@@ -442,7 +450,9 @@ impl VoiceE2eeScope {
     }
 }
 
-pub const VOICE_NS_MAX_TARGETED_USERS: usize = 1_000;
+pub const EXPERIMENT_MAX_TARGETED_USERS: usize = 1_000;
+pub const PUSH_SERVICE_DELIVERY_DEFAULT_SALT: &str = "push-service-delivery-v1";
+pub const SCREEN_SHARE_DELIVERY_DEFAULT_SALT: &str = "screen-share-delivery-v1";
 pub const VOICE_NS_MAX_GUILD_OVERRIDES: usize = 200;
 
 impl NoiseSuppressionBackend {
@@ -488,7 +498,6 @@ pub struct VoiceNoiseSuppressionConfigResponse {
     pub included_user_ids: Vec<String>,
     pub excluded_user_ids: Vec<String>,
     pub guild_overrides: Vec<VoiceNoiseSuppressionGuildOverride>,
-    pub stereo_enabled: bool,
     pub suppression_strength: u32,
 }
 
@@ -505,7 +514,6 @@ impl Default for VoiceNoiseSuppressionConfigResponse {
             included_user_ids: Vec::new(),
             excluded_user_ids: Vec::new(),
             guild_overrides: Vec::new(),
-            stereo_enabled: false,
             suppression_strength: 80,
         }
     }
@@ -532,9 +540,83 @@ pub struct VoiceNoiseSuppressionConfigUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_overrides: Option<Vec<VoiceNoiseSuppressionGuildOverride>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stereo_enabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub suppression_strength: Option<u32>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(default)]
+pub struct ScreenShareDeliveryConfigResponse {
+    pub enabled: bool,
+    pub config_version: u64,
+    pub rollout_basis_points: u32,
+    pub rollout_salt: String,
+    pub included_user_ids: Vec<String>,
+    pub excluded_user_ids: Vec<String>,
+}
+
+impl Default for ScreenShareDeliveryConfigResponse {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            config_version: 0,
+            rollout_basis_points: 0,
+            rollout_salt: SCREEN_SHARE_DELIVERY_DEFAULT_SALT.to_owned(),
+            included_user_ids: Vec::new(),
+            excluded_user_ids: Vec::new(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ScreenShareDeliveryConfigUpdateRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rollout_basis_points: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rollout_salt: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub included_user_ids: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub excluded_user_ids: Option<Vec<String>>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(default)]
+pub struct PushServiceDeliveryConfigResponse {
+    pub enabled: bool,
+    pub config_version: u64,
+    pub rollout_basis_points: u32,
+    pub rollout_salt: String,
+    pub included_user_ids: Vec<String>,
+    pub excluded_user_ids: Vec<String>,
+}
+
+impl Default for PushServiceDeliveryConfigResponse {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            config_version: 0,
+            rollout_basis_points: 0,
+            rollout_salt: PUSH_SERVICE_DELIVERY_DEFAULT_SALT.to_owned(),
+            included_user_ids: Vec::new(),
+            excluded_user_ids: Vec::new(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct PushServiceDeliveryConfigUpdateRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rollout_basis_points: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rollout_salt: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub included_user_ids: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub excluded_user_ids: Option<Vec<String>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -652,6 +734,10 @@ pub struct InstanceConfigUpdateRequest {
     pub media: Option<InstanceMediaUpdateRequest>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub voice_noise_suppression: Option<VoiceNoiseSuppressionConfigUpdateRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub screen_share_delivery: Option<ScreenShareDeliveryConfigUpdateRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub push_service_delivery: Option<PushServiceDeliveryConfigUpdateRequest>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub experiment_delivery: Option<ExperimentDeliveryConfigUpdateRequest>,
 }
@@ -858,6 +944,10 @@ pub struct AppBrandingConfigUpdateRequest {
     pub favicon_url: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub theme_color: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_page_url: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_page_incident_history_url: Option<Option<String>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -986,17 +1076,29 @@ mod tests {
                 .expect("admin schema");
         let noise = serde_json::from_value::<VoiceNoiseSuppressionConfigResponse>(json!({}))
             .expect("default noise config");
+        let screen_share = serde_json::from_value::<ScreenShareDeliveryConfigResponse>(json!({}))
+            .expect("default screen share config");
         let delivery = serde_json::from_value::<ExperimentDeliveryConfigResponse>(json!({}))
             .expect("default delivery config");
         let noise = serde_json::to_value(noise).expect("serializable noise config");
+        let screen_share =
+            serde_json::to_value(screen_share).expect("serializable screen share config");
         let delivery = serde_json::to_value(delivery).expect("serializable delivery config");
         let generated_noise: generated_types::VoiceNoiseSuppressionConfigResponse =
             serde_json::from_value(noise.clone()).expect("generated noise config contract");
+        let generated_screen_share: generated_types::ScreenShareDeliveryConfigResponse =
+            serde_json::from_value(screen_share.clone())
+                .expect("generated screen share config contract");
         let generated_delivery: generated_types::ExperimentDeliveryConfigResponse =
             serde_json::from_value(delivery.clone()).expect("generated delivery config contract");
         assert_eq!(
             serde_json::to_value(generated_noise).expect("serializable generated noise config"),
             noise
+        );
+        assert_eq!(
+            serde_json::to_value(generated_screen_share)
+                .expect("serializable generated screen share config"),
+            screen_share
         );
         assert_eq!(
             serde_json::to_value(generated_delivery)
@@ -1005,6 +1107,7 @@ mod tests {
         );
         for (name, value) in [
             ("VoiceNoiseSuppressionConfigResponse", noise),
+            ("ScreenShareDeliveryConfigResponse", screen_share),
             ("ExperimentDeliveryConfigResponse", delivery),
         ] {
             for (field, value) in value.as_object().expect("config object") {
@@ -1014,6 +1117,29 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn screen_share_delivery_update_preserves_empty_lists_and_omitted_fields() {
+        let update = ScreenShareDeliveryConfigUpdateRequest {
+            included_user_ids: Some(Vec::new()),
+            excluded_user_ids: Some(Vec::new()),
+            ..Default::default()
+        };
+        let value = serde_json::to_value(update).expect("serializable update");
+        serde_json::from_value::<generated_types::ScreenShareDeliveryConfigUpdateRequest>(
+            value.clone(),
+        )
+        .expect("generated update contract");
+        assert_eq!(
+            value,
+            json!({"included_user_ids": [], "excluded_user_ids": []})
+        );
+        assert_eq!(
+            serde_json::to_value(ScreenShareDeliveryConfigUpdateRequest::default())
+                .expect("serializable update"),
+            json!({})
+        );
     }
 
     #[test]

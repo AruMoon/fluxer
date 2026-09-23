@@ -3,13 +3,12 @@
 import AppStorage from '@app/features/platform/state/PersistentStorage';
 import {Logger} from '@app/features/platform/utils/AppLogger';
 import {makePersistent} from '@app/features/platform/utils/MobXPersistence';
+import ScreenShareDeliveryRollout from '@app/features/voice/state/ScreenShareDeliveryRollout';
 import type {
 	CodecPreference,
-	ScreenShareBackupCodecMode,
 	ScreenShareContentHint,
 	ScreenShareEncoderMode,
 	ScreenShareScalabilityModePreference,
-	ScreenShareSoftwareQuality,
 } from '@app/features/voice/utils/CodecCapabilityDetector';
 import {hasHigherVideoQuality} from '@app/features/voice/utils/VideoQualityEntitlement';
 import {areVoiceBackgroundsAvailable} from '@app/features/voice/utils/VoiceBackgroundAvailability';
@@ -60,9 +59,7 @@ export const CAMERA_EFFECT_STRENGTH_MAX = 100;
 export const CAMERA_EFFECT_STRENGTH_DEFAULT = 50;
 export const DEFAULT_SCREEN_SHARE_CONTENT_HINT: ScreenShareContentHint = 'text';
 export const DEFAULT_SCREEN_SHARE_ENCODER_MODE: ScreenShareEncoderMode = 'auto';
-export const DEFAULT_SCREEN_SHARE_SOFTWARE_QUALITY: ScreenShareSoftwareQuality = 'balanced';
 export const DEFAULT_SCREEN_SHARE_SCALABILITY_MODE: ScreenShareScalabilityModePreference = 'auto';
-export const DEFAULT_SCREEN_SHARE_BACKUP_CODEC_MODE: ScreenShareBackupCodecMode = 'off';
 
 type VoiceSettingsUpdate = Partial<{
 	inputDeviceId: string;
@@ -106,9 +103,7 @@ type VoiceSettingsUpdate = Partial<{
 	screenShareHevcOptIn: boolean;
 	screenShareContentHint: ScreenShareContentHint;
 	screenShareEncoderMode: ScreenShareEncoderMode;
-	screenShareSoftwareQuality: ScreenShareSoftwareQuality;
 	screenShareScalabilityMode: ScreenShareScalabilityModePreference;
-	screenShareBackupCodecMode: ScreenShareBackupCodecMode;
 	vadThreshold: number;
 	vadAutoSensitivity: boolean;
 	vadEnhanced: boolean;
@@ -124,7 +119,6 @@ type VoiceSettingsUpdate = Partial<{
 	screenShareAudioIncludeSources: Array<Record<string, string>>;
 	screenShareAudioExcludeSources: Array<Record<string, string>>;
 	screenShareDeviceAudioUsesMicrophone: boolean;
-	openH264Enabled: boolean;
 	lastScreenShareSource: LastScreenShareSource | null;
 }>;
 
@@ -268,6 +262,20 @@ function applyStreamingModeDefaultMigrationV1(parsed: Record<string, unknown>): 
 	return true;
 }
 
+function applyScreenShareFrameRateFloorMigrationV1(parsed: Record<string, unknown>): boolean {
+	if (!ScreenShareDeliveryRollout.enabled) {
+		return false;
+	}
+	if (parsed.screenShareFrameRateFloorMigratedV1 === true) {
+		return false;
+	}
+	if (parsed.streamingMode === 'custom' && parsed.videoFrameRate === VIDEO_FRAME_RATE_MIN) {
+		parsed.videoFrameRate = VIDEO_FRAME_RATE_DEFAULT;
+	}
+	parsed.screenShareFrameRateFloorMigratedV1 = true;
+	return true;
+}
+
 function applyScreenShareContentHintDefaultMigrationV1(parsed: Record<string, unknown>): boolean {
 	if (parsed.screenShareContentHintDefaultMigratedV1 === true) {
 		return false;
@@ -309,6 +317,27 @@ function applyScreenShareHevcOptOutMigrationV1(parsed: Record<string, unknown>):
 		parsed.preferredScreenShareCodec = 'auto';
 	}
 	parsed.screenShareHevcOptOutMigratedV1 = true;
+	return true;
+}
+
+export function applyScreenShareSoftwareQualityRetiredMigrationV1(parsed: Record<string, unknown>): boolean {
+	const stored = parsed.screenShareSoftwareQualityPrefV2;
+	delete parsed.screenShareSoftwareQualityPrefV2;
+	if (parsed.screenShareSoftwareQualityRetiredV1 === true) {
+		return stored !== undefined;
+	}
+	if (stored === 'realtime' && validateScreenShareScalabilityMode(parsed.screenShareScalabilityModePrefV2) === 'auto') {
+		parsed.screenShareScalabilityModePrefV2 = 'single_layer';
+	}
+	parsed.screenShareSoftwareQualityRetiredV1 = true;
+	return true;
+}
+
+export function applyScreenShareBackupCodecModeRetiredMigrationV1(parsed: Record<string, unknown>): boolean {
+	if (parsed.screenShareBackupCodecModePrefV2 === undefined) {
+		return false;
+	}
+	delete parsed.screenShareBackupCodecModePrefV2;
 	return true;
 }
 
@@ -389,6 +418,7 @@ class VoiceSettings {
 	videoFrameRate = 30;
 	streamingMode: StreamingMode = 'screenshare';
 	streamingModeDefaultMigratedV1 = false;
+	screenShareFrameRateFloorMigratedV1 = false;
 	hideStreamPreview = false;
 	muteStreamAudio = false;
 	shareAppAudio = true;
@@ -419,10 +449,9 @@ class VoiceSettings {
 	screenShareHevcOptOutMigratedV1 = false;
 	screenShareContentHintPrefV2: ScreenShareContentHint = DEFAULT_SCREEN_SHARE_CONTENT_HINT;
 	screenShareContentHintDefaultMigratedV1 = false;
+	screenShareSoftwareQualityRetiredV1 = false;
 	screenShareEncoderModePrefV2: ScreenShareEncoderMode = DEFAULT_SCREEN_SHARE_ENCODER_MODE;
-	screenShareSoftwareQualityPrefV2: ScreenShareSoftwareQuality = DEFAULT_SCREEN_SHARE_SOFTWARE_QUALITY;
 	screenShareScalabilityModePrefV2: ScreenShareScalabilityModePreference = DEFAULT_SCREEN_SHARE_SCALABILITY_MODE;
-	screenShareBackupCodecModePrefV2: ScreenShareBackupCodecMode = DEFAULT_SCREEN_SHARE_BACKUP_CODEC_MODE;
 	vadThreshold = 50;
 	vadAutoSensitivity = true;
 	vadEnhanced = true;
@@ -439,7 +468,6 @@ class VoiceSettings {
 	screenShareAudioIncludeSources: Array<Record<string, string>> = [];
 	screenShareAudioExcludeSources: Array<Record<string, string>> = [];
 	screenShareDeviceAudioUsesMicrophone = false;
-	openH264Enabled = true;
 	lastScreenShareSource: LastScreenShareSource | null = null;
 	prioritizeSpeakingParticipants = false;
 	private listeners = new Set<() => void>();
@@ -492,12 +520,8 @@ class VoiceSettings {
 				getScreenShareContentHint: false,
 				getScreenShareContentHintOverride: false,
 				getScreenShareEncoderMode: false,
-				getScreenShareSoftwareQuality: false,
-				getScreenShareSoftwareQualityOverride: false,
 				getScreenShareScalabilityMode: false,
 				getScreenShareScalabilityModeOverride: false,
-				getScreenShareBackupCodecMode: false,
-				getScreenShareBackupCodecModeOverride: false,
 				getVadThreshold: false,
 				getVadAutoSensitivity: false,
 				getVadEnhanced: false,
@@ -516,7 +540,6 @@ class VoiceSettings {
 				getScreenShareAudioIncludeSources: false,
 				getScreenShareAudioExcludeSources: false,
 				getScreenShareDeviceAudioUsesMicrophone: false,
-				getOpenH264Enabled: false,
 				getLastScreenShareSource: false,
 				getPrioritizeSpeakingParticipants: false,
 				notifyListeners: false,
@@ -540,6 +563,7 @@ class VoiceSettings {
 			changed = applyScreenShareAudioConsentMigrationV1(parsed) || changed;
 			changed = applyScreenShareAudioDefaultOnMigrationV1(parsed) || changed;
 			changed = applyStreamingModeDefaultMigrationV1(parsed) || changed;
+			changed = applyScreenShareFrameRateFloorMigrationV1(parsed) || changed;
 			changed = applyManualAudioSourcesOptOutResetMigrationV1(parsed) || changed;
 			changed = applyScreenShareContentHintDefaultMigrationV1(parsed) || changed;
 			changed = applyOutputVolumeRecalibrationMigrationV1(parsed) || changed;
@@ -547,6 +571,8 @@ class VoiceSettings {
 			changed = applyVideoQualityNormalisationMigration(parsed) || changed;
 			changed = applyScreenShareAv1OptOutMigrationV1(parsed) || changed;
 			changed = applyScreenShareHevcOptOutMigrationV1(parsed) || changed;
+			changed = applyScreenShareSoftwareQualityRetiredMigrationV1(parsed) || changed;
+			changed = applyScreenShareBackupCodecModeRetiredMigrationV1(parsed) || changed;
 			if (changed) {
 				AppStorage.setItem('VoiceSettings', JSON.stringify(parsed));
 			}
@@ -583,6 +609,7 @@ class VoiceSettings {
 			'videoFrameRate',
 			'streamingMode',
 			'streamingModeDefaultMigratedV1',
+			'screenShareFrameRateFloorMigratedV1',
 			'hideStreamPreview',
 			'muteStreamAudio',
 			'shareAppAudio',
@@ -612,10 +639,9 @@ class VoiceSettings {
 			'screenShareHevcOptOutMigratedV1',
 			'screenShareContentHintPrefV2',
 			'screenShareContentHintDefaultMigratedV1',
+			'screenShareSoftwareQualityRetiredV1',
 			'screenShareEncoderModePrefV2',
-			'screenShareSoftwareQualityPrefV2',
 			'screenShareScalabilityModePrefV2',
-			'screenShareBackupCodecModePrefV2',
 			'vadThreshold',
 			'vadAutoSensitivity',
 			'vadEnhanced',
@@ -632,7 +658,6 @@ class VoiceSettings {
 			'screenShareAudioIncludeSources',
 			'screenShareAudioExcludeSources',
 			'screenShareDeviceAudioUsesMicrophone',
-			'openH264Enabled',
 			'lastScreenShareSource',
 			'prioritizeSpeakingParticipants',
 		]);
@@ -710,28 +735,12 @@ class VoiceSettings {
 		this.screenShareEncoderModePrefV2 = value;
 	}
 
-	get screenShareSoftwareQuality(): ScreenShareSoftwareQuality {
-		return this.screenShareSoftwareQualityPrefV2;
-	}
-
-	set screenShareSoftwareQuality(value: ScreenShareSoftwareQuality) {
-		this.screenShareSoftwareQualityPrefV2 = value;
-	}
-
 	get screenShareScalabilityMode(): ScreenShareScalabilityModePreference {
 		return this.screenShareScalabilityModePrefV2;
 	}
 
 	set screenShareScalabilityMode(value: ScreenShareScalabilityModePreference) {
 		this.screenShareScalabilityModePrefV2 = value;
-	}
-
-	get screenShareBackupCodecMode(): ScreenShareBackupCodecMode {
-		return this.screenShareBackupCodecModePrefV2;
-	}
-
-	set screenShareBackupCodecMode(value: ScreenShareBackupCodecMode) {
-		this.screenShareBackupCodecModePrefV2 = value;
 	}
 
 	getInputDeviceId(): string {
@@ -957,16 +966,6 @@ class VoiceSettings {
 		return this.screenShareEncoderMode;
 	}
 
-	getScreenShareSoftwareQuality(): ScreenShareSoftwareQuality {
-		return this.screenShareSoftwareQuality;
-	}
-
-	getScreenShareSoftwareQualityOverride(): ScreenShareSoftwareQuality | undefined {
-		return this.screenShareSoftwareQuality === DEFAULT_SCREEN_SHARE_SOFTWARE_QUALITY
-			? undefined
-			: this.screenShareSoftwareQuality;
-	}
-
 	getScreenShareScalabilityMode(): ScreenShareScalabilityModePreference {
 		return this.screenShareScalabilityMode;
 	}
@@ -974,15 +973,6 @@ class VoiceSettings {
 	getScreenShareScalabilityModeOverride(): Exclude<ScreenShareScalabilityModePreference, 'auto'> | undefined {
 		const mode = this.screenShareScalabilityMode;
 		return mode === 'auto' ? undefined : mode;
-	}
-
-	getScreenShareBackupCodecMode(): ScreenShareBackupCodecMode {
-		return this.screenShareBackupCodecMode;
-	}
-
-	getScreenShareBackupCodecModeOverride(): Exclude<ScreenShareBackupCodecMode, 'off'> | undefined {
-		const mode = this.screenShareBackupCodecMode;
-		return mode === 'off' ? undefined : mode;
 	}
 
 	getVadThreshold(): number {
@@ -1057,10 +1047,6 @@ class VoiceSettings {
 		return this.getScreenShareAudioExcludeSources();
 	}
 
-	getOpenH264Enabled(): boolean {
-		return this.openH264Enabled;
-	}
-
 	getLastScreenShareSource(): LastScreenShareSource | null {
 		return this.lastScreenShareSource;
 	}
@@ -1132,12 +1118,8 @@ class VoiceSettings {
 		if (validated.screenShareHevcOptIn !== undefined) this.screenShareHevcOptIn = validated.screenShareHevcOptIn;
 		if (validated.screenShareContentHint !== undefined) this.screenShareContentHint = validated.screenShareContentHint;
 		if (validated.screenShareEncoderMode !== undefined) this.screenShareEncoderMode = validated.screenShareEncoderMode;
-		if (validated.screenShareSoftwareQuality !== undefined)
-			this.screenShareSoftwareQuality = validated.screenShareSoftwareQuality;
 		if (validated.screenShareScalabilityMode !== undefined)
 			this.screenShareScalabilityMode = validated.screenShareScalabilityMode;
-		if (validated.screenShareBackupCodecMode !== undefined)
-			this.screenShareBackupCodecMode = validated.screenShareBackupCodecMode;
 		if (validated.vadThreshold !== undefined) this.vadThreshold = validated.vadThreshold;
 		if (validated.vadAutoSensitivity !== undefined) this.vadAutoSensitivity = validated.vadAutoSensitivity;
 		if (validated.vadEnhanced !== undefined) this.vadEnhanced = validated.vadEnhanced;
@@ -1165,7 +1147,6 @@ class VoiceSettings {
 			this.screenShareAudioExcludeSources = validated.screenShareAudioExcludeSources;
 		if (validated.screenShareDeviceAudioUsesMicrophone !== undefined)
 			this.screenShareDeviceAudioUsesMicrophone = validated.screenShareDeviceAudioUsesMicrophone;
-		if (validated.openH264Enabled !== undefined) this.openH264Enabled = validated.openH264Enabled;
 		if (validated.lastScreenShareSource !== undefined) this.lastScreenShareSource = validated.lastScreenShareSource;
 		this.notifyListeners();
 	}
@@ -1200,14 +1181,8 @@ class VoiceSettings {
 		const screenShareEncoderMode = validateScreenShareEncoderMode(
 			data.screenShareEncoderMode ?? this.screenShareEncoderMode,
 		);
-		const screenShareSoftwareQuality = validateScreenShareSoftwareQuality(
-			data.screenShareSoftwareQuality ?? this.screenShareSoftwareQuality,
-		);
 		const screenShareScalabilityMode = validateScreenShareScalabilityMode(
 			data.screenShareScalabilityMode ?? this.screenShareScalabilityMode,
-		);
-		const screenShareBackupCodecMode = validateScreenShareBackupCodecMode(
-			data.screenShareBackupCodecMode ?? this.screenShareBackupCodecMode,
 		);
 		const screenShareAv1OptIn = data.screenShareAv1OptIn ?? this.screenShareAv1OptIn;
 		const screenShareHevcOptIn = data.screenShareHevcOptIn ?? this.screenShareHevcOptIn;
@@ -1273,9 +1248,7 @@ class VoiceSettings {
 				data.screenShareContentHint ?? this.screenShareContentHint,
 			),
 			screenShareEncoderMode,
-			screenShareSoftwareQuality,
 			screenShareScalabilityMode,
-			screenShareBackupCodecMode,
 			vadThreshold: Math.max(0, Math.min(100, data.vadThreshold ?? this.vadThreshold)),
 			vadAutoSensitivity: data.vadAutoSensitivity ?? this.vadAutoSensitivity,
 			vadEnhanced: data.vadEnhanced ?? this.vadEnhanced,
@@ -1298,7 +1271,6 @@ class VoiceSettings {
 				validateSourceList(data.screenShareAudioExcludeSources) ?? this.screenShareAudioExcludeSources,
 			screenShareDeviceAudioUsesMicrophone:
 				data.screenShareDeviceAudioUsesMicrophone ?? this.screenShareDeviceAudioUsesMicrophone,
-			openH264Enabled: data.openH264Enabled ?? this.openH264Enabled,
 			lastScreenShareSource:
 				data.lastScreenShareSource === undefined
 					? this.lastScreenShareSource
@@ -1336,20 +1308,10 @@ function validateScreenShareEncoderMode(mode: unknown): ScreenShareEncoderMode {
 	return mode === 'hardware' || mode === 'software' || mode === 'auto' ? mode : DEFAULT_SCREEN_SHARE_ENCODER_MODE;
 }
 
-function validateScreenShareSoftwareQuality(mode: unknown): ScreenShareSoftwareQuality {
-	return mode === 'realtime' || mode === 'quality' || mode === 'balanced'
-		? mode
-		: DEFAULT_SCREEN_SHARE_SOFTWARE_QUALITY;
-}
-
 function validateScreenShareScalabilityMode(mode: unknown): ScreenShareScalabilityModePreference {
-	return mode === 'single_layer' || mode === 'temporal' || mode === 'spatial' || mode === 'auto'
+	return mode === 'single_layer' || mode === 'temporal' || mode === 'auto'
 		? mode
 		: DEFAULT_SCREEN_SHARE_SCALABILITY_MODE;
-}
-
-function validateScreenShareBackupCodecMode(mode: unknown): ScreenShareBackupCodecMode {
-	return mode === 'h264_simulcast' || mode === 'off' ? mode : DEFAULT_SCREEN_SHARE_BACKUP_CODEC_MODE;
 }
 
 function validateScreenShareContentHint(hint: unknown): ScreenShareContentHint {

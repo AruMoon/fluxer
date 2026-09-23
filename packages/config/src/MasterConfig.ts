@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {DerivedEndpoints} from './EndpointDerivation';
+import type {DerivedEndpoints} from '@fluxer/config/src/EndpointDerivation';
 
 export type RuntimeEnv = 'development' | 'production' | 'test';
 export type DatabaseBackend = 'postgres' | 'cassandra';
 export type PublicScheme = 'http' | 'https';
+export const CACHE_PURGE_ADAPTER_NAMES = ['none', 'http'] as const;
+export type CachePurgeAdapterName = (typeof CACHE_PURGE_ADAPTER_NAMES)[number];
 
 export interface InstanceBrandingConfig {
 	product_name: string;
@@ -14,6 +16,8 @@ export interface InstanceBrandingConfig {
 	wordmark_url?: string;
 	favicon_url?: string;
 	theme_color?: string;
+	status_page_url?: string;
+	status_page_incident_history_url?: string;
 }
 
 export interface MasterConfig {
@@ -75,18 +79,9 @@ export interface MasterConfig {
 		buckets: {
 			cdn: string;
 			uploads: string;
-			downloads: string;
 			reports: string;
 			harvests: string;
 		};
-	};
-	s3_downloads?: {
-		endpoint: string;
-		presigned_url_base?: string;
-		force_path_style?: boolean;
-		region?: string;
-		access_key_id?: string;
-		secret_access_key?: string;
 	};
 	services: {
 		api: {
@@ -95,9 +90,8 @@ export interface MasterConfig {
 			request_timeout_ms: number;
 			max_inflight_requests: number;
 			ip_ban_exempt_ips: Array<string>;
-			desktop_github_redirect_countries: Array<string>;
+			donation_proxy_key: string;
 			presigned_attachment_uploads_enabled: boolean;
-			presigned_downloads_enabled: boolean;
 			presigned_harvest_downloads_enabled: boolean;
 			unfurl_ignored_hosts: Array<string>;
 			embeds: {
@@ -124,6 +118,11 @@ export interface MasterConfig {
 					batch?: number;
 				};
 			};
+			storage_change_feed?: {
+				enabled?: boolean;
+				stream?: string;
+				skip_buckets?: Array<string>;
+			};
 		};
 		nats?: {
 			core_url?: string;
@@ -142,6 +141,9 @@ export interface MasterConfig {
 				token_ttl_secs: number;
 				keep_direct_countries: Array<string>;
 			};
+			attachment_urls: {
+				secrets_base64: Array<string>;
+			};
 		};
 		gateway: {
 			port: number;
@@ -154,12 +156,6 @@ export interface MasterConfig {
 			base_path: string;
 			secret_key_base: string;
 			oauth_client_secret: string;
-		};
-		marketing: {
-			port: number;
-			host: string;
-			base_path: string;
-			secret_key_base: string;
 		};
 		app_proxy: {
 			port: number;
@@ -280,23 +276,27 @@ export interface MasterConfig {
 		youtube: {
 			api_key: string;
 		};
-		bunny: {
-			purge_enabled: boolean;
-			api_key: string;
-			pull_zone_id: number;
+		cache_purge: {
+			adapter: CachePurgeAdapterName;
+			http: {
+				endpoint: string;
+				token: string;
+				timeout_ms: number;
+			};
 		};
 		blocklist_feeds: {
+			enabled?: boolean;
+		};
+		tor_exit_list: {
+			enabled?: boolean;
+		};
+		breached_password_check: {
 			enabled?: boolean;
 		};
 		risk_integration: {
 			enabled: boolean;
 			ipinfo_api_key: string;
 			account_policy_dsl?: unknown;
-			tor: {
-				block_all_relays: boolean;
-				reverse_dns_heuristic: boolean;
-				reverse_dns_timeout_ms: number;
-			};
 		};
 		push: {
 			apns: {

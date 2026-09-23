@@ -60,13 +60,6 @@ jobs:
           cargo run --locked --quiet --manifest-path tools/ci/Cargo.toml -- resolve-calver
           --github-output
 
-  build_app_proxy:
-    needs: meta
-    uses: ./.github/workflows/build-app-proxy.yaml
-    with:
-      build-version: ${{ needs.meta.outputs.build_version }}
-    secrets: inherit
-
   build_admin:
     needs: meta
     uses: ./.github/workflows/build-admin.yaml
@@ -77,6 +70,13 @@ jobs:
   build_api:
     needs: meta
     uses: ./.github/workflows/build-api.yaml
+    with:
+      build-version: ${{ needs.meta.outputs.build_version }}
+    secrets: inherit
+
+  build_app_proxy:
+    needs: meta
+    uses: ./.github/workflows/build-app-proxy.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
@@ -109,9 +109,9 @@ jobs:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit
 
-  build_recon:
+  build_push:
     needs: meta
-    uses: ./.github/workflows/build-recon.yaml
+    uses: ./.github/workflows/build-push.yaml
     with:
       build-version: ${{ needs.meta.outputs.build_version }}
     secrets: inherit

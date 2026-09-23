@@ -27,11 +27,11 @@ const NOISE_SUPPRESSION_GATE_DESCRIPTOR = msg({
 	context: 'noise-suppression-option',
 });
 const NOISE_SUPPRESSION_GATE_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'Cuts audio below a loudness threshold, lowest CPU cost.',
+	message: 'Cuts audio below a loudness threshold with minimal CPU usage.',
 	comment: 'Description for the noise gate suppression option.',
 });
 const NOISE_SUPPRESSION_SPEEX_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'Lightweight classic filter, works on any device.',
+	message: 'Lightweight classic filter that works on any device.',
 	comment: 'Description for the Speex noise suppression option.',
 });
 const NOISE_SUPPRESSION_RNNOISE_DESCRIPTION_DESCRIPTOR = msg({
@@ -39,7 +39,7 @@ const NOISE_SUPPRESSION_RNNOISE_DESCRIPTION_DESCRIPTOR = msg({
 	comment: 'Description for the RNNoise noise suppression option.',
 });
 const NOISE_SUPPRESSION_GTCRN_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'Strongest neural filter for speech, limits audio to the speech range.',
+	message: 'Strongest neural filter for speech. Limits audio to the speech range.',
 	comment: 'Description for the GTCRN noise suppression option.',
 });
 const STEREO_MICROPHONE_DESCRIPTOR = msg({
@@ -47,7 +47,7 @@ const STEREO_MICROPHONE_DESCRIPTOR = msg({
 	comment: 'Switch label in the voice settings that sends both channels of a stereo microphone. Keep it concise.',
 });
 const STEREO_MICROPHONE_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'Sends both channels of a stereo microphone. Works only with no suppression or standard suppression.',
+	message: 'Sends both channels of a stereo microphone. Needs all processing off and a channel at 128 kbps or higher.',
 	comment: 'Description for the stereo microphone switch in the voice settings.',
 });
 
