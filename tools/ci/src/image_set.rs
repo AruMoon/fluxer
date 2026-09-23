@@ -816,7 +816,6 @@ mod tests {
     use super::*;
     use std::cmp::Ordering;
 
-    const COMPOSE_IMAGE_TAG: &str = "${FLUXER_IMAGE_TAG:-v1}";
     const RELEASE_VERSION: &str = "2026.901.120000";
     const COMPONENT_TAG: &str = "2026.830.191141";
 
@@ -835,14 +834,6 @@ mod tests {
 
     fn manifest() -> ImageSetManifest {
         build_manifest(RELEASE_VERSION, DEFAULT_REGISTRY, &resolved_set(), true).unwrap()
-    }
-
-    fn compose_component(reference: &str) -> Option<&str> {
-        reference
-            .strip_prefix(COMPOSE_IMAGE_PREFIX)?
-            .strip_prefix('/')?
-            .strip_suffix(COMPOSE_IMAGE_TAG)?
-            .strip_suffix(':')
     }
 
     #[test]

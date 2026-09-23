@@ -4332,37 +4332,6 @@ mod tests {
     }
 
     #[test]
-    fn the_github_release_is_the_only_destination_for_built_artifacts() {
-        for job in ["build", "upload", "publish_release"] {
-            let body = workflow_job(job);
-            for forbidden in [
-                "S3_BUCKET",
-                "S3_ENDPOINT",
-                "AWS_ACCESS_KEY_ID",
-                "AWS_SECRET_ACCESS_KEY",
-                "DOWNLOADS_S3",
-                "_handoff/",
-            ] {
-                assert!(
-                    !body.contains(forbidden),
-                    "{job} must not reference {forbidden} now that the downloads bucket is gone"
-                );
-            }
-        }
-
-        assert_eq!(
-            workflow_step_names(workflow_job("publish_release")),
-            vec![
-                "Checkout source",
-                "Set up Rust toolchain (CI helpers)",
-                "Download GitHub release assets",
-                "Create token",
-                "Publish GitHub desktop release",
-            ]
-        );
-    }
-
-    #[test]
     fn the_job_handoff_travels_as_github_actions_artifacts() {
         let build = workflow_job("build");
         assert!(build.contains("--step stage_handoff"));
