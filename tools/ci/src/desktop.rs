@@ -4305,12 +4305,6 @@ mod tests {
         &body[..end]
     }
 
-    fn workflow_step_names(job: &str) -> Vec<&str> {
-        job.lines()
-            .filter_map(|line| line.strip_prefix("      - name: "))
-            .collect()
-    }
-
     #[test]
     fn every_build_desktop_workflow_step_dispatches_to_a_desktop_step() {
         let steps = BUILD_DESKTOP_WORKFLOW
