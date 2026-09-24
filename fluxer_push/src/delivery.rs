@@ -58,10 +58,17 @@ enum Audience {
 
 impl Audience {
     fn admits(self, subscription: &Subscription) -> bool {
-        let voip = subscription.platform() == Some(Platform::IosApnsVoip);
         match self {
-            Self::Standard => !voip,
-            Self::Ring => voip,
+            Self::Standard => subscription.platform() != Some(Platform::IosApnsVoip),
+            Self::Ring => Self::rings(subscription),
+        }
+    }
+
+    fn rings(subscription: &Subscription) -> bool {
+        match subscription.platform() {
+            Some(Platform::IosApnsVoip) => true,
+            Some(Platform::AndroidFcm) => subscription.is_web_push_registration(),
+            _ => false,
         }
     }
 }
@@ -272,13 +279,10 @@ async fn run_subject<T: Transport>(
             let job_transport = transport.clone();
             running.spawn(async move {
                 let _permit = permit;
-                let mut result = run_job(&job_state, &job_sends, job).await;
+                let result = run_job(&job_state, &job_sends, job).await;
                 if matches!(result, Answer::Done) {
                     for claim in claims {
                         claim.done();
-                    }
-                    if recipients_running {
-                        result = Answer::NotDone(RUNNING);
                     }
                 }
                 answer(&job_transport, reply_to, result).await;

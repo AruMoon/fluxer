@@ -11,16 +11,24 @@ const CLEAR_ACTION: &str = "clear_channel";
 const RING_TYPE: &str = "call_ring";
 const FALLBACK_TAG: &str = "fluxer-message";
 const FALLBACK_TITLE: &str = "Fluxer";
-const APNS_CATEGORY: &str = "FLUXER_MESSAGE";
+const APNS_CATEGORY: &str = "fluxer_message";
+const FCM_CLICK_ACTION: &str = "FLUXER_MESSAGE";
 const APNS_SOUND: &str = "default";
 const APNS_ALERT_EXPIRATION_SECONDS: i64 = 86_400;
-const APNS_BACKGROUND_EXPIRATION_SECONDS: i64 = 3_600;
+const APNS_BACKGROUND_EXPIRATION_SECONDS: i64 = 86_400;
 const APNS_COLLAPSE_ID_MAX_BYTES: usize = 64;
 const SHRUNK_BODY_MAX_BYTES: usize = 40;
 const MINIMAL_TITLE_MAX_BYTES: usize = 120;
 const MEDIA_KEYS: [&str; 2] = ["image_url", "image"];
 const ICON_KEYS: [&str; 3] = ["icon", "badge", "author_avatar_url"];
-const MINIMAL_DATA_KEYS: [&str; 7] = [
+const RING_CALLER_ID_KEY: &str = "caller_id";
+const RING_CALLER_NAME_KEY: &str = "caller_name";
+const RING_CALLER_AVATAR_KEY: &str = "caller_avatar_url";
+const RING_AVATAR_KEYS: [&str; 1] = [RING_CALLER_AVATAR_KEY];
+const RING_IDENTITY_KEYS: [&str; 2] = [RING_CALLER_ID_KEY, RING_CALLER_NAME_KEY];
+const MINIMAL_DATA_KEYS: [&str; 9] = [
+    "type",
+    "action",
     "channel_id",
     "message_id",
     "guild_id",
@@ -106,18 +114,36 @@ pub fn web_push_clear(job: &ClearJob, badge_count: u32) -> Value {
 }
 
 pub fn web_push_call_ring(job: &RingJob) -> Value {
-    let data = json!({
+    let mut data = json!({
         "type": RING_TYPE,
         "channel_id": job.channel_id,
         "message_id": job.message_id,
         "target_user_id": job.user_id,
         "started_at_ms": job.started_at_ms,
+        "expires_at_ms": job.expires_at_ms,
     });
+    put_caller(&mut data, job);
     json!({
         "web_push": WEB_PUSH_MARKER,
         "type": RING_TYPE,
         "data": data,
     })
+}
+
+fn put_caller(data: &mut Value, job: &RingJob) {
+    let Some(object) = data.as_object_mut() else {
+        return;
+    };
+    let caller = [
+        (RING_CALLER_ID_KEY, job.caller_id.as_deref()),
+        (RING_CALLER_NAME_KEY, job.caller_name.as_deref()),
+        (RING_CALLER_AVATAR_KEY, job.caller_avatar_url.as_deref()),
+    ];
+    for (key, value) in caller {
+        if let Some(value) = value.filter(|value| !value.is_empty()) {
+            object.insert(key.to_owned(), value.into());
+        }
+    }
 }
 
 pub fn fcm_message(device_token: &str, envelope: &Value) -> Value {
@@ -145,7 +171,7 @@ fn fcm_clear_message(device_token: &str, envelope: &Value) -> Value {
             "data": data,
             "android": {
                 "priority": "NORMAL",
-                "ttl": "3600s",
+                "ttl": "86400s",
                 "collapse_key": format!("clear:{tag}"),
             },
             "fcm_options": {"analytics_label": CLEAR_TYPE},
@@ -178,7 +204,7 @@ fn fcm_notification_message(device_token: &str, envelope: &Value) -> Value {
     let mut android_notification = json!({
         "channel_id": "fluxer_default_push",
         "tag": tag,
-        "click_action": APNS_CATEGORY,
+        "click_action": FCM_CLICK_ACTION,
     });
     put_image(&mut android_notification, image_url);
     json!({
@@ -239,9 +265,7 @@ pub fn apns_payload(envelope: &Value) -> Value {
     if let Some(badge) = badge_number(data.and_then(|data| data.get("badge_count"))) {
         aps.insert("badge".to_owned(), badge.into());
     }
-    if image_url.is_some() {
-        aps.insert("mutable-content".to_owned(), 1.into());
-    }
+    aps.insert("mutable-content".to_owned(), 1.into());
     payload.insert("title".to_owned(), title.into());
     payload.insert("body".to_owned(), body.into());
     payload.remove("url");
@@ -397,6 +421,9 @@ pub fn fit(envelope: &Value, budget: usize) -> (Vec<u8>, Option<PayloadShrink>) 
     if serialized.len() <= budget {
         return (serialized, None);
     }
+    if matches!(record_kind(envelope), RecordKind::Ring) {
+        return fit_ring(envelope, budget);
+    }
     let mut working = envelope.clone();
     for step in PayloadShrink::ALL {
         working = shrink(&working, step, budget);
@@ -405,6 +432,17 @@ pub fn fit(envelope: &Value, budget: usize) -> (Vec<u8>, Option<PayloadShrink>) 
             return (serialized, Some(step));
         }
     }
+    (serialize(&working), Some(PayloadShrink::Minimal))
+}
+
+fn fit_ring(envelope: &Value, budget: usize) -> (Vec<u8>, Option<PayloadShrink>) {
+    let mut working = envelope.clone();
+    drop_keys(&mut working, &RING_AVATAR_KEYS);
+    let serialized = serialize(&working);
+    if serialized.len() <= budget {
+        return (serialized, Some(PayloadShrink::Icons));
+    }
+    drop_keys(&mut working, &RING_IDENTITY_KEYS);
     (serialize(&working), Some(PayloadShrink::Minimal))
 }
 
@@ -553,4 +591,96 @@ fn non_empty(value: &Value) -> Option<&str> {
 
 fn serialize(value: &Value) -> Vec<u8> {
     serde_json::to_vec(value).expect("a json value serialises")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::job::{ClearJob, MessageJob, NotificationFields};
+
+    const CHANNEL_ID: &str = "9876543210987654321";
+    const MESSAGE_ID: &str = "1122334455667788990";
+    const USER_ID: &str = "1234567890123456789";
+
+    fn message_job(image_url: Option<&str>) -> MessageJob {
+        MessageJob {
+            v: 1,
+            config_version: 7,
+            guild_id: "0".to_owned(),
+            channel_id: CHANNEL_ID.to_owned(),
+            message_id: MESSAGE_ID.to_owned(),
+            notification: NotificationFields {
+                title: "Elias".to_owned(),
+                body: "see you tomorrow".to_owned(),
+                icon: "https://media.fluxer.app/avatars/1/a.webp".to_owned(),
+                badge: "https://media.fluxer.app/badge.png".to_owned(),
+                tag: format!("channel:{CHANNEL_ID}:{MESSAGE_ID}"),
+                notification_tag: format!("channel:{CHANNEL_ID}"),
+                url: format!("/channels/@me/{CHANNEL_ID}"),
+                image_url: image_url.map(str::to_owned),
+            },
+            user_ids: vec![USER_ID.to_owned()],
+        }
+    }
+
+    fn clear_job() -> ClearJob {
+        ClearJob {
+            v: 1,
+            config_version: 7,
+            user_id: USER_ID.to_owned(),
+            channel_id: CHANNEL_ID.to_owned(),
+            message_id: MESSAGE_ID.to_owned(),
+        }
+    }
+
+    fn apns_for(image_url: Option<&str>) -> Value {
+        apns_payload(&web_push_message(&message_job(image_url), USER_ID, 3))
+    }
+
+    #[test]
+    fn a_message_without_an_image_still_runs_the_notification_service_extension() {
+        assert_eq!(apns_for(None)["aps"]["mutable-content"], json!(1));
+    }
+
+    #[test]
+    fn a_message_with_an_image_still_runs_the_notification_service_extension() {
+        assert_eq!(
+            apns_for(Some("https://media.fluxer.app/proxy/attachment.webp"))["aps"]["mutable-content"],
+            json!(1)
+        );
+    }
+
+    #[test]
+    fn a_background_clear_never_runs_the_notification_service_extension() {
+        let payload = apns_payload(&web_push_clear(&clear_job(), 3));
+        assert_eq!(payload["aps"], json!({"content-available": 1}));
+    }
+
+    #[test]
+    fn the_apns_category_is_the_identifier_the_app_registers() {
+        assert_eq!(apns_for(None)["aps"]["category"], json!("fluxer_message"));
+    }
+
+    #[test]
+    fn the_android_click_action_keeps_its_own_identifier() {
+        let message = fcm_message(
+            "device-token",
+            &web_push_message(&message_job(None), USER_ID, 3),
+        );
+        assert_eq!(
+            message["message"]["android"]["notification"]["click_action"],
+            json!("FLUXER_MESSAGE")
+        );
+    }
+
+    #[test]
+    fn a_shrunk_clear_still_tells_the_client_it_is_a_clear() {
+        let envelope = web_push_clear(&clear_job(), 3);
+        let budget = serialize(&envelope).len() - 1;
+        let (bytes, step) = fit(&envelope, budget);
+        assert_eq!(step, Some(PayloadShrink::Minimal));
+        let shrunk: Value = serde_json::from_slice(&bytes).expect("the shrunk payload is json");
+        assert_eq!(shrunk["data"]["type"], json!(CLEAR_TYPE));
+        assert_eq!(shrunk["data"]["action"], json!(CLEAR_ACTION));
+    }
 }

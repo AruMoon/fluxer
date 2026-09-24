@@ -6,12 +6,13 @@ use crate::providers::SendOutcome;
 use crate::resolver;
 use crate::server::AppState;
 use crate::subscription::Subscription;
-use crate::vendor::is_transient_status;
+use crate::vendor::{Unreachable, is_transient_status};
 use rand::RngExt as _;
 use reqwest::header::{AUTHORIZATION, CONTENT_ENCODING, CONTENT_TYPE};
 use serde_json::Value;
 use std::net::IpAddr;
 use std::time::Duration;
+use tracing::warn;
 use url::{Host, Url};
 
 pub const RECORD_SIZE: usize = 2816;
@@ -26,7 +27,7 @@ const MAX_TRANSIENT_RETRIES: u32 = 2;
 const BASE_RETRY_DELAY_MS: u64 = 200;
 const MAX_RETRY_DELAY_MS: u64 = 2_000;
 const ALERT_TTL_SECONDS: &str = "86400";
-const CLEAR_TTL_SECONDS: &str = "3600";
+const CLEAR_TTL_SECONDS: &str = "86400";
 const RING_TTL_SECONDS: &str = "0";
 const TTL_HEADER: &str = "TTL";
 const URGENCY_HEADER: &str = "Urgency";
@@ -36,6 +37,7 @@ const OCTET_STREAM: &str = "application/octet-stream";
 const AES128GCM: &str = "aes128gcm";
 const NOT_FOUND: u16 = 404;
 const GONE: u16 = 410;
+const INSUFFICIENT_STORAGE: u16 = 507;
 const MAX_HOSTNAME_BYTES: usize = 253;
 const MAX_LABEL_BYTES: usize = 63;
 
@@ -90,16 +92,26 @@ pub async fn send(state: &AppState, sub: &Subscription, envelope: &Value) -> Sen
 
         let status = match response {
             Ok(response) => response.status().as_u16(),
-            Err(_) if attempt >= MAX_TRANSIENT_RETRIES => {
-                return SendOutcome::transient("transport");
-            }
-            Err(_) => {
+            Err(error) => {
+                let unreachable = Unreachable::of(&error);
+                warn!(
+                    error = %error.without_url(),
+                    kind = unreachable.label(),
+                    endpoint = %origin_of(&sub.endpoint),
+                    "web push request did not complete"
+                );
+                if unreachable.is_permanent() {
+                    return SendOutcome::permanent(unreachable.label());
+                }
+                if attempt >= MAX_TRANSIENT_RETRIES {
+                    return SendOutcome::transient(unreachable.label());
+                }
                 tokio::time::sleep(retry_delay(attempt)).await;
                 attempt += 1;
                 continue;
             }
         };
-        if is_transient_status(status) && attempt < MAX_TRANSIENT_RETRIES {
+        if should_retry(status, attempt) {
             tokio::time::sleep(retry_delay(attempt)).await;
             attempt += 1;
             continue;
@@ -116,6 +128,10 @@ fn delivery_headers(envelope: &Value) -> (&'static str, &'static str) {
     }
 }
 
+fn should_retry(status: u16, attempt: u32) -> bool {
+    is_transient_status(status) && status != INSUFFICIENT_STORAGE && attempt < MAX_TRANSIENT_RETRIES
+}
+
 fn classify(status: u16) -> SendOutcome {
     match status {
         200..=299 => SendOutcome::Accepted,
@@ -123,6 +139,7 @@ fn classify(status: u16) -> SendOutcome {
         NOT_FOUND => SendOutcome::TokenInvalid {
             reason: "not_found",
         },
+        INSUFFICIENT_STORAGE => SendOutcome::permanent("http_507"),
         _ if is_transient_status(status) => SendOutcome::transient(format!("http_{status}")),
         _ => SendOutcome::permanent(format!("http_{status}")),
     }
@@ -196,4 +213,44 @@ fn retry_delay(attempt: u32) -> Duration {
     );
     let jitter = rand::rng().random_range(1..=(base / 4).max(1));
     Duration::from_millis(MAX_RETRY_DELAY_MS.min(base + jitter - 1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_unified_push_topic_with_no_listener_is_permanent() {
+        assert_eq!(
+            classify(INSUFFICIENT_STORAGE),
+            SendOutcome::permanent("http_507")
+        );
+    }
+
+    #[test]
+    fn an_unavailable_push_service_stays_retryable() {
+        assert_eq!(classify(503), SendOutcome::transient("http_503"));
+    }
+}
+
+#[cfg(test)]
+mod retry_tests {
+    use super::*;
+
+    #[test]
+    fn a_topic_with_no_listener_is_not_retried() {
+        assert!(!should_retry(INSUFFICIENT_STORAGE, 0));
+    }
+
+    #[test]
+    fn an_unavailable_push_service_is_retried_until_the_budget_runs_out() {
+        assert!(should_retry(503, 0));
+        assert!(!should_retry(503, MAX_TRANSIENT_RETRIES));
+    }
+
+    #[test]
+    fn a_permanent_status_is_never_retried() {
+        assert!(!should_retry(400, 0));
+        assert!(!should_retry(410, 0));
+    }
 }
