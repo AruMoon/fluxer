@@ -1522,6 +1522,9 @@
         "msgid": "Approval required"
       },
       {
+        "msgid": "Approve this app from the {productName} app you already use. No password needed."
+      },
+      {
         "msgid": "Are you sure you want to kick <0>{targetUserTag}</0> from the community? They will be able to rejoin with a new invite."
       },
       {
@@ -1541,6 +1544,9 @@
       },
       {
         "msgid": "Automatic ({codec})"
+      },
+      {
+        "msgid": "Back to {productName}"
       },
       {
         "msgid": "Backup code"
@@ -1717,6 +1723,9 @@
         "msgid": "Choices"
       },
       {
+        "msgid": "Choose File, then Add to Dock."
+      },
+      {
         "msgid": "Choose how new accounts are created on this instance."
       },
       {
@@ -1762,6 +1771,12 @@
         "msgid": "Community overrides"
       },
       {
+        "msgid": "Compressing"
+      },
+      {
+        "msgid": "Compressing {percent}%"
+      },
+      {
         "msgid": "Connect a camera and try again."
       },
       {
@@ -1798,10 +1813,16 @@
         "msgid": "Couldn't update passkey two-factor authentication"
       },
       {
+        "msgid": "Couldn't update your passkey. Try again."
+      },
+      {
         "msgid": "Create administrator account"
       },
       {
         "msgid": "Create the administrator account"
+      },
+      {
+        "msgid": "Cropping {percent}%"
       },
       {
         "msgid": "Custom emoji {emojiName} from a community"
@@ -1870,6 +1891,9 @@
         "msgid": "Do you want to join {communityName}?"
       },
       {
+        "msgid": "Domain moved nagbar"
+      },
+      {
         "msgid": "Drag members between voice channels they can access, and disconnect them from voice."
       },
       {
@@ -1924,6 +1948,9 @@
         "msgid": "Enter the PIN for your security key to continue."
       },
       {
+        "msgid": "Enter this code in your old {PRODUCT_NAME} app to complete sign-in."
+      },
+      {
         "msgid": "Entire screen"
       },
       {
@@ -1945,6 +1972,9 @@
         "msgid": "Finish"
       },
       {
+        "msgid": "Finish in the new tab. If you closed it, press Continue with passkey again."
+      },
+      {
         "msgid": "Finish setup"
       },
       {
@@ -1960,10 +1990,16 @@
         "msgid": "Fully quit and restart {productName} so macOS applies this permission."
       },
       {
+        "msgid": "Get the new {productName} app"
+      },
+      {
         "msgid": "Give everyone on this instance the highest premium limits."
       },
       {
         "msgid": "Global shortcut"
+      },
+      {
+        "msgid": "Go back to {productName} to continue."
       },
       {
         "msgid": "Go to {communityName}"
@@ -2015,6 +2051,12 @@
       },
       {
         "msgid": "Input level"
+      },
+      {
+        "msgid": "Install it from your browser menu."
+      },
+      {
+        "msgid": "Install the new app"
       },
       {
         "msgid": "Invite new people to the community with a link to this channel."
@@ -2075,6 +2117,9 @@
       },
       {
         "msgid": "Limited the channel to {count, plural, one {# user} other {# users}}."
+      },
+      {
+        "msgid": "Link a new device"
       },
       {
         "msgid": "Loading instance configuration"
@@ -2206,6 +2251,21 @@
         "msgid": "Open popup"
       },
       {
+        "msgid": "Open the new app and choose Sign in with your old {productName} app. Then choose Link a new device here and enter the code it shows."
+      },
+      {
+        "msgid": "Open your old {PRODUCT_NAME} app and choose Link a new device, then enter the code below."
+      },
+      {
+        "msgid": "Open {host} in Safari."
+      },
+      {
+        "msgid": "Open {host} in your browser."
+      },
+      {
+        "msgid": "Open {productName} in your browser"
+      },
+      {
         "msgid": "Opens the Members page. Press Space or Enter to open."
       },
       {
@@ -2228,6 +2288,9 @@
       },
       {
         "msgid": "Our phone number check is down right now. This is on us, not your number. Wait a few minutes and try the same number again."
+      },
+      {
+        "msgid": "Passkey updated"
       },
       {
         "msgid": "Pause preview when Fluxer isn’t focused"
@@ -2278,6 +2341,12 @@
         "msgid": "Premium model"
       },
       {
+        "msgid": "Preparing"
+      },
+      {
+        "msgid": "Press Continue to use your passkey."
+      },
+      {
         "msgid": "Prevent <0>{targetUserTag}</0> from sending messages, reacting, and connecting to voice channels for the specified duration."
       },
       {
@@ -2297,6 +2366,9 @@
       },
       {
         "msgid": "Previous 6 days"
+      },
+      {
+        "msgid": "Previous channels"
       },
       {
         "msgid": "Product name"
@@ -2557,6 +2629,21 @@
         "msgid": "Search for {query}"
       },
       {
+        "msgid": "Searching all users"
+      },
+      {
+        "msgid": "Searching communities"
+      },
+      {
+        "msgid": "Searching friends and members of {communityName}"
+      },
+      {
+        "msgid": "Searching text channels"
+      },
+      {
+        "msgid": "Searching voice channels"
+      },
+      {
         "msgid": "Second factor"
       },
       {
@@ -2567,6 +2654,9 @@
       },
       {
         "msgid": "See this channel. Denying it for {everyoneMention} makes the channel private."
+      },
+      {
+        "msgid": "Select the account you want to sign in with on your new device."
       },
       {
         "msgid": "Self-host setup"
@@ -2749,6 +2839,9 @@
         "msgid": "Show fewer filters"
       },
       {
+        "msgid": "Show me how"
+      },
+      {
         "msgid": "Show per-device participant volume sliders in voice menus"
       },
       {
@@ -2759,6 +2852,9 @@
       },
       {
         "msgid": "Showed members with this role in their own section in the member list."
+      },
+      {
+        "msgid": "Sign in with your old {productName} app"
       },
       {
         "msgid": "Sign-in details"
@@ -2890,6 +2986,9 @@
         "msgid": "Talk in calls and test your input."
       },
       {
+        "msgid": "Tap Share, then Add to Home Screen."
+      },
+      {
         "msgid": "Text is rendered with grayscale antialiasing instead of ClearType while transparency is enabled, so it will look softer."
       },
       {
@@ -2983,10 +3082,25 @@
         "msgid": "These options change how people use the instance. Some can only be chosen during setup."
       },
       {
+        "msgid": "This animation is too long or too large to crop. Try a shorter or smaller file."
+      },
+      {
+        "msgid": "This browser can't crop animated {AVIF_FORMAT_LABEL} files. Upload a GIF or WebP instead."
+      },
+      {
+        "msgid": "This browser can't crop animated {avifFormatLabel} files. Upload a GIF or WebP instead."
+      },
+      {
+        "msgid": "This browser has WebAssembly turned off, so animated images can't be cropped."
+      },
+      {
         "msgid": "This device could not keep up with {targetResolution} at {targetFrameRate} FPS last time, so your stream started at {resolution} at {frameRate} FPS."
       },
       {
         "msgid": "This emoji is from"
+      },
+      {
+        "msgid": "This image couldn't be read. It may be damaged."
       },
       {
         "msgid": "This instance currently allows screen share up to 720p at 30 FPS."
@@ -3032,6 +3146,9 @@
       },
       {
         "msgid": "This option is required. Please provide a value."
+      },
+      {
+        "msgid": "This request has expired. Go back and try again."
       },
       {
         "msgid": "This reset link has expired. Reset links last 1 hour. Please request a new one."
@@ -3094,6 +3211,15 @@
         "msgid": "Unavailable"
       },
       {
+        "msgid": "Unread channels"
+      },
+      {
+        "msgid": "Update passkey"
+      },
+      {
+        "msgid": "Update your passkey"
+      },
+      {
         "msgid": "Upload files and media in messages."
       },
       {
@@ -3125,6 +3251,9 @@
       },
       {
         "msgid": "Use your operating system's spellchecker when available. Otherwise, use {productName}'s in-app dictionaries."
+      },
+      {
+        "msgid": "Use your passkey"
       },
       {
         "msgid": "Used in Custom mode. The Gaming and Screen share presets set their own hint."
@@ -3175,6 +3304,9 @@
         "msgid": "You asked for {resolution} at {frameRate} FPS"
       },
       {
+        "msgid": "You can close this tab"
+      },
+      {
         "msgid": "You can still ask the administrators of this instance for a human review at any time."
       },
       {
@@ -3218,6 +3350,12 @@
       },
       {
         "msgid": "Your device could not keep up, so your stream now sends {resolution} to keep {frameRate} FPS smooth."
+      },
+      {
+        "msgid": "Your device will ask you to save an updated passkey for {name}. It replaces the old one."
+      },
+      {
+        "msgid": "Your device will ask you to save an updated passkey for {name}. Use the same phone or security key you just used."
       },
       {
         "msgid": "Your new nickname, or leave blank to reset it."
@@ -3796,7 +3934,25 @@
         "msgid": "{productName} cannot start a safe isolated route for this app's audio."
       },
       {
+        "msgid": "{productName} has moved to {host}. Add it to your Home Screen or Dock, then sign in with this app."
+      },
+      {
+        "msgid": "{productName} has moved to {host}. Install it from your browser, then sign in with this app."
+      },
+      {
+        "msgid": "{productName} has moved to {host}. Install the new app and you will already be signed in."
+      },
+      {
+        "msgid": "{productName} has moved to {host}. Open it in your browser to install the new app."
+      },
+      {
         "msgid": "{productName} needs screen recording access. Allow screen recording in your operating system privacy settings and restart the app."
+      },
+      {
+        "msgid": "{productName} now lives at {host}. Install it from there, then sign in with this app."
+      },
+      {
+        "msgid": "{productName} now lives at {host}. Install it from there."
       },
       {
         "msgid": "{productName} wordmark"
@@ -6793,6 +6949,9 @@
       },
       {
         "msgid": "Open {displayName}"
+      },
+      {
+        "msgid": "Open {host} in Safari."
       },
       {
         "msgid": "Open {landmarkName}"

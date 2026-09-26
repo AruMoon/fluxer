@@ -18,6 +18,11 @@ import {Routes} from '@app/app/Routes';
 import {AppErrorBoundary} from '@app/features/app/components/AppErrorBoundary';
 import {BootstrapErrorScreen} from '@app/features/app/components/BootstrapErrorScreen';
 import {ErrorFallback} from '@app/features/app/components/ErrorFallback';
+import {
+	type DomainMigrationSide,
+	resolveDomainMigrationSide,
+} from '@app/features/app/domain_migration/DomainMigrationCore';
+import {runDomainMigrationPreMount} from '@app/features/app/domain_migration/DomainMigrationPreMount';
 import {installSelfXssNotice} from '@app/features/devtools/utils/SelfXssNotice';
 import {AppI18nProvider} from '@app/features/i18n/components/AppI18nProvider';
 import {installLocaleSwitchWatchdog} from '@app/features/i18n/utils/LocaleSwitchWatchdog';
@@ -33,6 +38,7 @@ import {
 import {loadLazyModule} from '@app/features/platform/utils/LazyModuleLoader';
 import {scheduleNonLatinScriptFaces} from '@app/features/theme/fonts/ScriptFontLoader';
 import {installVoiceSubscriptionDebugApi} from '@app/features/voice/diagnostics/VoiceSubscriptionDebugApi';
+import {PASSKEY_BRIDGE_PATH} from '@fluxer/constants/src/PasskeyConstants';
 import {i18n} from '@lingui/core';
 import {configure} from 'mobx';
 import type {ReactNode} from 'react';
@@ -115,6 +121,27 @@ async function bootstrapThemeStudio(): Promise<void> {
 	);
 }
 
+async function bootstrapPasskeyBridge(side: DomainMigrationSide): Promise<void> {
+	const hash = window.location.hash;
+	const opensInOwnTab = window.history.length === 1;
+	window.history.replaceState(null, '', PASSKEY_BRIDGE_PATH);
+	const [{PasskeyBridgePage}] = await Promise.all([
+		loadLazyModule(() => import('@app/features/auth/passkey_migration/PasskeyBridgePage')),
+		initI18n(),
+	]);
+	mountRoot(
+		<AppI18nProvider i18n={i18n}>
+			<PasskeyBridgePage
+				side={side}
+				hash={hash}
+				opensInOwnTab={opensInOwnTab}
+				data-flx="index.passkey-bridge.passkey-bridge-page"
+			/>
+		</AppI18nProvider>,
+		'index.passkey-bridge',
+	);
+}
+
 async function bootstrapApp(): Promise<void> {
 	const markdownParserReady = preloadMarkdownParser();
 	const [
@@ -169,6 +196,15 @@ async function bootstrapApp(): Promise<void> {
 }
 
 async function bootstrap(): Promise<void> {
+	const passkeyBridgeSide =
+		window.location.pathname === PASSKEY_BRIDGE_PATH ? resolveDomainMigrationSide(window.location.origin) : null;
+	if (passkeyBridgeSide !== null) {
+		await bootstrapPasskeyBridge(passkeyBridgeSide);
+		return;
+	}
+	if (await runDomainMigrationPreMount()) {
+		return;
+	}
 	scheduleNonLatinScriptFaces();
 	await initI18n();
 	installLocaleSwitchWatchdog();
