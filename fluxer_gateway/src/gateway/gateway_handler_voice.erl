@@ -13,6 +13,10 @@
 
 -export_type([state/0, ws_result/0]).
 
+-ifdef(TEST).
+-export([add_server_client_ip/2]).
+-endif.
+
 -define(VOICE_UPDATE_RATE_LIMIT, 2).
 -define(VOICE_RATE_LIMIT_WINDOW, 1000).
 -define(VOICE_QUEUE_TABLE, voice_update_queue).
@@ -25,14 +29,24 @@
 
 -spec handle_voice_state_update(pid(), map(), state()) -> ws_result().
 handle_voice_state_update(Pid, Data, State) ->
+    VoiceData = add_server_client_ip(Data, State),
     case should_queue_voice_update(Pid) of
         false ->
-            log_voice_update(Pid, Data, direct),
-            process_voice_update(Pid, Data, State);
+            log_voice_update(Pid, VoiceData, direct),
+            process_voice_update(Pid, VoiceData, State);
         true ->
-            log_voice_update(Pid, Data, queued),
-            queue_voice_update(Pid, Data),
+            log_voice_update(Pid, VoiceData, queued),
+            queue_voice_update(Pid, VoiceData),
             {ok, ensure_voice_queue_timer(State)}
+    end.
+
+-spec add_server_client_ip(map(), state()) -> map().
+add_server_client_ip(Data, State) ->
+    case maps:get(peer_ip, State, undefined) of
+        IP when is_binary(IP), byte_size(IP) > 0 ->
+            Data#{<<"client_ip">> => IP};
+        _ ->
+            maps:remove(<<"client_ip">>, Data)
     end.
 
 -spec log_voice_update(pid(), map(), direct | queued) -> ok.
@@ -66,14 +80,18 @@ process_voice_update(SessionPid, Data, State) ->
             {ok, State}
     end.
 
+-spec sanitize_voice_update_data(map()) -> map().
+sanitize_voice_update_data(Data) ->
+    maps:remove(<<"client_ip">>, Data).
+
 -spec log_voice_update_call_failure(atom(), term(), pid(), map()) -> ok.
 log_voice_update_call_failure(exit, {timeout, _}, SessionPid, Data) ->
     logger:warning("Gateway voice state update call timeout", #{
-        session_pid => SessionPid, data => Data
+        session_pid => SessionPid, data => sanitize_voice_update_data(Data)
     });
 log_voice_update_call_failure(exit, {noproc, _}, SessionPid, Data) ->
     logger:warning("Gateway voice state update call noproc", #{
-        session_pid => SessionPid, data => Data
+        session_pid => SessionPid, data => sanitize_voice_update_data(Data)
     });
 log_voice_update_call_failure(exit, Reason, SessionPid, _Data) ->
     logger:warning("Gateway voice state update call exit", #{

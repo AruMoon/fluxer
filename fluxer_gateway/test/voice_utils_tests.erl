@@ -47,6 +47,29 @@ add_rtc_region_to_request_test() ->
     WithoutRegion = voice_utils:add_rtc_region_to_request(BaseReq, null),
     ?assertNot(maps:is_key(<<"rtc_region">>, WithoutRegion)).
 
+build_voice_token_rpc_request_with_client_ip_test() ->
+    VoicePerms = #{
+        can_speak => true,
+        can_stream => true,
+        can_video => true
+    },
+    Req = voice_utils:build_voice_token_rpc_request(
+        123,
+        456,
+        789,
+        null,
+        <<"55.0">>,
+        <<"37.0">>,
+        <<"203.0.113.10">>,
+        VoicePerms,
+        <<"nonce">>
+    ),
+
+    ?assertEqual(<<"203.0.113.10">>, maps:get(<<"client_ip">>, Req)),
+    ?assertEqual(<<"55.0">>, maps:get(<<"latitude">>, Req)),
+    ?assertEqual(<<"37.0">>, maps:get(<<"longitude">>, Req)),
+    ?assertNot(maps:is_key(<<"country_code">>, Req)).
+
 build_force_disconnect_rpc_request_test() ->
     Req = voice_utils:build_force_disconnect_rpc_request(123, 456, 789, <<"conn">>),
     ?assertEqual(<<"voice_force_disconnect_participant">>, maps:get(<<"type">>, Req)),

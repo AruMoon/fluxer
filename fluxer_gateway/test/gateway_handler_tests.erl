@@ -506,6 +506,34 @@ voice_state_update_with_non_map_payload_closes_test() ->
     ),
     ?assertEqual(constants:close_code_to_num(decode_error), CloseCode).
 
+add_server_client_ip_overwrites_client_value_test() ->
+    Data = #{<<"client_ip">> => <<"1.2.3.4">>},
+    State = #{peer_ip => <<"5.6.7.8">>},
+    Result = gateway_handler_voice:add_server_client_ip(Data, State),
+    ?assertEqual(<<"5.6.7.8">>, maps:get(<<"client_ip">>, Result)).
+
+add_server_client_ip_removes_untrusted_value_without_peer_ip_test() ->
+    Data = #{<<"client_ip">> => <<"1.2.3.4">>},
+    State = #{peer_ip => undefined},
+    Result = gateway_handler_voice:add_server_client_ip(Data, State),
+    ?assertEqual(false, maps:is_key(<<"client_ip">>, Result)).
+
+add_server_client_ip_preserves_other_payload_fields_test() ->
+    Data = #{
+        <<"guild_id">> => <<"1">>,
+        <<"latitude">> => <<"55.7">>,
+        <<"longitude">> => <<"37.6">>,
+        <<"client_ip">> => <<"1.1.1.1">>
+    },
+    State = #{peer_ip => <<"2.2.2.2">>},
+
+    Result = gateway_handler_voice:add_server_client_ip(Data, State),
+
+    ?assertEqual(<<"1">>, maps:get(<<"guild_id">>, Result)),
+    ?assertEqual(<<"55.7">>, maps:get(<<"latitude">>, Result)),
+    ?assertEqual(<<"37.6">>, maps:get(<<"longitude">>, Result)),
+    ?assertEqual(<<"2.2.2.2">>, maps:get(<<"client_ip">>, Result)).
+
 new_json_state() ->
     (gateway_handler:new_state())#{
         version => 1, encoding => json, compress_ctx => gateway_compress:new_context(none)
