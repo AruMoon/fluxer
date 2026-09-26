@@ -12,6 +12,8 @@ pub struct VoiceRegion {
     pub is_default: Option<bool>,
     pub vip_only: Option<bool>,
     #[serde(default)]
+    pub country_codes: Vec<String>,
+    #[serde(default)]
     pub required_guild_features: Vec<String>,
     #[serde(default)]
     pub allowed_guild_ids: Vec<String>,

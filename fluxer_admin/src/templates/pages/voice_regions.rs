@@ -113,6 +113,7 @@ fn region_card(config: &AdminConfig, region: &VoiceRegion, csrf_token: &str) -> 
             div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" {
                 (data_field_text("Latitude", &lat))
                 (data_field_text("Longitude", &lng))
+                (data_field_text("Country Codes", &region.country_codes.join(", ")))
                 (data_field_text("Servers", &servers.len().to_string()))
             }
             (voice_features_list(&region.required_guild_features))
@@ -197,6 +198,7 @@ fn edit_region_form(config: &AdminConfig, region: &VoiceRegion, csrf_token: &str
         .map_or_else(|| "0".to_string(), |v| v.to_string());
     let is_default = region.is_default.unwrap_or(false);
     let vip_only = region.vip_only.unwrap_or(false);
+    let countries_csv = region.country_codes.join(", ");
     let features_csv = region.required_guild_features.join(", ");
     let guild_ids_csv = region.allowed_guild_ids.join(", ");
     html! {
@@ -210,6 +212,7 @@ fn edit_region_form(config: &AdminConfig, region: &VoiceRegion, csrf_token: &str
                         (form_field("Emoji", "region-emoji", "emoji", "text", emoji, "Flag or emoji for the region", false))
                         (form_field("Latitude", "region-latitude", "latitude", "number", &lat, "Geographic latitude", false))
                         (form_field("Longitude", "region-longitude", "longitude", "number", &lng, "Geographic longitude", false))
+                        (form_field("Country Codes", "region-country-codes", "country_codes", "text", &countries_csv, "Two-letter codes, comma-separated", false))
                     }
                     (checkbox("is_default", "true", "Set as default region", is_default, true))
                     (voice_restriction_fields("edit", vip_only, &features_csv, &guild_ids_csv))
@@ -241,6 +244,7 @@ fn create_region_form(config: &AdminConfig, csrf_token: &str) -> Markup {
                         (form_field("Emoji", "new-region-emoji", "emoji", "text", "", "Flag emoji", true))
                         (form_field("Latitude", "new-region-latitude", "latitude", "number", "", "40.7128", true))
                         (form_field("Longitude", "new-region-longitude", "longitude", "number", "", "-74.0060", true))
+                        (form_field("Country Codes", "new-region-country-codes", "country_codes", "text", "", "RU,BY", true))
                     }
                     (checkbox("is_default", "true", "Set as default region", false, true))
                     (voice_restriction_fields("create", false, "", ""))

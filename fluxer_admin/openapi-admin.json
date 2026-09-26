@@ -9045,6 +9045,12 @@
 					"latitude": {"description": "Geographic latitude coordinate", "type": "number"},
 					"longitude": {"description": "Geographic longitude coordinate", "type": "number"},
 					"is_default": {"description": "Whether this is the default region", "type": "boolean"},
+					"country_codes": {
+						"description": "ISO 3166-1 alpha-2 country codes routed to this region",
+						"maxItems": 249,
+						"type": "array",
+						"items": {"type": "string"}
+					},
 					"vip_only": {"description": "Whether this region is restricted to VIP users", "type": "boolean"},
 					"required_guild_features": {
 						"description": "Guild features required to use this region",
@@ -9091,6 +9097,12 @@
 							"latitude": {"type": "number", "description": "Geographic latitude coordinate"},
 							"longitude": {"type": "number", "description": "Geographic longitude coordinate"},
 							"is_default": {"type": "boolean", "description": "Whether this is the default region"},
+							"country_codes": {
+								"maxItems": 249,
+								"type": "array",
+								"items": {"type": "string", "minLength": 2, "maxLength": 2},
+								"description": "ISO 3166-1 alpha-2 country codes routed to this region"
+							},
 							"vip_only": {"type": "boolean", "description": "Whether this region is restricted to VIP users"},
 							"required_guild_features": {
 								"maxItems": 100,
@@ -9133,6 +9145,7 @@
 							"latitude",
 							"longitude",
 							"is_default",
+							"country_codes",
 							"vip_only",
 							"required_guild_features",
 							"allowed_guild_ids",
@@ -9155,6 +9168,13 @@
 					"latitude": {"type": "number", "description": "Geographic latitude coordinate"},
 					"longitude": {"type": "number", "description": "Geographic longitude coordinate"},
 					"is_default": {"default": false, "description": "Whether this is the default region", "type": "boolean"},
+					"country_codes": {
+						"default": [],
+						"description": "ISO 3166-1 alpha-2 country codes routed to this region",
+						"maxItems": 249,
+						"type": "array",
+						"items": {"type": "string"}
+					},
 					"vip_only": {
 						"default": false,
 						"description": "Whether this region is restricted to VIP users",
@@ -9207,6 +9227,12 @@
 								"latitude": {"type": "number", "description": "Geographic latitude coordinate"},
 								"longitude": {"type": "number", "description": "Geographic longitude coordinate"},
 								"is_default": {"type": "boolean", "description": "Whether this is the default region"},
+								"country_codes": {
+									"maxItems": 249,
+									"type": "array",
+									"items": {"type": "string", "minLength": 2, "maxLength": 2},
+									"description": "ISO 3166-1 alpha-2 country codes routed to this region"
+								},
 								"vip_only": {"type": "boolean", "description": "Whether this region is restricted to VIP users"},
 								"required_guild_features": {
 									"maxItems": 100,
@@ -9249,6 +9275,7 @@
 								"latitude",
 								"longitude",
 								"is_default",
+								"country_codes",
 								"vip_only",
 								"required_guild_features",
 								"allowed_guild_ids",
@@ -15801,6 +15828,12 @@
 					"latitude": {"type": "number", "description": "Geographic latitude coordinate"},
 					"longitude": {"type": "number", "description": "Geographic longitude coordinate"},
 					"is_default": {"type": "boolean", "description": "Whether this is the default region"},
+					"country_codes": {
+						"maxItems": 249,
+						"type": "array",
+						"items": {"type": "string", "minLength": 2, "maxLength": 2},
+						"description": "ISO 3166-1 alpha-2 country codes routed to this region"
+					},
 					"vip_only": {"type": "boolean", "description": "Whether this region is restricted to VIP users"},
 					"required_guild_features": {
 						"maxItems": 100,
@@ -15838,6 +15871,7 @@
 					"latitude",
 					"longitude",
 					"is_default",
+					"country_codes",
 					"vip_only",
 					"required_guild_features",
 					"allowed_guild_ids",

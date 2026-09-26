@@ -7,6 +7,7 @@ export interface VoiceRegionRow {
 	latitude: number;
 	longitude: number;
 	is_default: boolean | null;
+	country_codes: Set<string> | null;
 	vip_only: boolean | null;
 	required_guild_features: Set<string> | null;
 	allowed_guild_ids: Set<bigint> | null;
@@ -22,6 +23,7 @@ export const VOICE_REGION_COLUMNS = [
 	'latitude',
 	'longitude',
 	'is_default',
+	'country_codes',
 	'vip_only',
 	'required_guild_features',
 	'allowed_guild_ids',

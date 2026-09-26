@@ -48,6 +48,7 @@ pub(crate) fn build_region_body(form: &MultiValueForm) -> serde_json::Value {
         body.insert("longitude".into(), lng.into());
     }
     body.insert("is_default".into(), form.bool_value("is_default").into());
+    insert_submitted_list(&mut body, form, "country_codes");
     body.insert("vip_only".into(), form.bool_value("vip_only").into());
     insert_submitted_list(&mut body, form, "required_guild_features");
     insert_submitted_list(&mut body, form, "allowed_guild_ids");

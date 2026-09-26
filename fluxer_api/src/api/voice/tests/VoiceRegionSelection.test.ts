@@ -4,6 +4,7 @@ import type {VoiceRegionAvailability, VoiceServerRecord} from '@app/api/voice/Vo
 import {
 	preferServersUnderSoftLimit,
 	resolveVoiceRegionPreference,
+	selectCountryVoiceRegionId,
 	selectClosestPseudoRegionServer,
 	selectVoiceRegionId,
 } from '@app/api/voice/VoiceRegionSelection';
@@ -27,6 +28,7 @@ function createRegionAvailability({
 		latitude,
 		longitude,
 		isDefault,
+		countryCodes: [],
 		vipOnly: false,
 		requiredGuildFeatures: [],
 		isAccessible: true,
@@ -301,5 +303,173 @@ describe('VoiceRegionSelection', () => {
 			softConnectionLimit: 0,
 		});
 		expect(preferServersUnderSoftLimit([serverA], new Map([['a1', 500]]))).toEqual([serverA]);
+	});
+	it('selects a configured country region in automatic mode', () => {
+		const regions = [
+			{
+				...createRegionAvailability({
+					id: 'moscow',
+					latitude: 55.75,
+					longitude: 37.61,
+					isDefault: false,
+				}),
+				countryCodes: ['RU'],
+			},
+			{
+				...createRegionAvailability({
+					id: 'eu',
+					latitude: 50,
+					longitude: 10,
+					isDefault: true,
+				}),
+				countryCodes: ['UA'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'RU',
+			mode: 'automatic',
+			accessibleRegions: regions,
+		});
+
+		expect(selected).toBe('moscow');
+	});
+
+	it('matches country codes case-insensitively', () => {
+		const regions = [
+			{
+				...createRegionAvailability({
+					id: 'moscow',
+					latitude: 55.75,
+					longitude: 37.61,
+					isDefault: false,
+				}),
+				countryCodes: ['RU'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'ru',
+			mode: 'automatic',
+			accessibleRegions: regions,
+		});
+
+		expect(selected).toBe('moscow');
+	});
+
+	it('does not use country routing in explicit mode', () => {
+		const regions = [
+			{
+				...createRegionAvailability({
+					id: 'moscow',
+					latitude: 55.75,
+					longitude: 37.61,
+					isDefault: false,
+				}),
+				countryCodes: ['RU'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'RU',
+			mode: 'explicit',
+			accessibleRegions: regions,
+		});
+
+		expect(selected).toBeNull();
+	});
+
+	it('does not select an inaccessible country region', () => {
+		const regions = [
+			{
+				...createRegionAvailability({
+					id: 'moscow',
+					latitude: 55.75,
+					longitude: 37.61,
+					isDefault: false,
+				}),
+				countryCodes: ['RU'],
+				isAccessible: false,
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'RU',
+			mode: 'automatic',
+			accessibleRegions: regions.filter((region) => region.isAccessible),
+		});
+
+		expect(selected).toBeNull();
+	});
+
+	it('returns no country region when the country is not configured', () => {
+		const regions = [
+			{
+				...createRegionAvailability({
+					id: 'moscow',
+					latitude: 55.75,
+					longitude: 37.61,
+					isDefault: false,
+				}),
+				countryCodes: ['RU'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'DE',
+			mode: 'automatic',
+			accessibleRegions: regions,
+		});
+
+		expect(selected).toBeNull();
+	});
+
+	it('selects one of multiple accessible regions configured for the country', () => {
+		const regions = [
+			{
+				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5}),
+				countryCodes: ['DE'],
+			},
+			{
+				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10}),
+				countryCodes: ['DE'],
+			},
+			{
+				...createRegionAvailability({id: 'warsaw', latitude: 52, longitude: 21}),
+				countryCodes: ['PL'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'DE',
+			mode: 'automatic',
+			accessibleRegions: regions,
+			selectionKey: 'user-1',
+		});
+
+		expect(['eu-west', 'eu-central']).toContain(selected);
+	});
+
+	it('ignores inaccessible regions when multiple regions match the country', () => {
+		const regions = [
+			{
+				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5}),
+				countryCodes: ['DE'],
+				isAccessible: false,
+			},
+			{
+				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10}),
+				countryCodes: ['DE'],
+			},
+		];
+
+		const selected = selectCountryVoiceRegionId({
+			countryCode: 'DE',
+			mode: 'automatic',
+			accessibleRegions: regions,
+			selectionKey: 'user-1',
+		});
+
+		expect(selected).toBe('eu-central');
 	});
 });

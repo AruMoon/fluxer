@@ -74,6 +74,31 @@ export function selectVoiceRegionId({
 	return availableRegions[0]?.id ?? null;
 }
 
+export function selectCountryVoiceRegionId({
+	countryCode,
+	mode,
+	accessibleRegions,
+	selectionKey,
+}: {
+	countryCode?: string;
+	mode: VoiceRegionPreference['mode'];
+	accessibleRegions: Array<VoiceRegionAvailability>;
+	selectionKey: string;
+}): string | null {
+	if (mode !== 'automatic' || !countryCode) {
+		return null;
+	}
+
+	const normalizedCountryCode = countryCode.trim().toUpperCase();
+	if (!normalizedCountryCode) {
+		return null;
+	}
+
+	const matchingRegionIds = accessibleRegions.filter((region) => region.countryCodes.includes(normalizedCountryCode)).map((region) => region.id);
+
+	return selectBalancedRegionId(matchingRegionIds, selectionKey);
+}
+
 export function selectClosestPseudoRegionServer({
 	mode,
 	accessibleServers,

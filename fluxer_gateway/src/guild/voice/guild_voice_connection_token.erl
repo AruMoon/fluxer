@@ -8,6 +8,7 @@
 -export([request_voice_token/5]).
 -export([request_voice_token/6]).
 -export([request_voice_token/8]).
+-export([request_voice_token/9]).
 
 -spec request_voice_token(integer(), integer(), integer(), map()) ->
     {ok, map()} | {error, term()}.
@@ -61,6 +62,49 @@ request_voice_token(
         ConnectionId,
         Latitude,
         Longitude,
+        VoicePermissions,
+        TokenNonce
+    ),
+    log_token_start(GuildId, ChannelId, UserId, ConnectionId, TokenNonce),
+    case rpc_client:call(Req) of
+        {ok, Data} ->
+            handle_token_success(GuildId, ChannelId, UserId, Data);
+        {error, {rpc_error, Status, Body}} ->
+            handle_token_rpc_error(GuildId, ChannelId, UserId, ConnectionId, Status, Body);
+        {error, Reason} ->
+            handle_token_error(GuildId, ChannelId, UserId, ConnectionId, Reason)
+    end.
+
+-spec request_voice_token(
+    integer(),
+    integer(),
+    integer(),
+    binary() | null,
+    map(),
+    binary() | null,
+    binary() | undefined | null,
+    binary() | undefined | null,
+    binary() | undefined | null
+) -> {ok, map()} | {error, term()}.
+request_voice_token(
+    GuildId,
+    ChannelId,
+    UserId,
+    ConnectionId,
+    VoicePermissions,
+    TokenNonce,
+    Latitude,
+    Longitude,
+    CountryCode
+) ->
+    Req = voice_utils:build_voice_token_rpc_request(
+        GuildId,
+        ChannelId,
+        UserId,
+        ConnectionId,
+        Latitude,
+        Longitude,
+        CountryCode,
         VoicePermissions,
         TokenNonce
     ),

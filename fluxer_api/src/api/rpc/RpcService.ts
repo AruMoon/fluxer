@@ -479,6 +479,7 @@ export class RpcService {
 					userId: createUserID(request.user_id),
 					connectionId: request.connection_id,
 					region: request.rtc_region,
+					countryCode: request.country_code,
 					latitude: request.latitude,
 					longitude: request.longitude,
 					canSpeak: request.can_speak,

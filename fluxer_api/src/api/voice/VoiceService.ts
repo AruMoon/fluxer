@@ -13,6 +13,7 @@ import type {VoiceAccessContext, VoiceAvailabilityService} from '@app/api/voice/
 import type {VoiceRegionAvailability, VoiceServerRecord} from '@app/api/voice/VoiceModel';
 import {
 	resolveVoiceRegionPreference,
+	selectCountryVoiceRegionId,
 	selectClosestPseudoRegionServer,
 	selectVoiceRegionId,
 } from '@app/api/voice/VoiceRegionSelection';
@@ -32,6 +33,7 @@ interface GetVoiceTokenParams {
 	userId: UserID;
 	connectionId?: string;
 	region?: string;
+	countryCode?: string;
 	latitude?: string;
 	longitude?: string;
 	canSpeak?: boolean;
@@ -157,20 +159,46 @@ export class VoiceService {
 			serverId = resolvedPinnedServer.serverId;
 			serverEndpoint = resolvedPinnedServer.endpoint;
 		}
+		const countryRegionId = selectCountryVoiceRegionId({
+			countryCode: params.countryCode,
+			mode: regionPreference.mode,
+			accessibleRegions,
+		});
 		if (!serverId) {
-			const pseudoRegionServer = selectClosestPseudoRegionServer({
-				mode: regionPreference.mode,
-				accessibleServers,
-				connectionCounts: this.voiceAvailabilityService.getServerConnectionCounts(),
-				latitude: params.latitude,
-				longitude: params.longitude,
-				selectionKey,
-			});
-			if (pseudoRegionServer) {
-				regionId = pseudoRegionServer.regionId;
-				serverId = pseudoRegionServer.serverId;
-				serverEndpoint = pseudoRegionServer.endpoint;
-			} else {
+			let serverSelection = null;
+
+			if (countryRegionId !== null) {
+				serverSelection = this.selectServerForRegion({
+					regionId: countryRegionId,
+					context,
+					accessibleRegions,
+					allowRegionFallback: false,
+				});
+			}
+
+			if (serverSelection) {
+				regionId = serverSelection.regionId;
+				serverId = serverSelection.server.serverId;
+				serverEndpoint = serverSelection.server.endpoint;
+			}
+
+			if (!serverId) {
+				const pseudoRegionServer = selectClosestPseudoRegionServer({
+					mode: regionPreference.mode,
+					accessibleServers,
+					connectionCounts: this.voiceAvailabilityService.getServerConnectionCounts(),
+					latitude: params.latitude,
+					longitude: params.longitude,
+					selectionKey,
+				});
+				if (pseudoRegionServer) {
+					regionId = pseudoRegionServer.regionId;
+					serverId = pseudoRegionServer.serverId;
+					serverEndpoint = pseudoRegionServer.endpoint;
+				}
+			}
+
+			if (!serverId) {
 				regionId = selectVoiceRegionId({
 					preferredRegionId: regionPreference.regionId,
 					mode: regionPreference.mode,
@@ -183,7 +211,7 @@ export class VoiceService {
 				if (!regionId) {
 					throw new FeatureTemporarilyDisabledError();
 				}
-				const serverSelection = this.selectServerForRegion({
+				serverSelection = this.selectServerForRegion({
 					regionId,
 					context,
 					accessibleRegions,
@@ -310,10 +338,12 @@ export class VoiceService {
 		regionId,
 		context,
 		accessibleRegions,
+		allowRegionFallback = true,
 	}: {
 		regionId: string;
 		context: VoiceAccessContext;
 		accessibleRegions: Array<VoiceRegionAvailability>;
+		allowRegionFallback?: boolean,
 	}): {
 		regionId: string;
 		server: VoiceServerRecord;
@@ -321,6 +351,9 @@ export class VoiceService {
 		const initialServer = this.voiceAvailabilityService.selectServer(regionId, context);
 		if (initialServer) {
 			return {regionId, server: initialServer};
+		}
+		if (!allowRegionFallback) {
+			return null;
 		}
 		const fallbackRegion = accessibleRegions.find((region) => region.id !== regionId);
 		if (fallbackRegion) {

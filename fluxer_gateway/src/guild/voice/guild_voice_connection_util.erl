@@ -61,7 +61,8 @@ build_context(Request0) ->
         latitude => Coord(maps:get(latitude, Request, undefined)),
         longitude => Coord(maps:get(longitude, Request, undefined)),
         e2ee_capable => Norm(maps:get(e2ee_capable, Request, false)),
-        bot => Norm(maps:get(bot, Request, false))
+        bot => Norm(maps:get(bot, Request, false)),
+        country_code => guild_voice_connection_normalize:normalize_optional_binary(maps:get(country_code, Request, undefined))
     }.
 
 -spec voice_flags_for_permissions(context(), voice_utils:voice_permissions()) -> voice_flags().
