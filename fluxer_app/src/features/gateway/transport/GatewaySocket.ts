@@ -503,14 +503,13 @@ export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 		options: {useCurrentConnectionFallback: boolean},
 	): GatewayPayload {
 		const isMobileLayout = MobileLayout.isMobileLayout();
-		const {countryCode, latitude, longitude} = GeoIP;
+		const {latitude, longitude} = GeoIP;
 		return {
 			op: GatewayOpcodes.VOICE_STATE_UPDATE,
 			d: {
 				...params,
 				connection_id: params.connection_id ?? (options.useCurrentConnectionFallback ? MediaEngine.connectionId : null),
 				is_mobile: isMobileLayout,
-				country_code: countryCode ?? undefined,
 				latitude: latitude ?? undefined,
 				longitude: longitude ?? undefined,
 			},

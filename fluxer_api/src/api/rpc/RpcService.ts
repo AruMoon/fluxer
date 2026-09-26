@@ -473,13 +473,14 @@ export class RpcService {
 				if (this.voiceService === null) {
 					throw new Error('Voice is not enabled on this server');
 				}
+				const serverGeoip = request.client_ip !== undefined ? await lookupGeoip(request.client_ip) : null;
 				const result = await this.voiceService.getVoiceToken({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),
 					connectionId: request.connection_id,
 					region: request.rtc_region,
-					countryCode: request.country_code,
+					countryCode: serverGeoip?.countryCode ?? undefined,
 					latitude: request.latitude,
 					longitude: request.longitude,
 					canSpeak: request.can_speak,

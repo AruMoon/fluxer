@@ -95,7 +95,7 @@ request_voice_token(
     TokenNonce,
     Latitude,
     Longitude,
-    CountryCode
+    ClientIP
 ) ->
     Req = voice_utils:build_voice_token_rpc_request(
         GuildId,
@@ -104,7 +104,7 @@ request_voice_token(
         ConnectionId,
         Latitude,
         Longitude,
-        CountryCode,
+        ClientIP,
         VoicePermissions,
         TokenNonce
     ),

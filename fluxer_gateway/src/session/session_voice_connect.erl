@@ -64,7 +64,8 @@ extract_voice_params(Data) ->
         viewer_stream_keys => maps:get(<<"viewer_stream_keys">>, Data, undefined),
         is_mobile => maps:get(<<"is_mobile">>, Data, false),
         latitude => maps:get(<<"latitude">>, Data, null),
-        longitude => maps:get(<<"longitude">>, Data, null)
+        longitude => maps:get(<<"longitude">>, Data, null),
+        client_ip => maps:get(<<"client_ip">>, Data, undefined)
     }.
 
 -spec dispatch_validated(
@@ -501,6 +502,7 @@ build_guild_request(ChId, Params, UserId, SId, E2EE, Bot) ->
         is_mobile => maps:get(is_mobile, Params),
         latitude => maps:get(latitude, Params),
         longitude => maps:get(longitude, Params),
+        client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
         bot => Bot
     }.

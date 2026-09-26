@@ -97,7 +97,7 @@ build_voice_token_rpc_request(
     ConnectionId,
     Latitude,
     Longitude,
-    CountryCode,
+    ClientIP,
     VoicePermissions,
     TokenNonce
 ) ->
@@ -111,9 +111,9 @@ build_voice_token_rpc_request(
         VoicePermissions,
         TokenNonce
     ),
-    case CountryCode of
-        CountryCodeBin when is_binary(CountryCodeBin), byte_size(CountryCodeBin) > 0 ->
-            BaseReq#{<<"country_code">> => CountryCodeBin};
+    case ClientIP of
+        ClientIPBin when is_binary(ClientIPBin), byte_size(ClientIPBin) > 0 ->
+            BaseReq#{<<"client_ip">> => ClientIPBin};
         _ ->
             BaseReq
     end.
