@@ -14,7 +14,7 @@ function createRegionAvailability({
 	id,
 	latitude,
 	longitude,
-	isDefault,
+	isDefault = false,
 }: {
 	id: string;
 	latitude: number;
