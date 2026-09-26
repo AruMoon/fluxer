@@ -128,6 +128,7 @@ export class VoiceAvailabilityService {
 				latitude: region.latitude,
 				longitude: region.longitude,
 				isDefault: region.isDefault,
+				countryCodes: region.countryCodes,
 				vipOnly: region.restrictions.vipOnly,
 				requiredGuildFeatures: Array.from(region.restrictions.requiredGuildFeatures),
 				serverCount: servers.length,

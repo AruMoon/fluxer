@@ -8842,6 +8842,10 @@
 					"type": "boolean"
 				},
 				{
+					"name": "country_codes",
+					"type": "set<text>"
+				},
+				{
 					"name": "vip_only",
 					"type": "boolean"
 				},

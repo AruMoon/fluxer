@@ -117,6 +117,7 @@ export class VoiceTopology {
 				latitude: region.latitude,
 				longitude: region.longitude,
 				isDefault: region.isDefault,
+				countryCodes: region.countryCodes,
 				restrictions: {
 					vipOnly: region.restrictions.vipOnly,
 					requiredGuildFeatures: new Set(region.restrictions.requiredGuildFeatures),

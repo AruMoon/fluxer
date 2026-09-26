@@ -134,6 +134,7 @@ export const RpcRequest = z.discriminatedUnion('type', [
 			.describe(
 				`Preferred voice region for the connection (${RTC_REGION_ID_MIN_LENGTH}-${RTC_REGION_ID_MAX_LENGTH} characters)`,
 			),
+		country_code: createStringType(2, 2).optional().describe('Two-letter country code for voice region selection'),
 		latitude: createStringType(1, 32).optional().describe('Client latitude for region selection'),
 		longitude: createStringType(1, 32).optional().describe('Client longitude for region selection'),
 		can_speak: z.boolean().optional().describe('Whether the user can speak in the channel'),

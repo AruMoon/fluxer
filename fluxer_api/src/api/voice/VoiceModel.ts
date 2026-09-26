@@ -16,6 +16,7 @@ export interface VoiceRegionRecord {
 	latitude: number;
 	longitude: number;
 	isDefault: boolean;
+	countryCodes: Array<string>;
 	restrictions: VoiceRestriction;
 	createdAt: Date | null;
 	updatedAt: Date | null;
@@ -52,6 +53,7 @@ export interface VoiceRegionMetadata {
 }
 
 export interface VoiceRegionAvailability extends VoiceRegionMetadata {
+	countryCodes: Array<string>;
 	isAccessible: boolean;
 	restrictions: VoiceRestriction;
 	serverCount: number;

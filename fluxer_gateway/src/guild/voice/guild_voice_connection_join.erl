@@ -156,6 +156,7 @@ request_token_and_build(Context, Member, ParsedViewerStreamKey, State, GuildId, 
     TokenNonce = voice_utils:generate_token_nonce(),
     Latitude = maps:get(latitude, Context, undefined),
     Longitude = maps:get(longitude, Context, undefined),
+    CountryCode = maps:get(country_code, Context, undefined),
     case
         guild_voice_connection_token:request_voice_token(
             GuildId,
@@ -165,7 +166,8 @@ request_token_and_build(Context, Member, ParsedViewerStreamKey, State, GuildId, 
             VoicePermissions,
             TokenNonce,
             Latitude,
-            Longitude
+            Longitude,
+            CountryCode
         )
     of
         {ok, TokenData} ->

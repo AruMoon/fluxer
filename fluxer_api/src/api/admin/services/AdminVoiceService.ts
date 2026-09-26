@@ -50,6 +50,10 @@ interface VoiceAuditParams {
 	metadata: Map<string, string>;
 }
 
+function normalizeVoiceCountryCodes(countryCodes: Array<string>): Array<string> {
+	return [...new Set(countryCodes.map((code) => code.trim().toUpperCase()))];
+}
+
 function buildVoiceRestrictions(data: VoiceRestrictionData): VoiceRegionRecord['restrictions'] {
 	return {
 		vipOnly: data.vip_only ?? false,
@@ -141,6 +145,7 @@ export class AdminVoiceService {
 			latitude: data.latitude,
 			longitude: data.longitude,
 			isDefault: data.is_default ?? false,
+			countryCodes: normalizeVoiceCountryCodes(data.country_codes ?? []),
 			restrictions: buildVoiceRestrictions(data),
 		});
 		await this.publishVoiceConfiguration({type: 'region_created', regionId: region.id});
@@ -171,6 +176,7 @@ export class AdminVoiceService {
 		if (data.latitude !== undefined) updates.latitude = data.latitude;
 		if (data.longitude !== undefined) updates.longitude = data.longitude;
 		if (data.is_default !== undefined) updates.isDefault = data.is_default;
+		if (data.country_codes !== undefined) updates.countryCodes = normalizeVoiceCountryCodes(data.country_codes);
 		updates.restrictions = patchVoiceRestrictions(existing.restrictions, data);
 		updates.updatedAt = new Date();
 		await voiceRepository.upsertRegion(updates);
@@ -323,6 +329,7 @@ export class AdminVoiceService {
 			latitude: region.latitude,
 			longitude: region.longitude,
 			is_default: region.isDefault,
+			country_codes: region.countryCodes,
 			vip_only: region.restrictions.vipOnly,
 			required_guild_features: Array.from(region.restrictions.requiredGuildFeatures),
 			allowed_guild_ids: allowedGuildIds,

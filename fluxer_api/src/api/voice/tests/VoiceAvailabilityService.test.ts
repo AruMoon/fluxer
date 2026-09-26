@@ -16,6 +16,7 @@ function createMockRegion(overrides: Partial<VoiceRegionRecord> = {}): VoiceRegi
 		latitude: 39.8283,
 		longitude: -98.5795,
 		isDefault: true,
+		countryCodes: [],
 		restrictions: {
 			vipOnly: false,
 			requiredGuildFeatures: new Set(),

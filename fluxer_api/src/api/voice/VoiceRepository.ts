@@ -81,6 +81,7 @@ export class VoiceRepository implements IVoiceRepository {
 			latitude: region.latitude,
 			longitude: region.longitude,
 			is_default: region.isDefault,
+			country_codes: new Set(region.countryCodes.map((code) => code.toUpperCase())),
 			vip_only: region.restrictions.vipOnly,
 			required_guild_features: new Set(region.restrictions.requiredGuildFeatures),
 			allowed_guild_ids: new Set(Array.from(region.restrictions.allowedGuildIds).map((id) => BigInt(id))),
@@ -170,6 +171,9 @@ export class VoiceRepository implements IVoiceRepository {
 			latitude: row.latitude,
 			longitude: row.longitude,
 			isDefault: row.is_default ?? false,
+			countryCodes: Array.from(row.country_codes ?? [])
+				.map((code) => code.toUpperCase())
+				.sort(),
 			restrictions: {
 				vipOnly: row.vip_only ?? false,
 				requiredGuildFeatures: new Set(toIterable<string>(row.required_guild_features)),

@@ -7,6 +7,7 @@
     build_voice_token_rpc_request/6,
     build_voice_token_rpc_request/7,
     build_voice_token_rpc_request/8,
+    build_voice_token_rpc_request/9,
     build_force_disconnect_rpc_request/4,
     build_list_participants_rpc_request/4,
     build_update_participant_rpc_request/5,
@@ -77,6 +78,45 @@ build_voice_token_rpc_request(GuildId, ChannelId, UserId, ConnectionId, Latitude
         end,
     WithConnection = add_connection_id_to_request(BaseReq, ConnectionId),
     add_geolocation_to_request(WithConnection, Latitude, Longitude).
+
+-spec build_voice_token_rpc_request(
+    integer() | null,
+    integer(),
+    integer(),
+    binary() | integer() | null,
+    coordinate_input(),
+    coordinate_input(),
+    binary() | undefined | null,
+    voice_permissions(),
+    binary() | null
+) -> map().
+build_voice_token_rpc_request(
+    GuildId,
+    ChannelId,
+    UserId,
+    ConnectionId,
+    Latitude,
+    Longitude,
+    CountryCode,
+    VoicePermissions,
+    TokenNonce
+) ->
+    BaseReq = build_voice_token_rpc_request(
+        GuildId,
+        ChannelId,
+        UserId,
+        ConnectionId,
+        Latitude,
+        Longitude,
+        VoicePermissions,
+        TokenNonce
+    ),
+    case CountryCode of
+        CountryCodeBin when is_binary(CountryCodeBin), byte_size(CountryCodeBin) > 0 ->
+            BaseReq#{<<"country_code">> => CountryCodeBin};
+        _ ->
+            BaseReq
+    end.
 
 -spec add_geolocation_to_request(
     map(),
