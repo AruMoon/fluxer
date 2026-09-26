@@ -48,6 +48,11 @@ add_rtc_region_to_request_test() ->
     ?assertNot(maps:is_key(<<"rtc_region">>, WithoutRegion)).
 
 build_voice_token_rpc_request_with_client_ip_test() ->
+    VoicePerms = #{
+        can_speak => true,
+        can_stream => true,
+        can_video => true
+    },
     Req = voice_utils:build_voice_token_rpc_request(
         123,
         456,

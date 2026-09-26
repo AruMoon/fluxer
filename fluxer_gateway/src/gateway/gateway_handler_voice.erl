@@ -80,14 +80,18 @@ process_voice_update(SessionPid, Data, State) ->
             {ok, State}
     end.
 
+-spec sanitize_voice_update_data(map()) -> map().
+sanitize_voice_update_data(Data) ->
+    maps:remove(<<"client_ip">>, Data).
+
 -spec log_voice_update_call_failure(atom(), term(), pid(), map()) -> ok.
 log_voice_update_call_failure(exit, {timeout, _}, SessionPid, Data) ->
     logger:warning("Gateway voice state update call timeout", #{
-        session_pid => SessionPid, data => Data
+        session_pid => SessionPid, data => sanitize_voice_update_data(Data)
     });
 log_voice_update_call_failure(exit, {noproc, _}, SessionPid, Data) ->
     logger:warning("Gateway voice state update call noproc", #{
-        session_pid => SessionPid, data => Data
+        session_pid => SessionPid, data => sanitize_voice_update_data(Data)
     });
 log_voice_update_call_failure(exit, Reason, SessionPid, _Data) ->
     logger:warning("Gateway voice state update call exit", #{
