@@ -15,6 +15,7 @@
     build_update_participant_permissions_rpc_request/5,
     add_geolocation_to_request/3,
     add_rtc_region_to_request/2,
+    add_client_ip_to_request/2,
     apply_voice_permissions_to_flags/2,
     compute_voice_permissions/3,
     generate_token_nonce/0
@@ -111,11 +112,15 @@ build_voice_token_rpc_request(
         VoicePermissions,
         TokenNonce
     ),
+    add_client_ip_to_request(BaseReq, ClientIP).
+
+-spec add_client_ip_to_request(map(), binary() | undefined | null) -> map().
+add_client_ip_to_request(RequestMap, ClientIP) ->
     case ClientIP of
         ClientIPBin when is_binary(ClientIPBin), byte_size(ClientIPBin) > 0 ->
-            BaseReq#{<<"client_ip">> => ClientIPBin};
+            RequestMap#{<<"client_ip">> => ClientIPBin};
         _ ->
-            BaseReq
+            RequestMap
     end.
 
 -spec add_geolocation_to_request(

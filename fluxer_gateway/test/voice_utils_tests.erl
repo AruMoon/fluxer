@@ -70,6 +70,29 @@ build_voice_token_rpc_request_with_client_ip_test() ->
     ?assertEqual(<<"37.0">>, maps:get(<<"longitude">>, Req)),
     ?assertNot(maps:is_key(<<"country_code">>, Req)).
 
+add_client_ip_to_request_adds_non_empty_ip_test() ->
+    BaseReq = #{
+        <<"type">> => <<"voice_get_token">>,
+        <<"channel_id">> => <<"123">>
+    },
+    Req = voice_utils:add_client_ip_to_request(
+        BaseReq,
+        <<"203.0.113.10">>
+    ),
+    ?assertEqual(
+        <<"203.0.113.10">>,
+        maps:get(<<"client_ip">>, Req)
+    ).
+
+add_client_ip_to_request_ignores_empty_ip_test() ->
+    BaseReq = #{
+        <<"type">> => <<"voice_get_token">>
+    },
+    ?assertEqual(
+        BaseReq,
+        voice_utils:add_client_ip_to_request(BaseReq, <<>>)
+    ).
+
 build_force_disconnect_rpc_request_test() ->
     Req = voice_utils:build_force_disconnect_rpc_request(123, 456, 789, <<"conn">>),
     ?assertEqual(<<"voice_force_disconnect_participant">>, maps:get(<<"type">>, Req)),

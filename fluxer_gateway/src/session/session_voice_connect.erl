@@ -275,6 +275,7 @@ handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, State) ->
         is_mobile => maps:get(is_mobile, Params),
         latitude => maps:get(latitude, Params),
         longitude => maps:get(longitude, Params),
+        client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
         bot => Bot
     },
@@ -349,10 +350,11 @@ log_dm_info(Tag, UserId, SId, ChId, Params) ->
 spawn_voice_token_fetch(ChId, UserId, SId, Params) ->
     Lat = maps:get(latitude, Params),
     Lon = maps:get(longitude, Params),
+    ClientIP = maps:get(client_ip, Params, undefined),
     SessionPid = self(),
     spawn(fun() ->
         dm_voice:get_voice_token(
-            ChId, UserId, SId, SessionPid, Lat, Lon
+            ChId, UserId, SId, SessionPid, Lat, Lon, ClientIP
         )
     end).
 
