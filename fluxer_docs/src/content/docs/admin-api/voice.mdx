@@ -56,6 +56,7 @@ The operator supplies `id` on creation. Channels reference it through `rtc_regio
 | latitude | number | The latitude placement measures distance from, in decimal degrees |
 | longitude | number | The longitude placement measures distance from, in decimal degrees |
 | is_default<sup>1</sup> | boolean | Whether automatic placement falls back to this region |
+| country_codes | array[string] | ISO 3166-1 alpha-2 country codes routed to this region (max 249) |
 | vip_only<sup>2</sup> | boolean | Whether the guild has to hold `VIP_VOICE` |
 | required_guild_features<sup>2</sup> | array[string] | [Guild features](/http-api/guilds/#guild-features) that admit a guild, any one of which is enough (max 100) |
 | allowed_guild_ids<sup>2</sup><sup>3</sup> | array[snowflake] | The guilds admitted without checking the other guild gates (max 1000) |
@@ -82,6 +83,7 @@ The operator supplies `id` on creation. Channels reference it through `rtc_regio
   "latitude": 59.33,
   "longitude": 18.06,
   "is_default": true,
+  "country_codes": ["SE"],
   "vip_only": false,
   "required_guild_features": [],
   "allowed_guild_ids": [],
@@ -259,6 +261,7 @@ Stores a region and returns it. Requires `voice:region:create`.
 | latitude | number | The latitude placement measures distance from, in decimal degrees |
 | longitude | number | The longitude placement measures distance from, in decimal degrees |
 | is_default? | boolean | Whether automatic placement falls back to this region (default false) |
+| country_codes? | array[string] | ISO 3166-1 alpha-2 country codes routed to this region (max 249, default empty) |
 | vip_only? | boolean | Whether the guild has to hold `VIP_VOICE` (default false) |
 | required_guild_features?<sup>2</sup> | array[string] | [Guild features](/http-api/guilds/#guild-features) that admit a guild (max 100 items, default empty) |
 | allowed_guild_ids? | array[snowflake] | The guilds admitted without checking the other guild gates (max 1000, default empty) |
@@ -313,6 +316,7 @@ Every field is optional and an omitted field is left unchanged. An absent, empty
 | latitude? | number | The latitude placement measures distance from, in decimal degrees |
 | longitude? | number | The longitude placement measures distance from, in decimal degrees |
 | is_default? | boolean | Whether automatic placement falls back to this region |
+| country_codes? | array[string] | ISO 3166-1 alpha-2 country codes routed to this region (max 249, default empty) |
 | vip_only? | boolean | Whether the guild has to hold `VIP_VOICE` |
 | required_guild_features?<sup>1</sup> | array[string] | [Guild features](/http-api/guilds/#guild-features) that admit a guild (max 100 items of 1-64 characters each) |
 | allowed_guild_ids?<sup>1</sup> | array[snowflake] | The guilds admitted without checking the other guild gates (max 1000) |

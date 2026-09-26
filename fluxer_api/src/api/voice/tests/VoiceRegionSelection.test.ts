@@ -4,8 +4,8 @@ import type {VoiceRegionAvailability, VoiceServerRecord} from '@app/api/voice/Vo
 import {
 	preferServersUnderSoftLimit,
 	resolveVoiceRegionPreference,
-	selectCountryVoiceRegionId,
 	selectClosestPseudoRegionServer,
+	selectCountryVoiceRegionId,
 	selectVoiceRegionId,
 } from '@app/api/voice/VoiceRegionSelection';
 import {describe, expect, it} from 'vitest';
@@ -19,7 +19,7 @@ function createRegionAvailability({
 	id: string;
 	latitude: number;
 	longitude: number;
-	isDefault: boolean;
+	isDefault?: boolean;
 }): VoiceRegionAvailability {
 	return {
 		id,
@@ -330,6 +330,7 @@ describe('VoiceRegionSelection', () => {
 			countryCode: 'RU',
 			mode: 'automatic',
 			accessibleRegions: regions,
+			selectionKey: 'guild:1:channel:1',
 		});
 
 		expect(selected).toBe('moscow');
@@ -352,6 +353,7 @@ describe('VoiceRegionSelection', () => {
 			countryCode: 'ru',
 			mode: 'automatic',
 			accessibleRegions: regions,
+			selectionKey: 'guild:1:channel:1',
 		});
 
 		expect(selected).toBe('moscow');
@@ -374,6 +376,7 @@ describe('VoiceRegionSelection', () => {
 			countryCode: 'RU',
 			mode: 'explicit',
 			accessibleRegions: regions,
+			selectionKey: 'guild:1:channel:1',
 		});
 
 		expect(selected).toBeNull();
@@ -397,6 +400,7 @@ describe('VoiceRegionSelection', () => {
 			countryCode: 'RU',
 			mode: 'automatic',
 			accessibleRegions: regions.filter((region) => region.isAccessible),
+			selectionKey: 'guild:1:channel:1',
 		});
 
 		expect(selected).toBeNull();
@@ -419,6 +423,7 @@ describe('VoiceRegionSelection', () => {
 			countryCode: 'DE',
 			mode: 'automatic',
 			accessibleRegions: regions,
+			selectionKey: 'guild:1:channel:1',
 		});
 
 		expect(selected).toBeNull();

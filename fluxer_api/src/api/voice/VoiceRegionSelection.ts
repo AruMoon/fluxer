@@ -94,7 +94,9 @@ export function selectCountryVoiceRegionId({
 		return null;
 	}
 
-	const matchingRegionIds = accessibleRegions.filter((region) => region.countryCodes.includes(normalizedCountryCode)).map((region) => region.id);
+	const matchingRegionIds = accessibleRegions
+		.filter((region) => region.countryCodes.includes(normalizedCountryCode))
+		.map((region) => region.id);
 
 	return selectBalancedRegionId(matchingRegionIds, selectionKey);
 }

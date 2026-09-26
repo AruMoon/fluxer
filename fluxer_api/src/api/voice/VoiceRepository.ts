@@ -171,7 +171,9 @@ export class VoiceRepository implements IVoiceRepository {
 			latitude: row.latitude,
 			longitude: row.longitude,
 			isDefault: row.is_default ?? false,
-			countryCodes: Array.from(row.country_codes ?? []).map((code) => code.toUpperCase()).sort(),
+			countryCodes: Array.from(row.country_codes ?? [])
+				.map((code) => code.toUpperCase())
+				.sort(),
 			restrictions: {
 				vipOnly: row.vip_only ?? false,
 				requiredGuildFeatures: new Set(toIterable<string>(row.required_guild_features)),

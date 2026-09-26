@@ -13,8 +13,8 @@ import type {VoiceAccessContext, VoiceAvailabilityService} from '@app/api/voice/
 import type {VoiceRegionAvailability, VoiceServerRecord} from '@app/api/voice/VoiceModel';
 import {
 	resolveVoiceRegionPreference,
-	selectCountryVoiceRegionId,
 	selectClosestPseudoRegionServer,
+	selectCountryVoiceRegionId,
 	selectVoiceRegionId,
 } from '@app/api/voice/VoiceRegionSelection';
 import {generateConnectionId} from '@app/api/words/Words';
@@ -163,6 +163,7 @@ export class VoiceService {
 			countryCode: params.countryCode,
 			mode: regionPreference.mode,
 			accessibleRegions,
+			selectionKey,
 		});
 		if (!serverId) {
 			let serverSelection = null;
@@ -222,6 +223,9 @@ export class VoiceService {
 				regionId = serverSelection.regionId;
 				serverId = serverSelection.server.serverId;
 				serverEndpoint = serverSelection.server.endpoint;
+			}
+			if (!serverId || !regionId || !serverEndpoint) {
+				throw new FeatureTemporarilyDisabledError();
 			}
 			await this.voiceRoomStore.pinRoomServer(guildId, channelId, regionId, serverId, serverEndpoint);
 		}
@@ -343,7 +347,7 @@ export class VoiceService {
 		regionId: string;
 		context: VoiceAccessContext;
 		accessibleRegions: Array<VoiceRegionAvailability>;
-		allowRegionFallback?: boolean,
+		allowRegionFallback?: boolean;
 	}): {
 		regionId: string;
 		server: VoiceServerRecord;

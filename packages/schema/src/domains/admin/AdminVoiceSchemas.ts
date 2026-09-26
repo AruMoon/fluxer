@@ -30,7 +30,10 @@ export const VoiceRegionAdminResponse = z.object({
 	latitude: z.number().describe('Geographic latitude coordinate'),
 	longitude: z.number().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().describe('Whether this is the default region'),
-	country_codes: z.array(createStringType(2, 2)).max(249).describe('ISO 3166-1 alpha-2 country codes routed to this region'),
+	country_codes: z
+		.array(createStringType(2, 2))
+		.max(249)
+		.describe('ISO 3166-1 alpha-2 country codes routed to this region'),
 	vip_only: z.boolean().describe('Whether this region is restricted to VIP users'),
 	required_guild_features: z.array(z.string()).max(100).describe('Guild features required to use this region'),
 	allowed_guild_ids: z.array(SnowflakeStringType).max(1000).describe('Guild IDs explicitly allowed to use this region'),
@@ -68,7 +71,12 @@ export const CreateVoiceRegionRequest = z.object({
 	latitude: z.number().describe('Geographic latitude coordinate'),
 	longitude: z.number().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().optional().default(false).describe('Whether this is the default region'),
-	country_codes: z.array(createStringType(2, 2)).max(249).optional().default([]).describe('ISO 3166-1 alpha-2 country codes routed to this region'),
+	country_codes: z
+		.array(createStringType(2, 2))
+		.max(249)
+		.optional()
+		.default([])
+		.describe('ISO 3166-1 alpha-2 country codes routed to this region'),
 	vip_only: z.boolean().optional().default(false).describe('Whether this region is restricted to VIP users'),
 	required_guild_features: z
 		.array(createStringType(1, 64))
@@ -99,7 +107,11 @@ export const UpdateVoiceRegionRequest = z.object({
 	latitude: z.number().optional().describe('Geographic latitude coordinate'),
 	longitude: z.number().optional().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().optional().describe('Whether this is the default region'),
-	country_codes: z.array(createStringType(2, 2)).max(249).optional().describe('ISO 3166-1 alpha-2 country codes routed to this region'),
+	country_codes: z
+		.array(createStringType(2, 2))
+		.max(249)
+		.optional()
+		.describe('ISO 3166-1 alpha-2 country codes routed to this region'),
 	vip_only: z.boolean().optional().describe('Whether this region is restricted to VIP users'),
 	required_guild_features: z
 		.array(createStringType(1, 64))
