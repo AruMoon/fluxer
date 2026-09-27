@@ -465,6 +465,21 @@ export class RpcService {
 						userIds: request.user_ids.map(createUserID),
 					}),
 				};
+			case 'voice_clear_room_server_pin': {
+				if (this.voiceService === null) {
+					throw new Error('Voice is not enabled on this server');
+				}
+				const cleared = await this.voiceService.clearRoomServerPinIfMatches({
+					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
+					channelId: createChannelID(request.channel_id),
+					regionId: request.region_id,
+					serverId: request.server_id,
+				});
+				return {
+					type: 'voice_clear_room_server_pin',
+					data: {success: cleared},
+				};
+			}
 			case 'voice_get_token': {
 				Logger.debug(
 					{type: 'voice_get_token', guildId: request.guild_id, channelId: request.channel_id, userId: request.user_id},
