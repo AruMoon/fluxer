@@ -60,6 +60,8 @@ build_pending(
         channel_id => ChannelId,
         connection_id => ConnectionId,
         session_id => SessionId,
+        region_id => maps:get(<<"region_id">>, maps:get(UserId, maps:get(voice_states, BaseState), #{}), undefined),
+        server_id => maps:get(<<"server_id">>, maps:get(UserId, maps:get(voice_states, BaseState), #{}), undefined),
         joined_at => erlang:system_time(millisecond)
     },
     erlang:send_after(
@@ -124,7 +126,7 @@ maybe_clear_empty_voice_room_pin(
 ) when is_map(RemovedVoiceState) ->
     case {maps:size(VoiceStates), maps:size(PendingConnections)} of
         {0, 0} ->
-            ChannelId = voice_state_utils:voice_state_channel_id(RemovedVoiceState),
+            ChannelId = maps:get(<<"channel_id">>, RemovedVoiceState, undefined),
             RegionId = maps:get(<<"region_id">>, RemovedVoiceState, undefined),
             ServerId = maps:get(<<"server_id">>, RemovedVoiceState, undefined),
             case {ChannelId, RegionId, ServerId} of
@@ -207,11 +209,14 @@ handle_disconnect_user(
         )
     of
         {not_found, _, _} ->
+            PendingVoiceState = maps:get(ConnectionId, PendingConns, undefined),
             NewPending = voice_pending_common:remove_pending_connection(
                 ConnectionId, PendingConns
             ),
+            NewState = State#{pending_connections => NewPending},
+            maybe_clear_empty_voice_room_pin(PendingVoiceState, NewState),
             Reply = #{success => true, ignored => true, reason => <<"not_in_call">>},
-            {reply, Reply, State#{pending_connections => NewPending}};
+            {reply, Reply, NewState};
         {channel_mismatch, _, _} ->
             Reply = #{success => true, ignored => true, reason => <<"channel_mismatch">>},
             {reply, Reply, State};
@@ -285,16 +290,22 @@ disconnect_user_after_pending_timeout(
     NewPending = voice_pending_common:remove_pending_connection(
         ConnectionId, PendingConns
     ),
+    NewState0 = State#{pending_connections => NewPending},
     case maps:is_key(UserId, VoiceStates) of
         true ->
-            {noreply, State#{pending_connections => NewPending}};
+            {noreply, NewState0};
         false ->
             NewSessions = call_state:remove_session_entry(
                 SessionId, Sessions
             ),
-            {noreply, State#{
-                pending_connections => NewPending, sessions => NewSessions
-            }}
+            NewState = NewState0#{
+                sessions => NewSessions
+            },
+            maybe_clear_empty_voice_room_pin(
+                maps:get(ConnectionId, PendingConns, undefined),
+                NewState
+            ),
+            {noreply, NewState}
     end.
 
 -spec maybe_notify_session_force_disconnect(
