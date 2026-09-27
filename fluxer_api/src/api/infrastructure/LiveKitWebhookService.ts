@@ -354,8 +354,8 @@ export class LiveKitWebhookService {
 			`Processing LiveKit ${event.event} event`,
 		);
 		try {
+			const guildId = context.type === 'guild' ? context.guildId : undefined;
 			if (raw.region_id && raw.server_id) {
-				const guildId = context.type === 'guild' ? context.guildId : undefined;
 				const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
 				if (pinnedServer && (pinnedServer.regionId !== raw.region_id || pinnedServer.serverId !== raw.server_id)) {
 					Logger.debug(
@@ -407,7 +407,6 @@ export class LiveKitWebhookService {
 				);
 				return;
 			}
-			const guildId = context.type === 'guild' ? context.guildId : undefined;
 			Logger.info(
 				{
 					type: context.type,
@@ -435,6 +434,38 @@ export class LiveKitWebhookService {
 				},
 				'LiveKit participant_left voice disconnect result',
 			);
+			if (!result.success) {
+				return;
+			}
+			const voiceStateResult = await this.gatewayService.getVoiceStatesForChannel({
+				guildId,
+				channelId: context.channelId,
+			});
+			if (voiceStateResult.voiceStates.length !== 0) {
+				return;
+			}
+			if (!raw.region_id || !raw.server_id) {
+				return;
+			}
+			// Re-read the pin so a stale leave event cannot clear a newer pin.
+			const currentPinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
+			if (
+				currentPinnedServer &&
+				currentPinnedServer.regionId === raw.region_id &&
+				currentPinnedServer.serverId === raw.server_id
+			) {
+				await this.voiceRoomStore.deleteRoomServer(guildId, context.channelId);
+				Logger.debug(
+					{
+						type: context.type,
+						guildId: guildId?.toString(),
+						channelId: context.channelId.toString(),
+						regionId: raw.region_id,
+						serverId: raw.server_id,
+					},
+					'Cleared voice room server pinning because the channel is now empty',
+				);
+			}
 		} catch (error) {
 			Logger.error({error, type: context.type}, 'Error processing participant_left');
 		}

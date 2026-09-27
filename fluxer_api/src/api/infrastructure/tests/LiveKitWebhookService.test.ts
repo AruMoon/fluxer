@@ -20,6 +20,33 @@ function roomFinished(name: string): WebhookEvent {
 	} as unknown as WebhookEvent;
 }
 
+function participantLeft(
+	eventName: 'participant_left' | 'participant_connection_aborted' = 'participant_left',
+	regionId = 'eu',
+	serverId = 'eu-1',
+): WebhookEvent {
+	return {
+		event: eventName,
+		room: {
+			name: `guild_${GUILD_ID}_channel_${CHANNEL_ID}`,
+			sid: 'RM_test',
+		},
+		participant: {
+			identity: 'user_3_conn-1',
+			metadata: JSON.stringify({
+				user_id: '3',
+				channel_id: CHANNEL_ID.toString(),
+				connection_id: 'conn-1',
+				guild_id: GUILD_ID.toString(),
+				token_nonce: 'nonce-1',
+				issued_at: '1',
+				region_id: regionId,
+				server_id: serverId,
+			}),
+		},
+	} as unknown as WebhookEvent;
+}
+
 function harness(pinnedServerId: string | null) {
 	const deleteRoomServer = vi.fn(async () => {});
 	const disconnectAllVoiceUsersInChannel = vi.fn(async () => ({disconnectedCount: 0}));
@@ -36,6 +63,73 @@ function harness(pinnedServerId: string | null) {
 		new VoiceTopology({} as unknown as IVoiceRepository, null),
 	);
 	return {service, deleteRoomServer, disconnectAllVoiceUsersInChannel};
+}
+
+function participantLeftHarness({
+	pinnedServerId = 'eu-1',
+	liveKitParticipantIdentities = [],
+	gatewayVoiceStateCount = 0,
+	gatewayDisconnectSuccess = true,
+}: {
+	pinnedServerId?: string | null;
+	liveKitParticipantIdentities?: Array<string>;
+	gatewayVoiceStateCount?: number;
+	gatewayDisconnectSuccess?: boolean;
+} = {}) {
+	const deleteRoomServer = vi.fn(async () => {});
+	const disconnectVoiceUserIfInChannel = vi.fn(async () => ({
+		success: gatewayDisconnectSuccess,
+	}));
+
+	const getVoiceStatesForChannel = vi.fn(async () => ({
+		voiceStates: Array.from({length: gatewayVoiceStateCount}, (_, index) => ({
+			connectionId: `conn-${index + 1}`,
+			userId: String(index + 10),
+			channelId: CHANNEL_ID.toString(),
+		})),
+	}));
+
+	const listParticipants = vi.fn(async () => ({
+		status: 'ok' as const,
+		participants: liveKitParticipantIdentities.map((identity) => ({identity})),
+	}));
+
+	const voiceRoomStore = {
+		getPinnedRoomServer: vi.fn(async () =>
+			pinnedServerId
+				? {
+						regionId: 'eu',
+						serverId: pinnedServerId,
+						endpoint: 'wss://eu-1.example',
+					}
+				: null,
+		),
+		deleteRoomServer,
+	} as unknown as IVoiceRoomStore;
+
+	const gatewayService = {
+		disconnectVoiceUserIfInChannel,
+		getVoiceStatesForChannel,
+	} as unknown as IGatewayService;
+
+	const liveKitService = {
+		listParticipants,
+	} as unknown as ILiveKitService;
+
+	const service = new LiveKitWebhookService(
+		voiceRoomStore,
+		gatewayService,
+		liveKitService,
+		new VoiceTopology({} as unknown as IVoiceRepository, null),
+	);
+
+	return {
+		service,
+		deleteRoomServer,
+		disconnectVoiceUserIfInChannel,
+		getVoiceStatesForChannel,
+		listParticipants,
+	};
 }
 
 describe('LiveKitWebhookService room_finished', () => {
@@ -64,5 +158,67 @@ describe('LiveKitWebhookService room_finished', () => {
 
 		expect(deleteRoomServer).not.toHaveBeenCalled();
 		expect(disconnectAllVoiceUsersInChannel).not.toHaveBeenCalled();
+	});
+});
+
+describe('LiveKitWebhookService participant_left', () => {
+	it.each(['participant_left', 'participant_connection_aborted'] as const)(
+		'clears the pin when the last voice user leaves via %s',
+		async (eventName) => {
+			const {service, deleteRoomServer, disconnectVoiceUserIfInChannel, getVoiceStatesForChannel} =
+				participantLeftHarness({
+					pinnedServerId: 'eu-1',
+					liveKitParticipantIdentities: [],
+					gatewayVoiceStateCount: 0,
+				});
+
+			await service.handleParticipantLeft(participantLeft(eventName));
+
+			expect(disconnectVoiceUserIfInChannel).toHaveBeenCalledTimes(1);
+			expect(getVoiceStatesForChannel).toHaveBeenCalledWith({
+				guildId: GUILD_ID,
+				channelId: CHANNEL_ID,
+			});
+			expect(deleteRoomServer).toHaveBeenCalledTimes(1);
+			expect(deleteRoomServer).toHaveBeenCalledWith(GUILD_ID, CHANNEL_ID);
+		},
+	);
+	it('keeps the pin when another voice user remains in the channel', async () => {
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
+			pinnedServerId: 'eu-1',
+			liveKitParticipantIdentities: [],
+			gatewayVoiceStateCount: 1,
+		});
+
+		await service.handleParticipantLeft(participantLeft());
+
+		expect(getVoiceStatesForChannel).toHaveBeenCalledTimes(1);
+		expect(deleteRoomServer).not.toHaveBeenCalled();
+	});
+	it('does not clear a pin for a participant_left event from a stale server', async () => {
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
+			pinnedServerId: 'eu-2',
+			liveKitParticipantIdentities: [],
+			gatewayVoiceStateCount: 0,
+		});
+
+		await service.handleParticipantLeft(participantLeft('participant_left', 'eu', 'eu-1'));
+
+		expect(deleteRoomServer).not.toHaveBeenCalled();
+		expect(getVoiceStatesForChannel).not.toHaveBeenCalled();
+	});
+	it('does not clear the pin when gateway voice state lookup fails', async () => {
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
+			pinnedServerId: 'eu-1',
+			liveKitParticipantIdentities: [],
+			gatewayVoiceStateCount: 0,
+		});
+
+		getVoiceStatesForChannel.mockRejectedValueOnce(new Error('gateway unavailable'));
+
+		await service.handleParticipantLeft(participantLeft());
+
+		expect(getVoiceStatesForChannel).toHaveBeenCalledTimes(1);
+		expect(deleteRoomServer).not.toHaveBeenCalled();
 	});
 });
