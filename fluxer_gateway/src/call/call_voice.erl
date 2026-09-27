@@ -126,9 +126,21 @@ maybe_clear_empty_voice_room_pin(
 ) when is_map(RemovedVoiceState) ->
     case {maps:size(VoiceStates), maps:size(PendingConnections)} of
         {0, 0} ->
-            ChannelId = maps:get(<<"channel_id">>, RemovedVoiceState, undefined),
-            RegionId = maps:get(<<"region_id">>, RemovedVoiceState, undefined),
-            ServerId = maps:get(<<"server_id">>, RemovedVoiceState, undefined),
+            ChannelId = maps:get(
+                <<"channel_id">>,
+                RemovedVoiceState,
+                maps:get(channel_id, RemovedVoiceState, undefined)
+            ),
+            RegionId = maps:get(
+                <<"region_id">>,
+                RemovedVoiceState,
+                maps:get(region_id, RemovedVoiceState, undefined)
+            ),
+            ServerId = maps:get(
+                <<"server_id">>,
+                RemovedVoiceState,
+                maps:get(server_id, RemovedVoiceState, undefined)
+            ),
             case {ChannelId, RegionId, ServerId} of
                 {CId, Region, Server} when
                     is_integer(CId),
