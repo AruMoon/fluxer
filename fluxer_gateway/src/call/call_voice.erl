@@ -471,6 +471,16 @@ clear_request_test_fun() ->
         ok
     end.
 
+receive_clear_request() ->
+    receive
+        {voice_room_pin_clear, _Request} = Message ->
+            Message;
+        _Other ->
+            receive_clear_request()
+    after 1000 ->
+        timeout
+    end.
+
 maybe_clear_empty_voice_room_pin_clears_dm_pin_test() ->
     State = #{
         voice_states => #{},
@@ -486,11 +496,7 @@ maybe_clear_empty_voice_room_pin_clears_dm_pin_test() ->
             <<"region_id">> => <<"us">>,
             <<"server_id">> => <<"us-1">>
         }},
-        receive
-            Message -> Message
-        after 1000 ->
-            timeout
-        end
+        receive_clear_request()
     ).
 
 maybe_clear_empty_voice_room_pin_clears_group_dm_pin_test() ->
@@ -509,11 +515,7 @@ maybe_clear_empty_voice_room_pin_clears_group_dm_pin_test() ->
             <<"region_id">> => <<"eu">>,
             <<"server_id">> => <<"eu-2">>
         }},
-        receive
-            Message -> Message
-        after 1000 ->
-            timeout
-        end
+        receive_clear_request()
     ).
 
 maybe_clear_empty_voice_room_pin_keeps_pin_for_remaining_user_test() ->
@@ -529,13 +531,7 @@ maybe_clear_empty_voice_room_pin_keeps_pin_for_remaining_user_test() ->
             State
         )
     ),
-    ?assertEqual(
-        timeout,
-        receive
-            Message -> Message
-        after 100 -> timeout
-        end
-    ).
+    ?assertEqual(timeout, receive_clear_request()).
 
 maybe_clear_empty_voice_room_pin_keeps_pin_for_pending_join_test() ->
     State = #{
@@ -550,12 +546,6 @@ maybe_clear_empty_voice_room_pin_keeps_pin_for_pending_join_test() ->
             State
         )
     ),
-    ?assertEqual(
-        timeout,
-        receive
-            Message -> Message
-        after 100 -> timeout
-        end
-    ).
+    ?assertEqual(timeout, receive_clear_request()).
 
 -endif.
