@@ -81,7 +81,6 @@ function participantLeftHarness({
 		success: gatewayDisconnectSuccess,
 	}));
 
-
 	const getPendingJoinsForChannel = vi.fn(async () => ({
 		pendingJoins: Array.from({length: pendingJoinCount}, (_, index) => ({
 			connectionId: `pending-${index + 1}`,
@@ -167,15 +166,10 @@ describe('LiveKitWebhookService participant_left', () => {
 	it.each(['participant_left', 'participant_connection_aborted'] as const)(
 		'clears the pin when the last voice user leaves via %s',
 		async (eventName) => {
-			const {
-				service,
-				deleteRoomServer,
-				disconnectVoiceUserIfInChannel,
-				getPendingJoinsForChannel,
-				listParticipants,
-			} = participantLeftHarness({
-				pinnedServerId: 'eu-1',
-			});
+			const {service, deleteRoomServer, disconnectVoiceUserIfInChannel, getPendingJoinsForChannel, listParticipants} =
+				participantLeftHarness({
+					pinnedServerId: 'eu-1',
+				});
 
 			await service.handleParticipantLeft(participantLeft(eventName));
 
