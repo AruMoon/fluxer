@@ -5,6 +5,43 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+token_rpc_data() ->
+    #{
+        <<"token">> => <<"tok">>,
+        <<"endpoint">> => <<"wss://voice.example">>,
+        <<"connectionId">> => <<"conn-token">>
+    }.
+
+with_token_rpc(Fun) ->
+    meck:new(rpc_client, [passthrough, no_link, non_strict]),
+    meck:expect(rpc_client, call, fun(Request) ->
+        self() ! {voice_token_rpc_request, Request},
+        {ok, token_rpc_data()}
+    end),
+    try
+        Fun()
+    after
+        meck:unload(rpc_client)
+    end.
+
+receive_voice_token_rpc_request() ->
+    receive
+        {voice_token_rpc_request, Request} ->
+            Request
+    after 1000 ->
+        error(voice_token_rpc_request_not_received)
+    end.
+
+state_with_channel_type(ChannelType) ->
+    (base_state(stream_voice_states([])))#{
+        channels => #{
+            100 => #{
+                <<"type">> => ChannelType,
+                <<"recipient_ids">> => [20, 30]
+            }
+        }
+    }.
+
 handle_dm_connect_or_update_user_mismatch_test() ->
     State = base_state(existing_voice_states(20)),
     {reply, {error, validation_error, voice_user_mismatch}, _} = call_update(State, #{}).
@@ -123,6 +160,50 @@ handle_dm_connect_or_update_stress_many_watch_unwatch_updates_test() ->
         lists:seq(1, 60)
     ),
     ?assertMatch(#{dm_voice_states := #{}}, FinalState).
+
+handle_dm_voice_with_channel_uses_client_ip_for_dm_test() ->
+    with_token_rpc(fun() ->
+        State = state_with_channel_type(1),
+        Channel = #{
+            <<"type">> => 1,
+            <<"recipient_ids">> => [20]
+        },
+        {reply, #{success := true}, _} =
+            dm_voice_connect:handle_dm_voice_with_channel(
+                Channel,
+                100,
+                10,
+                gateway_request(#{
+                    client_ip => <<"203.0.113.10">>
+                }),
+                State
+            ),
+        Request = receive_voice_token_rpc_request(),
+        ?assertEqual(<<"203.0.113.10">>, maps:get(<<"client_ip">>, Request)),
+        ?assertNot(maps:is_key(<<"guild_id">>, Request))
+    end).
+
+handle_dm_voice_with_channel_uses_client_ip_for_group_dm_test() ->
+    with_token_rpc(fun() ->
+        State = state_with_channel_type(3),
+        Channel = #{
+            <<"type">> => 3,
+            <<"recipient_ids">> => [20, 30]
+        },
+        {reply, #{success := true}, _} =
+            dm_voice_connect:handle_dm_voice_with_channel(
+                Channel,
+                100,
+                10,
+                gateway_request(#{
+                    client_ip => <<"203.0.113.10">>
+                }),
+                State
+            ),
+        Request = receive_voice_token_rpc_request(),
+        ?assertEqual(<<"203.0.113.10">>, maps:get(<<"client_ip">>, Request)),
+        ?assertNot(maps:is_key(<<"guild_id">>, Request))
+    end).
 
 existing_voice_states(UserId) ->
     #{<<"conn-1">> => voice_state(<<"conn-1">>, UserId, 100, [])}.

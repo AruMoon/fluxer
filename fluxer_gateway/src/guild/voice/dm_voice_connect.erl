@@ -72,6 +72,7 @@ build_connect_request(
         is_mobile => maps:get(is_mobile, Opts),
         latitude => maps:get(latitude, Opts),
         longitude => maps:get(longitude, Opts),
+        client_ip => maps:get(client_ip, Opts),
         e2ee_capable => maps:get(e2ee_capable, Opts),
         bot => maps:get(bot, Opts),
         voice_states => maps:get(dm_voice_states, State, #{}),
@@ -97,6 +98,7 @@ extract_request_opts(Request) ->
         viewer_stream_keys => maps:get(viewer_stream_keys, Request, undefined),
         latitude => maps:get(latitude, Request, null),
         longitude => maps:get(longitude, Request, null),
+        client_ip => maps:get(client_ip, Request, undefined),
         e2ee_capable => maps:get(e2ee_capable, Request, false),
         bot => maps:get(bot, Request, false)
     }.
