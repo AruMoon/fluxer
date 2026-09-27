@@ -414,6 +414,10 @@ export const RpcResponse = z.discriminatedUnion('type', [
 		data: z.record(SnowflakeStringType, z.array(SnowflakeStringType)).describe('Blocked user IDs keyed by user ID'),
 	}),
 	z.object({
+		type: z.literal('voice_clear_room_server_pin').describe('Response type for conditional voice room server pin cleanup'),
+		data: z.object({success: z.boolean().describe('Whether the voice room server pin was cleared')}),
+	}),
+	z.object({
 		type: z.literal('voice_get_token').describe('Response type for voice connection token'),
 		data: z
 			.object({
