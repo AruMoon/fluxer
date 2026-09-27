@@ -2,7 +2,7 @@
 
 import {createChannelID, createGuildID} from '@app/api/BrandedTypes';
 import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
-import type {ILiveKitService} from '@app/api/infrastructure/ILiveKitService';
+import type {ILiveKitService, ListParticipantsResult} from '@app/api/infrastructure/ILiveKitService';
 import type {IVoiceRoomStore} from '@app/api/infrastructure/IVoiceRoomStore';
 import {LiveKitWebhookService} from '@app/api/infrastructure/LiveKitWebhookService';
 import type {IVoiceRepository} from '@app/api/voice/IVoiceRepository';
@@ -90,8 +90,8 @@ function participantLeftHarness({
 		})),
 	}));
 
-	const listParticipants = vi.fn(async () => ({
-		status: 'ok' as const,
+	const listParticipants = vi.fn<() => Promise<ListParticipantsResult>>(async () => ({
+		status: 'ok',
 		participants: liveKitParticipantIdentities.map((identity) => ({identity})),
 	}));
 
