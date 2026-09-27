@@ -624,13 +624,17 @@ export class RpcService {
 				};
 			}
 			case 'call_ended': {
+				const channelId = createChannelID(request.channel_id);
 				await this.handleCallEnded({
-					channelId: createChannelID(request.channel_id),
+					channelId,
 					messageId: createMessageID(request.message_id),
 					participants: request.participants.map(createUserID),
 					endedTimestamp: new Date(request.ended_timestamp),
 					requestCache,
 				});
+				if (this.voiceService !== null) {
+					await this.voiceService.clearRoomServerPinIfEmpty(undefined, channelId);
+				}
 				return {
 					type: 'call_ended',
 					data: {success: true},
