@@ -165,16 +165,12 @@ describe('LiveKitWebhookService participant_left', () => {
 	it.each(['participant_left', 'participant_connection_aborted'] as const)(
 		'clears the pin when the last voice user leaves via %s',
 		async (eventName) => {
-			const {
-				service,
-				deleteRoomServer,
-				disconnectVoiceUserIfInChannel,
-				getVoiceStatesForChannel,
-			} = participantLeftHarness({
-				pinnedServerId: 'eu-1',
-				liveKitParticipantIdentities: [],
-				gatewayVoiceStateCount: 0,
-			});
+			const {service, deleteRoomServer, disconnectVoiceUserIfInChannel, getVoiceStatesForChannel} =
+				participantLeftHarness({
+					pinnedServerId: 'eu-1',
+					liveKitParticipantIdentities: [],
+					gatewayVoiceStateCount: 0,
+				});
 
 			await service.handleParticipantLeft(participantLeft(eventName));
 
@@ -188,11 +184,7 @@ describe('LiveKitWebhookService participant_left', () => {
 		},
 	);
 	it('keeps the pin when another voice user remains in the channel', async () => {
-		const {
-			service,
-			deleteRoomServer,
-			getVoiceStatesForChannel,
-		} = participantLeftHarness({
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
 			pinnedServerId: 'eu-1',
 			liveKitParticipantIdentities: [],
 			gatewayVoiceStateCount: 1,
@@ -204,29 +196,19 @@ describe('LiveKitWebhookService participant_left', () => {
 		expect(deleteRoomServer).not.toHaveBeenCalled();
 	});
 	it('does not clear a pin for a participant_left event from a stale server', async () => {
-		const {
-			service,
-			deleteRoomServer,
-			getVoiceStatesForChannel,
-		} = participantLeftHarness({
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
 			pinnedServerId: 'eu-2',
 			liveKitParticipantIdentities: [],
 			gatewayVoiceStateCount: 0,
 		});
 
-		await service.handleParticipantLeft(
-			participantLeft('participant_left', 'eu', 'eu-1'),
-		);
+		await service.handleParticipantLeft(participantLeft('participant_left', 'eu', 'eu-1'));
 
 		expect(deleteRoomServer).not.toHaveBeenCalled();
 		expect(getVoiceStatesForChannel).not.toHaveBeenCalled();
 	});
 	it('does not clear the pin when gateway voice state lookup fails', async () => {
-		const {
-			service,
-			deleteRoomServer,
-			getVoiceStatesForChannel,
-		} = participantLeftHarness({
+		const {service, deleteRoomServer, getVoiceStatesForChannel} = participantLeftHarness({
 			pinnedServerId: 'eu-1',
 			liveKitParticipantIdentities: [],
 			gatewayVoiceStateCount: 0,
