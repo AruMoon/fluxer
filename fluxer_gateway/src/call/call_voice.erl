@@ -2,6 +2,9 @@
 
 -module(call_voice).
 -typing([eqwalizer]).
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
 
 -export([
     handle_join_internal/6,
