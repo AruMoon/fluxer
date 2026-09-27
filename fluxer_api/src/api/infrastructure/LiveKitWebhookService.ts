@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {ChannelID, GuildID} from '@app/api/BrandedTypes';
 import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
 import type {ILiveKitService} from '@app/api/infrastructure/ILiveKitService';
 import type {IVoiceRoomStore} from '@app/api/infrastructure/IVoiceRoomStore';
@@ -9,12 +8,6 @@ import {Logger} from '@app/api/Logger';
 import type {VoiceTopology} from '@app/api/voice/VoiceTopology';
 import type {WebhookEvent} from 'livekit-server-sdk';
 import {WebhookReceiver} from 'livekit-server-sdk';
-
-interface VoiceWebhookParticipantContext {
-	readonly type: 'dm' | 'guild';
-	readonly channelId: ChannelID;
-	readonly guildId?: GuildID;
-}
 
 export class LiveKitWebhookService {
 	private receivers: Map<string, WebhookReceiver>;

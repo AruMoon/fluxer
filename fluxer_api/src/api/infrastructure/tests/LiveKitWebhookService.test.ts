@@ -178,11 +178,16 @@ describe('LiveKitWebhookService participant_left', () => {
 	it.each(['participant_left', 'participant_connection_aborted'] as const)(
 		'clears the pin when the last voice user leaves via %s',
 		async (eventName) => {
-			const {service, deleteRoomServer, disconnectVoiceUserIfInChannel, getVoiceStatesForChannel, getPendingJoinsForChannel} =
-				participantLeftHarness({
-					pinnedServerId: 'eu-1',
-					gatewayVoiceStateCount: 0,
-				});
+			const {
+				service,
+				deleteRoomServer,
+				disconnectVoiceUserIfInChannel,
+				getVoiceStatesForChannel,
+				getPendingJoinsForChannel,
+			} = participantLeftHarness({
+				pinnedServerId: 'eu-1',
+				gatewayVoiceStateCount: 0,
+			});
 
 			await service.handleParticipantLeft(participantLeft(eventName));
 
@@ -211,7 +216,7 @@ describe('LiveKitWebhookService participant_left', () => {
 		expect(getVoiceStatesForChannel).toHaveBeenCalledTimes(1);
 		expect(deleteRoomServer).not.toHaveBeenCalled();
 	});
-		
+
 	it('keeps the pin when a voice connection is still pending confirmation', async () => {
 		const {service, deleteRoomServer} = participantLeftHarness({
 			pinnedServerId: 'eu-1',
