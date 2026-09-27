@@ -295,6 +295,24 @@ export class VoiceService {
 		return {token, endpoint, connectionId, tokenNonce, regionId, serverId};
 	}
 
+	async clearRoomServerPin(guildId: GuildID | undefined, channelId: ChannelID): Promise<boolean> {
+		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
+		if (!pinnedServer) {
+			return false;
+		}
+		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
+		Logger.info(
+			{
+				guildId: guildId?.toString(),
+				channelId: channelId.toString(),
+				regionId: pinnedServer.regionId,
+				serverId: pinnedServer.serverId,
+			},
+			'Cleared voice room server pinning after call ended',
+		);
+		return true;
+	}
+
 	async clearRoomServerPinIfMatches(params: {
 		guildId?: GuildID;
 		channelId: ChannelID;
