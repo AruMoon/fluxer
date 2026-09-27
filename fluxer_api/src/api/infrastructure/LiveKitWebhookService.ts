@@ -366,17 +366,11 @@ export class LiveKitWebhookService {
 			if (!result.success) {
 				return;
 			}
-			const [voiceStateResult, pendingJoinResult] = await Promise.all([
-				this.gatewayService.getVoiceStatesForChannel({
-					guildId,
-					channelId: context.channelId,
-				}),
-				this.gatewayService.getPendingJoinsForChannel({
-					guildId,
-					channelId: context.channelId,
-				}),
-			]);
-			if (voiceStateResult.voiceStates.length !== 0 || pendingJoinResult.pendingJoins.length !== 0) {
+			const pendingJoinResult = await this.gatewayService.getPendingJoinsForChannel({
+				guildId,
+				channelId: context.channelId,
+			});
+			if (pendingJoinResult.pendingJoins.length !== 0) {
 				return;
 			}
 
@@ -392,6 +386,31 @@ export class LiveKitWebhookService {
 				);
 				return;
 			}
+			const roomParticipants = await this.liveKitService.listParticipants({
+				guildId,
+				channelId: context.channelId,
+				regionId: eventRegionId,
+				serverId: eventServerId,
+			});
+			if (roomParticipants.status === 'error') {
+				Logger.warn(
+					{
+						type: context.type,
+						guildId: guildId?.toString(),
+						channelId: context.channelId.toString(),
+						regionId: eventRegionId,
+						serverId: eventServerId,
+						errorCode: roomParticipants.errorCode,
+						retryable: roomParticipants.retryable,
+					},
+					'Cannot clear voice room server pinning because LiveKit participant lookup failed',
+				);
+				return;
+			}
+			if (roomParticipants.participants.length !== 0) {
+				return;
+			}
+
 			// Re-read the pin so a stale leave event cannot clear a newer pin.
 			const currentPinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
 			if (
