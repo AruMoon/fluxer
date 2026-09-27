@@ -239,7 +239,6 @@ export class VoiceService {
 		connectionId = providedConnectionId || generateConnectionId();
 		Logger.debug(
 			{
-				guildId: guildId?.toString(),
 				channelId: channelId.toString(),
 				userId: userId.toString(),
 				providedConnectionId,
@@ -293,6 +292,27 @@ export class VoiceService {
 				});
 		}
 		return {token, endpoint, connectionId, tokenNonce, regionId, serverId};
+	}
+
+	async clearDmRoomServerPin(channelId: ChannelID): Promise<boolean> {
+		const channel = await this.channelRepository.findUnique(channelId);
+		if (!channel || (channel.type !== ChannelTypes.DM && channel.type !== ChannelTypes.GROUP_DM)) {
+			return false;
+		}
+		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(undefined, channelId);
+		if (!pinnedServer) {
+			return false;
+		}
+		await this.voiceRoomStore.deleteRoomServer(undefined, channelId);
+		Logger.info(
+			{
+				channelId: channelId.toString(),
+				regionId: pinnedServer.regionId,
+				serverId: pinnedServer.serverId,
+			},
+			'Cleared DM voice room server pinning after call ended',
+		);
+		return true;
 	}
 
 	async clearRoomServerPinIfMatches(params: {
