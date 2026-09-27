@@ -155,10 +155,12 @@ spawn_leave_calls_for_removed_voice_states(UserVoiceStates, State) ->
 -spec maybe_spawn_leave_call(binary(), voice_state(), binary() | undefined) -> ok.
 maybe_spawn_leave_call(ConnId, VoiceState, SessionId) ->
     ChannelId = maps:get(<<"channel_id">>, VoiceState, null),
-    case {
-        guild_voice_connection_normalize:normalize_positive_snowflake(ChannelId),
-        SessionId
-    } of
+    case
+        {
+            guild_voice_connection_normalize:normalize_positive_snowflake(ChannelId),
+            SessionId
+        }
+    of
         {ChannelIdInt, SessionIdValue} when
             is_integer(ChannelIdInt),
             is_binary(SessionIdValue)
