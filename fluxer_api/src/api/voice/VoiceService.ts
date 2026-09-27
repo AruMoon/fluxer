@@ -318,7 +318,6 @@ export class VoiceService {
 		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
 		Logger.info(
 			{
-				guildId: guildId?.toString(),
 				channelId: channelId.toString(),
 				regionId: pinnedServer.regionId,
 				serverId: pinnedServer.serverId,
