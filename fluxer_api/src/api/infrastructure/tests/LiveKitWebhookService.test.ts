@@ -171,11 +171,10 @@ describe('LiveKitWebhookService participant_left', () => {
 				service,
 				deleteRoomServer,
 				disconnectVoiceUserIfInChannel,
-				getVoiceStatesForChannel,
 				getPendingJoinsForChannel,
+				listParticipants,
 			} = participantLeftHarness({
 				pinnedServerId: 'eu-1',
-				gatewayVoiceStateCount: 0,
 			});
 
 			await service.handleParticipantLeft(participantLeft(eventName));
