@@ -16,7 +16,7 @@ import {OpenAPI} from '@app/api/middleware/ResponseTypeMiddleware';
 import {
 	getGatewayRolloutConfigPublisher,
 	getInstanceConfigRepository,
-	getPushServiceDeliveryConfigPublisher,
+	getPushRelayConfigPublisher,
 } from '@app/api/middleware/ServiceSingletons';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
 import type {HonoApp, HonoEnv} from '@app/api/types/HonoEnv';
@@ -34,9 +34,10 @@ import {
 	PendingRegistrationActionRequest,
 	RegistrationUrlIdParam,
 } from '@fluxer/schema/src/domains/admin/AdminSchemas';
+import {AltchaCaptchaConfigSchema} from '@fluxer/schema/src/domains/admin/AltchaCaptchaSchemas';
 import {DomainMigrationConfigSchema} from '@fluxer/schema/src/domains/admin/DomainMigrationSchemas';
 import {GatewayRolloutConfigSchema} from '@fluxer/schema/src/domains/admin/GatewayRolloutSchemas';
-import {PushServiceDeliveryConfigSchema} from '@fluxer/schema/src/domains/admin/PushServiceDeliverySchemas';
+import type {PushRelayConfig, PushRelayConfigUpdateRequest} from '@fluxer/schema/src/domains/admin/PushRelaySchemas';
 import {VoiceNoiseSuppressionConfigSchema} from '@fluxer/schema/src/domains/admin/VoiceNoiseSuppressionSchemas';
 import {UserIdParam} from '@fluxer/schema/src/domains/common/CommonParamSchemas';
 import {ExperimentDeliveryConfigSchema} from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
@@ -65,8 +66,9 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		ssoConfig,
 		gatewayRollout,
 		voiceNoiseSuppression,
-		pushServiceDelivery,
+		pushRelay,
 		domainMigration,
+		altchaCaptcha,
 		experimentDelivery,
 		registrationConfig,
 		registrationUrls,
@@ -75,8 +77,9 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		instanceConfigRepository.getSsoConfig(),
 		instanceConfigRepository.getGatewayRolloutConfig(),
 		instanceConfigRepository.getVoiceNoiseSuppressionConfig(),
-		instanceConfigRepository.getPushServiceDeliveryConfig(),
+		instanceConfigRepository.getPushRelayConfig(),
 		instanceConfigRepository.getDomainMigrationConfig(),
+		instanceConfigRepository.getAltchaCaptchaConfig(),
 		instanceConfigRepository.getExperimentDeliveryConfig(),
 		instanceConfigRepository.getRegistrationConfig(),
 		instanceConfigRepository.getRegistrationUrlsForAdmin(),
@@ -108,8 +111,9 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		},
 		gateway_rollout: gatewayRollout,
 		voice_noise_suppression: voiceNoiseSuppression,
-		push_service_delivery: pushServiceDelivery,
+		push_relay: pushRelay,
 		domain_migration: domainMigration,
+		altcha_captcha: altchaCaptcha,
 		experiment_delivery: experimentDelivery,
 		registration: {
 			...registrationConfig,
@@ -194,6 +198,20 @@ async function grantSetupCompleterAdminACL(ctx: Context<HonoEnv>): Promise<boole
 	return true;
 }
 
+function relayConsentStamp(
+	current: PushRelayConfig,
+	patch: PushRelayConfigUpdateRequest,
+	adminUserId: string,
+): Partial<PushRelayConfig> {
+	const accepted = patch.relay_consent_accepted;
+	if (accepted === undefined || accepted === current.relay_consent_accepted) {
+		return {};
+	}
+	return accepted
+		? {relay_consent_accepted_at: new Date().toISOString(), relay_consent_accepted_by: adminUserId}
+		: {relay_consent_accepted_at: null, relay_consent_accepted_by: null};
+}
+
 function listSuppliedSections(data: InstanceConfigUpdateRequest): string | undefined {
 	const sections = Object.entries(data)
 		.filter(([, value]) => value != null)
@@ -273,17 +291,16 @@ export function InstanceConfigAdminController(app: HonoApp) {
 					);
 				}
 			}
-			if (data.push_service_delivery) {
-				const patch = omitUndefinedFields(data.push_service_delivery);
+			if (data.push_relay) {
+				const patch = omitUndefinedFields(data.push_relay);
 				if (Object.keys(patch).length > 0) {
-					const landed = await instanceConfigRepository.updatePushServiceDeliveryConfig((current) =>
-						PushServiceDeliveryConfigSchema.parse({
-							...current,
-							...patch,
-							config_version: current.config_version + 1,
-						}),
-					);
-					await getPushServiceDeliveryConfigPublisher().publish(landed);
+					const adminUserId = ctx.get('adminUserId').toString();
+					const landed = await instanceConfigRepository.updatePushRelayConfig((current) => ({
+						...current,
+						...patch,
+						...relayConsentStamp(current, patch, adminUserId),
+					}));
+					await getPushRelayConfigPublisher().publish(landed);
 				}
 			}
 			if (data.domain_migration) {
@@ -291,6 +308,18 @@ export function InstanceConfigAdminController(app: HonoApp) {
 				if (Object.keys(patch).length > 0) {
 					await instanceConfigRepository.updateDomainMigrationConfig((current) =>
 						DomainMigrationConfigSchema.parse({
+							...current,
+							...patch,
+							config_version: current.config_version + 1,
+						}),
+					);
+				}
+			}
+			if (data.altcha_captcha) {
+				const patch = omitUndefinedFields(data.altcha_captcha);
+				if (Object.keys(patch).length > 0) {
+					await instanceConfigRepository.updateAltchaCaptchaConfig((current) =>
+						AltchaCaptchaConfigSchema.parse({
 							...current,
 							...patch,
 							config_version: current.config_version + 1,

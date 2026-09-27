@@ -409,13 +409,10 @@ fn deserialize_instance_config_response_with_unknown_keys() {
             "future_object_knob": {"nested": true},
             "future_list_knob": ["a", "b"]
         },
-        "push_service_delivery": {
-            "enabled": true,
-            "config_version": 3,
-            "rollout_basis_points": 5000,
-            "rollout_salt": "push-service-delivery-v1",
-            "included_user_ids": ["1500000000000000002"],
-            "excluded_user_ids": []
+        "push_relay": {
+            "relay_consent_accepted": true,
+            "relay_consent_accepted_at": "2026-09-27T10:11:12.000Z",
+            "relay_consent_accepted_by": "1130650140672000000"
         },
         "domain_migration": {
             "enabled": true,
@@ -427,6 +424,18 @@ fn deserialize_instance_config_response_with_unknown_keys() {
             "future_migration_knob": 9,
             "anonymous_rollout_basis_points": 100,
             "standalone_forwarding": true
+        },
+        "altcha_captcha": {
+            "enabled": true,
+            "config_version": 3,
+            "rollout_basis_points": 500,
+            "rollout_salt": "altcha-captcha-v1",
+            "included_user_ids": [],
+            "excluded_user_ids": ["1500000000000000003"],
+            "anonymous_enabled": true,
+            "cost": 5000,
+            "max_counter": 10000,
+            "future_altcha_knob": "argon2id"
         },
         "experiment_delivery": {"poll_interval_seconds": 300, "poll_jitter_percent": 15},
         "registration": {
@@ -564,6 +573,12 @@ fn deserialize_instance_config_response_with_unknown_keys() {
     assert_eq!(resp.domain_migration.included_user_ids.len(), 1);
     assert_eq!(resp.domain_migration.anonymous_rollout_basis_points, 100);
     assert!(resp.domain_migration.standalone_forwarding);
+    assert!(resp.push_relay.relay_consent_accepted);
+    assert!(resp.altcha_captcha.enabled);
+    assert_eq!(resp.altcha_captcha.config_version, 3);
+    assert!(resp.altcha_captcha.anonymous_enabled);
+    assert_eq!(resp.altcha_captcha.excluded_user_ids.len(), 1);
+    assert_eq!(resp.altcha_captcha.max_counter, 10000);
     assert_eq!(resp.experiment_delivery.poll_interval_seconds, 300);
     assert!(resp.policy.single_community_guild_id.is_none());
     assert_eq!(resp.policy.services.gif_enabled, Some(true));
@@ -593,6 +608,51 @@ fn deserialize_instance_config_response_with_unknown_keys() {
     assert_eq!(
         serde_json::to_value(&baseline).unwrap(),
         serde_json::to_value(&resp).unwrap()
+    );
+}
+
+#[test]
+fn deserialize_push_relay_config() {
+    let accepted: types::PushRelayConfigResponse = serde_json::from_str(
+        r#"{
+        "relay_consent_accepted": true,
+        "relay_consent_accepted_at": "2026-09-27T10:11:12.000Z",
+        "relay_consent_accepted_by": "1130650140672000000"
+    }"#,
+    )
+    .expect("an accepted relay consent must deserialize");
+
+    assert!(accepted.relay_consent_accepted);
+    assert_eq!(
+        accepted.relay_consent_accepted_at.as_deref(),
+        Some("2026-09-27T10:11:12.000Z")
+    );
+    assert_eq!(
+        accepted.relay_consent_accepted_by.as_deref(),
+        Some("1130650140672000000")
+    );
+
+    let empty: types::PushRelayConfigResponse =
+        serde_json::from_str("{}").expect("an empty push relay config must deserialize");
+
+    assert!(!empty.relay_consent_accepted);
+    assert!(empty.relay_consent_accepted_at.is_none());
+    assert!(empty.relay_consent_accepted_by.is_none());
+}
+
+#[test]
+fn serialize_push_relay_update_omits_an_unset_consent() {
+    assert_eq!(
+        serde_json::to_value(types::PushRelayConfigUpdateRequest::default()).unwrap(),
+        serde_json::json!({})
+    );
+
+    let with = types::PushRelayConfigUpdateRequest {
+        relay_consent_accepted: Some(true),
+    };
+    assert_eq!(
+        serde_json::to_value(&with).unwrap(),
+        serde_json::json!({"relay_consent_accepted": true})
     );
 }
 

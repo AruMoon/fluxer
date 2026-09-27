@@ -10551,8 +10551,9 @@
 					},
 					"gateway_rollout": {"$ref": "#/components/schemas/GatewayRolloutConfigResponse"},
 					"voice_noise_suppression": {"$ref": "#/components/schemas/VoiceNoiseSuppressionConfigResponse"},
-					"push_service_delivery": {"$ref": "#/components/schemas/PushServiceDeliveryConfigResponse"},
+					"push_relay": {"$ref": "#/components/schemas/PushRelayConfigResponse"},
 					"domain_migration": {"$ref": "#/components/schemas/DomainMigrationConfigResponse"},
+					"altcha_captcha": {"$ref": "#/components/schemas/AltchaCaptchaConfigResponse"},
 					"experiment_delivery": {"$ref": "#/components/schemas/ExperimentDeliveryConfigResponse"},
 					"registration": {
 						"type": "object",
@@ -10980,8 +10981,9 @@
 					"sso",
 					"gateway_rollout",
 					"voice_noise_suppression",
-					"push_service_delivery",
+					"push_relay",
 					"domain_migration",
+					"altcha_captcha",
 					"experiment_delivery",
 					"registration",
 					"self_hosted",
@@ -11116,13 +11118,14 @@
 						"nullable": true,
 						"allOf": [{"$ref": "#/components/schemas/VoiceNoiseSuppressionConfigUpdateRequest"}]
 					},
-					"push_service_delivery": {
-						"nullable": true,
-						"allOf": [{"$ref": "#/components/schemas/PushServiceDeliveryConfigUpdateRequest"}]
-					},
+					"push_relay": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/PushRelayConfigUpdateRequest"}]},
 					"domain_migration": {
 						"nullable": true,
 						"allOf": [{"$ref": "#/components/schemas/DomainMigrationConfigUpdateRequest"}]
+					},
+					"altcha_captcha": {
+						"nullable": true,
+						"allOf": [{"$ref": "#/components/schemas/AltchaCaptchaConfigUpdateRequest"}]
 					},
 					"experiment_delivery": {
 						"nullable": true,
@@ -15217,6 +15220,27 @@
 					"poll_jitter_percent": {"type": "integer", "minimum": 0, "maximum": 50}
 				}
 			},
+			"AltchaCaptchaConfigUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"enabled": {"type": "boolean"},
+					"rollout_basis_points": {"type": "integer", "minimum": 0, "maximum": 10000},
+					"rollout_salt": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[\\x20-\\x7e]+$"},
+					"included_user_ids": {
+						"maxItems": 1000,
+						"type": "array",
+						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
+					},
+					"excluded_user_ids": {
+						"maxItems": 1000,
+						"type": "array",
+						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
+					},
+					"anonymous_enabled": {"type": "boolean"},
+					"cost": {"type": "integer", "minimum": 1000, "maximum": 100000},
+					"max_counter": {"type": "integer", "minimum": 100, "maximum": 1000000}
+				}
+			},
 			"DomainMigrationConfigUpdateRequest": {
 				"type": "object",
 				"properties": {
@@ -15237,24 +15261,7 @@
 					"standalone_forwarding": {"type": "boolean"}
 				}
 			},
-			"PushServiceDeliveryConfigUpdateRequest": {
-				"type": "object",
-				"properties": {
-					"enabled": {"type": "boolean"},
-					"rollout_basis_points": {"type": "integer", "minimum": 0, "maximum": 10000},
-					"rollout_salt": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[\\x20-\\x7e]+$"},
-					"included_user_ids": {
-						"maxItems": 1000,
-						"type": "array",
-						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
-					},
-					"excluded_user_ids": {
-						"maxItems": 1000,
-						"type": "array",
-						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
-					}
-				}
-			},
+			"PushRelayConfigUpdateRequest": {"type": "object", "properties": {"relay_consent_accepted": {"type": "boolean"}}},
 			"VoiceNoiseSuppressionConfigUpdateRequest": {
 				"type": "object",
 				"properties": {
@@ -15320,6 +15327,48 @@
 				"required": ["poll_interval_seconds", "poll_jitter_percent"],
 				"additionalProperties": false
 			},
+			"AltchaCaptchaConfigResponse": {
+				"type": "object",
+				"properties": {
+					"enabled": {"default": false, "type": "boolean"},
+					"config_version": {"default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991},
+					"rollout_basis_points": {"default": 0, "type": "integer", "minimum": 0, "maximum": 10000},
+					"rollout_salt": {
+						"default": "altcha-captcha-v1",
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 64,
+						"pattern": "^[\\x20-\\x7e]+$"
+					},
+					"included_user_ids": {
+						"default": [],
+						"maxItems": 1000,
+						"type": "array",
+						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
+					},
+					"excluded_user_ids": {
+						"default": [],
+						"maxItems": 1000,
+						"type": "array",
+						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
+					},
+					"anonymous_enabled": {"default": false, "type": "boolean"},
+					"cost": {"default": 5000, "type": "integer", "minimum": 1000, "maximum": 100000},
+					"max_counter": {"default": 10000, "type": "integer", "minimum": 100, "maximum": 1000000}
+				},
+				"required": [
+					"enabled",
+					"config_version",
+					"rollout_basis_points",
+					"rollout_salt",
+					"included_user_ids",
+					"excluded_user_ids",
+					"anonymous_enabled",
+					"cost",
+					"max_counter"
+				],
+				"additionalProperties": false
+			},
 			"DomainMigrationConfigResponse": {
 				"type": "object",
 				"properties": {
@@ -15360,40 +15409,20 @@
 				],
 				"additionalProperties": false
 			},
-			"PushServiceDeliveryConfigResponse": {
+			"PushRelayConfigResponse": {
 				"type": "object",
 				"properties": {
-					"enabled": {"default": false, "type": "boolean"},
-					"config_version": {"default": 0, "type": "integer", "minimum": 0, "maximum": 9007199254740991},
-					"rollout_basis_points": {"default": 0, "type": "integer", "minimum": 0, "maximum": 10000},
-					"rollout_salt": {
-						"default": "push-service-delivery-v1",
+					"relay_consent_accepted": {"default": false, "type": "boolean"},
+					"relay_consent_accepted_at": {
+						"default": null,
+						"nullable": true,
 						"type": "string",
-						"minLength": 1,
-						"maxLength": 64,
-						"pattern": "^[\\x20-\\x7e]+$"
+						"format": "date-time",
+						"pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
 					},
-					"included_user_ids": {
-						"default": [],
-						"maxItems": 1000,
-						"type": "array",
-						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
-					},
-					"excluded_user_ids": {
-						"default": [],
-						"maxItems": 1000,
-						"type": "array",
-						"items": {"type": "string", "pattern": "^\\d{1,20}$"}
-					}
+					"relay_consent_accepted_by": {"default": null, "nullable": true, "type": "string", "pattern": "^\\d{1,20}$"}
 				},
-				"required": [
-					"enabled",
-					"config_version",
-					"rollout_basis_points",
-					"rollout_salt",
-					"included_user_ids",
-					"excluded_user_ids"
-				],
+				"required": ["relay_consent_accepted", "relay_consent_accepted_at", "relay_consent_accepted_by"],
 				"additionalProperties": false
 			},
 			"VoiceNoiseSuppressionConfigResponse": {
