@@ -469,8 +469,7 @@ export class RpcService {
 				if (this.voiceService === null) {
 					throw new Error('Voice is not enabled on this server');
 				}
-				const cleared = await this.voiceService.clearRoomServerPinIfEmpty(
-					request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
+				const cleared = await this.voiceService.clearDmRoomServerPin(
 					createChannelID(request.channel_id),
 				);
 				return {
@@ -633,7 +632,7 @@ export class RpcService {
 					requestCache,
 				});
 				if (this.voiceService !== null) {
-					await this.voiceService.clearRoomServerPinIfEmpty(undefined, channelId);
+					await this.voiceService.clearDmRoomServerPin(channelId);
 				}
 				return {
 					type: 'call_ended',
