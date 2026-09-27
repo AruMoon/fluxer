@@ -132,13 +132,7 @@ do_disconnect_voice_user(UserVoiceStates, VoiceStates, State) ->
     NewState = clear_dm_e2ee_room_keys_for_removed_voice_states(
         UserVoiceStates, NewVoiceStates, NewState0
     ),
-    maps:foreach(
-        fun(ConnId, _VS) ->
-            _ = voice_state_counts_cache:remove_connection(ConnId),
-            ok
-        end,
-        UserVoiceStates
-    ),
+    spawn_leave_calls_for_removed_voice_states(UserVoiceStates, State),
     spawn_disconnect_broadcasts(UserVoiceStates, NewState),
     {reply, #{success => true}, NewState}.
 
@@ -146,6 +140,42 @@ do_disconnect_voice_user(UserVoiceStates, VoiceStates, State) ->
 spawn_disconnect_broadcasts(UserVoiceStates, NewState) ->
     spawn(fun() -> broadcast_user_disconnects(UserVoiceStates, NewState) end),
     ok.
+
+-spec spawn_leave_calls_for_removed_voice_states(voice_state_map(), dm_state()) -> ok.
+spawn_leave_calls_for_removed_voice_states(UserVoiceStates, State) ->
+    SessionId = normalize_session_id(maps:get(id, State, undefined)),
+    maps:foreach(
+        fun(ConnId, VoiceState) ->
+            maybe_spawn_leave_call(ConnId, VoiceState, SessionId)
+        end,
+        UserVoiceStates
+    ),
+    ok.
+
+-spec maybe_spawn_leave_call(binary(), voice_state(), binary() | undefined) -> ok.
+maybe_spawn_leave_call(ConnId, VoiceState, SessionId) ->
+    ChannelId = maps:get(<<"channel_id">>, VoiceState, null),
+    case {
+        guild_voice_connection_normalize:normalize_positive_snowflake(ChannelId),
+        SessionId
+    } of
+        {ChannelIdInt, SessionIdValue} when
+            is_integer(ChannelIdInt),
+            is_binary(SessionIdValue)
+        ->
+            spawn(fun() ->
+                _ = shard_utils:safe_apply(
+                    fun() -> maybe_leave_call(ChannelIdInt, SessionIdValue) end,
+                    ok
+                ),
+                _ = voice_state_counts_cache:remove_connection(ConnId),
+                ok
+            end),
+            ok;
+        _ ->
+            _ = voice_state_counts_cache:remove_connection(ConnId),
+            ok
+    end.
 
 -spec broadcast_user_disconnects(voice_state_map(), dm_state()) -> ok.
 broadcast_user_disconnects(UserVoiceStates, NewState) ->
