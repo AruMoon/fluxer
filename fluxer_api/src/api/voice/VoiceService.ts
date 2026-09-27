@@ -294,38 +294,27 @@ export class VoiceService {
 		return {token, endpoint, connectionId, tokenNonce, regionId, serverId};
 	}
 
-	async clearRoomServerPinIfEmpty(guildId: GuildID | undefined, channelId: ChannelID): Promise<boolean> {
-		if (guildId !== undefined) {
-			return false;
-		}
+	async clearDmRoomServerPin(channelId: ChannelID): Promise<boolean> {
 		const channel = await this.channelRepository.findUnique(channelId);
 		if (!channel || (channel.type !== ChannelTypes.DM && channel.type !== ChannelTypes.GROUP_DM)) {
 			return false;
 		}
-		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
+		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(undefined, channelId);
 		if (!pinnedServer) {
 			return false;
 		}
-		const participants = await this.liveKitService.listParticipants({
-			guildId,
-			channelId,
-			regionId: pinnedServer.regionId,
-			serverId: pinnedServer.serverId,
-		});
-		if (participants.status === 'error' || participants.participants.length !== 0) {
-			return false;
-		}
-		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
+		await this.voiceRoomStore.deleteRoomServer(undefined, channelId);
 		Logger.info(
 			{
 				channelId: channelId.toString(),
 				regionId: pinnedServer.regionId,
 				serverId: pinnedServer.serverId,
 			},
-			'Cleared voice room server pinning after empty call ended',
+			'Cleared DM voice room server pinning after call ended',
 		);
 		return true;
 	}
+
 
 	async clearRoomServerPinIfMatches(params: {
 		guildId?: GuildID;
