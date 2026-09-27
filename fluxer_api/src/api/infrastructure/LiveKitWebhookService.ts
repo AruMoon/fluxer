@@ -290,43 +290,7 @@ export class LiveKitWebhookService {
 		}
 	}
 
-	private async isParticipantStillInRoom(params: {
-		participantIdentity: string;
-		context: VoiceWebhookParticipantContext;
-		regionId?: string;
-		serverId?: string;
-	}): Promise<'present' | 'absent' | 'unknown'> {
-		const {participantIdentity, context} = params;
-		const guildId = context.type === 'guild' ? context.guildId : undefined;
-		let regionId = params.regionId;
-		let serverId = params.serverId;
-		if (!regionId || !serverId) {
-			const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
-			if (pinnedServer) {
-				regionId = pinnedServer.regionId;
-				serverId = pinnedServer.serverId;
-			}
-		}
-		if (!regionId || !serverId) {
-			return 'unknown';
-		}
-		const result = await this.liveKitService.listParticipants({
-			guildId,
-			channelId: context.channelId,
-			regionId,
-			serverId,
-		});
-		if (result.status === 'error') {
-			Logger.warn(
-				{errorCode: result.errorCode, retryable: result.retryable, participantIdentity},
-				'Cannot determine participant presence due to LiveKit lookup failure',
-			);
-			return 'unknown';
-		}
-		return result.participants.some((p) => p.identity === participantIdentity) ? 'present' : 'absent';
-	}
-
-	async handleParticipantLeft(event: WebhookEvent): Promise<void> {
+	async handleParticipantLeft(event: WebhookEvent, apiKey?: string): Promise<void> {
 		if (event.event !== 'participant_left' && event.event !== 'participant_connection_aborted') {
 			return;
 		}
@@ -355,18 +319,22 @@ export class LiveKitWebhookService {
 		);
 		try {
 			const guildId = context.type === 'guild' ? context.guildId : undefined;
-			if (raw.region_id && raw.server_id) {
+			const sourceServer = apiKey ? this.serverMap.get(apiKey) : undefined;
+			const eventRegionId = sourceServer?.regionId ?? raw.region_id;
+			const eventServerId = sourceServer?.serverId ?? raw.server_id;
+
+			if (eventRegionId && eventServerId) {
 				const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
-				if (pinnedServer && (pinnedServer.regionId !== raw.region_id || pinnedServer.serverId !== raw.server_id)) {
+				if (pinnedServer && (pinnedServer.regionId !== eventRegionId || pinnedServer.serverId !== eventServerId)) {
 					Logger.debug(
 						{
 							type: context.type,
 							participantIdentity: participant.identity,
 							channelId: context.channelId.toString(),
-							guildId: context.type === 'guild' ? context.guildId.toString() : undefined,
+							guildId: guildId?.toString(),
 							connectionId: context.connectionId,
-							eventRegionId: raw.region_id,
-							eventServerId: raw.server_id,
+							eventRegionId,
+							eventServerId,
 							currentRegionId: pinnedServer.regionId,
 							currentServerId: pinnedServer.serverId,
 						},
@@ -374,38 +342,6 @@ export class LiveKitWebhookService {
 					);
 					return;
 				}
-			}
-			const presenceStatus = await this.isParticipantStillInRoom({
-				participantIdentity: participant.identity,
-				context,
-				regionId: raw.region_id,
-				serverId: raw.server_id,
-			});
-			if (presenceStatus === 'present') {
-				Logger.warn(
-					{
-						type: context.type,
-						participantIdentity: participant.identity,
-						channelId: context.channelId.toString(),
-						guildId: context.type === 'guild' ? context.guildId.toString() : undefined,
-						connectionId: context.connectionId,
-					},
-					'Ignoring stale participant_left event because participant is still present in room',
-				);
-				return;
-			}
-			if (presenceStatus === 'unknown') {
-				Logger.warn(
-					{
-						type: context.type,
-						participantIdentity: participant.identity,
-						channelId: context.channelId.toString(),
-						guildId: context.type === 'guild' ? context.guildId.toString() : undefined,
-						connectionId: context.connectionId,
-					},
-					'Skipping participant_left disconnect because participant presence is uncertain',
-				);
-				return;
 			}
 			Logger.info(
 				{
@@ -437,22 +373,38 @@ export class LiveKitWebhookService {
 			if (!result.success) {
 				return;
 			}
-			const voiceStateResult = await this.gatewayService.getVoiceStatesForChannel({
-				guildId,
-				channelId: context.channelId,
-			});
-			if (voiceStateResult.voiceStates.length !== 0) {
+			const [voiceStateResult, pendingJoinResult] = await Promise.all([
+				this.gatewayService.getVoiceStatesForChannel({
+					guildId,
+					channelId: context.channelId,
+				}),
+				this.gatewayService.getPendingJoinsForChannel({
+					guildId,
+					channelId: context.channelId,
+				}),
+			]);
+			if (voiceStateResult.voiceStates.length !== 0 || pendingJoinResult.pendingJoins.length !== 0) {
 				return;
 			}
-			if (!raw.region_id || !raw.server_id) {
+
+			if (!eventRegionId || !eventServerId) {
+				Logger.warn(
+					{
+						type: context.type,
+						guildId: guildId?.toString(),
+						channelId: context.channelId.toString(),
+						connectionId: context.connectionId,
+					},
+					'Cannot clear voice room server pinning because the LiveKit event source server is unknown',
+				);
 				return;
 			}
 			// Re-read the pin so a stale leave event cannot clear a newer pin.
 			const currentPinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, context.channelId);
 			if (
 				currentPinnedServer &&
-				currentPinnedServer.regionId === raw.region_id &&
-				currentPinnedServer.serverId === raw.server_id
+				currentPinnedServer.regionId === eventRegionId &&
+				currentPinnedServer.serverId === eventServerId
 			) {
 				await this.voiceRoomStore.deleteRoomServer(guildId, context.channelId);
 				Logger.debug(
@@ -480,7 +432,7 @@ export class LiveKitWebhookService {
 				break;
 			case 'participant_left':
 			case 'participant_connection_aborted':
-				await this.handleParticipantLeft(event);
+				await this.handleParticipantLeft(event, apiKey);
 				break;
 			case 'room_finished':
 				await this.handleRoomFinished(event, apiKey);
