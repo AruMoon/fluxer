@@ -276,7 +276,7 @@ normalize_session_id(Value) -> voice_state_utils:normalize_session_id(Value).
 -spec maybe_clear_empty_voice_room_pin(integer(), integer(), voice_state(), voice_state_map(), guild_state()) -> ok.
 maybe_clear_empty_voice_room_pin(GuildId, ChannelId, RemovedVoiceState, RemainingVoiceStates, State) ->
     case has_voice_state_in_channel(ChannelId, RemainingVoiceStates) orelse
-        guild_voice_connection_pending:has_pending_for_channel(ChannelId, State) of
+        has_pending_voice_connection_in_channel(ChannelId, State) of
         true ->
             ok;
         false ->
@@ -284,8 +284,7 @@ maybe_clear_empty_voice_room_pin(GuildId, ChannelId, RemovedVoiceState, Remainin
             ServerId = maps:get(<<"server_id">>, RemovedVoiceState, undefined),
             case {RegionId, ServerId} of
                 {Region, Server} when is_binary(Region), is_binary(Server) ->
-                    _ = rpc_client:call(#
-                        {<<"type">> => <<"voice_clear_room_server_pin">>,
+                    _ = rpc_client:call(#{<<"type">> => <<"voice_clear_room_server_pin">>,
                          <<"guild_id">> => integer_to_binary(GuildId),
                          <<"channel_id">> => integer_to_binary(ChannelId),
                          <<"region_id">> => Region,
@@ -299,6 +298,17 @@ maybe_clear_empty_voice_room_pin(GuildId, ChannelId, RemovedVoiceState, Remainin
                     ok
             end
     end.
+
+-spec has_pending_voice_connection_in_channel(integer(), guild_state()) -> boolean().
+has_pending_voice_connection_in_channel(ChannelId, State) ->
+    Pending = maps:get(pending_voice_connections, State, #{}),
+    maps:fold(
+        fun(_, PendingData, Acc) ->
+            Acc orelse maps:get(channel_id, PendingData, undefined) =:= ChannelId
+        end,
+        false,
+        Pending
+    ).
 
 -spec has_voice_state_in_channel(integer(), voice_state_map()) -> boolean().
 has_voice_state_in_channel(ChannelId, VoiceStates) ->
