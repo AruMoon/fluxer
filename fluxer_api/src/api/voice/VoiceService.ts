@@ -295,6 +295,44 @@ export class VoiceService {
 		return {token, endpoint, connectionId, tokenNonce, regionId, serverId};
 	}
 
+	async clearRoomServerPinIfMatches(params: {
+		guildId?: GuildID;
+		channelId: ChannelID;
+		regionId: string;
+		serverId: string;
+	}): Promise<boolean> {
+		const {guildId, channelId, regionId, serverId} = params;
+		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
+		if (!pinnedServer) {
+			return false;
+		}
+		if (pinnedServer.regionId !== regionId || pinnedServer.serverId !== serverId) {
+			Logger.debug(
+				{
+					guildId: guildId?.toString(),
+					channelId: channelId.toString(),
+					regionId,
+					serverId,
+					pinnedRegionId: pinnedServer.regionId,
+					pinnedServerId: pinnedServer.serverId,
+				},
+				'Voice room pin clear ignored because the pin belongs to a different server',
+			);
+			return false;
+		}
+		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
+		Logger.info(
+			{
+				guildId: guildId?.toString(),
+				channelId: channelId.toString(),
+				regionId,
+				serverId,
+			},
+			'Cleared voice room server pinning after the gateway channel became empty',
+		);
+		return true;
+	}
+
 	private createVoiceRoutingSelectionKey(guildId: GuildID | undefined, channelId: ChannelID): string {
 		const guildKey = guildId?.toString() ?? 'dm';
 		return `${guildKey}:${channelId.toString()}`;
