@@ -296,6 +296,13 @@ export class VoiceService {
 	}
 
 	async clearRoomServerPinIfEmpty(guildId: GuildID | undefined, channelId: ChannelID): Promise<boolean> {
+		if (guildId !== undefined) {
+			return false;
+		}
+		const channel = await this.channelRepository.findUnique(channelId);
+		if (!channel || (channel.type !== ChannelTypes.DM && channel.type !== ChannelTypes.GROUP_DM)) {
+			return false;
+		}
 		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
 		if (!pinnedServer) {
 			return false;
