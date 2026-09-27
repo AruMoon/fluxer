@@ -33,7 +33,7 @@ handle_join_internal(UserId, VoiceState, SessionId, SessionPid, ConnectionId, St
         Sessions0, SessionId, UserId, SessionPid
     ),
     NewHistory = sets:add_element(UserId, History0),
-    NewPending = build_pending(ConnectionId, UserId, SessionId, BaseState),
+    NewPending = build_pending(ConnectionId, UserId, SessionId, VoiceState, BaseState),
     NewState = BaseState#{
         voice_states => NewVoiceStates,
         sessions => NewSessions,
@@ -46,13 +46,14 @@ handle_join_internal(UserId, VoiceState, SessionId, SessionPid, ConnectionId, St
     ),
     {reply, ok, ensure_call_update(UpdatedState, Dispatched)}.
 
--spec build_pending(binary() | undefined, integer(), binary(), map()) -> map().
-build_pending(undefined, _UserId, _SessionId, #{pending_connections := Pending}) ->
+-spec build_pending(binary() | undefined, integer(), binary(), map(), map()) -> map().
+build_pending(undefined, _UserId, _SessionId, _VoiceState, #{pending_connections := Pending}) ->
     Pending;
 build_pending(
     ConnectionId,
     UserId,
     SessionId,
+    VoiceState,
     #{channel_id := ChannelId, pending_connections := Pending}
 ) ->
     PendingMetadata = #{
@@ -60,8 +61,8 @@ build_pending(
         channel_id => ChannelId,
         connection_id => ConnectionId,
         session_id => SessionId,
-        region_id => maps:get(<<"region_id">>, maps:get(UserId, maps:get(voice_states, BaseState), #{}), undefined),
-        server_id => maps:get(<<"server_id">>, maps:get(UserId, maps:get(voice_states, BaseState), #{}), undefined),
+        region_id => maps:get(<<"region_id">>, VoiceState, undefined),
+        server_id => maps:get(<<"server_id">>, VoiceState, undefined),
         joined_at => erlang:system_time(millisecond)
     },
     erlang:send_after(
