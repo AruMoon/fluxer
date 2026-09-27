@@ -191,7 +191,9 @@ handle_session_down(Pid, #{sessions := Sessions, voice_states := VoiceStates} = 
             BaseState = State#{voice_states => NewVS, sessions => NewSess},
             CleanState = call_ringing:cancel_ringing_timers([UserId], BaseState),
             RingState = call_ringing:remove_users_from_ringing([UserId], CleanState),
-            maybe_clear_empty_voice_room_pin(maps:get(UserId, VoiceStates, undefined), RingState),
+            maybe_clear_empty_voice_room_pin(
+                maps:get(UserId, VoiceStates, undefined), RingState
+            ),
             {UpdState, Dispatched} = call_ringing:maybe_dispatch_state_update(
                 State, RingState
             ),
@@ -278,7 +280,9 @@ handle_leave(SessionId, #{sessions := Sessions, voice_states := VoiceStates} = S
             BaseState = State#{voice_states => NewVS, sessions => NewSess},
             CleanState = call_ringing:cancel_ringing_timers([UserId], BaseState),
             RingState = call_ringing:remove_users_from_ringing([UserId], CleanState),
-            maybe_clear_empty_voice_room_pin(maps:get(UserId, VoiceStates, undefined), RingState),
+            maybe_clear_empty_voice_room_pin(
+                maps:get(UserId, VoiceStates, undefined), RingState
+            ),
             {UpdState, Dispatched} = call_ringing:maybe_dispatch_state_update(
                 State, RingState
             ),
@@ -449,7 +453,6 @@ dispatch_voice_server_rpc(ChannelId, SessionPid, Req) ->
 is_session_pid_alive(Pid) ->
     process_liveness:is_alive(Pid).
 
-
 -ifdef(TEST).
 
 dm_voice_state(ChannelId, RegionId, ServerId) ->
@@ -523,7 +526,13 @@ maybe_clear_empty_voice_room_pin_keeps_pin_for_remaining_user_test() ->
             State
         )
     ),
-    ?assertEqual(timeout, receive Message -> Message after 100 -> timeout end).
+    ?assertEqual(
+        timeout,
+        receive
+            Message -> Message
+        after 100 -> timeout
+        end
+    ).
 
 maybe_clear_empty_voice_room_pin_keeps_pin_for_pending_join_test() ->
     State = #{
@@ -538,6 +547,12 @@ maybe_clear_empty_voice_room_pin_keeps_pin_for_pending_join_test() ->
             State
         )
     ),
-    ?assertEqual(timeout, receive Message -> Message after 100 -> timeout end).
+    ?assertEqual(
+        timeout,
+        receive
+            Message -> Message
+        after 100 -> timeout
+        end
+    ).
 
 -endif.
