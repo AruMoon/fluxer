@@ -469,9 +469,7 @@ export class RpcService {
 				if (this.voiceService === null) {
 					throw new Error('Voice is not enabled on this server');
 				}
-				const cleared = await this.voiceService.clearDmRoomServerPin(
-					createChannelID(request.channel_id),
-				);
+				const cleared = await this.voiceService.clearDmRoomServerPin(createChannelID(request.channel_id));
 				return {
 					type: 'voice_clear_room_server_pin_unconditional',
 					data: {success: cleared},
