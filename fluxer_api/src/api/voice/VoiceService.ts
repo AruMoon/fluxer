@@ -295,9 +295,18 @@ export class VoiceService {
 		return {token, endpoint, connectionId, tokenNonce, regionId, serverId};
 	}
 
-	async clearRoomServerPin(guildId: GuildID | undefined, channelId: ChannelID): Promise<boolean> {
+	async clearRoomServerPinIfEmpty(guildId: GuildID | undefined, channelId: ChannelID): Promise<boolean> {
 		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
 		if (!pinnedServer) {
+			return false;
+		}
+		const participants = await this.liveKitService.listParticipants({
+			guildId,
+			channelId,
+			regionId: pinnedServer.regionId,
+			serverId: pinnedServer.serverId,
+		});
+		if (participants.status === 'error' || participants.participants.length !== 0) {
 			return false;
 		}
 		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
@@ -308,10 +317,11 @@ export class VoiceService {
 				regionId: pinnedServer.regionId,
 				serverId: pinnedServer.serverId,
 			},
-			'Cleared voice room server pinning after call ended',
+			'Cleared voice room server pinning after empty call ended',
 		);
 		return true;
 	}
+
 
 	async clearRoomServerPinIfMatches(params: {
 		guildId?: GuildID;
