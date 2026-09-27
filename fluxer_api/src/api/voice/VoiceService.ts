@@ -329,7 +329,6 @@ export class VoiceService {
 		return true;
 	}
 
-
 	async clearRoomServerPinIfMatches(params: {
 		guildId?: GuildID;
 		channelId: ChannelID;
