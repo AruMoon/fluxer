@@ -98,7 +98,9 @@ do_voice_disconnect(
         ChannelId, NewVoiceStates, NewState1
     ),
     voice_state_utils:broadcast_disconnects(#{ConnectionId => OldVoiceState}, NewState),
-    ok = maybe_clear_empty_voice_room_pin(GuildId, ChannelId, OldVoiceState, NewVoiceStates, NewState),
+    ok = maybe_clear_empty_voice_room_pin(
+        GuildId, ChannelId, OldVoiceState, NewVoiceStates, NewState
+    ),
     FinalState = maybe_cleanup_after_disconnect(UserId, ChannelId, NewState),
     {reply, #{success => true}, FinalState}.
 
@@ -273,10 +275,16 @@ voice_state_session_matches(VoiceState, RequestSessionId) ->
 -spec normalize_session_id(term()) -> binary() | undefined.
 normalize_session_id(Value) -> voice_state_utils:normalize_session_id(Value).
 
--spec maybe_clear_empty_voice_room_pin(integer(), integer(), voice_state(), voice_state_map(), guild_state()) -> ok.
-maybe_clear_empty_voice_room_pin(GuildId, ChannelId, RemovedVoiceState, RemainingVoiceStates, State) ->
-    case has_voice_state_in_channel(ChannelId, RemainingVoiceStates) orelse
-        has_pending_voice_connection_in_channel(ChannelId, State) of
+-spec maybe_clear_empty_voice_room_pin(
+    integer(), integer(), voice_state(), voice_state_map(), guild_state()
+) -> ok.
+maybe_clear_empty_voice_room_pin(
+    GuildId, ChannelId, RemovedVoiceState, RemainingVoiceStates, State
+) ->
+    case
+        has_voice_state_in_channel(ChannelId, RemainingVoiceStates) orelse
+            has_pending_voice_connection_in_channel(ChannelId, State)
+    of
         true ->
             ok;
         false ->
@@ -284,16 +292,22 @@ maybe_clear_empty_voice_room_pin(GuildId, ChannelId, RemovedVoiceState, Remainin
             ServerId = maps:get(<<"server_id">>, RemovedVoiceState, undefined),
             case {RegionId, ServerId} of
                 {Region, Server} when is_binary(Region), is_binary(Server) ->
-                    _ = rpc_client:call(#{<<"type">> => <<"voice_clear_room_server_pin">>,
-                         <<"guild_id">> => integer_to_binary(GuildId),
-                         <<"channel_id">> => integer_to_binary(ChannelId),
-                         <<"region_id">> => Region,
-                         <<"server_id">> => Server}),
+                    _ = rpc_client:call(#{
+                        <<"type">> => <<"voice_clear_room_server_pin">>,
+                        <<"guild_id">> => integer_to_binary(GuildId),
+                        <<"channel_id">> => integer_to_binary(ChannelId),
+                        <<"region_id">> => Region,
+                        <<"server_id">> => Server
+                    }),
                     ok;
                 _ ->
                     logger:warning(
                         "voice_pin_cleanup_missing_routing: guild_id=~p channel_id=~p connection_id=~p",
-                        [GuildId, ChannelId, maps:get(<<"connection_id">>, RemovedVoiceState, undefined)]
+                        [
+                            GuildId,
+                            ChannelId,
+                            maps:get(<<"connection_id">>, RemovedVoiceState, undefined)
+                        ]
                     ),
                     ok
             end
