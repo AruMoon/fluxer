@@ -239,7 +239,6 @@ export class VoiceService {
 		connectionId = providedConnectionId || generateConnectionId();
 		Logger.debug(
 			{
-				guildId: guildId?.toString(),
 				channelId: channelId.toString(),
 				userId: userId.toString(),
 				providedConnectionId,
