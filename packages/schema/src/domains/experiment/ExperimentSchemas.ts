@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {AltchaCaptchaAssignmentResponse} from '@fluxer/schema/src/domains/admin/AltchaCaptchaSchemas';
 import {
 	DomainMigrationAssignmentResponse,
 	INERT_DOMAIN_MIGRATION_ASSIGNMENT,
 } from '@fluxer/schema/src/domains/admin/DomainMigrationSchemas';
 import {
-	INERT_PROFILE_TIMEZONE_ASSIGNMENT,
-	ProfileTimezoneAssignmentResponse,
-} from '@fluxer/schema/src/domains/admin/ProfileTimezoneSchemas';
+	INERT_PLUTONIUM_PAGE_ASSIGNMENT,
+	PlutoniumPageAssignmentResponse,
+} from '@fluxer/schema/src/domains/admin/PlutoniumPageSchemas';
 import {z} from 'zod';
 
 export const EXPERIMENT_MIN_POLL_INTERVAL_SECONDS = 60;
@@ -47,8 +46,7 @@ export type ExperimentDeliveryConfigResponse = z.infer<typeof ExperimentDelivery
 
 const ExperimentAssignmentsSchema = z.object({
 	domain_migration: DomainMigrationAssignmentResponse.optional(),
-	altcha_captcha: AltchaCaptchaAssignmentResponse.optional(),
-	profile_timezone: ProfileTimezoneAssignmentResponse.optional(),
+	plutonium_page: PlutoniumPageAssignmentResponse.optional(),
 });
 
 export const ExperimentAssignmentsResponse = z.object({
@@ -71,8 +69,6 @@ export function readDomainMigrationAssignment(
 	return response.assignments.domain_migration ?? INERT_DOMAIN_MIGRATION_ASSIGNMENT;
 }
 
-export function readProfileTimezoneAssignment(
-	response: ExperimentAssignmentsResponse,
-): ProfileTimezoneAssignmentResponse {
-	return response.assignments.profile_timezone ?? INERT_PROFILE_TIMEZONE_ASSIGNMENT;
+export function readPlutoniumPageAssignment(response: ExperimentAssignmentsResponse): PlutoniumPageAssignmentResponse {
+	return response.assignments.plutonium_page ?? INERT_PLUTONIUM_PAGE_ASSIGNMENT;
 }

@@ -57,9 +57,6 @@ catalogs:
     '@floating-ui/react-dom':
       specifier: 2.1.9
       version: 2.1.9
-    '@hcaptcha/react-hcaptcha':
-      specifier: 2.2.0
-      version: 2.2.0
     '@hono/node-server':
       specifier: 2.1.1
       version: 2.1.1
@@ -87,9 +84,6 @@ catalogs:
     '@livekit/components-react':
       specifier: 2.9.24
       version: 2.9.24
-    '@marsidev/react-turnstile':
-      specifier: 1.6.1
-      version: 1.6.1
     '@mdx-js/mdx':
       specifier: 3.1.1
       version: 3.1.1
@@ -216,9 +210,6 @@ catalogs:
     combokeys:
       specifier: 3.0.1
       version: 3.0.1
-    deepfilternet3-noise-filter:
-      specifier: 1.3.0
-      version: 1.3.0
     emoji-regex:
       specifier: 11.0.0
       version: 11.0.0
@@ -273,9 +264,6 @@ catalogs:
     lexical:
       specifier: 0.50.0
       version: 0.50.0
-    libphonenumber-js:
-      specifier: 1.13.13
-      version: 1.13.13
     livekit-server-sdk:
       specifier: 2.19.0
       version: 2.19.0
@@ -635,9 +623,6 @@ importers:
       '@pkgs/rate_limit':
         specifier: workspace:*
         version: link:pkgs/rate_limit
-      '@pkgs/sms':
-        specifier: workspace:*
-        version: link:pkgs/sms
       '@pkgs/virus_scan':
         specifier: workspace:*
         version: link:pkgs/virus_scan
@@ -869,18 +854,9 @@ importers:
       '@fluxer/ip_utils':
         specifier: workspace:*
         version: link:../../../packages/ip_utils
-      '@pkgs/cassandra':
-        specifier: workspace:*
-        version: link:../cassandra
-      '@pkgs/postgres':
-        specifier: workspace:*
-        version: link:../postgres
       maxmind:
         specifier: 'catalog:'
         version: 5.0.7
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.5
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -1017,28 +993,6 @@ importers:
         specifier: catalog:ts7
         version: 7.0.2
 
-  fluxer_api/pkgs/sms:
-    dependencies:
-      '@fluxer/constants':
-        specifier: workspace:*
-        version: link:../../../packages/constants
-      '@fluxer/errors':
-        specifier: workspace:*
-        version: link:../../../packages/errors
-      '@fluxer/logger':
-        specifier: workspace:*
-        version: link:../../../packages/logger
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.1
-      typescript:
-        specifier: catalog:ts7
-        version: 7.0.2
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.1(@opentelemetry/api@1.9.1)(@types/node@26.6.1)(@vitest/coverage-v8@5.0.1)(happy-dom@20.14.5)(msw@2.15.0(@types/node@26.6.1)(typescript@7.0.2))(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.1))
-
   fluxer_api/pkgs/virus_scan:
     dependencies:
       '@fluxer/logger':
@@ -1057,15 +1011,9 @@ importers:
 
   fluxer_api/pkgs/worker:
     dependencies:
-      '@fluxer/constants':
-        specifier: workspace:*
-        version: link:../../../packages/constants
       '@fluxer/logger':
         specifier: workspace:*
         version: link:../../../packages/logger
-      itty-time:
-        specifier: 'catalog:'
-        version: 2.0.2
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -1442,9 +1390,6 @@ importers:
       '@fluxer/voice_engine_v2':
         specifier: workspace:*
         version: link:../packages/voice_engine_v2
-      '@hcaptcha/react-hcaptcha':
-        specifier: 'catalog:'
-        version: 2.2.0
       '@lexical/history':
         specifier: 'catalog:'
         version: 0.50.0(typescript@7.0.2)
@@ -1466,9 +1411,6 @@ importers:
       '@livekit/components-react':
         specifier: 'catalog:'
         version: 2.9.24(livekit-client@fluxer_app+pkgs+livekit-client)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(tslib@2.8.1)
-      '@marsidev/react-turnstile':
-        specifier: 'catalog:'
-        version: 1.6.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@phosphor-icons/react':
         specifier: 'catalog:'
         version: 2.1.10(patch_hash=9b0b481de857aa7a7525f023baea9da72be4574ff72825e39d959e6979d78eea)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1517,9 +1459,6 @@ importers:
       combokeys:
         specifier: 'catalog:'
         version: 3.0.1
-      deepfilternet3-noise-filter:
-        specifier: 'catalog:'
-        version: 1.3.0(livekit-client@fluxer_app+pkgs+livekit-client)
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.4
@@ -1553,9 +1492,6 @@ importers:
       lexical:
         specifier: 'catalog:'
         version: 0.50.0(typescript@7.0.2)
-      libphonenumber-js:
-        specifier: 'catalog:'
-        version: 1.13.13
       livekit-client:
         specifier: workspace:*
         version: link:pkgs/livekit-client
@@ -2006,9 +1942,6 @@ importers:
 
   packages/errors:
     dependencies:
-      '@fluxer/config':
-        specifier: workspace:*
-        version: link:../config
       '@fluxer/constants':
         specifier: workspace:*
         version: link:../constants
@@ -4621,9 +4554,6 @@ packages:
     cpu: [x64, arm64]
     os: [win32]
 
-  '@hcaptcha/react-hcaptcha@2.2.0':
-    resolution: {integrity: sha512-/HrPgNLRrJziLrh2s+qFRO33ubBSuHn9sdNsQcP0wQElpORxlpR6wnq3X9j/bZGd+uQtYIvPl4QSU2la+Jl9Hg==}
-
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
@@ -5214,12 +5144,6 @@ packages:
 
   '@marijn/find-cluster-break@1.0.4':
     resolution: {integrity: sha512-Wy0V7+SGUjnF9/TkiM1hKVDPj7jKXduPNboMVtHTA8dySMURWqfg/JZ9E2Sq8JgSJmkl7k7Qe9FLeMSrSraWmQ==}
-
-  '@marsidev/react-turnstile@1.6.1':
-    resolution: {integrity: sha512-ojI9NLYv821IRKi7KraTkxTto6KC/m58hNNyKxvYxm/cQBu5MI5eMkaiJs2JSQBFiXE3LPQI3seJVjv/2lgALA==}
-    peerDependencies:
-      react: ^17.0.2 || ^18.0.0 || ^19.0
-      react-dom: ^17.0.2 || ^18.0.0 || ^19.0
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
@@ -7618,12 +7542,6 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
-  deepfilternet3-noise-filter@1.3.0:
-    resolution: {integrity: sha512-yYFUlPuvPguqcd/R6/OSsr0noGqlqOE50JkCWYHogk+PjLj9qrNgwTt5zKraVkKnw0l4+eXJagkz2SUWtUl4sQ==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      livekit-client: ^2.0.0
-
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
     engines: {node: '>=0.10.0'}
@@ -8651,9 +8569,6 @@ packages:
     resolution: {integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==}
     engines: {node: '>=16'}
     hasBin: true
-
-  libphonenumber-js@1.13.13:
-    resolution: {integrity: sha512-hV6SmWnyQ8U1QXhhqbqYBHIStNnscG7A5XbGodgdHhf/8N5PwhYpJA5U/yHDjYwPYTd8uNGXqq416XctuvK2PA==}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -13711,8 +13626,6 @@ snapshots:
   '@fluxer/windows-input-hook@file:fluxer_desktop/native/windows-input-hook':
     optional: true
 
-  '@hcaptcha/react-hcaptcha@2.2.0': {}
-
   '@hexagon/base64@1.1.28': {}
 
   '@hono/node-server@2.1.1(hono@4.13.8)':
@@ -14300,11 +14213,6 @@ snapshots:
       - supports-color
 
   '@marijn/find-cluster-break@1.0.4': {}
-
-  '@marsidev/react-turnstile@1.6.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
-    dependencies:
-      react: 19.3.0
-      react-dom: 19.3.0(react@19.3.0)
 
   '@mdx-js/mdx@3.1.1(supports-color@7.2.0)':
     dependencies:
@@ -16589,10 +16497,6 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-  deepfilternet3-noise-filter@1.3.0(livekit-client@fluxer_app+pkgs+livekit-client):
-    dependencies:
-      livekit-client: link:fluxer_app/pkgs/livekit-client
-
   deepmerge@4.3.1: {}
 
   defu@6.1.7: {}
@@ -17788,8 +17692,6 @@ snapshots:
   lib0@0.2.117:
     dependencies:
       isomorphic.js: 0.2.5
-
-  libphonenumber-js@1.13.13: {}
 
   lightningcss-android-arm64@1.32.0:
     optional: true

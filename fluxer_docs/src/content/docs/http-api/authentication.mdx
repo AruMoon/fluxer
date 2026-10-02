@@ -10,13 +10,13 @@ The Authentication resource covers signing up, signing in, recovering an account
 
 ## Shared behaviour
 
-[Authentication](/authentication/) and [HTTP authentication](/http-api/#authentication) define credential syntax and the credential namespaces. Changing the credentials of an account that is already signed in is covered by [Email and password changes](/http-api/users/email-and-password/), [Multi-factor authentication](/http-api/users/mfa/), and [Phone verification](/http-api/users/phone-verification/).
+[Authentication](/authentication/) and [HTTP authentication](/http-api/#authentication) define credential syntax and the credential namespaces. Changing the credentials of an account that is already signed in is covered by [Email and password changes](/http-api/users/email-and-password/) and [Multi-factor authentication](/http-api/users/mfa/).
 
 :::caution[Authentication material is confidential and opaque]
 A client MUST treat every session token, one-use token, ticket, SSO state, and handoff code as confidential. It MUST NOT parse one, expose it to untrusted code, or write it to logs, analytics, or a URL the operation did not assign.
 :::
 
-Most operations need no `Authorization` credential, because the request has a one-use token, MFA ticket, WebAuthn assertion, or account credential of its own. [List authentication sessions](#list-authentication-sessions), [terminate authentication sessions](#terminate-authentication-sessions), [resend email verification](#resend-email-verification), [log out](#log-out), [complete desktop handoff](#complete-desktop-handoff), and [create origin handoff](#create-origin-handoff) are the only operations on this page that read an `Authorization` credential. Complete desktop handoff reads the header only when its body omits the `token` field. The first three and create origin handoff require an ordinary user session, and each rejects a bot token and an OAuth2 bearer token with 403 `ACCESS_DENIED`. All four still admit a session whose account is flagged for suspicious activity.
+Most operations need no `Authorization` credential, because the request has a one-use token, MFA ticket, WebAuthn assertion, or account credential of its own. [List authentication sessions](#list-authentication-sessions), [terminate authentication sessions](#terminate-authentication-sessions), [resend email verification](#resend-email-verification), [log out](#log-out), [complete desktop handoff](#complete-desktop-handoff), and [create origin handoff](#create-origin-handoff) are the only operations on this page that read an `Authorization` credential. Complete desktop handoff reads the header only when its body omits the `token` field. The first three and create origin handoff require an ordinary user session, and each rejects a bot token and an OAuth2 bearer token with 403 `ACCESS_DENIED`.
 
 Every route has a route bucket and is also subject to the [global HTTP limit](/topics/rate-limits/). A route bucket is keyed by the authenticated user when the request has a resolvable credential and by the client IP address otherwise. Bucket or global denial returns 429 `RATE_LIMITED`.
 
@@ -423,11 +423,11 @@ Starts a single sign-on flow. Authentication is not required. Returns an [SSO st
 | Field | Type | Description |
 | --- | --- | --- |
 | redirect_to?<sup>1</sup> | ?string | The post-authentication redirect to bind to the state |
-| redirect_uri?<sup>2</sup> | ?string | The provider callback URI to use instead of the configured default |
+| redirect_uri?<sup>2</sup> | ?string | The callback URI the client wants the result delivered to |
 
 <sup>1</sup> Fluxer sanitises the value before binding it to the state and discards a value that does not survive, which the [SSO completion response](#sso-completion-response-object) reports as the empty string. Sanitisation keeps the trimmed value only when it begins with a single `/`, is at most 2,048 characters, and contains no carriage return or line feed
 
-<sup>2</sup> The accepted values are the instance default reported as `redirect_uri` by [get SSO status](#get-sso-status) and the mobile callback `fluxer://auth/sso/callback`, and any other value returns the field code `INVALID_URL_FORMAT`. The accepted value is bound to the state and reused at the token exchange
+<sup>2</sup> The accepted values are the instance default reported as `redirect_uri` by [get SSO status](#get-sso-status) and the mobile callback `fluxer://auth/sso/callback`, and any other value returns the field code `INVALID_URL_FORMAT`. The provider always receives the instance default. For the mobile callback the state starts with `m.`, and the web callback page forwards the provider's query string to `fluxer://auth/sso/callback` unchanged
 
 ### Response
 
@@ -506,21 +506,18 @@ Approval mode registration instead returns 403 `REGISTRATION_PENDING_APPROVAL` a
 
 Creates an ordinary account. Returns an [authentication token response](#authentication-token-response) when the instance admits the account immediately and a [registration pending approval response](#registration-pending-approval-response-object) when it does not. Emits a [Guild Member Add](/gateway/events/#guild-member-add) Gateway event for each guild the new account joins through an invite or through the instance's single community guild.
 
-Registration verifies [CAPTCHA](/topics/captcha/) when CAPTCHA is enabled. It permits 3 attempts per hour for each client IP address and 15 per hour for each client subnet, which is the IPv4 /24 or IPv6 /48 network. A supplied email address permits 3 attempts per 15 minutes of its own. Those allowances are separate from the route bucket, and only a deployment with `dev.relax_registration_rate_limits` set to true disables them.
+Registration verifies a [CAPTCHA](/topics/captcha/). It permits 3 attempts per hour for each client IP address and 15 per hour for each client subnet, which is the IPv4 /24 or IPv6 /48 network. A supplied email address permits 3 attempts per 15 minutes of its own. Those allowances are separate from the route bucket, and only a deployment with `dev.relax_registration_rate_limits` set to true disables them.
 
 ### Request headers
 
 | Field | Type | Description |
 | --- | --- | --- |
-| X-Captcha-Token?<sup>1</sup> | string | The proof issued by the CAPTCHA provider |
-| X-Captcha-Type?<sup>2</sup> | string | The provider that issued the proof, either `hcaptcha` or `turnstile` |
-| Accept-Language?<sup>3</sup> | string | The language tag that selects the locale stored on the new account |
+| X-Captcha-Token?<sup>1</sup> | string | The solved ALTCHA challenge, see [CAPTCHA handling](/topics/captcha/) |
+| Accept-Language?<sup>2</sup> | string | The language tag that selects the locale stored on the new account |
 
-<sup>1</sup> A missing proof returns 400 `CAPTCHA_REQUIRED` and a rejected proof returns 400 `INVALID_CAPTCHA`, and verification is skipped entirely when CAPTCHA is disabled for the instance
+<sup>1</sup> A missing token returns 400 `CAPTCHA_REQUIRED` and a rejected token returns 400 `INVALID_CAPTCHA`, each with a new challenge. Verification is skipped entirely while the check is off for the instance
 
-<sup>2</sup> Omitting the header selects the instance's configured provider
-
-<sup>3</sup> The parsed locale becomes the account locale and selects the language of the verification email
+<sup>2</sup> The parsed locale becomes the account locale and selects the language of the verification email
 
 ### JSON body
 
@@ -536,7 +533,7 @@ Registration verifies [CAPTCHA](/topics/captcha/) when CAPTCHA is enabled. It pe
 | registration_url_code?<sup>6</sup> | ?string | The administrator-issued registration URL code (1-256 characters) |
 | theme? | string | The initial theme preference, one of `dark`, `dark_legacy`, `coal`, `light`, or `system` |
 
-<sup>1</sup> Omitting the email address creates an unclaimed account, which has no recovery path until it is claimed. An address whose domain has no usable DNS records, or whose top-level domain is blocked by account policy, returns the field code `INVALID_EMAIL_ADDRESS`, and an address already in use returns `EMAIL_ALREADY_IN_USE`
+<sup>1</sup> Omitting the email address creates an unclaimed account, which has no recovery path until it is claimed. An address whose domain has no usable DNS records, or whose top-level domain the instance blocks, returns the field code `INVALID_EMAIL_ADDRESS`, and an address already in use returns `EMAIL_ALREADY_IN_USE`
 
 <sup>2</sup> Omitting the username derives one from `global_name` when that value produces a permitted username, and otherwise allocates a generated username, in both cases with a server-allocated discriminator
 
@@ -548,7 +545,7 @@ Registration verifies [CAPTCHA](/topics/captcha/) when CAPTCHA is enabled. It pe
 
 <sup>6</sup> A code supplied on an instance with administrator registration URLs disabled, and a code that does not resolve, both return 400 `REGISTRATION_URL_INVALID`. A valid code overrides the closed registration mode and replaces the instance approval mode with its own approval setting
 
-Fluxer resolves the region from the client IP address, and an age below the minimum for that region returns the field code `MUST_BE_MINIMUM_AGE`. That minimum is 13 years unless account policy sets a different minimum for the region, and the applied minimum appears only in the localised message.
+Fluxer resolves the region from the client IP address, and an age below the minimum for that region returns the field code `MUST_BE_MINIMUM_AGE`. That minimum is 13 years unless the region sets a different minimum, and the applied minimum appears only in the localised message.
 
 Registration returns 403 `REGISTRATION_CLOSED` when the instance is closed and no valid registration URL was supplied. A username whose discriminator space is exhausted returns the field code `TOO_MANY_USERS_WITH_THIS_USERNAME`. A username or display name containing a blocked substring returns 403 `CONTENT_BLOCKED`.
 
@@ -573,9 +570,9 @@ There is no retry key. A repeated request with the same values creates a second 
 
 ### Side effects
 
-The operation applies the instance's registration, email-domain, breached-password, and regional policies before creating the account, and its risk policy can set suspicious activity flags on the created account. It records the accepted terms and privacy policy, authorises the registering client IP address, and sends an email verification message when the instance sends email. An instance that sends no email marks the address verified at creation instead.
+The operation applies the instance's registration, email-domain, breached-password, and regional policies before creating the account. It records the accepted terms and privacy policy, authorises the registering client IP address, and sends an email verification message when the instance sends email. An instance that sends no email marks the address verified at creation instead.
 
-Registration accepts the `invite_code` from the body, or the instance's configured auto-join invite when the body has none. On an instance with single-community mode enabled, the account also joins the community guild. Each join emits [Guild Member Add](/gateway/events/#guild-member-add) to the affected guild's sessions. Registration policy can suppress invite admission.
+Registration accepts the `invite_code` from the body, or the instance's configured auto-join invite when the body has none. On an instance with single-community mode enabled, the account also joins the community guild. Each join emits [Guild Member Add](/gateway/events/#guild-member-add) to the affected guild's sessions.
 
 Approval mode registration creates no guild membership and no authentication session, and the account cannot sign in until an administrator approves it. Every other successful registration creates one session and returns its token.
 
@@ -589,22 +586,19 @@ Approval mode registration creates no guild membership and no authentication ses
 
 Validates local email and password credentials. Authentication is not required. Returns an [authentication token response](#authentication-token-response) when no second factor and no IP approval are outstanding, and an [MFA challenge response](#mfa-challenge-response) when the account has a second factor.
 
-Login verifies CAPTCHA when CAPTCHA is enabled. It also permits 10 attempts per client IP address in 30 minutes, keyed by the exact IPv4 address or the IPv6 /64 network, and 5 attempts per email address in 15 minutes. Every admitted attempt consumes both allowances, whether or not the credentials turn out to be correct, and a successful login clears neither.
+Login verifies a [CAPTCHA](/topics/captcha/). It also permits 10 attempts per client IP address in 30 minutes, keyed by the exact IPv4 address or the IPv6 /64 network, and 5 attempts per email address in 15 minutes. Every admitted attempt consumes both allowances, whether or not the credentials turn out to be correct, and a successful login clears neither.
 
 ### Request headers
 
 | Field | Type | Description |
 | --- | --- | --- |
-| X-Captcha-Token?<sup>1</sup> | string | The proof issued by the CAPTCHA provider |
-| X-Captcha-Type?<sup>2</sup> | string | The provider that issued the proof, either `hcaptcha` or `turnstile` |
-| X-Fluxer-Client-Properties?<sup>3</sup> | string | The base64-encoded JSON with the reporting client's `os` |
-| User-Agent?<sup>3</sup> | string | The client string recorded on the created session and shown by [list authentication sessions](#list-authentication-sessions) |
+| X-Captcha-Token?<sup>1</sup> | string | The solved ALTCHA challenge, see [CAPTCHA handling](/topics/captcha/) |
+| X-Fluxer-Client-Properties?<sup>2</sup> | string | The base64-encoded JSON with the reporting client's `os` |
+| User-Agent?<sup>2</sup> | string | The client string recorded on the created session and shown by [list authentication sessions](#list-authentication-sessions) |
 
-<sup>1</sup> A missing proof returns 400 `CAPTCHA_REQUIRED` and a rejected proof returns 400 `INVALID_CAPTCHA`, and verification is skipped entirely when CAPTCHA is disabled for the instance
+<sup>1</sup> A missing token returns 400 `CAPTCHA_REQUIRED` and a rejected token returns 400 `INVALID_CAPTCHA`, each with a new challenge. Verification is skipped entirely while the check is off for the instance
 
-<sup>2</sup> Omitting the header selects the instance's configured provider
-
-<sup>3</sup> Both values feed the [client info](#client-info-object) object recorded on the session, and `X-Fluxer-Client-Properties` is read only for a native Fluxer `User-Agent`
+<sup>2</sup> Both values feed the [client info](#client-info-object) object recorded on the session, and `X-Fluxer-Client-Properties` is read only for a native Fluxer `User-Agent`
 
 ### JSON body
 
@@ -840,7 +834,7 @@ Success consumes the challenge, clears an expired temporary suspension, and crea
 
 Revokes the session identified by the user session token in the `Authorization` header. Returns 204 with no body.
 
-The request has no body. The operation requires a credential that resolves to an account, and it admits one flagged for suspicious activity. An absent, malformed, or unknown token returns 401 `UNAUTHORIZED`. An OAuth2 bearer token returns 403 `ACCESS_DENIED`. A bot holds no session, so a bot token is accepted and revokes nothing.
+The request has no body. The operation requires a credential that resolves to an account. An absent, malformed, or unknown token returns 401 `UNAUTHORIZED`. An OAuth2 bearer token returns 403 `ACCESS_DENIED`. A bot holds no session, so a bot token is accepted and revokes nothing.
 
 :::note[Logging out revokes exactly the calling session]
 The account's other sessions, its OAuth2 grants, and any outstanding MFA ticket, IP authorisation ticket, or desktop handoff all survive. Use [terminate authentication sessions](#terminate-authentication-sessions) to revoke other sessions.
@@ -896,7 +890,7 @@ Fluxer never compares the account's address against the one the token was issued
 
 ### Side effects
 
-The operation marks the current address verified, clears its bounced state, and clears every suspicious activity flag that verifying or reverifying an email address satisfies. It emits a [User Update](/gateway/events/#user-update) Gateway Dispatch to the account's own sessions.
+The operation marks the current address verified and clears its bounced state. It emits a [User Update](/gateway/events/#user-update) Gateway Dispatch to the account's own sessions.
 
 ### Rate limit
 
@@ -908,7 +902,7 @@ The operation marks the current address verified, clears its bounced state, and 
 
 Issues and sends a new email verification token for the authenticated account. Requires a user session token for an ordinary user. Returns 204 with no body.
 
-The request has no body. When the current address is already verified and no reverification suspicious activity flag is set, the operation returns 204 and sends nothing.
+The request has no body. When the current address is already verified, the operation returns 204 and sends nothing.
 
 ### Response
 
@@ -935,18 +929,15 @@ The operation creates one 64-character verification token bound to the account a
 
 Accepts a password recovery request for an email address. Authentication is not required. Returns 204 with no body.
 
-Password recovery verifies CAPTCHA when CAPTCHA is enabled. Fluxer consumes both the client IP address and email address allowances before it validates the address, and exhausting either returns 429.
+Password recovery verifies a [CAPTCHA](/topics/captcha/). Fluxer consumes both the client IP address and email address allowances before it validates the address, and exhausting either returns 429.
 
 ### Request headers
 
 | Field | Type | Description |
 | --- | --- | --- |
-| X-Captcha-Token?<sup>1</sup> | string | The proof issued by the CAPTCHA provider |
-| X-Captcha-Type?<sup>2</sup> | string | The provider that issued the proof, either `hcaptcha` or `turnstile` |
+| X-Captcha-Token?<sup>1</sup> | string | The solved ALTCHA challenge, see [CAPTCHA handling](/topics/captcha/) |
 
-<sup>1</sup> A missing proof returns 400 `CAPTCHA_REQUIRED` and a rejected proof returns 400 `INVALID_CAPTCHA`, and verification is skipped entirely when CAPTCHA is disabled for the instance
-
-<sup>2</sup> Omitting the header selects the instance's configured provider
+<sup>1</sup> A missing token returns 400 `CAPTCHA_REQUIRED` and a rejected token returns 400 `INVALID_CAPTCHA`, each with a new challenge. Verification is skipped entirely while the check is off for the instance
 
 ### JSON body
 
@@ -1601,7 +1592,7 @@ The sending origin encrypts the state and keeps the key. Fluxer never receives t
 | nonce_hash | string | The SHA-256 digest of the receiving origin's nonce, as 64 lowercase hex characters |
 | payload | string | The encrypted client state as base64url, 1 to 8388608 characters |
 
-A bot token and an OAuth2 bearer token both return 403 `ACCESS_DENIED`. A session whose account is flagged for suspicious activity is admitted.
+A bot token and an OAuth2 bearer token both return 403 `ACCESS_DENIED`.
 
 ### Response
 

@@ -74,8 +74,7 @@ export const InstanceAppPublicSchema = z.object({
 });
 export type InstanceAppPublic = z.infer<typeof InstanceAppPublicSchema>;
 
-export const InstanceCaptchaProviderSchema = z.enum(['hcaptcha', 'turnstile', 'none']);
-export type InstanceCaptchaProvider = z.infer<typeof InstanceCaptchaProviderSchema>;
+export const InstanceCaptchaProviderSchema = z.enum(['altcha', 'none']);
 
 export const InstanceEndpointsSchema = z
 	.object({
@@ -96,9 +95,7 @@ export type InstanceEndpoints = z.infer<typeof InstanceEndpointsSchema>;
 
 export const InstanceCaptchaSchema = z
 	.object({
-		provider: InstanceCaptchaProviderSchema.describe('Captcha provider name (hcaptcha, turnstile, none)'),
-		hcaptcha_site_key: z.string().nullable().describe('hCaptcha site key if using hCaptcha'),
-		turnstile_site_key: z.string().nullable().describe('Cloudflare Turnstile site key if using Turnstile'),
+		provider: InstanceCaptchaProviderSchema.describe('Captcha provider (altcha or none)'),
 	})
 	.describe('Captcha configuration');
 export type InstanceCaptcha = z.infer<typeof InstanceCaptchaSchema>;
@@ -116,6 +113,7 @@ export const InstanceFeaturesSchema = z
 		self_hosted: z.boolean().describe('Whether this is a self-hosted instance'),
 		presigned_attachment_uploads: z.boolean().describe('Whether clients can request presigned attachment upload URLs'),
 		emails_enabled: z.boolean().describe('Whether the instance sends emails (verification, password reset, etc.)'),
+		phone_verification_enabled: z.boolean().describe('Deprecated. Always false.'),
 	})
 	.describe('Feature flags for this instance');
 export type InstanceFeatures = z.infer<typeof InstanceFeaturesSchema>;
@@ -163,6 +161,11 @@ export const InstanceCommunitySchema = z
 		direct_messages_disabled: z
 			.boolean()
 			.describe('Whether direct messages and friend requests are disabled instance-wide'),
+		guild_create_access: z
+			.boolean()
+			.describe(
+				'Whether every account can create communities. When false, only admins and accounts granted the feature_guild_create limit can',
+			),
 	})
 	.describe('Community topology and direct-message policy for this instance');
 export type InstanceCommunity = z.infer<typeof InstanceCommunitySchema>;

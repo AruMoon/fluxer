@@ -117,14 +117,12 @@ presence_push_buffer_env_defaults_test() ->
 env_only_http_runtime_config_test() ->
     with_envs(
         [
-            {"FLUXER_GATEWAY_SHUTDOWN_DRAIN_WAIT_MS", "1234"},
             {"FLUXER_GATEWAY_HTTP_RPC_MAX_CONCURRENCY", "42"},
             {"FLUXER_GATEWAY_HTTP_FAILURE_THRESHOLD", "9"},
             {"FLUXER_GATEWAY_HTTP_RECOVERY_TIMEOUT_MS", "6000"}
         ],
         fun() ->
             Config = fluxer_gateway_config:load(),
-            ?assertEqual(1234, maps:get(shutdown_drain_wait_ms, Config)),
             ?assertEqual(42, maps:get(gateway_http_rpc_max_concurrency, Config)),
             ?assertEqual(9, maps:get(gateway_http_failure_threshold, Config)),
             ?assertEqual(6000, maps:get(gateway_http_recovery_timeout_ms, Config))
@@ -158,10 +156,70 @@ env_int_falls_back_to_the_default_for_an_empty_value_test() ->
         ?assertEqual(512, maps:get(gateway_http_rpc_max_concurrency, Config))
     end).
 
+blank_env_values_fall_back_to_the_defaults_test() ->
+    with_envs(
+        [
+            {"FLUXER_GATEWAY_HTTP_RPC_MAX_CONCURRENCY", "  "},
+            {"FLUXER_CLIENT_IP_HEADER_NAME", " "},
+            {"FLUXER_NATS_URL", "\t"},
+            {"FLUXER_GATEWAY_API_RPC_ENDPOINT", "   "},
+            {"FLUXER_GATEWAY_LOGGER_LEVEL", " "},
+            {"FLUXER_GATEWAY_PUSH_ENABLED", " "}
+        ],
+        fun() ->
+            Config = fluxer_gateway_config:load(),
+            ?assertEqual(512, maps:get(gateway_http_rpc_max_concurrency, Config)),
+            ?assertEqual(<<"x-forwarded-for">>, maps:get(client_ip_header, Config)),
+            ?assertEqual("nats://nats:4222", maps:get(nats_core_url, Config)),
+            ?assertEqual(undefined, maps:get(api_rpc_endpoint, Config)),
+            ?assertEqual(info, maps:get(logger_level, Config)),
+            ?assertEqual(true, maps:get(push_enabled, Config))
+        end
+    ).
+
+logger_level_env_test() ->
+    with_env("FLUXER_GATEWAY_LOGGER_LEVEL", "Debug", fun() ->
+        ?assertEqual(debug, maps:get(logger_level, fluxer_gateway_config:load()))
+    end).
+
 rpc_concurrency_key_defaults_test() ->
     Config = fluxer_gateway_config:build_config(#{}),
     ?assertEqual(512, maps:get(gateway_nats_rpc_max_handlers, Config)),
     ?assertEqual(512, maps:get(gateway_http_rpc_max_concurrency, Config)).
+
+pinned_node_defaults_keep_release_behaviour_test() ->
+    Config = fluxer_gateway_config:load(),
+    ?assertEqual(true, maps:get(nats_rpc_enabled, Config)),
+    ?assertEqual([], maps:get(pinned_guild_ids, Config)),
+    ?assertEqual(undefined, maps:get(guild_pin_keeper_beam, Config)).
+
+pinned_node_env_test() ->
+    with_envs(
+        [
+            {"FLUXER_GATEWAY_NATS_RPC_ENABLED", "false"},
+            {"FLUXER_GATEWAY_PINNED_GUILD_IDS", "1100000000000000001, 42"},
+            {"FLUXER_GATEWAY_GUILD_PIN_KEEPER_BEAM", "/etc/fluxer/gw/gateway_node_router.beam"},
+            {"FLUXER_GATEWAY_GUILD_PIN_KEEPER_BEAM_MD5", "D5E42B1D6D85C4CDEE93AA0CCA18A420"}
+        ],
+        fun() ->
+            Config = fluxer_gateway_config:load(),
+            ?assertEqual(false, maps:get(nats_rpc_enabled, Config)),
+            ?assertEqual([42, 1100000000000000001], maps:get(pinned_guild_ids, Config)),
+            ?assertEqual(
+                "/etc/fluxer/gw/gateway_node_router.beam",
+                maps:get(guild_pin_keeper_beam, Config)
+            ),
+            ?assertEqual(
+                <<"D5E42B1D6D85C4CDEE93AA0CCA18A420">>,
+                maps:get(guild_pin_keeper_beam_md5, Config)
+            )
+        end
+    ).
+
+pinned_guild_ids_reject_non_snowflakes_test() ->
+    with_env("FLUXER_GATEWAY_PINNED_GUILD_IDS", "1100000000000000001,ab", fun() ->
+        ?assertError({invalid_pinned_guild_id, "ab"}, fluxer_gateway_config:load())
+    end).
 
 optional_string_test() ->
     ?assertEqual(undefined, fluxer_gateway_config:optional_string(undefined)),

@@ -2,14 +2,14 @@
 
 use crate::{
     api::types::{
-        ALTCHA_CAPTCHA_COST_RANGE, ALTCHA_CAPTCHA_DEFAULT_SALT, ALTCHA_CAPTCHA_MAX_COUNTER_RANGE,
-        AltchaCaptchaConfigResponse, AppPublicConfigResponse, DOMAIN_MIGRATION_DEFAULT_SALT,
-        DomainMigrationConfigResponse, EXPERIMENT_MAX_TARGETED_USERS,
-        ExperimentDeliveryConfigResponse, GatewayRolloutConfigResponse, InstanceConfigResponse,
-        InstanceIntegrationsResponse, InstanceMediaResponse, InstancePolicyResponse,
-        InstanceRegistrationResponse, LimitConfigResponse, PROFILE_TIMEZONE_DEFAULT_SALT,
-        PendingRegistrationResponse, ProfileTimezoneConfigResponse, PushRelayConfigResponse,
-        RegistrationUrlResponse, SsoConfigResponse,
+        AppPublicConfigResponse, CAPTCHA_COST_RANGE, CAPTCHA_MAX_COUNTER_RANGE,
+        CaptchaConfigResponse, DOMAIN_MIGRATION_DEFAULT_SALT, DomainMigrationConfigResponse,
+        EXPERIMENT_MAX_TARGETED_USERS, ExperimentDeliveryConfigResponse,
+        GatewayRolloutConfigResponse, InstanceConfigResponse, InstanceIntegrationsResponse,
+        InstanceMediaResponse, InstancePolicyResponse, InstanceRegistrationResponse,
+        LimitConfigResponse, PLUTONIUM_PAGE_DEFAULT_SALT, PendingRegistrationResponse,
+        PlutoniumPageConfigResponse, PushRelayConfigResponse, RegistrationUrlResponse,
+        SsoConfigResponse,
     },
     config::AdminConfig,
     middleware::auth::AuthContext,
@@ -119,7 +119,13 @@ pub fn instance_config_page(
                             instance_config.self_hosted,
                         ))
                         (sso_config_section(base, csrf_token, &instance_config.sso))
-                        (deferred_phone_gate_form(base, csrf_token, &instance_config.policy))
+                    },
+                ))
+                (config_group(
+                    "Bot protection",
+                    "A proof-of-work check on sign-up, login, password reset and a few other abuse-prone actions.",
+                    html! {
+                        (captcha_section(base, csrf_token, &instance_config.captcha))
                     },
                 ))
                 @if instance_config.self_hosted {
@@ -176,8 +182,7 @@ pub fn instance_config_page(
                     html! {
                         (gateway_rollout_section(base, csrf_token, &instance_config.gateway_rollout))
                         (domain_migration_section(base, csrf_token, &instance_config.domain_migration))
-                        (altcha_captcha_section(base, csrf_token, &instance_config.altcha_captcha))
-                        (profile_timezone_section(base, csrf_token, &instance_config.profile_timezone))
+                        (plutonium_page_section(base, csrf_token, &instance_config.plutonium_page))
                         (experiment_delivery_section(base, csrf_token, &instance_config.experiment_delivery))
                         @if let Some(limit_config) = limit_config {
                             (limit_config_section(base, limit_config))
@@ -242,6 +247,7 @@ fn policy_config_section(
                 (single_community_form(base, csrf_token, policy))
                 (direct_messages_form(base, csrf_token, policy))
                 (premium_mode_form(base, csrf_token, policy, premium_name))
+                (community_creation_form(base, csrf_token, policy))
                 (services_form(base, csrf_token, policy))
             }
         },
@@ -334,57 +340,6 @@ fn direct_messages_form(base: &str, csrf_token: &str, policy: &InstancePolicyRes
     }
 }
 
-fn deferred_phone_gate_form(
-    base: &str,
-    csrf_token: &str,
-    policy: &InstancePolicyResponse,
-) -> Markup {
-    let gate = &policy.deferred_phone_gate;
-    let status = if gate.enabled {
-        ("Enabled", BadgeVariant::Success)
-    } else {
-        ("Disabled", BadgeVariant::Default)
-    };
-    html! {
-        div class="space-y-4 border-t border-neutral-200 pt-6" {
-            div class="flex flex-wrap items-center gap-2" {
-                h3 class="text-sm font-semibold text-neutral-900" { "Deferred phone verification" }
-                (badge(status.0, status.1))
-            }
-            p class="text-sm text-neutral-500" {
-                "When enabled, a phone requirement raised at registration is held back and only \
-                 applied if the account joins a discoverable community, or one above the member \
-                 threshold, within the window. Accounts that wait out the window are not challenged. \
-                 Inbound-SMS requirements are never deferred."
-            }
-            form method="post" action={(base) "/instance-config?action=update_policy"} {
-                (csrf_input(csrf_token))
-                div class="space-y-4" {
-                    (select_input("policy_deferred_phone_gate_enabled", "Deferred phone verification", &[
-                        ("true", "Enabled"),
-                        ("false", "Disabled"),
-                    ], if gate.enabled { "true" } else { "false" }))
-                    (text_input(
-                        "policy_deferred_phone_gate_window_hours",
-                        "Window (hours)",
-                        &gate.window_hours.to_string(),
-                        "6",
-                    ))
-                    (text_input(
-                        "policy_deferred_phone_gate_member_threshold",
-                        "Member threshold",
-                        &gate.member_threshold.to_string(),
-                        "50",
-                    ))
-                    (form_actions(html! {
-                        (submit_button("Save deferred phone verification"))
-                    }))
-                }
-            }
-        }
-    }
-}
-
 fn premium_mode_form(
     base: &str,
     csrf_token: &str,
@@ -405,6 +360,37 @@ fn premium_mode_form(
                     ], policy.premium_mode.as_str()))
                     (form_actions(html! {
                         (submit_button("Save premium model"))
+                    }))
+                }
+            }
+        }
+    }
+}
+
+fn community_creation_form(
+    base: &str,
+    csrf_token: &str,
+    policy: &InstancePolicyResponse,
+) -> Markup {
+    html! {
+        div id="community-creation" class="space-y-4 border-t border-neutral-200 pt-6" {
+            h3 class="text-sm font-semibold text-neutral-900" { "Community creation" }
+            form method="post" action={(base) "/instance-config?action=update_policy"} {
+                (csrf_input(csrf_token))
+                div class="space-y-4" {
+                    (select_input("policy_guild_create_access", "Who can create communities", &[
+                        ("true", "Everyone"),
+                        ("false", "Restricted"),
+                    ], if policy.guild_create_access { "true" } else { "false" }))
+                    p class="text-xs text-neutral-500" {
+                        "When restricted, only admins with the wildcard ACL and users matched by a "
+                        a href={(base) "/limit-config"} class="text-blue-600 hover:underline" {
+                            "limit rule"
+                        }
+                        " that grants Community Creation Access can create communities."
+                    }
+                    (form_actions(html! {
+                        (submit_button("Save community creation policy"))
                     }))
                 }
             }
@@ -519,11 +505,6 @@ fn integrations_config_section(
     csrf_token: &str,
     integrations: &InstanceIntegrationsResponse,
 ) -> Markup {
-    let captcha_provider = integrations
-        .captcha
-        .provider
-        .as_deref()
-        .unwrap_or(integrations.captcha.effective_provider.as_str());
     let smtp_port = integrations
         .email
         .smtp
@@ -553,35 +534,6 @@ fn integrations_config_section(
                             (secret_badge("API key", integrations.youtube.api_key_set))
                         }
                         (password_input("integration_youtube_api_key", "YouTube API key", Some("Leave blank to keep the current key.")))
-                    }
-
-                    div class="space-y-4 border-t border-neutral-200 pt-6" {
-                        div class="flex flex-wrap items-center gap-2" {
-                            h3 class="text-sm font-semibold text-neutral-900" { "Bot protection" }
-                            (secret_badge("hCaptcha secret", integrations.captcha.hcaptcha_secret_key_set))
-                            (secret_badge("Turnstile secret", integrations.captcha.turnstile_secret_key_set))
-                        }
-                        div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" {
-                            (select_input("integration_captcha_provider", "Provider", &[
-                                ("none", "Disabled"),
-                                ("hcaptcha", "hCaptcha"),
-                                ("turnstile", "Cloudflare Turnstile"),
-                            ], captcha_provider))
-                            (text_input(
-                                "integration_hcaptcha_site_key",
-                                "hCaptcha site key",
-                                integrations.captcha.hcaptcha_site_key.as_deref().unwrap_or(""),
-                                "",
-                            ))
-                            (password_input("integration_hcaptcha_secret_key", "hCaptcha secret key", Some("Leave blank to keep the current secret.")))
-                            (text_input(
-                                "integration_turnstile_site_key",
-                                "Turnstile site key",
-                                integrations.captcha.turnstile_site_key.as_deref().unwrap_or(""),
-                                "",
-                            ))
-                            (password_input("integration_turnstile_secret_key", "Turnstile secret key", Some("Leave blank to keep the current secret.")))
-                        }
                     }
 
                     div class="space-y-4 border-t border-neutral-200 pt-6" {
@@ -1257,83 +1209,70 @@ fn domain_migration_section(
     )
 }
 
-fn altcha_captcha_section(
+fn plutonium_page_section(
     base: &str,
     csrf_token: &str,
-    altcha_captcha: &AltchaCaptchaConfigResponse,
+    plutonium_page: &PlutoniumPageConfigResponse,
 ) -> Markup {
-    let status = if altcha_captcha.enabled {
+    let status = if plutonium_page.enabled {
         ("Live", BadgeVariant::Success)
     } else {
         ("Inert", BadgeVariant::Default)
     };
-    let included_user_ids = altcha_captcha.included_user_ids.join("\n");
-    let excluded_user_ids = altcha_captcha.excluded_user_ids.join("\n");
+    let included_user_ids = plutonium_page.included_user_ids.join("\n");
+    let excluded_user_ids = plutonium_page.excluded_user_ids.join("\n");
     section_card_with_description(
-        "ALTCHA Captcha",
-        "Replaces the configured captcha provider with an ALTCHA proof-of-work check for the \
-         selected requesters. The API issues and verifies every challenge itself, so no third \
-         party is involved. Requests only need a captcha where one is already required, so this \
-         does nothing while captcha is off for the instance.",
+        "Plutonium page",
+        "Replaces the Plutonium settings tab with a full Plutonium page, makes app pages linkable \
+         in chat, and uses a minimal gift purchase modal.",
         html! {
-            form method="post" action={(base) "/instance-config?action=update_altcha_captcha"} {
+            form method="post" action={(base) "/instance-config?action=update_plutonium_page"} {
                 (csrf_input(csrf_token))
                 div class="space-y-6" {
                     div class="flex flex-wrap items-center gap-2" {
                         h3 class="text-sm font-semibold text-neutral-900" { "Master switch" }
                         (badge(status.0, status.1))
                         span class="text-xs text-neutral-500" {
-                            "Config version " (altcha_captcha.config_version)
+                            "Config version " (plutonium_page.config_version)
                         }
                     }
                     (checkbox(
-                        "altcha_captcha_enabled",
+                        "plutonium_page_enabled",
                         "true",
-                        "Serve ALTCHA to the selected requesters",
-                        altcha_captcha.enabled,
+                        "Serve the Plutonium page to the selected users",
+                        plutonium_page.enabled,
                         true,
                     ))
                     p class="text-xs text-neutral-500" {
                         "Off is the safe state and the kill switch. With this unchecked every \
-                         requester gets the configured provider and ALTCHA answers are rejected."
-                    }
-
-                    h3 class="text-sm font-semibold text-neutral-900" { "Logged-out requests" }
-                    (checkbox(
-                        "altcha_captcha_anonymous_enabled",
-                        "true",
-                        "Serve ALTCHA to logged-out requests",
-                        altcha_captcha.anonymous_enabled,
-                        true,
-                    ))
-                    p class="text-xs text-neutral-500" {
-                        "Covers registration, login and password reset. These requests have no \
-                         account to bucket, so this switch applies to all of them at once."
+                         client keeps the Plutonium settings tab, so the rollout and targeting \
+                         fields below have no effect at all."
                     }
 
                     h3 class="text-sm font-semibold text-neutral-900" { "Rollout" }
                     (number_field(
-                        "altcha_captcha_rollout_basis_points",
+                        "plutonium_page_rollout_basis_points",
                         "Rollout (basis points)",
-                        &altcha_captcha.rollout_basis_points.to_string(),
+                        &plutonium_page.rollout_basis_points.to_string(),
                         Some(0), Some(10000), "1",
-                        Some("Share of logged-in users bucketed into ALTCHA, in basis points: 0 is nobody, 100 is 1%, 10000 is everybody."),
+                        Some("Share of users bucketed into the Plutonium page, in basis points: 0 is nobody, 100 is 1%, 10000 is everybody."),
                     ))
                     div class="flex flex-col gap-2" {
                         (text_input(
-                            "altcha_captcha_rollout_salt",
+                            "plutonium_page_rollout_salt",
                             "Rollout Salt",
-                            &altcha_captcha.rollout_salt,
-                            ALTCHA_CAPTCHA_DEFAULT_SALT,
+                            &plutonium_page.rollout_salt,
+                            PLUTONIUM_PAGE_DEFAULT_SALT,
                         ))
                         p class="text-xs text-neutral-500" {
                             "Seeds the bucketing hash. Changing it reshuffles which users fall \
-                             inside the percentage above."
+                             inside the percentage above. Leave it alone to keep the current \
+                             cohort stable."
                         }
                     }
                     div class="flex flex-col gap-2" {
                         (textarea_input(
-                            "altcha_captcha_included_user_ids",
+                            "plutonium_page_included_user_ids",
                             "Always-on User IDs",
                             "1500000000000000001\n1500000000000000002",
                             &included_user_ids,
@@ -1341,20 +1280,22 @@ fn altcha_captcha_section(
                             false,
                         ))
                         (entry_count_hint(
-                            altcha_captcha.included_user_ids.len(),
+                            plutonium_page.included_user_ids.len(),
                             EXPERIMENT_MAX_TARGETED_USERS,
                         ))
                         p class="text-xs text-neutral-500" {
-                            "One snowflake per line, or comma separated. These users get ALTCHA \
-                             regardless of the percentage above. Invalid entries prevent the save."
+                            "One snowflake per line, or comma separated. These users are targeted \
+                             regardless of the percentage above. IDs must contain 1 to 20 decimal \
+                             digits. Invalid entries prevent the save. Blank entries and duplicate \
+                             IDs are ignored."
                         }
                     }
                     div class="flex flex-col gap-2" {
                         (checkbox(
-                            "altcha_captcha_include_premium_users",
+                            "plutonium_page_include_premium_users",
                             "true",
                             "Include premium users",
-                            altcha_captcha.include_premium_users,
+                            plutonium_page.include_premium_users,
                             true,
                         ))
                         p class="text-xs text-neutral-500" {
@@ -1364,15 +1305,15 @@ fn altcha_captcha_section(
                     }
                     div class="flex flex-col gap-2" {
                         (textarea_input(
-                            "altcha_captcha_included_guild_ids",
+                            "plutonium_page_included_guild_ids",
                             "Always-on Guild IDs",
                             "1500000000000000005\n1500000000000000006",
-                            &altcha_captcha.included_guild_ids.join("\n"),
+                            &plutonium_page.included_guild_ids.join("\n"),
                             4,
                             false,
                         ))
                         (entry_count_hint(
-                            altcha_captcha.included_guild_ids.len(),
+                            plutonium_page.included_guild_ids.len(),
                             EXPERIMENT_MAX_TARGETED_USERS,
                         ))
                         p class="text-xs text-neutral-500" {
@@ -1383,7 +1324,7 @@ fn altcha_captcha_section(
                     }
                     div class="flex flex-col gap-2" {
                         (textarea_input(
-                            "altcha_captcha_excluded_user_ids",
+                            "plutonium_page_excluded_user_ids",
                             "Never-on User IDs",
                             "1500000000000000003\n1500000000000000004",
                             &excluded_user_ids,
@@ -1391,36 +1332,17 @@ fn altcha_captcha_section(
                             false,
                         ))
                         (entry_count_hint(
-                            altcha_captcha.excluded_user_ids.len(),
+                            plutonium_page.excluded_user_ids.len(),
                             EXPERIMENT_MAX_TARGETED_USERS,
                         ))
                         p class="text-xs text-neutral-500" {
-                            "Same format. Exclusion wins over both the always-on list and the percentage."
+                            "Same format. Exclusion wins over both the always-on list and the \
+                             percentage."
                         }
                     }
 
-                    h3 class="text-sm font-semibold text-neutral-900" { "Difficulty" }
-                    (number_field(
-                        "altcha_captcha_cost",
-                        "Cost (PBKDF2 iterations per attempt)",
-                        &altcha_captcha.cost.to_string(),
-                        Some(*ALTCHA_CAPTCHA_COST_RANGE.start()),
-                        Some(*ALTCHA_CAPTCHA_COST_RANGE.end()),
-                        "1",
-                        Some("The API spends one attempt at this cost to issue each challenge."),
-                    ))
-                    (number_field(
-                        "altcha_captcha_max_counter",
-                        "Maximum counter",
-                        &altcha_captcha.max_counter.to_string(),
-                        Some(*ALTCHA_CAPTCHA_MAX_COUNTER_RANGE.start()),
-                        Some(*ALTCHA_CAPTCHA_MAX_COUNTER_RANGE.end()),
-                        "1",
-                        Some("Each challenge hides its answer between half this value and this value. The client tries counters from 0 until it finds it, so solve time grows with cost times this value. At the defaults a recent laptop takes about 3 seconds."),
-                    ))
-
                     (form_actions(html! {
-                        (submit_button("Save ALTCHA Configuration"))
+                        (submit_button("Save Plutonium Page Configuration"))
                     }))
                 }
             }
@@ -1428,137 +1350,67 @@ fn altcha_captcha_section(
     )
 }
 
-fn profile_timezone_section(
-    base: &str,
-    csrf_token: &str,
-    profile_timezone: &ProfileTimezoneConfigResponse,
-) -> Markup {
-    let status = if profile_timezone.enabled {
-        ("Live", BadgeVariant::Success)
-    } else {
-        ("Inert", BadgeVariant::Default)
-    };
-    let included_user_ids = profile_timezone.included_user_ids.join("\n");
-    let excluded_user_ids = profile_timezone.excluded_user_ids.join("\n");
-    section_card_with_description(
-        "Profile Timezone",
-        "Lets the selected users save a time zone in profile settings and show their local time \
-         on their profile. Users outside the rollout cannot change it, and a saved time zone \
-         stays hidden from everyone while its owner is outside the rollout.",
-        html! {
-            form method="post" action={(base) "/instance-config?action=update_profile_timezone"} {
-                (csrf_input(csrf_token))
-                div class="space-y-6" {
-                    div class="flex flex-wrap items-center gap-2" {
-                        h3 class="text-sm font-semibold text-neutral-900" { "Master switch" }
-                        (badge(status.0, status.1))
-                        span class="text-xs text-neutral-500" {
-                            "Config version " (profile_timezone.config_version)
-                        }
-                    }
-                    (checkbox(
-                        "profile_timezone_enabled",
-                        "true",
-                        "Serve profile timezone to the selected users",
-                        profile_timezone.enabled,
-                        true,
-                    ))
-                    p class="text-xs text-neutral-500" {
-                        "Off is the safe state and the kill switch. With this unchecked nobody \
-                         sees the setting and every saved time zone is hidden."
-                    }
+fn estimate_low_end_solve_seconds(cost: u32, max_counter: u32) -> f64 {
+    0.75 * f64::from(cost) * f64::from(max_counter) / 1_050_000.0
+}
 
-                    h3 class="text-sm font-semibold text-neutral-900" { "Rollout" }
-                    (number_field(
-                        "profile_timezone_rollout_basis_points",
-                        "Rollout (basis points)",
-                        &profile_timezone.rollout_basis_points.to_string(),
-                        Some(0), Some(10000), "1",
-                        Some("Share of users bucketed into profile timezone, in basis points: 0 is nobody, 100 is 1%, 10000 is everybody."),
-                    ))
-                    div class="flex flex-col gap-2" {
-                        (text_input(
-                            "profile_timezone_rollout_salt",
-                            "Rollout Salt",
-                            &profile_timezone.rollout_salt,
-                            PROFILE_TIMEZONE_DEFAULT_SALT,
-                        ))
-                        p class="text-xs text-neutral-500" {
-                            "Seeds the bucketing hash. Changing it reshuffles which users fall \
-                             inside the percentage above."
-                        }
-                    }
-                    div class="flex flex-col gap-2" {
-                        (textarea_input(
-                            "profile_timezone_included_user_ids",
-                            "Always-on User IDs",
-                            "1500000000000000001\n1500000000000000002",
-                            &included_user_ids,
-                            4,
-                            false,
-                        ))
-                        (entry_count_hint(
-                            profile_timezone.included_user_ids.len(),
-                            EXPERIMENT_MAX_TARGETED_USERS,
-                        ))
-                        p class="text-xs text-neutral-500" {
-                            "One snowflake per line, or comma separated. These users get profile \
-                             timezone regardless of the percentage above. Invalid entries prevent the save."
-                        }
-                    }
-                    div class="flex flex-col gap-2" {
+fn captcha_section(base: &str, csrf_token: &str, captcha: &CaptchaConfigResponse) -> Markup {
+    let status = if captcha.enabled {
+        ("On", BadgeVariant::Success)
+    } else {
+        ("Off", BadgeVariant::Default)
+    };
+    let estimate = estimate_low_end_solve_seconds(captcha.cost, captcha.max_counter);
+    section_card_with_description(
+        "Proof-of-work check",
+        "Clients solve it in the background. The API issues and verifies every challenge itself, \
+         and no third party is involved.",
+        html! {
+            div class="space-y-6" {
+                div class="flex flex-wrap items-center gap-2" {
+                    (badge(status.0, status.1))
+                }
+                form method="post" action={(base) "/instance-config?action=update_captcha"} {
+                    (csrf_input(csrf_token))
+                    div class="space-y-6" {
                         (checkbox(
-                            "profile_timezone_include_premium_users",
+                            "captcha_enabled",
                             "true",
-                            "Include premium users",
-                            profile_timezone.include_premium_users,
+                            "Require a proof-of-work check",
+                            captcha.enabled,
                             true,
                         ))
                         p class="text-xs text-neutral-500" {
-                            "Includes every account with active premium perks, regardless of the \
-                             percentage above. The never-on list still wins."
+                            "On by default. Turning it off removes the check from every request."
                         }
-                    }
-                    div class="flex flex-col gap-2" {
-                        (textarea_input(
-                            "profile_timezone_included_guild_ids",
-                            "Always-on Guild IDs",
-                            "1500000000000000005\n1500000000000000006",
-                            &profile_timezone.included_guild_ids.join("\n"),
-                            4,
-                            false,
+                        (number_field(
+                            "captcha_cost",
+                            "Cost (PBKDF2 iterations per try)",
+                            &captcha.cost.to_string(),
+                            Some(*CAPTCHA_COST_RANGE.start()),
+                            Some(*CAPTCHA_COST_RANGE.end()),
+                            "1",
+                            Some("Default 5000."),
                         ))
-                        (entry_count_hint(
-                            profile_timezone.included_guild_ids.len(),
-                            EXPERIMENT_MAX_TARGETED_USERS,
+                        (number_field(
+                            "captcha_max_counter",
+                            "Maximum counter",
+                            &captcha.max_counter.to_string(),
+                            Some(*CAPTCHA_MAX_COUNTER_RANGE.start()),
+                            Some(*CAPTCHA_MAX_COUNTER_RANGE.end()),
+                            "1",
+                            Some("Default 1000. Solve time grows with cost times this value."),
                         ))
-                        p class="text-xs text-neutral-500" {
-                            "Same format, with guild IDs. Every member of a listed guild is \
-                             included regardless of the percentage above, unless the user is \
-                             in the never-on list."
+                        p class="text-sm text-neutral-700" {
+                            (format!(
+                                "Average solve: about {estimate:.1} s on a low-end Android device, \
+                                 well under a second in desktop browsers."
+                            ))
                         }
+                        (form_actions(html! {
+                            (submit_button("Save"))
+                        }))
                     }
-                    div class="flex flex-col gap-2" {
-                        (textarea_input(
-                            "profile_timezone_excluded_user_ids",
-                            "Never-on User IDs",
-                            "1500000000000000003\n1500000000000000004",
-                            &excluded_user_ids,
-                            4,
-                            false,
-                        ))
-                        (entry_count_hint(
-                            profile_timezone.excluded_user_ids.len(),
-                            EXPERIMENT_MAX_TARGETED_USERS,
-                        ))
-                        p class="text-xs text-neutral-500" {
-                            "Same format. Exclusion wins over both the always-on list and the percentage."
-                        }
-                    }
-
-                    (form_actions(html! {
-                        (submit_button("Save Profile Timezone Configuration"))
-                    }))
                 }
             }
         },
@@ -2181,6 +2033,23 @@ mod tests {
     use super::*;
 
     #[test]
+    fn captcha_section_posts_the_switch_and_difficulty_fields() {
+        let markup =
+            captcha_section("/admin", "csrf", &CaptchaConfigResponse::default()).into_string();
+        assert!(markup.contains("/admin/instance-config?action=update_captcha"));
+        assert!(markup.contains(r#"name="captcha_enabled""#));
+        assert!(markup.contains(r#"name="captcha_cost""#));
+        assert!(markup.contains(r#"name="captcha_max_counter""#));
+        assert!(markup.contains("about 3.6 s"));
+    }
+
+    #[test]
+    fn low_end_solve_estimate_at_the_defaults_is_about_three_and_a_half_seconds() {
+        let seconds = estimate_low_end_solve_seconds(5_000, 1_000);
+        assert!((seconds - 3.57).abs() < 0.01, "{seconds}");
+    }
+
+    #[test]
     fn domain_migration_section_shows_both_rollouts_and_list_counts() {
         let domain_migration = DomainMigrationConfigResponse {
             anonymous_rollout_basis_points: 250,
@@ -2200,6 +2069,34 @@ mod tests {
         assert!(markup.contains("1 of 1000 stored"));
         assert!(markup.contains("2 of 1000 stored"));
         assert!(!markup.contains("at the cap"));
+    }
+
+    #[test]
+    fn plutonium_page_section_shows_the_rollout_and_list_counts() {
+        let plutonium_page = PlutoniumPageConfigResponse {
+            enabled: true,
+            config_version: 3,
+            rollout_basis_points: 250,
+            included_user_ids: vec!["1500000000000000001".to_owned()],
+            excluded_user_ids: vec![
+                "1500000000000000002".to_owned(),
+                "1500000000000000003".to_owned(),
+            ],
+            ..PlutoniumPageConfigResponse::default()
+        };
+        let markup = plutonium_page_section("/admin", "csrf", &plutonium_page).into_string();
+        assert!(markup.contains("Plutonium page"));
+        assert!(markup.contains("action=update_plutonium_page"));
+        assert!(markup.contains("name=\"plutonium_page_enabled\""));
+        assert!(markup.contains("name=\"plutonium_page_rollout_basis_points\""));
+        assert!(markup.contains("value=\"250\""));
+        assert!(markup.contains("name=\"plutonium_page_include_premium_users\""));
+        assert!(markup.contains("name=\"plutonium_page_included_guild_ids\""));
+        assert!(markup.contains("Config version 3"));
+        assert!(markup.contains("1 of 1000 stored"));
+        assert!(markup.contains("2 of 1000 stored"));
+        assert!(!markup.contains("anonymous_rollout_basis_points"));
+        assert!(!markup.contains("standalone_forwarding"));
     }
 
     #[test]

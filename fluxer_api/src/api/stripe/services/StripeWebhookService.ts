@@ -11,6 +11,8 @@ import type {KVAccountDeletionQueueService} from '@app/api/infrastructure/KVAcco
 import type {PremiumStateReconciliationQueueService} from '@app/api/infrastructure/PremiumStateReconciliationQueueService';
 import type {UserCacheService} from '@app/api/infrastructure/UserCacheService';
 import {Logger} from '@app/api/Logger';
+import {OAuth2TokenRepository} from '@app/api/oauth/repositories/OAuth2TokenRepository';
+import type {StoreEntitlementService} from '@app/api/store_billing/StoreEntitlementService';
 import {getAcceptedWebhookSecrets} from '@app/api/stripe/BillingConfigCache';
 import type {ProductRegistry} from '@app/api/stripe/ProductRegistry';
 import type {AgeVerificationService} from '@app/api/stripe/services/AgeVerificationService';
@@ -63,6 +65,7 @@ export class StripeWebhookService {
 		snowflakeService: ISnowflakeService,
 		private billingRepository: BillingRepository,
 		private refundService: StripeRefundService,
+		storeEntitlementService: StoreEntitlementService | null = null,
 	) {
 		this.checkoutHandler = new StripeCheckoutWebhookHandler(
 			stripe,
@@ -79,8 +82,8 @@ export class StripeWebhookService {
 		const giftReversalHandler = new StripeGiftReversalHandler(
 			userRepository,
 			gatewayService,
-			premiumService,
 			premiumStateReconciliationQueueService,
+			storeEntitlementService,
 		);
 		const auditService = new AdminAuditService(adminRepository, snowflakeService);
 		this.paymentFraudService = new StripePaymentFraudService({
@@ -94,6 +97,7 @@ export class StripeWebhookService {
 			cacheService,
 			auditService,
 			kvDeletionQueue,
+			oauth2Tokens: new OAuth2TokenRepository(),
 		});
 		this.subscriptionHandler = new StripeSubscriptionWebhookHandler(
 			userRepository,
@@ -103,6 +107,7 @@ export class StripeWebhookService {
 			premiumStateReconciliationQueueService,
 			reconciler,
 			billingRepository,
+			storeEntitlementService,
 		);
 		this.disputeHandler = new StripeDisputeWebhookHandler(
 			userRepository,

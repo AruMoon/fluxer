@@ -4,24 +4,22 @@ use crate::{
     api::{
         client::AdminApiClient,
         types::{
-            ALTCHA_CAPTCHA_COST_RANGE, ALTCHA_CAPTCHA_MAX_COUNTER_RANGE,
-            AltchaCaptchaConfigUpdateRequest, AppBrandingConfigUpdateRequest,
-            AppLegalConfigUpdateRequest, AppPublicConfigUpdateRequest,
-            AppRegistrationConfigUpdateRequest, AppSetupConfigUpdateRequest,
-            CreateRegistrationUrlRequest, DeferredPhoneGateUpdateRequest,
+            AppBrandingConfigUpdateRequest, AppLegalConfigUpdateRequest,
+            AppPublicConfigUpdateRequest, AppRegistrationConfigUpdateRequest,
+            AppSetupConfigUpdateRequest, CAPTCHA_COST_RANGE, CAPTCHA_MAX_COUNTER_RANGE,
+            CaptchaConfigUpdateRequest, CreateRegistrationUrlRequest,
             DomainMigrationConfigUpdateRequest, EXPERIMENT_MAX_TARGETED_USERS,
             ExperimentDeliveryConfigUpdateRequest, GatewayRolloutConfigUpdateRequest,
             GatewayRolloutMode, InstanceAttachmentDecayUpdateRequest,
             InstanceBlueskyIntegrationUpdateRequest, InstanceBlueskyKeyIntegrationUpdateRequest,
-            InstanceCaptchaIntegrationUpdateRequest, InstanceConfigUpdateRequest,
-            InstanceEmailIntegrationUpdateRequest, InstanceEmailSmtpIntegrationUpdateRequest,
-            InstanceEmailSmtpTestRequest, InstanceGifIntegrationUpdateRequest,
-            InstanceIntegrationsUpdateRequest, InstanceMediaUpdateRequest,
-            InstancePolicyUpdateRequest, InstanceRegistrationConfigUpdateRequest,
-            InstanceServicesUpdateRequest, InstanceYoutubeIntegrationUpdateRequest,
-            LimitConfigUpdateRequest, LimitRule, LimitRuleFilters, PremiumMode,
-            ProfileTimezoneConfigUpdateRequest, PushRelayConfigUpdateRequest, RegistrationMode,
-            SsoConfigUpdateRequest, VoiceE2eeScope,
+            InstanceConfigUpdateRequest, InstanceEmailIntegrationUpdateRequest,
+            InstanceEmailSmtpIntegrationUpdateRequest, InstanceEmailSmtpTestRequest,
+            InstanceGifIntegrationUpdateRequest, InstanceIntegrationsUpdateRequest,
+            InstanceMediaUpdateRequest, InstancePolicyUpdateRequest,
+            InstanceRegistrationConfigUpdateRequest, InstanceServicesUpdateRequest,
+            InstanceYoutubeIntegrationUpdateRequest, LimitConfigUpdateRequest, LimitRule,
+            LimitRuleFilters, PlutoniumPageConfigUpdateRequest, PremiumMode,
+            PushRelayConfigUpdateRequest, RegistrationMode, SsoConfigUpdateRequest, VoiceE2eeScope,
         },
     },
     config::AdminConfig,
@@ -222,11 +220,11 @@ pub async fn instance_config_post(
             Ok(update) => instance_config_result(client.update_instance_config(&update).await),
             Err(message) => FlashData::error(message),
         },
-        "update_altcha_captcha" => match build_altcha_captcha_update(&form) {
+        "update_plutonium_page" => match build_plutonium_page_update(&form) {
             Ok(update) => instance_config_result(client.update_instance_config(&update).await),
             Err(message) => FlashData::error(message),
         },
-        "update_profile_timezone" => match build_profile_timezone_update(&form) {
+        "update_captcha" => match build_captcha_update(&form) {
             Ok(update) => instance_config_result(client.update_instance_config(&update).await),
             Err(message) => FlashData::error(message),
         },
@@ -615,86 +613,59 @@ fn build_domain_migration_update(
     })
 }
 
-fn build_altcha_captcha_update(
+fn build_plutonium_page_update(
     form: &MultiValueForm,
 ) -> Result<InstanceConfigUpdateRequest, String> {
     Ok(InstanceConfigUpdateRequest {
-        altcha_captcha: Some(AltchaCaptchaConfigUpdateRequest {
-            enabled: Some(form.bool_value("altcha_captcha_enabled")),
+        plutonium_page: Some(PlutoniumPageConfigUpdateRequest {
+            enabled: Some(form.bool_value("plutonium_page_enabled")),
             rollout_basis_points: parse_form_number(
                 form,
-                "altcha_captcha_rollout_basis_points",
+                "plutonium_page_rollout_basis_points",
                 "Rollout basis points",
                 0,
                 EXPERIMENT_ROLLOUT_BASIS_POINTS_MAX,
             )?,
-            rollout_salt: parse_experiment_rollout_salt(form, "altcha_captcha_rollout_salt")?,
+            rollout_salt: parse_experiment_rollout_salt(form, "plutonium_page_rollout_salt")?,
             included_user_ids: Some(parse_experiment_user_ids(
-                form.first("altcha_captcha_included_user_ids")
+                form.first("plutonium_page_included_user_ids")
                     .unwrap_or_default(),
                 "Included user IDs",
             )?),
             included_guild_ids: Some(parse_experiment_user_ids(
-                form.first("altcha_captcha_included_guild_ids")
+                form.first("plutonium_page_included_guild_ids")
                     .unwrap_or_default(),
                 "Included guild IDs",
             )?),
-            include_premium_users: Some(form.bool_value("altcha_captcha_include_premium_users")),
+            include_premium_users: Some(form.bool_value("plutonium_page_include_premium_users")),
             excluded_user_ids: Some(parse_experiment_user_ids(
-                form.first("altcha_captcha_excluded_user_ids")
+                form.first("plutonium_page_excluded_user_ids")
                     .unwrap_or_default(),
                 "Excluded user IDs",
             )?),
-            anonymous_enabled: Some(form.bool_value("altcha_captcha_anonymous_enabled")),
-            cost: parse_form_number(
-                form,
-                "altcha_captcha_cost",
-                "Cost",
-                *ALTCHA_CAPTCHA_COST_RANGE.start(),
-                *ALTCHA_CAPTCHA_COST_RANGE.end(),
-            )?,
-            max_counter: parse_form_number(
-                form,
-                "altcha_captcha_max_counter",
-                "Maximum counter",
-                *ALTCHA_CAPTCHA_MAX_COUNTER_RANGE.start(),
-                *ALTCHA_CAPTCHA_MAX_COUNTER_RANGE.end(),
-            )?,
         }),
         ..Default::default()
     })
 }
 
-fn build_profile_timezone_update(
-    form: &MultiValueForm,
-) -> Result<InstanceConfigUpdateRequest, String> {
+fn build_captcha_update(form: &MultiValueForm) -> Result<InstanceConfigUpdateRequest, String> {
     Ok(InstanceConfigUpdateRequest {
-        profile_timezone: Some(ProfileTimezoneConfigUpdateRequest {
-            enabled: Some(form.bool_value("profile_timezone_enabled")),
-            rollout_basis_points: parse_form_number(
+        captcha: Some(CaptchaConfigUpdateRequest {
+            enabled: Some(form.bool_value("captcha_enabled")),
+            cost: parse_form_number(
                 form,
-                "profile_timezone_rollout_basis_points",
-                "Rollout basis points",
-                0,
-                EXPERIMENT_ROLLOUT_BASIS_POINTS_MAX,
+                "captcha_cost",
+                "Cost",
+                *CAPTCHA_COST_RANGE.start(),
+                *CAPTCHA_COST_RANGE.end(),
             )?,
-            rollout_salt: parse_experiment_rollout_salt(form, "profile_timezone_rollout_salt")?,
-            included_user_ids: Some(parse_experiment_user_ids(
-                form.first("profile_timezone_included_user_ids")
-                    .unwrap_or_default(),
-                "Included user IDs",
-            )?),
-            included_guild_ids: Some(parse_experiment_user_ids(
-                form.first("profile_timezone_included_guild_ids")
-                    .unwrap_or_default(),
-                "Included guild IDs",
-            )?),
-            include_premium_users: Some(form.bool_value("profile_timezone_include_premium_users")),
-            excluded_user_ids: Some(parse_experiment_user_ids(
-                form.first("profile_timezone_excluded_user_ids")
-                    .unwrap_or_default(),
-                "Excluded user IDs",
-            )?),
+            max_counter: parse_form_number(
+                form,
+                "captcha_max_counter",
+                "Maximum counter",
+                *CAPTCHA_MAX_COUNTER_RANGE.start(),
+                *CAPTCHA_MAX_COUNTER_RANGE.end(),
+            )?,
         }),
         ..Default::default()
     })
@@ -802,48 +773,26 @@ fn build_policy_update(form: &MultiValueForm) -> InstanceConfigUpdateRequest {
     let direct_messages_disabled = form
         .first("policy_direct_messages_disabled")
         .map(|value| value == "true");
+    let guild_create_access = form
+        .first("policy_guild_create_access")
+        .map(|value| value == "true");
     let premium_mode = match form.first("policy_premium_mode") {
         Some("mirror") => Some(PremiumMode::Mirror),
         Some("everyone") => Some(PremiumMode::Everyone),
         _ => None,
     };
     let services = build_services_update(form);
-    let deferred_phone_gate = build_deferred_phone_gate_update(form);
     InstanceConfigUpdateRequest {
         policy: Some(InstancePolicyUpdateRequest {
             single_community_enabled: None,
             single_community_name: None,
             direct_messages_disabled,
+            guild_create_access,
             premium_mode,
             services,
-            deferred_phone_gate,
         }),
         ..Default::default()
     }
-}
-
-fn build_deferred_phone_gate_update(
-    form: &MultiValueForm,
-) -> Option<DeferredPhoneGateUpdateRequest> {
-    let enabled = form
-        .first("policy_deferred_phone_gate_enabled")
-        .map(|value| value == "true");
-    let window_hours = form
-        .first("policy_deferred_phone_gate_window_hours")
-        .and_then(|value| value.parse::<f64>().ok())
-        .filter(|value| *value > 0.0);
-    let member_threshold = form
-        .first("policy_deferred_phone_gate_member_threshold")
-        .and_then(|value| value.parse::<i64>().ok())
-        .filter(|value| *value > 0);
-    if enabled.is_none() && window_hours.is_none() && member_threshold.is_none() {
-        return None;
-    }
-    Some(DeferredPhoneGateUpdateRequest {
-        enabled,
-        window_hours,
-        member_threshold,
-    })
 }
 
 fn build_services_update(form: &MultiValueForm) -> Option<InstanceServicesUpdateRequest> {
@@ -888,13 +837,6 @@ fn build_integrations_update(form: &MultiValueForm) -> InstanceConfigUpdateReque
             }),
             youtube: Some(InstanceYoutubeIntegrationUpdateRequest {
                 api_key: clean("integration_youtube_api_key"),
-            }),
-            captcha: Some(InstanceCaptchaIntegrationUpdateRequest {
-                provider: clean("integration_captcha_provider"),
-                hcaptcha_site_key: clean("integration_hcaptcha_site_key"),
-                hcaptcha_secret_key: clean("integration_hcaptcha_secret_key"),
-                turnstile_site_key: clean("integration_turnstile_site_key"),
-                turnstile_secret_key: clean("integration_turnstile_secret_key"),
             }),
             email: Some(InstanceEmailIntegrationUpdateRequest {
                 enabled: Some(form.bool_value("integration_email_enabled")),
@@ -976,11 +918,7 @@ fn build_single_community_update(enabled: bool) -> InstanceConfigUpdateRequest {
     InstanceConfigUpdateRequest {
         policy: Some(InstancePolicyUpdateRequest {
             single_community_enabled: Some(enabled),
-            single_community_name: None,
-            direct_messages_disabled: None,
-            premium_mode: None,
-            services: None,
-            deferred_phone_gate: None,
+            ..Default::default()
         }),
         ..Default::default()
     }
@@ -1369,7 +1307,7 @@ mod tests {
     #[test]
     fn build_domain_migration_update_reads_the_rollout_fields() {
         let form = MultiValueForm::parse(
-            b"domain_migration_enabled=true&domain_migration_rollout_basis_points=%20250%20&domain_migration_rollout_salt=%20domain-migration-v2%20&domain_migration_included_user_ids=1500000000000000001%0A1500000000000000002&domain_migration_excluded_user_ids=1500000000000000003%2C%201500000000000000004&domain_migration_anonymous_rollout_basis_points=%20100%20&domain_migration_standalone_forwarding=true",
+            b"domain_migration_enabled=true&domain_migration_rollout_basis_points=%20250%20&domain_migration_rollout_salt=%20domain-migration-v2%20&domain_migration_included_user_ids=1500000000000000001%0A1500000000000000002&domain_migration_excluded_user_ids=1500000000000000003%2C%201500000000000000004&domain_migration_anonymous_rollout_basis_points=%20100%20&domain_migration_standalone_forwarding=true&domain_migration_included_guild_ids=1500000000000000005%0A1500000000000000006%2C1500000000000000005&domain_migration_include_premium_users=true",
         );
         let update = build_domain_migration_update(&form)
             .expect("valid form")
@@ -1394,6 +1332,14 @@ mod tests {
         );
         assert_eq!(update.anonymous_rollout_basis_points, Some(100));
         assert_eq!(update.standalone_forwarding, Some(true));
+        assert_eq!(update.include_premium_users, Some(true));
+        assert_eq!(
+            update.included_guild_ids,
+            Some(vec![
+                "1500000000000000005".to_owned(),
+                "1500000000000000006".to_owned()
+            ])
+        );
     }
 
     #[test]
@@ -1475,83 +1421,80 @@ mod tests {
     }
 
     #[test]
-    fn build_altcha_captcha_update_reads_the_rollout_and_difficulty_fields() {
+    fn build_captcha_update_reads_the_switch_and_difficulty_fields() {
         let form = MultiValueForm::parse(
-            b"altcha_captcha_enabled=true&altcha_captcha_rollout_basis_points=%20500%20&altcha_captcha_rollout_salt=%20altcha-captcha-v2%20&altcha_captcha_included_user_ids=1500000000000000001&altcha_captcha_excluded_user_ids=1500000000000000002&altcha_captcha_anonymous_enabled=true&altcha_captcha_cost=2000&altcha_captcha_max_counter=%20400%20",
+            b"captcha_enabled=true&captcha_cost=%202000%20&captcha_max_counter=400",
         );
-        let update = build_altcha_captcha_update(&form)
+        let update = build_captcha_update(&form)
             .expect("valid form")
-            .altcha_captcha
-            .expect("altcha captcha update");
+            .captcha
+            .expect("captcha update");
         assert_eq!(update.enabled, Some(true));
-        assert_eq!(update.rollout_basis_points, Some(500));
-        assert_eq!(update.rollout_salt, Some("altcha-captcha-v2".to_owned()));
-        assert_eq!(
-            update.included_user_ids,
-            Some(vec!["1500000000000000001".to_owned()])
-        );
-        assert_eq!(
-            update.excluded_user_ids,
-            Some(vec!["1500000000000000002".to_owned()])
-        );
-        assert_eq!(update.anonymous_enabled, Some(true));
         assert_eq!(update.cost, Some(2000));
         assert_eq!(update.max_counter, Some(400));
     }
 
     #[test]
-    fn build_altcha_captcha_update_leaves_the_feature_inert_when_nothing_is_submitted() {
+    fn build_captcha_update_turns_the_check_off_when_the_box_is_unchecked() {
         let form = MultiValueForm::parse(b"_csrf=token");
-        let request = build_altcha_captcha_update(&form).expect("valid form");
+        let request = build_captcha_update(&form).expect("valid form");
         assert_eq!(
             serde_json::to_value(request).expect("serializable update"),
-            serde_json::json!({"altcha_captcha": {
-                "enabled": false,
-                "included_user_ids": [],
-                "included_guild_ids": [],
-                "include_premium_users": false,
-                "excluded_user_ids": [],
-                "anonymous_enabled": false,
-            }})
+            serde_json::json!({"captcha": {"enabled": false}})
         );
     }
 
     #[test]
-    fn build_altcha_captcha_update_rejects_difficulty_outside_the_supported_range() {
+    fn build_captcha_update_rejects_difficulty_outside_the_supported_range() {
         for (form, message) in [
             (
-                "altcha_captcha_cost=999",
-                "Cost must be a whole number between 1000 and 100000",
+                "captcha_cost=999",
+                "Cost must be a whole number between 1000 and 20000",
             ),
             (
-                "altcha_captcha_max_counter=1000001",
-                "Maximum counter must be a whole number between 100 and 1000000",
+                "captcha_cost=20001",
+                "Cost must be a whole number between 1000 and 20000",
             ),
             (
-                "altcha_captcha_rollout_basis_points=10001",
-                "Rollout basis points must be a whole number between 0 and 10000",
+                "captcha_max_counter=99",
+                "Maximum counter must be a whole number between 100 and 20000",
+            ),
+            (
+                "captcha_max_counter=20001",
+                "Maximum counter must be a whole number between 100 and 20000",
             ),
         ] {
             let form = MultiValueForm::parse(form.as_bytes());
             assert_eq!(
-                build_altcha_captcha_update(&form).expect_err("invalid field"),
+                build_captcha_update(&form).expect_err("invalid field"),
                 message
             );
         }
     }
 
     #[test]
-    fn build_profile_timezone_update_reads_the_rollout_fields() {
+    fn domain_migration_update_rejects_an_invalid_included_guild_id() {
         let form = MultiValueForm::parse(
-            b"profile_timezone_enabled=true&profile_timezone_rollout_basis_points=%20500%20&profile_timezone_rollout_salt=%20profile-timezone-v2%20&profile_timezone_included_user_ids=1500000000000000001&profile_timezone_excluded_user_ids=1500000000000000002&profile_timezone_included_guild_ids=1500000000000000005%0A1500000000000000006%2C1500000000000000005&profile_timezone_include_premium_users=true",
+            b"domain_migration_included_guild_ids=1500000000000000005%0Anot-a-guild",
         );
-        let update = build_profile_timezone_update(&form)
+        assert_eq!(
+            build_domain_migration_update(&form).expect_err("invalid guild id"),
+            "Included guild IDs entry 2 must contain 1 to 20 decimal digits"
+        );
+    }
+
+    #[test]
+    fn build_plutonium_page_update_reads_the_rollout_fields() {
+        let form = MultiValueForm::parse(
+            b"plutonium_page_enabled=true&plutonium_page_rollout_basis_points=%20500%20&plutonium_page_rollout_salt=%20plutonium-page-v2%20&plutonium_page_included_user_ids=1500000000000000001&plutonium_page_excluded_user_ids=1500000000000000002&plutonium_page_included_guild_ids=1500000000000000005%0A1500000000000000006%2C1500000000000000005&plutonium_page_include_premium_users=true",
+        );
+        let update = build_plutonium_page_update(&form)
             .expect("valid form")
-            .profile_timezone
-            .expect("profile timezone update");
+            .plutonium_page
+            .expect("plutonium page update");
         assert_eq!(update.enabled, Some(true));
         assert_eq!(update.rollout_basis_points, Some(500));
-        assert_eq!(update.rollout_salt, Some("profile-timezone-v2".to_owned()));
+        assert_eq!(update.rollout_salt, Some("plutonium-page-v2".to_owned()));
         assert_eq!(update.include_premium_users, Some(true));
         assert_eq!(
             update.included_guild_ids,
@@ -1571,12 +1514,12 @@ mod tests {
     }
 
     #[test]
-    fn build_profile_timezone_update_leaves_the_feature_inert_when_nothing_is_submitted() {
+    fn build_plutonium_page_update_leaves_the_feature_inert_when_nothing_is_submitted() {
         let form = MultiValueForm::parse(b"_csrf=token");
-        let request = build_profile_timezone_update(&form).expect("valid form");
+        let request = build_plutonium_page_update(&form).expect("valid form");
         assert_eq!(
             serde_json::to_value(request).expect("serializable update"),
-            serde_json::json!({"profile_timezone": {
+            serde_json::json!({"plutonium_page": {
                 "enabled": false,
                 "included_user_ids": [],
                 "included_guild_ids": [],
@@ -1587,34 +1530,23 @@ mod tests {
     }
 
     #[test]
-    fn every_experiment_update_rejects_an_invalid_included_guild_id() {
-        for (prefix, build) in [
+    fn build_plutonium_page_update_rejects_invalid_rollout_fields() {
+        for (form, message) in [
             (
-                "domain_migration",
-                build_domain_migration_update
-                    as fn(&MultiValueForm) -> Result<InstanceConfigUpdateRequest, String>,
+                "plutonium_page_rollout_basis_points=10001",
+                "Rollout basis points must be a whole number between 0 and 10000",
             ),
-            ("altcha_captcha", build_altcha_captcha_update),
-            ("profile_timezone", build_profile_timezone_update),
-        ] {
-            let form = MultiValueForm::parse(
-                format!("{prefix}_included_guild_ids=1500000000000000005%0Anot-a-guild").as_bytes(),
-            );
-            assert_eq!(
-                build(&form).expect_err("invalid guild id"),
+            (
+                "plutonium_page_included_guild_ids=1500000000000000005%0Anot-a-guild",
                 "Included guild IDs entry 2 must contain 1 to 20 decimal digits",
-                "{prefix}"
+            ),
+        ] {
+            let form = MultiValueForm::parse(form.as_bytes());
+            assert_eq!(
+                build_plutonium_page_update(&form).expect_err("invalid field"),
+                message
             );
         }
-    }
-
-    #[test]
-    fn build_profile_timezone_update_rejects_a_rollout_above_everybody() {
-        let form = MultiValueForm::parse(b"profile_timezone_rollout_basis_points=10001");
-        assert_eq!(
-            build_profile_timezone_update(&form).expect_err("invalid field"),
-            "Rollout basis points must be a whole number between 0 and 10000"
-        );
     }
 
     #[test]

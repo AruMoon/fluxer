@@ -35,10 +35,9 @@ import {
 	PendingRegistrationActionRequest,
 	RegistrationUrlIdParam,
 } from '@fluxer/schema/src/domains/admin/AdminSchemas';
-import {AltchaCaptchaConfigSchema} from '@fluxer/schema/src/domains/admin/AltchaCaptchaSchemas';
 import {DomainMigrationConfigSchema} from '@fluxer/schema/src/domains/admin/DomainMigrationSchemas';
 import {GatewayRolloutConfigSchema} from '@fluxer/schema/src/domains/admin/GatewayRolloutSchemas';
-import {ProfileTimezoneConfigSchema} from '@fluxer/schema/src/domains/admin/ProfileTimezoneSchemas';
+import {PlutoniumPageConfigSchema} from '@fluxer/schema/src/domains/admin/PlutoniumPageSchemas';
 import type {PushRelayConfig, PushRelayConfigUpdateRequest} from '@fluxer/schema/src/domains/admin/PushRelaySchemas';
 import {UserIdParam} from '@fluxer/schema/src/domains/common/CommonParamSchemas';
 import {ExperimentDeliveryConfigSchema} from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
@@ -68,8 +67,8 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		gatewayRollout,
 		pushRelay,
 		domainMigration,
-		altchaCaptcha,
-		profileTimezone,
+		plutoniumPage,
+		captcha,
 		experimentDelivery,
 		registrationConfig,
 		registrationUrls,
@@ -79,8 +78,8 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		instanceConfigRepository.getGatewayRolloutConfig(),
 		instanceConfigRepository.getPushRelayConfig(),
 		instanceConfigRepository.getDomainMigrationConfig(),
-		instanceConfigRepository.getAltchaCaptchaConfig(),
-		instanceConfigRepository.getProfileTimezoneConfig(),
+		instanceConfigRepository.getPlutoniumPageConfig(),
+		instanceConfigRepository.getCaptchaConfig(),
 		instanceConfigRepository.getExperimentDeliveryConfig(),
 		instanceConfigRepository.getRegistrationConfig(),
 		instanceConfigRepository.getRegistrationUrlsForAdmin(),
@@ -114,8 +113,8 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		gateway_rollout: gatewayRollout,
 		push_relay: pushRelay,
 		domain_migration: domainMigration,
-		altcha_captcha: altchaCaptcha,
-		profile_timezone: profileTimezone,
+		plutonium_page: plutoniumPage,
+		captcha,
 		experiment_delivery: experimentDelivery,
 		registration: {
 			...registrationConfig,
@@ -129,16 +128,12 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 			single_community_guild_id: policy.single_community_guild_id,
 			direct_messages_disabled: policy.direct_messages_disabled,
 			direct_messages_locked: policy.direct_messages_locked,
+			guild_create_access: policy.guild_create_access,
 			premium_mode: policy.premium_mode,
 			services: {
 				gif_enabled: policy.gif_enabled,
 				youtube_enabled: policy.youtube_enabled,
 				bluesky_enabled: policy.bluesky_enabled,
-			},
-			deferred_phone_gate: {
-				enabled: policy.deferred_phone_gate_enabled,
-				window_hours: policy.deferred_phone_gate_window_hours,
-				member_threshold: policy.deferred_phone_gate_member_threshold,
 			},
 			services_resolved: resolvedServices,
 			services_available: {
@@ -397,11 +392,11 @@ export function InstanceConfigAdminController(app: HonoApp) {
 					);
 				}
 			}
-			if (data.altcha_captcha) {
-				const patch = omitUndefinedFields(data.altcha_captcha);
+			if (data.plutonium_page) {
+				const patch = omitUndefinedFields(data.plutonium_page);
 				if (Object.keys(patch).length > 0) {
-					await instanceConfigRepository.updateAltchaCaptchaConfig((current) =>
-						AltchaCaptchaConfigSchema.parse({
+					await instanceConfigRepository.updatePlutoniumPageConfig((current) =>
+						PlutoniumPageConfigSchema.parse({
 							...current,
 							...patch,
 							config_version: current.config_version + 1,
@@ -409,16 +404,10 @@ export function InstanceConfigAdminController(app: HonoApp) {
 					);
 				}
 			}
-			if (data.profile_timezone) {
-				const patch = omitUndefinedFields(data.profile_timezone);
+			if (data.captcha) {
+				const patch = omitUndefinedFields(data.captcha);
 				if (Object.keys(patch).length > 0) {
-					await instanceConfigRepository.updateProfileTimezoneConfig((current) =>
-						ProfileTimezoneConfigSchema.parse({
-							...current,
-							...patch,
-							config_version: current.config_version + 1,
-						}),
-					);
+					await instanceConfigRepository.updateCaptchaConfig(patch);
 				}
 			}
 			if (data.experiment_delivery) {
@@ -517,15 +506,6 @@ export function InstanceConfigAdminController(app: HonoApp) {
 					youtube: data.integrations.youtube
 						? omitUndefinedFields({
 								api_key: readOptionalField(data.integrations.youtube, 'api_key'),
-							})
-						: undefined,
-					captcha: data.integrations.captcha
-						? omitUndefinedFields({
-								provider: readOptionalField(data.integrations.captcha, 'provider'),
-								hcaptcha_site_key: readOptionalField(data.integrations.captcha, 'hcaptcha_site_key'),
-								hcaptcha_secret_key: readOptionalField(data.integrations.captcha, 'hcaptcha_secret_key'),
-								turnstile_site_key: readOptionalField(data.integrations.captcha, 'turnstile_site_key'),
-								turnstile_secret_key: readOptionalField(data.integrations.captcha, 'turnstile_secret_key'),
 							})
 						: undefined,
 					email: data.integrations.email
@@ -868,6 +848,9 @@ function planInstancePolicyPatch(
 			patch.direct_messages_locked = true;
 		}
 	}
+	if (policy.guild_create_access !== undefined && policy.guild_create_access !== current.guild_create_access) {
+		patch.guild_create_access = policy.guild_create_access;
+	}
 	if (policy.services) {
 		if (policy.services.gif_enabled !== undefined) {
 			patch.gif_enabled = policy.services.gif_enabled ?? null;
@@ -877,17 +860,6 @@ function planInstancePolicyPatch(
 		}
 		if (policy.services.bluesky_enabled !== undefined) {
 			patch.bluesky_enabled = policy.services.bluesky_enabled ?? null;
-		}
-	}
-	if (policy.deferred_phone_gate) {
-		if (policy.deferred_phone_gate.enabled !== undefined) {
-			patch.deferred_phone_gate_enabled = policy.deferred_phone_gate.enabled;
-		}
-		if (policy.deferred_phone_gate.window_hours !== undefined) {
-			patch.deferred_phone_gate_window_hours = policy.deferred_phone_gate.window_hours;
-		}
-		if (policy.deferred_phone_gate.member_threshold !== undefined) {
-			patch.deferred_phone_gate_member_threshold = policy.deferred_phone_gate.member_threshold;
 		}
 	}
 	return {patch, enablesSingleCommunity};
