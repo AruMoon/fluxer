@@ -8,9 +8,7 @@
     disconnect_voice_user/2,
     disconnect_voice_user_if_in_channel/2,
     force_disconnect_participant/4,
-    cleanup_virtual_channel_access_for_user/2,
-    maybe_clear_empty_voice_room_pin/3,
-    maybe_clear_pending_voice_room_pin/2
+    cleanup_virtual_channel_access_for_user/2
 ]).
 
 -export_type([
@@ -47,55 +45,10 @@ handle_voice_disconnect(ConnectionId, _SessionId, UserId, VoiceStates0, State) -
 
 -spec clear_missing_connection_success(binary(), guild_state()) -> voice_reply().
 clear_missing_connection_success(ConnectionId, State) ->
-    PendingConnections = guild_voice_connection_pending:pending_voice_connections(State),
-    PendingData = maps:get(ConnectionId, PendingConnections, undefined),
     State1 = guild_voice_disconnect_broadcast:clear_pending_voice_connection(
         ConnectionId, State
     ),
-    ok = maybe_clear_pending_voice_room_pin(PendingData, State1),
     {reply, #{success => true}, State1}.
-
--spec maybe_clear_empty_voice_room_pin(
-    voice_state(), voice_state_map(), guild_state()
-) -> ok.
-maybe_clear_empty_voice_room_pin(RemovedVoiceState, RemainingVoiceStates, State) ->
-    GuildId = resolve_guild_id(RemovedVoiceState, State),
-    ChannelId = voice_state_utils:voice_state_channel_id(RemovedVoiceState),
-    case {GuildId, ChannelId} of
-        {GId, CId} when is_integer(GId), is_integer(CId) ->
-            maybe_clear_empty_voice_room_pin(
-                GId,
-                CId,
-                RemovedVoiceState,
-                RemainingVoiceStates,
-                State
-            );
-        _ ->
-            ok
-    end.
-
--spec maybe_clear_pending_voice_room_pin(term(), guild_state()) -> ok.
-maybe_clear_pending_voice_room_pin(
-    #{
-        guild_id := GuildId,
-        channel_id := ChannelId,
-        voice_state := VoiceState
-    },
-    State
-) when
-    is_integer(GuildId),
-    is_integer(ChannelId),
-    is_map(VoiceState)
-->
-    maybe_clear_empty_voice_room_pin(
-        GuildId,
-        ChannelId,
-        VoiceState,
-        voice_state_utils:voice_states(State),
-        State
-    );
-maybe_clear_pending_voice_room_pin(_PendingData, _State) ->
-    ok.
 
 -spec handle_existing_voice_state(
     binary(), integer(), voice_state(), voice_state_map(), guild_state()
@@ -145,9 +98,6 @@ do_voice_disconnect(
         ChannelId, NewVoiceStates, NewState1
     ),
     voice_state_utils:broadcast_disconnects(#{ConnectionId => OldVoiceState}, NewState),
-    ok = maybe_clear_empty_voice_room_pin(
-        GuildId, ChannelId, OldVoiceState, NewVoiceStates, NewState
-    ),
     FinalState = maybe_cleanup_after_disconnect(UserId, ChannelId, NewState),
     {reply, #{success => true}, FinalState}.
 
@@ -170,22 +120,8 @@ disconnect_all_user_connections(UserId, RequestSessionId, VoiceStates, State) ->
     UserVoiceStates = matching_user_voice_states(UserId, RequestSessionId, VoiceStates),
     case maps:size(UserVoiceStates) of
         0 ->
-            PendingBefore = guild_voice_connection_pending:pending_voice_connections(State),
             State1 = guild_voice_disconnect_broadcast:clear_pending_voice_connections_for_user(
                 UserId, RequestSessionId, State
-            ),
-            PendingAfter = guild_voice_connection_pending:pending_voice_connections(State1),
-            RemovedPending = maps:filter(
-                fun(ConnId, _PendingData) ->
-                    not maps:is_key(ConnId, PendingAfter)
-                end,
-                PendingBefore
-            ),
-            maps:foreach(
-                fun(_ConnId, PendingData) ->
-                    maybe_clear_pending_voice_room_pin(PendingData, State1)
-                end,
-                RemovedPending
             ),
             {reply, #{success => true}, State1};
         _ ->
@@ -198,12 +134,6 @@ disconnect_all_user_connections(UserId, RequestSessionId, VoiceStates, State) ->
             ),
             NewState = clear_recently_disconnected_connections(UserVoiceStates, NewState1),
             voice_state_utils:broadcast_disconnects(UserVoiceStates, NewState),
-            maps:foreach(
-                fun(_ConnId, VoiceState) ->
-                    maybe_clear_empty_voice_room_pin(VoiceState, NewVoiceStates, NewState)
-                end,
-                UserVoiceStates
-            ),
             FinalState = maybe_cleanup_virtual_channel_access(UserId, NewVoiceStates, NewState),
             {reply, #{success => true}, FinalState}
     end.
@@ -249,11 +179,6 @@ handle_specific_disconnect(UserId, ConnId, VoiceState, VoiceStates, State) ->
                 voice_state_utils:voice_state_channel_id(VoiceState), NewVoiceStates, NewState1
             ),
             voice_state_utils:broadcast_disconnects(#{ConnId => VoiceState}, NewState),
-            ok = maybe_clear_empty_voice_room_pin(
-                VoiceState,
-                NewVoiceStates,
-                NewState
-            ),
             FinalState = maybe_cleanup_virtual_channel_access(UserId, NewVoiceStates, NewState),
             {reply, #{success => true}, FinalState};
         _ ->
@@ -346,65 +271,6 @@ voice_state_session_matches(VoiceState, RequestSessionId) ->
 
 -spec normalize_session_id(term()) -> binary() | undefined.
 normalize_session_id(Value) -> voice_state_utils:normalize_session_id(Value).
-
--spec maybe_clear_empty_voice_room_pin(
-    integer(), integer(), voice_state(), voice_state_map(), guild_state()
-) -> ok.
-maybe_clear_empty_voice_room_pin(
-    GuildId, ChannelId, RemovedVoiceState, RemainingVoiceStates, State
-) ->
-    case
-        has_voice_state_in_channel(ChannelId, RemainingVoiceStates) orelse
-            has_pending_voice_connection_in_channel(ChannelId, State)
-    of
-        true ->
-            ok;
-        false ->
-            RegionId = maps:get(<<"region_id">>, RemovedVoiceState, undefined),
-            ServerId = maps:get(<<"server_id">>, RemovedVoiceState, undefined),
-            case {RegionId, ServerId} of
-                {Region, Server} when is_binary(Region), is_binary(Server) ->
-                    _ = rpc_client:call(#{
-                        <<"type">> => <<"voice_clear_room_server_pin">>,
-                        <<"guild_id">> => integer_to_binary(GuildId),
-                        <<"channel_id">> => integer_to_binary(ChannelId),
-                        <<"region_id">> => Region,
-                        <<"server_id">> => Server
-                    }),
-                    ok;
-                _ ->
-                    logger:warning(
-                        "voice_pin_cleanup_missing_routing: guild_id=~p channel_id=~p connection_id=~p",
-                        [
-                            GuildId,
-                            ChannelId,
-                            maps:get(<<"connection_id">>, RemovedVoiceState, undefined)
-                        ]
-                    ),
-                    ok
-            end
-    end.
-
--spec has_pending_voice_connection_in_channel(integer(), guild_state()) -> boolean().
-has_pending_voice_connection_in_channel(ChannelId, State) ->
-    Pending = maps:get(pending_voice_connections, State, #{}),
-    maps:fold(
-        fun(_, PendingData, Acc) ->
-            Acc orelse maps:get(channel_id, PendingData, undefined) =:= ChannelId
-        end,
-        false,
-        Pending
-    ).
-
--spec has_voice_state_in_channel(integer(), voice_state_map()) -> boolean().
-has_voice_state_in_channel(ChannelId, VoiceStates) ->
-    maps:fold(
-        fun(_, VoiceState, Acc) ->
-            Acc orelse voice_state_utils:voice_state_channel_id(VoiceState) =:= ChannelId
-        end,
-        false,
-        VoiceStates
-    ).
 
 -spec maybe_cleanup_after_disconnect(integer(), integer(), guild_state()) -> guild_state().
 maybe_cleanup_after_disconnect(UserId, ChannelId, State) ->

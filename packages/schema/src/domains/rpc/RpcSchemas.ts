@@ -124,20 +124,6 @@ export const RpcRequest = z.discriminatedUnion('type', [
 		user_ids: z.array(SnowflakeType).max(RPC_USER_BATCH_MAX).describe('IDs of users to fetch blocked lists for'),
 	}),
 	z.object({
-		type: z.literal('voice_clear_room_server_pin_unconditional'),
-		guild_id: SnowflakeType.optional(),
-		channel_id: SnowflakeType,
-	}),
-	z.object({
-		type: z
-			.literal('voice_clear_room_server_pin')
-			.describe('Request type for conditionally clearing an empty voice room server pin'),
-		guild_id: SnowflakeType.optional().describe('ID of the guild for the voice channel'),
-		channel_id: SnowflakeType.describe('ID of the voice channel'),
-		region_id: createStringType(1, 64).describe('Region currently hosting the voice room'),
-		server_id: createStringType(1, 128).describe('Server currently hosting the voice room'),
-	}),
-	z.object({
 		type: z.literal('voice_get_token').describe('Request type for getting voice connection token'),
 		guild_id: SnowflakeType.optional().describe('ID of the guild for the voice channel'),
 		channel_id: SnowflakeType.describe('ID of the voice channel'),
@@ -419,16 +405,6 @@ export const RpcResponse = z.discriminatedUnion('type', [
 	z.object({
 		type: z.literal('get_user_blocked_ids').describe('Response type for blocked user IDs'),
 		data: z.record(SnowflakeStringType, z.array(SnowflakeStringType)).describe('Blocked user IDs keyed by user ID'),
-	}),
-	z.object({
-		type: z.literal('voice_clear_room_server_pin_unconditional'),
-		data: z.object({success: z.boolean()}),
-	}),
-	z.object({
-		type: z
-			.literal('voice_clear_room_server_pin')
-			.describe('Response type for conditional voice room server pin cleanup'),
-		data: z.object({success: z.boolean().describe('Whether the voice room server pin was cleared')}),
 	}),
 	z.object({
 		type: z.literal('voice_get_token').describe('Response type for voice connection token'),

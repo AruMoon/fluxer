@@ -54,16 +54,6 @@ do_disconnect_channel(ChannelId, ChannelVoiceStates, VoiceStates, Count, State) 
         ChannelId, NewVoiceStates, NewState1
     ),
     voice_state_utils:broadcast_disconnects(ChannelVoiceStates, NewState),
-    maps:foreach(
-        fun(_ConnId, VoiceState) ->
-            guild_voice_disconnect_user:maybe_clear_empty_voice_room_pin(
-                VoiceState,
-                NewVoiceStates,
-                NewState
-            )
-        end,
-        ChannelVoiceStates
-    ),
     {reply, #{success => true, disconnected_count => Count}, NewState}.
 
 -spec disconnect_user_from_expected_channel(
@@ -97,16 +87,6 @@ disconnect_user_from_expected_channel(UserId, ExpectedChannelId, VoiceStates, St
                 UserVoiceStates, NewState1
             ),
             voice_state_utils:broadcast_disconnects(UserVoiceStates, NewState),
-            maps:foreach(
-                fun(_ConnId, VoiceState) ->
-                    guild_voice_disconnect_user:maybe_clear_empty_voice_room_pin(
-                        VoiceState,
-                        NewVoiceStates,
-                        NewState
-                    )
-                end,
-                UserVoiceStates
-            ),
             {reply, #{success => true}, NewState}
     end.
 
@@ -152,11 +132,6 @@ check_and_disconnect_connection(
                 #{ConnId => VoiceState}, NewState1
             ),
             voice_state_utils:broadcast_disconnects(#{ConnId => VoiceState}, NewState),
-            ok = guild_voice_disconnect_user:maybe_clear_empty_voice_room_pin(
-                VoiceState,
-                NewVoiceStates,
-                NewState
-            ),
             {reply, #{success => true}, NewState};
         _ ->
             MismatchReply = #{

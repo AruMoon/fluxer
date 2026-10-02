@@ -457,31 +457,6 @@ export class RpcService {
 						userIds: request.user_ids.map(createUserID),
 					}),
 				};
-			case 'voice_clear_room_server_pin_unconditional': {
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				const cleared = await this.voiceService.clearDmRoomServerPin(createChannelID(request.channel_id));
-				return {
-					type: 'voice_clear_room_server_pin_unconditional',
-					data: {success: cleared},
-				};
-			}
-			case 'voice_clear_room_server_pin': {
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				const cleared = await this.voiceService.clearRoomServerPinIfMatches({
-					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
-					channelId: createChannelID(request.channel_id),
-					regionId: request.region_id,
-					serverId: request.server_id,
-				});
-				return {
-					type: 'voice_clear_room_server_pin',
-					data: {success: cleared},
-				};
-			}
 			case 'voice_get_token': {
 				Logger.debug(
 					{type: 'voice_get_token', guildId: request.guild_id, channelId: request.channel_id, userId: request.user_id},
@@ -613,17 +588,13 @@ export class RpcService {
 				};
 			}
 			case 'call_ended': {
-				const channelId = createChannelID(request.channel_id);
 				await this.handleCallEnded({
-					channelId,
+					channelId: createChannelID(request.channel_id),
 					messageId: createMessageID(request.message_id),
 					participants: request.participants.map(createUserID),
 					endedTimestamp: new Date(request.ended_timestamp),
 					requestCache,
 				});
-				if (this.voiceService !== null) {
-					await this.voiceService.clearDmRoomServerPin(channelId);
-				}
 				return {
 					type: 'call_ended',
 					data: {success: true},

@@ -2,9 +2,6 @@
 
 -module(call_voice).
 -typing([eqwalizer]).
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
--endif.
 
 -export([
     handle_join_internal/6,
@@ -36,7 +33,7 @@ handle_join_internal(UserId, VoiceState, SessionId, SessionPid, ConnectionId, St
         Sessions0, SessionId, UserId, SessionPid
     ),
     NewHistory = sets:add_element(UserId, History0),
-    NewPending = build_pending(ConnectionId, UserId, SessionId, VoiceState, BaseState),
+    NewPending = build_pending(ConnectionId, UserId, SessionId, BaseState),
     NewState = BaseState#{
         voice_states => NewVoiceStates,
         sessions => NewSessions,
@@ -49,14 +46,13 @@ handle_join_internal(UserId, VoiceState, SessionId, SessionPid, ConnectionId, St
     ),
     {reply, ok, ensure_call_update(UpdatedState, Dispatched)}.
 
--spec build_pending(binary() | undefined, integer(), binary(), map(), map()) -> map().
-build_pending(undefined, _UserId, _SessionId, _VoiceState, #{pending_connections := Pending}) ->
+-spec build_pending(binary() | undefined, integer(), binary(), map()) -> map().
+build_pending(undefined, _UserId, _SessionId, #{pending_connections := Pending}) ->
     Pending;
 build_pending(
     ConnectionId,
     UserId,
     SessionId,
-    VoiceState,
     #{channel_id := ChannelId, pending_connections := Pending}
 ) ->
     PendingMetadata = #{
@@ -64,8 +60,6 @@ build_pending(
         channel_id => ChannelId,
         connection_id => ConnectionId,
         session_id => SessionId,
-        region_id => maps:get(<<"region_id">>, VoiceState, undefined),
-        server_id => maps:get(<<"server_id">>, VoiceState, undefined),
         joined_at => erlang:system_time(millisecond)
     },
     erlang:send_after(
@@ -120,65 +114,6 @@ maybe_remove_user_voice_state(UserId, RemainingSessions, VoiceStates) ->
         false -> maps:remove(UserId, VoiceStates)
     end.
 
--spec maybe_clear_empty_voice_room_pin(map() | undefined, map()) -> ok.
-maybe_clear_empty_voice_room_pin(
-    RemovedVoiceState,
-    #{
-        voice_states := VoiceStates,
-        pending_connections := PendingConnections
-    } = State
-) when is_map(RemovedVoiceState) ->
-    case {maps:size(VoiceStates), maps:size(PendingConnections)} of
-        {0, 0} ->
-            ChannelId = maps:get(
-                <<"channel_id">>,
-                RemovedVoiceState,
-                maps:get(channel_id, RemovedVoiceState, undefined)
-            ),
-            RegionId = maps:get(
-                <<"region_id">>,
-                RemovedVoiceState,
-                maps:get(region_id, RemovedVoiceState, undefined)
-            ),
-            ServerId = maps:get(
-                <<"server_id">>,
-                RemovedVoiceState,
-                maps:get(server_id, RemovedVoiceState, undefined)
-            ),
-            case {ChannelId, RegionId, ServerId} of
-                {CId, Region, Server} when
-                    is_integer(CId),
-                    is_binary(Region),
-                    is_binary(Server)
-                ->
-                    _ = clear_room_server_pin(
-                        #{
-                            <<"type">> => <<"voice_clear_room_server_pin">>,
-                            <<"channel_id">> => integer_to_binary(CId),
-                            <<"region_id">> => Region,
-                            <<"server_id">> => Server
-                        },
-                        State
-                    ),
-                    ok;
-                _ ->
-                    ok
-            end;
-        _ ->
-            ok
-    end;
-maybe_clear_empty_voice_room_pin(_RemovedVoiceState, _State) ->
-    ok.
-
--spec clear_room_server_pin(map(), map()) -> term().
-clear_room_server_pin(Request, State) ->
-    case maps:get(test_clear_room_server_pin_fun, State, undefined) of
-        Fun when is_function(Fun, 1) ->
-            Fun(Request);
-        _ ->
-            rpc_client:call(Request)
-    end.
-
 -spec ensure_call_update(map(), boolean()) -> map().
 ensure_call_update(State, true) ->
     State;
@@ -194,9 +129,6 @@ handle_session_down(Pid, #{sessions := Sessions, voice_states := VoiceStates} = 
             BaseState = State#{voice_states => NewVS, sessions => NewSess},
             CleanState = call_ringing:cancel_ringing_timers([UserId], BaseState),
             RingState = call_ringing:remove_users_from_ringing([UserId], CleanState),
-            maybe_clear_empty_voice_room_pin(
-                maps:get(UserId, VoiceStates, undefined), RingState
-            ),
             {UpdState, Dispatched} = call_ringing:maybe_dispatch_state_update(
                 State, RingState
             ),
@@ -220,44 +152,31 @@ handle_disconnect_user(
     CleanupFun = fun(DUId, DSId) ->
         maybe_notify_session_force_disconnect(DUId, DSId, ConnectionId, State)
     end,
-    RemovedVoiceState = maps:get(UserId, VoiceStates, undefined),
     case
         voice_disconnect_common:disconnect_user_if_in_channel(
             UserId, ExpectedChannelId, ConnectionId, VoiceStates, Sessions, CleanupFun
         )
     of
         {not_found, _, _} ->
-            PendingVoiceState = maps:get(ConnectionId, PendingConns, undefined),
             NewPending = voice_pending_common:remove_pending_connection(
                 ConnectionId, PendingConns
             ),
-            NewState = State#{pending_connections => NewPending},
-            maybe_clear_empty_voice_room_pin(PendingVoiceState, NewState),
             Reply = #{success => true, ignored => true, reason => <<"not_in_call">>},
-            {reply, Reply, NewState};
+            {reply, Reply, State#{pending_connections => NewPending}};
         {channel_mismatch, _, _} ->
             Reply = #{success => true, ignored => true, reason => <<"channel_mismatch">>},
             {reply, Reply, State};
         {ok, NewVS, NewSess} ->
-            do_disconnect_cleanup(
-                UserId, ConnectionId, NewVS, NewSess, RemovedVoiceState, State
-            )
+            do_disconnect_cleanup(UserId, ConnectionId, NewVS, NewSess, State)
     end.
 
--spec do_disconnect_cleanup(
-    integer(),
-    binary() | undefined,
-    map(),
-    map(),
-    map() | undefined,
-    map()
-) -> {reply, term(), map()} | {stop, normal, term(), map()}.
+-spec do_disconnect_cleanup(integer(), binary() | undefined, map(), map(), map()) ->
+    {reply, term(), map()} | {stop, normal, term(), map()}.
 do_disconnect_cleanup(
     UserId,
     ConnectionId,
     NewVS,
     NewSess,
-    RemovedVoiceState,
     #{pending_connections := PendingConns} = State
 ) ->
     NewPending = voice_pending_common:remove_pending_connection(
@@ -268,7 +187,6 @@ do_disconnect_cleanup(
     },
     CleanState = call_ringing:cancel_ringing_timers([UserId], BaseState),
     RingState = call_ringing:remove_users_from_ringing([UserId], CleanState),
-    maybe_clear_empty_voice_room_pin(RemovedVoiceState, RingState),
     {UpdState, Dispatched} = call_ringing:maybe_dispatch_state_update(State, RingState),
     call_ringing:maybe_stop_or_map_reply(UpdState, Dispatched, #{success => true}).
 
@@ -283,9 +201,6 @@ handle_leave(SessionId, #{sessions := Sessions, voice_states := VoiceStates} = S
             BaseState = State#{voice_states => NewVS, sessions => NewSess},
             CleanState = call_ringing:cancel_ringing_timers([UserId], BaseState),
             RingState = call_ringing:remove_users_from_ringing([UserId], CleanState),
-            maybe_clear_empty_voice_room_pin(
-                maps:get(UserId, VoiceStates, undefined), RingState
-            ),
             {UpdState, Dispatched} = call_ringing:maybe_dispatch_state_update(
                 State, RingState
             ),
@@ -310,22 +225,16 @@ disconnect_user_after_pending_timeout(
     NewPending = voice_pending_common:remove_pending_connection(
         ConnectionId, PendingConns
     ),
-    NewState0 = State#{pending_connections => NewPending},
     case maps:is_key(UserId, VoiceStates) of
         true ->
-            {noreply, NewState0};
+            {noreply, State#{pending_connections => NewPending}};
         false ->
             NewSessions = call_state:remove_session_entry(
                 SessionId, Sessions
             ),
-            NewState = NewState0#{
-                sessions => NewSessions
-            },
-            maybe_clear_empty_voice_room_pin(
-                maps:get(ConnectionId, PendingConns, undefined),
-                NewState
-            ),
-            {noreply, NewState}
+            {noreply, State#{
+                pending_connections => NewPending, sessions => NewSessions
+            }}
     end.
 
 -spec maybe_notify_session_force_disconnect(
@@ -455,97 +364,3 @@ dispatch_voice_server_rpc(ChannelId, SessionPid, Req) ->
 -spec is_session_pid_alive(pid()) -> boolean().
 is_session_pid_alive(Pid) ->
     process_liveness:is_alive(Pid).
-
--ifdef(TEST).
-
-dm_voice_state(ChannelId, RegionId, ServerId) ->
-    #{
-        <<"channel_id">> => ChannelId,
-        <<"region_id">> => RegionId,
-        <<"server_id">> => ServerId
-    }.
-
-clear_request_test_fun() ->
-    fun(Request) ->
-        self() ! {voice_room_pin_clear, Request},
-        ok
-    end.
-
-receive_clear_request() ->
-    receive
-        {voice_room_pin_clear, _Request} = Message ->
-            Message;
-        _Other ->
-            receive_clear_request()
-    after 1000 ->
-        timeout
-    end.
-
-maybe_clear_empty_voice_room_pin_clears_dm_pin_test() ->
-    State = #{
-        voice_states => #{},
-        pending_connections => #{},
-        test_clear_room_server_pin_fun => clear_request_test_fun()
-    },
-    RemovedVoiceState = dm_voice_state(100, <<"us">>, <<"us-1">>),
-    ?assertEqual(ok, maybe_clear_empty_voice_room_pin(RemovedVoiceState, State)),
-    ?assertEqual(
-        {voice_room_pin_clear, #{
-            <<"type">> => <<"voice_clear_room_server_pin">>,
-            <<"channel_id">> => <<"100">>,
-            <<"region_id">> => <<"us">>,
-            <<"server_id">> => <<"us-1">>
-        }},
-        receive_clear_request()
-    ).
-
-maybe_clear_empty_voice_room_pin_clears_group_dm_pin_test() ->
-    State = #{
-        recipients => [2, 3, 4],
-        voice_states => #{},
-        pending_connections => #{},
-        test_clear_room_server_pin_fun => clear_request_test_fun()
-    },
-    RemovedVoiceState = dm_voice_state(200, <<"eu">>, <<"eu-2">>),
-    ?assertEqual(ok, maybe_clear_empty_voice_room_pin(RemovedVoiceState, State)),
-    ?assertEqual(
-        {voice_room_pin_clear, #{
-            <<"type">> => <<"voice_clear_room_server_pin">>,
-            <<"channel_id">> => <<"200">>,
-            <<"region_id">> => <<"eu">>,
-            <<"server_id">> => <<"eu-2">>
-        }},
-        receive_clear_request()
-    ).
-
-maybe_clear_empty_voice_room_pin_keeps_pin_for_remaining_user_test() ->
-    State = #{
-        voice_states => #{2 => #{}},
-        pending_connections => #{},
-        test_clear_room_server_pin_fun => clear_request_test_fun()
-    },
-    ?assertEqual(
-        ok,
-        maybe_clear_empty_voice_room_pin(
-            dm_voice_state(300, <<"us">>, <<"us-1">>),
-            State
-        )
-    ),
-    ?assertEqual(timeout, receive_clear_request()).
-
-maybe_clear_empty_voice_room_pin_keeps_pin_for_pending_join_test() ->
-    State = #{
-        voice_states => #{},
-        pending_connections => #{<<"pending">> => #{}},
-        test_clear_room_server_pin_fun => clear_request_test_fun()
-    },
-    ?assertEqual(
-        ok,
-        maybe_clear_empty_voice_room_pin(
-            dm_voice_state(400, <<"us">>, <<"us-2">>),
-            State
-        )
-    ),
-    ?assertEqual(timeout, receive_clear_request()).
-
--endif.
