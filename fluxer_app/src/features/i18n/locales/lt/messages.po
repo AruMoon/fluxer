@@ -21,7 +21,7 @@ msgstr "... įjungsite tankųjį režimą. Puiku!"
 
 #. Button or menu action label in the channel and chat user message. Keep it concise.
 #. Suffix after the message text in the forward modal preview when the forwarded message was edited.
-#: src/features/channel/components/MessageAttachments.tsx:392
+#: src/features/channel/components/MessageAttachments.tsx:390
 #: src/features/channel/components/UserMessage.tsx:75
 #: src/features/messaging/components/modals/ForwardMessagePreview.tsx:26
 msgid "(edited)"
@@ -1019,8 +1019,8 @@ msgid "{count, plural, one {# image} other {# images}}"
 msgstr "{count, plural, one {# vaizdas} few {# vaizdai} many {# vaizdo} other {# vaizdų}}"
 
 #: src/features/channel/components/ChannelSourcePreview.tsx:245
-#: src/features/channel/components/direct_message/DMListItem.tsx:437
-#: src/features/channel/components/direct_message/DMListItem.tsx:601
+#: src/features/channel/components/direct_message/DMListItem.tsx:430
+#: src/features/channel/components/direct_message/DMListItem.tsx:592
 #: src/features/guild/components/bottomsheets/GuildHeaderBottomSheet.tsx:118
 #: src/features/user/components/modals/MutualItemsSheet.tsx:159
 #: src/features/user/components/modals/user_profile_modal/MutualGroupItem.tsx:26
@@ -1051,7 +1051,7 @@ msgid "{count, plural, one {# potential spammer message} other {# potential spam
 msgstr "{count, plural, one {# galima šlamšto siuntėjo žinutė} few {# galimos šlamšto siuntėjo žinutės} other {# galimų šlamšto siuntėjo žinučių}}"
 
 #: src/features/app/components/shared/MessageReactionsContent.tsx:56
-#: src/features/channel/components/MessageReactions.tsx:146
+#: src/features/channel/components/MessageReactions.tsx:143
 msgid "{count, plural, one {# reaction} other {# reactions}}"
 msgstr "{count, plural, one {# reakcija} few {# reakcijos} other {# reakcijų}}"
 
@@ -1329,12 +1329,12 @@ msgid "{emojiName}, {reactionCountText}"
 msgstr "{emojiName}, {reactionCountText}"
 
 #. Short label in the channel and chat message reactions. Keep it concise. Preserve {emojiName}, {reactionCountText}; they are inserted by code.
-#: src/features/channel/components/MessageReactions.tsx:50
+#: src/features/channel/components/MessageReactions.tsx:48
 msgid "{emojiName}: {reactionCountText}"
 msgstr "{emojiName}: {reactionCountText}"
 
 #. Short label in the channel and chat message reactions. Keep it concise. Preserve {emojiName}, {reactionCountText}, {actionText}; they are inserted by code.
-#: src/features/channel/components/MessageReactions.tsx:55
+#: src/features/channel/components/MessageReactions.tsx:53
 msgid "{emojiName}: {reactionCountText}, {actionText}"
 msgstr "{emojiName}: {reactionCountText}, {actionText}"
 
@@ -2215,8 +2215,8 @@ msgstr "<0>{username}</0> vis dar yra grupėje. Bandykite dar kartą po akimirko
 
 #. Attribution line on a forwarded message, above the forwarded content. sourceInfo is the icon and name of the community and channel the message came from.
 #. Attribution line on a forwarded message, above the forwarded content. sourceInfo is the icon and name of the conversation the message came from.
-#: src/features/channel/components/MessageAttachments.tsx:243
-#: src/features/channel/components/MessageAttachments.tsx:299
+#: src/features/channel/components/MessageAttachments.tsx:241
+#: src/features/channel/components/MessageAttachments.tsx:297
 msgid "<0>Forwarded from</0>{sourceInfo}"
 msgstr "<0>Persiųsta iš</0>{sourceInfo}"
 
@@ -2786,11 +2786,6 @@ msgstr "Paskyros duomenys"
 #: src/features/moderation/components/report_modal/IARModalCopy.ts:253
 msgid "Account exists to spam, scam, or abuse the platform."
 msgstr "Paskyra skirta šlamštui, sukčiavimui arba piktnaudžiavimui platforma."
-
-#. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
-#: src/features/channel/components/channel_header_components/developer_tools/OptionPresets.ts:49
-msgid "Account limited"
-msgstr "Paskyra apribota"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AccountSecuritySections.ts:124
@@ -6730,7 +6725,7 @@ msgid "Categories"
 msgstr "Kategorijos"
 
 #. Lowercase channel type label used inside channel-list accessible text.
-#: src/features/app/components/layout/ChannelItem.tsx:84
+#: src/features/app/components/layout/ChannelItem.tsx:83
 msgid "category"
 msgstr "kategorija"
 
@@ -7200,7 +7195,7 @@ msgstr "Pakeitimai iškart pritaikomi veikiančiam klientui."
 
 #. Fallback channel-name placeholder used inside the textarea message hint when no name is available. Lowercase.
 #. Lowercase generic channel type label used inside channel-list accessible text.
-#: src/features/app/components/layout/ChannelItem.tsx:92
+#: src/features/app/components/layout/ChannelItem.tsx:91
 #: src/features/channel/components/channel_textarea/shared.ts:12
 msgid "channel"
 msgstr "kanalas"
@@ -7768,9 +7763,9 @@ msgstr "Pasirinkite, ką „{clientLabel}“ gali daryti jūsų bendruomenėje. 
 msgid "Choose what friends see in their active now panel"
 msgstr "Pasirinkite, ką draugai mato savo aktyvumo skydelyje"
 
-#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:292
-msgid "Choose what members must have before they can post or DM community members."
-msgstr "Pasirinkite, ką nariai turi turėti, kad galėtų rašyti žinutes ar siųsti tiesiogines žinutes bendruomenės nariams."
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:291
+msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
+msgstr "Pasirinkite, ką nariai turi turėti prieš galėdami skelbti ar siųsti tiesioginius pranešimus bendruomenės nariams. Nariai, turintys vaidmenis, gali praleisti šiuos patikrinimus. Viešoms erdvėms rekomenduojame įjungti patvirtinimą."
 
 #. Scope option (radio) that lets the user pick conversation kinds and exclude specific communities.
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx:71
@@ -8296,7 +8291,7 @@ msgid "Close account"
 msgstr "Uždaryti paskyrą"
 
 #. Accessible label and tooltip for the close-DM button on a DM list row.
-#: src/features/channel/components/direct_message/DMListItem.tsx:83
+#: src/features/channel/components/direct_message/DMListItem.tsx:82
 msgid "Close direct message with {displayName}"
 msgstr "Uždaryti tiesioginį pokalbį su „{displayName}“"
 
@@ -8505,7 +8500,7 @@ msgstr "Sutraukti neskaitytas žinutes kanale „{channelHeading}“"
 
 #. Lowercase screen-reader fragment in the sidebar navigation guild folder item.
 #. Lowercase state label used inside channel-list accessible text for a collapsed category.
-#: src/features/app/components/layout/ChannelItem.tsx:100
+#: src/features/app/components/layout/ChannelItem.tsx:99
 #: src/features/app/components/layout/sidebar_nav/GuildFolderItem.tsx:85
 msgid "collapsed"
 msgstr "sutraukta"
@@ -8643,7 +8638,7 @@ msgstr "Bendruomenės ir kanalai, kuriuose negalite tvarkyti webhookų, yra pasl
 msgid "Communities listed in Discovery are required to scan messages from all members. This setting cannot be changed while Discovery is enabled."
 msgstr "Į Atradimą įtrauktos bendruomenės privalo tikrinti visų narių žinutes. Šio nustatymo negalima keisti, kol įjungtas Atradimas."
 
-#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:301
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:302
 msgid "Communities listed in Discovery require at least email verification. None cannot be selected while Discovery is enabled."
 msgstr "Į Atradimą įtrauktoms bendruomenėms būtinas bent el. pašto patvirtinimas. Kol įjungtas Atradimas, negalima pasirinkti „Nėra“."
 
@@ -9149,7 +9144,7 @@ msgid "Connect with {providerName}"
 msgstr "Prisijungti naudojant „{providerName}“"
 
 #. Lowercase state label used inside channel-list accessible text for the current voice channel.
-#: src/features/app/components/layout/ChannelItem.tsx:116
+#: src/features/app/components/layout/ChannelItem.tsx:115
 msgid "connected"
 msgstr "prisijungta"
 
@@ -12678,7 +12673,7 @@ msgid "DM"
 msgstr "DM"
 
 #. Very short badge shown in place of an avatar on a favorited direct-message row. Must fit about 2-3 characters; abbreviate rather than translate in full.
-#: src/features/app/components/layout/FavoritesChannelListContent.tsx:70
+#: src/features/app/components/layout/FavoritesChannelListContent.tsx:68
 msgctxt "channel-badge"
 msgid "DM"
 msgstr "DM"
@@ -13039,7 +13034,7 @@ msgid "Downloading desktop update: {percent}% ({formatBytes} / {formatBytes2} at
 msgstr "Atsisiunčiamas darbalaukio naujinimas: {percent}% ({formatBytes} / {formatBytes2}, {formatBytes3}/s)"
 
 #. Short desktop updater status label.
-#: src/features/app/state/Updater.ts:46
+#: src/features/app/state/Updater.ts:48
 msgid "Downloading desktop update…"
 msgstr "Atsisiunčiamas darbalaukio naujinimas…"
 
@@ -13294,7 +13289,7 @@ msgstr "Redaguoti priedą"
 #. Action that opens the edit-category modal.
 #. Action that opens the edit-category modal.
 #. Tooltip and accessible label for the category settings button in the channel list.
-#: src/features/app/components/layout/ChannelItem.tsx:120
+#: src/features/app/components/layout/ChannelItem.tsx:119
 #: src/features/ui/action_menu/items/CategoryMenuData.tsx:85
 #: src/features/ui/action_menu/items/CategoryMenuItems.tsx:62
 msgid "Edit category"
@@ -13754,7 +13749,7 @@ msgid "Empty edit"
 msgstr "Tuščias redagavimas"
 
 #. Short label in the app layout favorites channel list content.
-#: src/features/app/components/layout/FavoritesChannelListContent.tsx:77
+#: src/features/app/components/layout/FavoritesChannelListContent.tsx:75
 msgid "Empty favorites"
 msgstr "Nėra mėgstamiausių"
 
@@ -14608,7 +14603,7 @@ msgstr "Išskleisti neperskaitytas žinutes kanale „{channelHeading}“"
 
 #. Lowercase screen-reader fragment in the sidebar navigation guild folder item.
 #. Lowercase state label used inside channel-list accessible text for an expanded category.
-#: src/features/app/components/layout/ChannelItem.tsx:104
+#: src/features/app/components/layout/ChannelItem.tsx:103
 #: src/features/app/components/layout/sidebar_nav/GuildFolderItem.tsx:81
 msgid "expanded"
 msgstr "išskleista"
@@ -15849,7 +15844,7 @@ msgstr "Persiųsti mediją"
 msgid "Forward message"
 msgstr "Persiųsti žinutę"
 
-#: src/features/channel/components/MessageAttachments.tsx:362
+#: src/features/channel/components/MessageAttachments.tsx:360
 msgid "Forwarded"
 msgstr "Persiųsta"
 
@@ -18625,7 +18620,7 @@ msgstr "Kvietimų maskavimas"
 #. Action label that opens the invite flow.
 #. Button or menu action label in the guild header popout. Keep it concise.
 #. Tooltip and accessible label for the invite button shown beside a channel in the channel list.
-#: src/features/app/components/layout/ChannelItem.tsx:124
+#: src/features/app/components/layout/ChannelItem.tsx:123
 #: src/features/guild/components/popouts/GuildHeaderPopout.tsx:58
 #: src/features/ui/action_menu/items/GuildMenuData.tsx:84
 msgid "Invite members"
@@ -20850,10 +20845,6 @@ msgstr "Nariai pašalinami, kai yra neprisijungę, nebent jiems priskirtas vaidm
 msgid "Members with \"{pinMessagesPermissionLabel}\" can pin messages for everyone."
 msgstr "Nariai, turintys leidimą „{pinMessagesPermissionLabel}“, gali prisegti žinutes visiems."
 
-#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:295
-msgid "Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
-msgstr "Nariai, turintys vaidmenis, gali apeiti šiuos patikrinimus. Viešosioms erdvėms rekomenduojame įjungti patvirtinimą."
-
 #. Helper text under the Allow mentions switch in the role editor. {mentionEveryonePermissionLabel} is the localized name of the Mention Everyone permission and should match its label exactly.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx:47
 msgid "Members with the \"{mentionEveryonePermissionLabel}\" permission can always mention roles, regardless of this setting."
@@ -21306,9 +21297,24 @@ msgstr "Pranešimai, paskelbti šiuose informavimo kanaluose, bus nukopijuoti į
 msgid "Messages you can bookmark"
 msgstr "Pranešimai, kuriuos galite pasižymėti"
 
+#. Title of the error modal shown when an action fails because messaging is paused on the current account until the user completes one quick step described in an email. Keep the tone calm and friendly.
+#: src/features/user/utils/AccountLimitUtils.ts:15
+msgid "Messaging is paused"
+msgstr "Žinučių siuntimas pristabdytas"
+
+#. Notice shown in place of the message composer, and as an error, when messaging is paused on the current account until the user completes one quick step described in an email. While paused, the account cannot post, react, join communities or change its profile. Keep the tone calm and friendly.
+#: src/features/user/utils/AccountLimitUtils.ts:10
+msgid "Messaging is paused on your account. Check your email for a quick step to continue."
+msgstr "Žinučių siuntimas jūsų paskyroje pristabdytas. Peržiūrėkite el. paštą: tęsti galėsite atlikę vieną greitą žingsnį."
+
 #: src/features/channel/components/barriers/BarrierComponents.tsx:274
 msgid "Messaging is temporarily paused in this community."
 msgstr "Šioje bendruomenėje žinučių siuntimas laikinai pristabdytas."
+
+#. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
+#: src/features/channel/components/channel_header_components/developer_tools/OptionPresets.ts:49
+msgid "Messaging paused"
+msgstr "Žinučių siuntimas pristabdytas"
 
 #. Column header for saved billing payment methods.
 #: src/features/app/components/dialogs/components/plutonium/PaymentMethodList.tsx:65
@@ -22052,10 +22058,10 @@ msgstr "Nutildyti srauto garsą"
 #. Lowercase screen-reader fragment in the sidebar navigation guild list item.
 #. Lowercase state label used inside channel-list accessible text when a channel is muted.
 #. Screen-reader fragment announcing that the DM list row is muted. Lowercase fragment.
-#: src/features/app/components/layout/ChannelItem.tsx:112
+#: src/features/app/components/layout/ChannelItem.tsx:111
 #: src/features/app/components/layout/sidebar_nav/GuildListDMItem.tsx:62
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:39
-#: src/features/channel/components/direct_message/DMListItem.tsx:75
+#: src/features/channel/components/direct_message/DMListItem.tsx:74
 msgid "muted"
 msgstr "nutildyta"
 
@@ -23985,7 +23991,7 @@ msgstr "Atidaryti kanalo „{channelName}“ išsamią informaciją"
 
 #. Context-menu action that opens a voice channel's embedded chat view without connecting to voice.
 #. Tooltip and accessible label for the chat icon shown beside a voice channel in the channel list.
-#: src/features/app/components/layout/ChannelItem.tsx:128
+#: src/features/app/components/layout/ChannelItem.tsx:127
 #: src/features/ui/action_menu/items/ChannelMenuData.tsx:156
 msgid "Open chat"
 msgstr "Atidaryti pokalbį"
@@ -25233,7 +25239,7 @@ msgid "Ping: {latency}ms"
 msgstr "Ping: {latency} ms"
 
 #. Screen-reader fragment announcing that the DM list row is pinned. Lowercase fragment.
-#: src/features/channel/components/direct_message/DMListItem.tsx:79
+#: src/features/channel/components/direct_message/DMListItem.tsx:78
 msgid "pinned"
 msgstr "prisegta"
 
@@ -25620,12 +25626,12 @@ msgid "Press Continue to use your passkey."
 msgstr "Paspauskite „Tęsti“, kad naudotumėte savo prieigos raktą."
 
 #. Label in the channel and chat message reactions.
-#: src/features/channel/components/MessageReactions.tsx:46
+#: src/features/channel/components/MessageReactions.tsx:44
 msgid "press to add reaction"
 msgstr "paspauskite, kad pridėtumėte reakciją"
 
 #. Label in the channel and chat message reactions. Keep the tone plain and specific.
-#: src/features/channel/components/MessageReactions.tsx:42
+#: src/features/channel/components/MessageReactions.tsx:40
 msgid "press to remove reaction"
 msgstr "paspauskite, kad pašalintumėte reakciją"
 
@@ -29531,10 +29537,10 @@ msgstr "Pažymimas tekstas"
 #. Lowercase screen-reader fragment in the sidebar navigation guild list item.
 #. Lowercase state label used inside channel-list accessible text for the selected channel.
 #. Screen-reader suffix announcing that the DM list row is the active selection. Lowercase fragment.
-#: src/features/app/components/layout/ChannelItem.tsx:96
+#: src/features/app/components/layout/ChannelItem.tsx:95
 #: src/features/app/components/layout/sidebar_nav/GuildListDMItem.tsx:54
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:35
-#: src/features/channel/components/direct_message/DMListItem.tsx:67
+#: src/features/channel/components/direct_message/DMListItem.tsx:66
 msgid "selected"
 msgstr "pasirinkta"
 
@@ -29842,7 +29848,7 @@ msgid "Sent"
 msgstr "Išsiųsta"
 
 #. DM list row preview text when the most recent message has only attachments.
-#: src/features/channel/components/direct_message/DMListItem.tsx:63
+#: src/features/channel/components/direct_message/DMListItem.tsx:62
 msgid "Sent an attachment"
 msgstr "Išsiuntė priedą"
 
@@ -36229,11 +36235,11 @@ msgstr "Grupės DM atsegtas"
 #. Lowercase screen-reader fragment in the sidebar navigation guild list item.
 #. Lowercase state label used inside channel-list accessible text when a channel has unread messages.
 #. Screen-reader fragment announcing that the DM list row has unread messages. Lowercase fragment.
-#: src/features/app/components/layout/ChannelItem.tsx:108
+#: src/features/app/components/layout/ChannelItem.tsx:107
 #: src/features/app/components/layout/sidebar_nav/GuildFolderItem.tsx:89
 #: src/features/app/components/layout/sidebar_nav/GuildListDMItem.tsx:58
 #: src/features/app/components/layout/sidebar_nav/UseGuildListItemState.ts:27
-#: src/features/channel/components/direct_message/DMListItem.tsx:71
+#: src/features/channel/components/direct_message/DMListItem.tsx:70
 msgid "unread"
 msgstr "neskaityta"
 
@@ -38121,7 +38127,7 @@ msgstr "Balso skambutis. {statusText}."
 
 #. Generic channel-type token used inside a wider delete confirmation string.
 #. Lowercase channel type label used inside channel-list accessible text.
-#: src/features/app/components/layout/ChannelItem.tsx:88
+#: src/features/app/components/layout/ChannelItem.tsx:87
 #: src/features/ui/action_menu/items/ChannelMenuItems.tsx:79
 msgid "voice channel"
 msgstr "balso kanalas"
@@ -39164,7 +39170,7 @@ msgstr "Vakar, {timeString}"
 
 #. First-person prefix used in DM list row preview when the current user is the message author.
 #: src/features/app/components/layout/MobileBottomNav.tsx:153
-#: src/features/channel/components/direct_message/DMListItem.tsx:59
+#: src/features/channel/components/direct_message/DMListItem.tsx:58
 msgid "You"
 msgstr "Jūs"
 
@@ -40067,16 +40073,6 @@ msgstr "Jūsų paskyra"
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:29
 msgid "Your account has been linked successfully. You can now close this tab and return to the app."
 msgstr "Jūsų paskyra sėkmingai susieta. Dabar galite uždaryti šį skirtuką ir grįžti į programėlę."
-
-#. Title of the error modal shown when an action fails because the current account is limited.
-#: src/features/user/utils/AccountLimitUtils.ts:15
-msgid "Your account is limited"
-msgstr "Jūsų paskyra yra apribota"
-
-#. Notice shown in place of the message composer, and as an error, when the current account is limited and cannot post, react, join communities or change its profile.
-#: src/features/user/utils/AccountLimitUtils.ts:10
-msgid "Your account is limited. Check your email for how to lift it."
-msgstr "Jūsų paskyra yra apribota. Patikrinkite savo el. paštą, kad sužinotumėte, kaip ją atblokuoti."
 
 #: src/features/app/components/dialogs/components/UnclaimedAccountAlert.tsx:26
 msgid "Your account is not yet claimed. Without an email and password, you won't be able to sign in from other devices and you could lose access to your account. Claim your account now to secure it."
