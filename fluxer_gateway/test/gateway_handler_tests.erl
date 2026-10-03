@@ -534,6 +534,18 @@ add_server_client_ip_preserves_other_payload_fields_test() ->
     ?assertEqual(<<"37.6">>, maps:get(<<"longitude">>, Result)),
     ?assertEqual(<<"2.2.2.2">>, maps:get(<<"client_ip">>, Result)).
 
+websocket_handle_rejects_compressed_frame_past_max_payload_test() ->
+    {ok, Compressed, _} = gateway_compress:compress(
+        binary:copy(<<"a">>, constants:max_payload_size() * 64),
+        gateway_compress:new_context(zstd_stream)
+    ),
+    ?assert(byte_size(Compressed) =< constants:max_payload_size()),
+    State = (new_json_state())#{compress_ctx => gateway_compress:new_context(zstd_stream)},
+    {[{close, CloseCode, Reason}], _} =
+        gateway_handler:websocket_handle({binary, Compressed}, State),
+    ?assertEqual(constants:close_code_to_num(decode_error), CloseCode),
+    ?assertEqual(<<"Payload too large">>, Reason).
+
 new_json_state() ->
     (gateway_handler:new_state())#{
         version => 1, encoding => json, compress_ctx => gateway_compress:new_context(none)
