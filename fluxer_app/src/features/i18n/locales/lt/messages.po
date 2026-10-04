@@ -993,7 +993,7 @@ msgstr "{count, plural, one {# kanalas jį seka} other {# kanalai jį seka}} š�
 msgid "{count, plural, one {# community found} other {# communities found}}"
 msgstr "{count, plural, one {Rasta # bendruomenė} few {Rastos # bendruomenės} other {Rasta # bendruomenių}}"
 
-#: src/features/app/components/layout/GuildsLayout.tsx:1955
+#: src/features/app/components/layout/GuildsLayout.tsx:1954
 msgid "{count, plural, one {# community is temporarily unavailable due to a flux capacitor malfunction.} other {# communities are temporarily unavailable due to a flux capacitor malfunction.}}"
 msgstr "{count, plural, one {# bendruomenė laikinai nepasiekiama dėl srauto kondensatoriaus gedimo.} few {# bendruomenės laikinai nepasiekiamos dėl srauto kondensatoriaus gedimo.} other {# bendruomenių laikinai nepasiekiama dėl srauto kondensatoriaus gedimo.}}"
 
@@ -1611,11 +1611,6 @@ msgstr "{overrideCount, plural, one {# pakeitimas} few {# pakeitimai} other {# p
 msgid "{PAYMENT_PROVIDER_NAME} handles payment securely."
 msgstr "{PAYMENT_PROVIDER_NAME} saugiai apdoroja mokėjimus."
 
-#. Modal body for the mobile card verification confirmation. Explains the two-step flow and the return path.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:198
-msgid "{paymentProviderName} will first verify that your card is eligible for localized pricing, then take you to payment. Return to {productName} once you've completed it."
-msgstr "{paymentProviderName} pirmiausia patikrins, ar jūsų kortelė tinka vietinei kainodarai, tada nukreips jus į mokėjimą. Grįžkite į {productName}, kai baigsite."
-
 #. Badge label with a date in the user profile badges popout. Preserve {premiumProductFullName}, {premiumSinceFormatted}; they are inserted by code. In English, keep "subscriber since" lowercase. Other locales should use natural local capitalization.
 #: src/features/user/components/popouts/UserProfileBadges.tsx:54
 msgid "{premiumProductFullName} subscriber since {premiumSinceFormatted}"
@@ -1707,6 +1702,31 @@ msgstr "„{productName}“ nesiunčia tiesioginių pranešimų į jūsų mobili
 #: src/features/user/components/popouts/UserProfileBadges.tsx:39
 msgid "{productName} Bug Hunter"
 msgstr "{productName} klaidų medžiotojas"
+
+#. Linux settings text before system-wide shortcuts are set up. The desktop environment owns the keys. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:28
+msgid "{productName} can ask your desktop to run its shortcuts while {productName} is not focused. Your desktop asks you to confirm and lets you pick the keys."
+msgstr "{productName} gali paprašyti jūsų darbalaukio vykdyti jo sparčiuosius klavišus, kai {productName} nėra aktyvus. Darbalaukis paprašys patvirtinti ir leis pasirinkti klavišus."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read, on an X11 session. The app now listens for shortcuts through the X11 display server itself. Keep "X11" as written. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:177
+msgid "{productName} can no longer read your keyboard, so it listens for shortcuts through X11 instead."
+msgstr "{productName} nebegali skaityti jūsų klaviatūros, todėl sparčiųjų klavišų klausosi per X11."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read, for example after a restart removed the access. The app already falls back to the shortcuts the desktop runs. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:172
+msgid "{productName} can no longer read your keyboard, so your desktop's shortcuts are used instead."
+msgstr "{productName} nebegali skaityti jūsų klaviatūros, todėl naudojami jūsų darbalaukio spartieji klavišai."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read and nothing else runs system-wide shortcuts. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:182
+msgid "{productName} can no longer read your keyboard. Shortcuts only work while {productName} is focused."
+msgstr "{productName} nebegali nuskaityti jūsų klaviatūros. Spartieji klavišai veikia tik tada, kai {productName} yra aktyvus."
+
+#. Linux settings text before system-wide shortcuts are set up on the Hyprland desktop. Hyprland shows no dialog. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:34
+msgid "{productName} can register its shortcuts with Hyprland so they run while {productName} is not focused. You then bind the keys in your Hyprland config."
+msgstr "{productName} gali užregistruoti savo sparčiuosius klavišus Hyprland, kad jie veiktų, net kai {productName} nėra aktyvus. Tada klavišus susiesite savo Hyprland konfigūracijoje."
 
 #. Inline notice body on Windows. Explains that desktop audio is disabled because productName cannot exclude its own WebRTC/call playback on this OS build.
 #. Inline notice body on macOS. Explains that desktop audio is disabled because productName cannot exclude its own WebRTC/call playback on this OS build.
@@ -1813,7 +1833,7 @@ msgid "{productName} needs camera access to list your devices."
 msgstr "{productName} reikia prieigos prie kameros, kad būtų galima parodyti jūsų įrenginius."
 
 #. Voice settings notice shown when microphone permission has not been granted.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:141
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:143
 msgid "{productName} needs microphone access to list your devices."
 msgstr "{productName} reikia prieigos prie mikrofono, kad būtų galima parodyti jūsų įrenginius."
 
@@ -1836,6 +1856,11 @@ msgstr "{productName} dabar veikia adresu {host}. Įdiekite jį iš ten."
 #: src/features/user/components/popouts/UserProfileBadges.tsx:34
 msgid "{productName} Partner"
 msgstr "„{productName}“ partneris"
+
+#. Subtitle for system-wide shortcuts on the Hyprland desktop after setup. Hyprland shows no list of assigned keys. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:58
+msgid "{productName} registered its shortcuts with Hyprland. Bind them in your Hyprland config to use them while {productName} is not focused."
+msgstr "{productName} užregistravo savo sparčiuosius klavišus Hyprland. Susiekite juos savo Hyprland konfigūracijoje, kad galėtumėte juos naudoti, kai {productName} nėra aktyvus."
 
 #. Nagbar shown after the app restarts while the user was connected to a community voice channel. {productName} is Fluxer, {channelName} is the voice channel name, and {communityName} is the community name.
 #: src/features/app/components/layout/app_layout/nagbars/VoiceSessionRestoreNagbar.tsx:24
@@ -2586,7 +2611,7 @@ msgid "A profile that stands out"
 msgstr "Profilis, kuris išsiskiria"
 
 #. OAuth authorize page error shown when the bot scope requires a redirect_uri that is missing. Technical message; keep "redirect_uri" and "bot" untranslated.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:54
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:55
 msgid "A redirect_uri is required when the bot scope is not the only scope."
 msgstr "redirect_uri yra būtinas, kai bot nėra vienintelė aprėptis."
 
@@ -2847,7 +2872,7 @@ msgstr "Tik visuose atidarytuose DM"
 msgid "Across every community you're in"
 msgstr "Visose bendruomenėse, kurioms priklausote"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:110
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:112
 msgid "Action"
 msgstr "Veiksmas"
 
@@ -2962,7 +2987,7 @@ msgid "Activity sharing"
 msgstr "Dalijimasis veikla"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:488
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:495
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:102
 msgid "Activity threshold"
 msgstr "Aktyvumo slenkstis"
@@ -3091,7 +3116,7 @@ msgid "Add an extra layer of security to your account"
 msgstr "Pridėkite papildomą saugumo lygį savo paskyrai"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:41
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:43
 msgid "Add another custom shortcut"
 msgstr "Pridėti kitą pasirinktinį spartųjį klavišą"
 
@@ -3427,7 +3452,7 @@ msgid "Address"
 msgstr "Adresas"
 
 #. Description for the custom profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:99
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:101
 msgid "Adjust each setting yourself: noise suppression, echo cancellation, and gain."
 msgstr "Reguliuokite kiekvieną nustatymą patys: triukšmo slopinimą, aido slopinimą ir stiprinimą."
 
@@ -3625,7 +3650,7 @@ msgstr "Visi DM + bendruomenės"
 msgid "All DMs only"
 msgstr "Tik visi DM"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:166
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:67
 msgid "All done"
 msgstr "Atlikta"
 
@@ -3696,11 +3721,11 @@ msgstr "Leisti {everyoneMention} ir {hereMention}"
 msgid "Allow {PRODUCT_NAME} to access your camera in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 msgstr "Leiskite {PRODUCT_NAME} pasiekti jūsų kamerą: {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:546
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:553
 msgid "Allow {PRODUCT_NAME} to access your microphone in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 msgstr "Leiskite {PRODUCT_NAME} pasiekti jūsų mikrofoną: {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:551
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:558
 msgid "Allow {PRODUCT_NAME} to access your microphone. Check your browser's address bar or settings."
 msgstr "Leiskite {PRODUCT_NAME} pasiekti jūsų mikrofoną. Patikrinkite naršyklės adreso juostą arba nustatymus."
 
@@ -3803,7 +3828,7 @@ msgstr "Leisti nariams be leidimo „{readMessageHistoryPermissionLabel}“ maty
 msgid "Allow mentions for this role"
 msgstr "Leisti paminėti šį vaidmenį"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:571
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:578
 msgid "Allow microphone"
 msgstr "Leisti naudoti mikrofoną"
 
@@ -4034,7 +4059,7 @@ msgid "An invalid status was provided. You can close this tab and return to the 
 msgstr "Pateikta netinkama būsena. Galite uždaryti šį skirtuką ir grįžti į programėlę."
 
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:59
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:272
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:81
 msgid "An invalid status was provided. You can now close this tab and return to the app."
 msgstr "Pateikta netinkama būsena. Dabar galite uždaryti šį skirtuką ir grįžti į programėlę."
 
@@ -5003,7 +5028,7 @@ msgid "Authorization failed"
 msgstr "Autorizacija nepavyko"
 
 #. OAuth authorize page generic error toast shown when the authorize request fails unexpectedly.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:75
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:76
 msgid "Authorization failed. Try again."
 msgstr "Autorizacija nepavyko. Bandykite dar kartą."
 
@@ -5092,8 +5117,8 @@ msgid "Auto-detect language"
 msgstr "Automatiškai aptikti kalbą"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:119
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:475
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:121
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:482
 msgid "Auto-set activity threshold"
 msgstr "Automatiškai nustatyti aktyvumo slenkstį"
 
@@ -5998,7 +6023,7 @@ msgid "Bot permissions"
 msgstr "boto leidimai"
 
 #. OAuth authorize page error shown when the permissions query parameter is a negative integer.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:67
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:68
 msgid "Bot permissions cannot be negative."
 msgstr "Boto leidimai negali būti neigiami."
 
@@ -6709,14 +6734,6 @@ msgstr "Kortelės lygiavimas"
 msgid "Card alignment controls"
 msgstr "Kortelės lygiavimo valdikliai"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:200
-msgid "Card not eligible"
-msgstr "Kortelė netinkama"
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:261
-msgid "Card verification was canceled. You can close this tab and return to the app."
-msgstr "Kortelės patvirtinimas atšauktas. Galite uždaryti šį skirtuką ir grįžti į programėlę."
-
 #. Heading above the category filter list in the Discovery search sidebar.
 #. Short label in the discovery category bottom sheet. Keep it concise.
 #: src/features/discovery/components/bottomsheets/DiscoveryCategoryBottomSheet.tsx:15
@@ -6868,6 +6885,11 @@ msgstr "Keisti grupės slapyvardį"
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/fields/GuildIconUploadField.tsx:35
 msgid "Change icon"
 msgstr "Keisti piktogramą"
+
+#. Button that opens the Linux desktop dialog for changing the keys of system-wide shortcuts.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:83
+msgid "Change in system settings"
+msgstr "Keisti sistemos nustatymuose"
 
 #. Title of the modal where the user picks a community invite background source. Keep it concise. Keep the tone plain and specific.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/fields/GuildInviteSplashUploadField.tsx:37
@@ -7229,7 +7251,7 @@ msgid "Channel access"
 msgstr "Prieiga prie kanalo"
 
 #. Title of the alert shown when clicking a message link the user does not have permission to view.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:137
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:140
 msgid "Channel access denied"
 msgstr "Prieiga prie kanalo uždrausta"
 
@@ -7294,7 +7316,7 @@ msgstr "Kanalo ID nukopijuotas į iškarpinę"
 
 #. Short label in the messaging mention renderer. Keep it concise.
 #. Type chip suffix in tooltips for inline rendered channel mentions. Lowercase because it follows the channel name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:97
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:100
 #: src/features/messaging/components/markdown/renderers/MentionRenderer.tsx:39
 msgid "channel link"
 msgstr "kanalo nuoroda"
@@ -7462,6 +7484,11 @@ msgstr "pokalbių įvestis"
 msgid "Chat shortcuts"
 msgstr "Pokalbių spartieji klavišai"
 
+#. Button on Linux that checks again whether the desktop offers system-wide shortcuts, for example after the desktop service started. Keep it short.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:139
+msgid "Check again"
+msgstr "Patikrinti dar kartą"
+
 #. Tray menu item. Triggers the auto-updater to look for a new desktop build.
 #: src/features/platform/utils/DesktopLocaleBridge.ts:225
 msgid "Check for updates"
@@ -7523,17 +7550,17 @@ msgid "Checkout"
 msgstr "Atsiskaitymas"
 
 #. Modal body for the generic "checkout blocked" state on a self-hosted instance.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:164
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:124
 msgid "Checkout is blocked for this account."
 msgstr "Apmokėjimas šiai paskyrai užblokuotas."
 
 #. Modal body for the generic "checkout blocked" state. Provides the support email.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:160
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:120
 msgid "Checkout is blocked for this account. Contact {supportEmail} if you need help."
 msgstr "Šiai paskyrai atsiskaitymas yra užblokuotas. Jei reikia pagalbos, susisiekite su {supportEmail}."
 
 #. Modal title for the generic "checkout blocked" state when no more specific reason is known.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:156
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:116
 msgid "Checkout unavailable"
 msgstr "Atsiskaitymas negalimas"
 
@@ -7645,7 +7672,7 @@ msgstr "Pasirinkite langą sistemos parinkiklyje"
 msgid "Choose an account"
 msgstr "Pasirinkite paskyrą"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:152
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:154
 msgid "Choose an action."
 msgstr "Pasirinkite veiksmą."
 
@@ -7667,7 +7694,7 @@ msgid "Choose background"
 msgstr "Pasirinkite foną"
 
 #. OAuth authorize page error shown when a bot invite request provides both guild_id and channel_id. Keep the parameter names literal.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:87
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:88
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "Pasirinkite „guild_id“ arba „channel_id“, bet ne abu."
 
@@ -7707,7 +7734,7 @@ msgid "Choose how times are displayed throughout the app"
 msgstr "Pasirinkite, kaip laikas rodomas programėlėje"
 
 #. Plutonium subscription payment method picker description, generic fallback when no country-specific copy applies.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:60
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:59
 msgid "Choose how you'd like to pay for this subscription."
 msgstr "Pasirinkite, kaip norėtumėte apmokėti šią prenumeratą."
 
@@ -7721,7 +7748,7 @@ msgid "Choose one of the methods below to prove domain ownership. You only need 
 msgstr "Pasirinkite vieną iš toliau nurodytų būdų, kad įrodytumėte domeno nuosavybę. Jums reikia užbaigti tik vieną."
 
 #. Modal title for the payment method picker (local card vs alternative method).
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:212
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:159
 msgid "Choose payment method"
 msgstr "Pasirinkite mokėjimo būdą"
 
@@ -7990,7 +8017,7 @@ msgstr "Išvalo mikrofono garsą, kad kalba būtų aiški."
 #: src/features/app/components/setup/SetupWizardSteps.tsx:120
 #: src/features/channel/components/message_search_bar/HistorySection.tsx:24
 #: src/features/guild/components/modals/guild_tabs/GuildMembersDateRangeModal.tsx:74
-#: src/features/input/components/KeybindRecorder.tsx:442
+#: src/features/input/components/KeybindRecorder.tsx:482
 #: src/features/theme_studio/sections/QuickCssSection.tsx:64
 #: src/features/theme_studio/sections/QuickCssSection.tsx:241
 msgid "Clear"
@@ -8191,7 +8218,7 @@ msgstr "Spustelėkite, kad atidarytumėte spalvų parinkiklį ir pasirinktumėte
 msgid "Click to react"
 msgstr "Spustelėkite, kad reaguotumėte"
 
-#: src/features/input/components/KeybindRecorder.tsx:411
+#: src/features/input/components/KeybindRecorder.tsx:451
 msgid "Click to record"
 msgstr "Spustelėkite, kad įrašytumėte"
 
@@ -8917,7 +8944,7 @@ msgid "Complete mature content check"
 msgstr "Užbaigti brandaus turinio patikrą"
 
 #. Modal title for the mobile checkout confirmation when opening the payment provider in a browser.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:194
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:150
 msgid "Complete payment"
 msgstr "Užbaigti mokėjimą"
 
@@ -9110,7 +9137,7 @@ msgstr "Patvirtinimas"
 msgid "Confirmation or double-click for community voice joins"
 msgstr "Patvirtinimas arba dvigubas spustelėjimas prisijungiant prie bendruomenės balso kanalų"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:169
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:176
 msgid "Conflicts with {conflictLabel}"
 msgstr "Kertasi su „{conflictLabel}“"
 
@@ -9127,7 +9154,7 @@ msgstr "Prijunkite kamerą arba virtualų fiksavimo įrenginį ir bandykite dar 
 msgid "Connect a display, then try again."
 msgstr "Prijunkite ekraną ir bandykite dar kartą."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:556
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:563
 msgid "Connect a microphone and try again."
 msgstr "Prijunkite mikrofoną ir bandykite dar kartą."
 
@@ -9368,11 +9395,6 @@ msgstr "Kontekstiniai meniu atidaromi kairiuoju pelės mygtuku (ant mygtukų) ar
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx:182
 msgid "Continue"
 msgstr "Tęsti"
-
-#. Plutonium checkout pre-approval prompt secondary button. Continues straight to the standard checkout screen.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:91
-msgid "Continue to checkout"
-msgstr "Tęsti atsiskaitymą"
 
 #. Button or menu action label in the report action utils helper. Keep it concise. Keep the tone plain and specific.
 #: src/features/moderation/utils/ReportActionUtils.tsx:37
@@ -9699,6 +9721,21 @@ msgstr "Kopijuoti kvietimo nuorodą"
 #: src/features/channel/components/modals/channel_tabs/ChannelInvitesTab.tsx:49
 msgid "Copy invite URL"
 msgstr "Kopijuoti kvietimo URL"
+
+#. Button that copies Hyprland config lines to the clipboard.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:120
+msgid "Copy lines"
+msgstr "Kopijuoti eilutes"
+
+#. Screen reader name of the button that copies Hyprland config lines in the older hyprlang format. Starts with the visible button text "Copy lines". Keep "hyprland.conf" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:129
+msgid "Copy lines for hyprland.conf"
+msgstr "Kopijuoti eilutes, skirtas hyprland.conf"
+
+#. Screen reader name of the button that copies Hyprland config lines in the Lua format. Starts with the visible button text "Copy lines". Keep "hyprland.lua" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:124
+msgid "Copy lines for hyprland.lua"
+msgstr "Kopijuoti eilutes, skirtas hyprland.lua"
 
 #. Generic action label that copies a URL to the clipboard.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:750
@@ -10147,7 +10184,7 @@ msgstr "Nepavyko atidaryti paieškos rezultato"
 #. Title of the error modal shown when opening the billing customer portal from the grace-period nagbar fails.
 #. Title of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Title of the generic fallback error modal shown when opening the billing customer portal fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:32
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:31
 #: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:14
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:29
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:29
@@ -10304,7 +10341,7 @@ msgid "Couldn't start {blueskyProviderName} authorization"
 msgstr "Nepavyko pradėti „{blueskyProviderName}“ autorizavimo"
 
 #. Title of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:168
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:128
 msgid "Couldn't start checkout"
 msgstr "Nepavyko pradėti atsiskaitymo"
 
@@ -10845,7 +10882,7 @@ msgstr "Pasirinktinis šaltinis"
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:94
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:96
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:42
 #: src/features/voice/components/VoiceSettingsMenus.tsx:70
 msgctxt "voice-processing-profile"
@@ -10948,12 +10985,12 @@ msgid "Custom selection"
 msgstr "Atskiras pasirinkimas"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:42
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:44
 msgid "Custom shortcut action"
 msgstr "Pasirinktinio sparčiojo klavišo veiksmas"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:38
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:40
 msgid "Custom shortcut options"
 msgstr "Pasirinktinio sparčiojo klavišo parinktys"
 
@@ -11466,7 +11503,7 @@ msgstr "Numatytieji spartieji klavišai"
 msgid "Default translator"
 msgstr "Numatytasis vertėjas"
 
-#: src/features/input/components/KeybindRecorder.tsx:419
+#: src/features/input/components/KeybindRecorder.tsx:459
 msgid "Default:"
 msgstr "Numatyta:"
 
@@ -11715,7 +11752,7 @@ msgid "Delete saved media"
 msgstr "Ištrinti išsaugotą mediją"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:34
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:36
 msgid "Delete shortcut"
 msgstr "Ištrinti spartųjį klavišą"
 
@@ -12102,13 +12139,13 @@ msgstr "Kūrėjo būsena"
 #. Short label in the channel and chat utility buttons. Keep it concise.
 #. Title of the info alert shown when clicking an internal developer-tools deep link.
 #: src/features/channel/components/channel_header_components/UtilityButtons.tsx:20
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:149
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:152
 #: src/features/ui/action_menu/items/StaffDeveloperUserControlsMenuItem.tsx:13
 msgid "Developer tools"
 msgstr "Kūrėjo įrankiai"
 
 #. Body of the developer-tools info alert. Refers to the staff badge button in the channel header.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:153
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:156
 msgid "Developer tools are available from the staff badge in the channel header."
 msgstr "Kūrėjo įrankiai pasiekiami iš personalo ženkliuko kanalo antraštėje."
 
@@ -12313,7 +12350,7 @@ msgid "Disable backend premium perks"
 msgstr "Išjungti premium privilegijas serveryje"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:33
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:35
 msgid "Disable built-in shortcut"
 msgstr "Išjungti integruotą spartųjį klavišą"
 
@@ -12377,7 +12414,7 @@ msgid "Disable screen share picture-in-picture popouts?"
 msgstr "Išjungti ekrano bendrinimo „vaizdas vaizde“ iššokančiuosius langus?"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:26
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:28
 msgid "Disable shortcut"
 msgstr "Išjungti spartųjį klavišą"
 
@@ -12888,7 +12925,7 @@ msgstr "Paaukoti vietoj to"
 #. Primary button in the favorite GIF import modal after a completed import.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthSuccessState.tsx:44
 #: src/features/channel/components/pickers/gif/ImportFavoriteGifsModal.tsx:54
-#: src/features/input/components/KeybindRecorder.tsx:470
+#: src/features/input/components/KeybindRecorder.tsx:510
 #: src/features/moderation/components/report_modal/IARModal.tsx:94
 #: src/features/moderation/components/report/ReportBreadcrumbs.tsx:31
 #: src/features/search/components/search/ChannelFilterSheet.tsx:165
@@ -12951,7 +12988,7 @@ msgid "Download button"
 msgstr "Atsisiuntimo mygtukas"
 
 #. Button or menu action label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:107
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:109
 msgid "Download desktop app"
 msgstr "Atsisiųsti darbalaukio programėlę"
 
@@ -13204,6 +13241,11 @@ msgstr "olandų"
 msgid "e.g., YubiKey, iPhone, work computer"
 msgstr "pvz., YubiKey, iPhone, darbinis kompiuteris"
 
+#. Note under the list of system-wide shortcuts on Linux. The desktop cannot assign one key to two actions.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:75
+msgid "Each key can run only one system-wide shortcut."
+msgstr "Kiekvienas klavišas gali paleisti tik vieną sistemos spartųjį klavišą."
+
 #. Body of the alert shown when a published announcement message hit its editing limit. {duration} is a localized short duration such as "12 minutes".
 #: src/features/messaging/components/alerts/PublishedMessageEditLimitModal.tsx:12
 msgid "Each published message allows 3 quick edits, then 1 every 20 minutes. Try again in {duration}."
@@ -13350,7 +13392,7 @@ msgid "Edit invite link"
 msgstr "Redaguoti kvietimo nuorodą"
 
 #. Button or menu action label in the keyboard shortcuts keybind recorder. Keep it concise.
-#: src/features/input/components/KeybindRecorder.tsx:32
+#: src/features/input/components/KeybindRecorder.tsx:40
 msgid "Edit keyboard shortcut"
 msgstr "Redaguoti spartųjį klavišą"
 
@@ -13425,7 +13467,7 @@ msgstr "Išsaugotos medijos redagavimo forma"
 msgid "Edit search engine"
 msgstr "Redaguoti paieškos variklį"
 
-#: src/features/input/components/KeybindRecorder.tsx:378
+#: src/features/input/components/KeybindRecorder.tsx:418
 msgid "Edit shortcut"
 msgstr "Redaguoti spartųjį klavišą"
 
@@ -13753,20 +13795,16 @@ msgstr "Tuščias redagavimas"
 msgid "Empty favorites"
 msgstr "Nėra mėgstamiausių"
 
-#. Button label in the Linux Wayland input-access nagbar.
-#. Button label in the keybind settings system-wide shortcuts section.
 #. Button or menu action label in the invites disable invites button. Keep it concise.
 #. Primary button label in the enable-invites confirmation modal.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:32
 #: src/features/app/components/layout/GuildLayout.tsx:54
 #: src/features/invite/components/DisableInvitesButton.tsx:27
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx:360
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:23
 msgid "Enable"
 msgstr "Įjungti"
 
 #. Voice settings CTA label for opening a platform permission prompt.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:127
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:129
 msgid "Enable {permissionName} permission"
 msgstr "Įjungti {permissionName} leidimą"
 
@@ -13876,11 +13914,6 @@ msgstr "Įjungti aparatinės įrangos spartinimą ir paleisti iš naujo"
 msgid "Enable hardware acceleration?"
 msgstr "Įjungti aparatinės įrangos spartinimą?"
 
-#. Description for a Linux Wayland input-access nagbar. {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:16
-msgid "Enable input access to use system-wide shortcuts on Wayland. After changing input access, fully quit and restart {productName} so shortcuts can use it."
-msgstr "Įjunkite įvesties prieigą, kad „Wayland“ aplinkoje veiktų visos sistemos spartieji klavišai. Pakeitę įvesties prieigą, visiškai išjunkite „{productName}“ ir paleiskite iš naujo, kad spartieji klavišai galėtų ja naudotis."
-
 #. Button label that re-enables invite links for a community.
 #: src/features/invite/components/DisableInvitesButton.tsx:40
 msgid "Enable invites"
@@ -13971,7 +14004,7 @@ msgid "Enable Shift to expand"
 msgstr "Įjungti išplėtimą laikant „Shift“"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:30
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:32
 msgid "Enable shortcut"
 msgstr "Įjungti spartųjį klavišą"
 
@@ -14357,7 +14390,7 @@ msgstr "Visos sistemos garsas"
 #. Voice menu submenu label that contains per-user entrance sound mute and volume controls.
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:181
 #: src/features/ui/action_menu/items/VoiceParticipantMenuItems.tsx:310
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:192
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:194
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:150
 msgid "Entrance sound"
 msgstr "Įėjimo garsas"
@@ -14467,7 +14500,7 @@ msgstr "Vakaras"
 
 #. Description for the automatic gain control toggle in the voice processing settings.
 #. Description for the automatic gain control toggle in the voice processing settings.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:176
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:178
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:63
 msgid "Evens out your mic volume so you are not too quiet."
 msgstr "Sulygina mikrofono garsumą, kad jūsų balsas nebūtų per tylus."
@@ -15682,6 +15715,26 @@ msgstr "Tik britams skirta..."
 msgid "For me"
 msgstr "Man"
 
+#. Warning on GNOME when the push-to-mute shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the microphone muted.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:204
+msgid "For push-to-mute, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the microphone can stay muted."
+msgstr "Nutildymui paspaudus naudokite vieną klavišą be Ctrl, Alt ar Shift. Jei naudojate kombinaciją, pirmiausia atleiskite pagrindinį klavišą, kitaip mikrofonas gali likti išjungtas."
+
+#. Warning on GNOME when the push-to-talk shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the microphone on.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:198
+msgid "For push-to-talk, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the microphone can stay on."
+msgstr "Kalbėjimui paspaudus naudokite vieną klavišą be Ctrl, Alt ar Shift. Jei naudojate kombinaciją, pirmiausia atleiskite pagrindinį klavišą, kitaip mikrofonas gali likti įjungtas."
+
+#. Warning on GNOME when a hold shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the shortcut active.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:216
+msgid "For this shortcut, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the shortcut can stay active."
+msgstr "Šiam sparčiajam klavišui naudokite vieną klavišą be Ctrl, Alt ar Shift. Jei naudojate kombinaciją, pirmiausia atleiskite pagrindinį klavišą, kitaip spartusis klavišas gali likti aktyvus."
+
+#. Warning on GNOME when the voice activity priority shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave priority speaking on. "Voice activity priority" is the shortcut name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:210
+msgid "For voice activity priority, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or priority can stay on."
+msgstr "Balso aktyvumo prioritetui naudokite vieną klavišą be Ctrl, Alt ar Shift. Jei naudojate kombinaciją, pirmiausia atleiskite pagrindinį klavišą, kitaip prioritetas gali likti įjungtas."
+
 #: src/features/auth/components/modals/SudoVerificationModal.tsx:268
 msgid "For your security, please confirm it's you to continue."
 msgstr "Siekdami užtikrinti jūsų saugumą, patvirtinkite, kad tai jūs."
@@ -16600,8 +16653,8 @@ msgid "Global profile"
 msgstr "Visuotinis profilis"
 
 #. Toggle in the keybinds tab. When on, the shortcut works even when Fluxer is not focused. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:81
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:63
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:83
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:65
 msgid "Global shortcut"
 msgstr "Visuotinis spartusis klavišas"
 
@@ -17435,6 +17488,11 @@ msgstr "Paspauskite ir palaikykite „Shift“, tada paspauskite „X“, kad pa
 msgid "Hold to record. Drag up to lock, or release to send."
 msgstr "Laikykite, kad įrašytumėte. Vilkite aukštyn, kad užrakintumėte, arba atleiskite, kad išsiųstumėte."
 
+#. Hint under a system-wide hold shortcut such as push-to-talk on Linux. The desktop ignores the key while other modifier keys are held.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:39
+msgid "Holding Shift, Ctrl or Alt blocks this shortcut. Add alternates in your system settings."
+msgstr "Laikant nuspaustą Shift, Ctrl arba Alt, šis spartusis klavišas neveikia. Pridėkite alternatyvių klavišų sistemos nustatymuose."
+
 #. Action label in quick switcher for navigating to the Home tab.
 #: src/features/app/components/layout/MobileBottomNav.tsx:110
 #: src/features/search/state/QuickSwitcherCandidateBuilder.ts:47
@@ -17538,6 +17596,26 @@ msgstr "Valio! Pranešimai įjungti"
 msgid "Hyperlink"
 msgstr "Hipersaitas"
 
+#. Instructions for the Hyprland desktop, shown above config lines for hyprland.lua (Hyprland 0.55 and later) and for hyprland.conf (before 0.55). Keep "KEY" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:97
+msgid "Hyprland has no shortcut dialog. Add the lines for your Hyprland version to your Hyprland config and replace KEY with the key you want."
+msgstr "Hyprland neturi sparčiųjų klavišų dialogo lango. Pridėkite savo Hyprland versijai skirtas eilutes į Hyprland konfigūraciją ir pakeiskite KEY norimu klavišu."
+
+#. Instructions for the Hyprland desktop when the app id is unknown. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:103
+msgid "Hyprland has no shortcut dialog. Bind the keys in your Hyprland config."
+msgstr "Hyprland neturi sparčiųjų klavišų dialogo lango. Susiekite klavišus savo Hyprland konfigūracijoje."
+
+#. Label above Hyprland config lines in the older hyprlang format. Keep "hyprland.conf" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:116
+msgid "hyprland.conf (before Hyprland 0.55)"
+msgstr "hyprland.conf (prieš Hyprland 0.55)"
+
+#. Label above Hyprland config lines in the Lua format. Keep "hyprland.lua" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:112
+msgid "hyprland.lua (Hyprland 0.55 and later)"
+msgstr "hyprland.lua (Hyprland 0.55 ir vėlesnės versijos)"
+
 #: src/features/auth/flow/RegistrationLegalConsent.tsx:83
 msgid "I agree to the <0>Privacy policy</0>"
 msgstr "Sutinku su <0>Privatumo politika</0>"
@@ -17577,7 +17655,7 @@ msgstr "Persigalvojau"
 
 #. Short label in the voice tab. Keep it concise.
 #: src/features/channel/components/MatureContentChannelGate.tsx:207
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:111
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:113
 msgid "I understand"
 msgstr "Supratau"
 
@@ -18001,7 +18079,7 @@ msgstr "Kanale"
 msgid "In \"Operating system\" mode, dictionaries listed above are advisory. {PRODUCT_NAME} will pass these language tags to your OS spellchecker when supported. Tags it doesn't recognize are ignored."
 msgstr "Režimu „Operacinė sistema“ aukščiau išvardyti žodynai yra tik patariamieji. {PRODUCT_NAME} perduos šias kalbų žymas jūsų OS rašybos tikrintuvui, kai tai bus palaikoma. Žymų, kurių jis neatpažįsta, bus nepaisoma."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:322
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:324
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "Naršyklėje funkcija „Kalbėti paspaudus“ veikia tik tada, kai {PRODUCT_NAME} skirtukas yra aktyvus. Įdiekite darbalaukio programą, kad ji veiktų visoje sistemoje."
 
@@ -18269,30 +18347,8 @@ msgctxt "chat-settings-section"
 msgid "Input"
 msgstr "Įvestis"
 
-#. Status text after Linux input access setup failed. {productName} is the app name.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:35
-msgid "Input access could not be enabled automatically. Change it manually, then fully quit and restart {productName} so shortcuts can use it."
-msgstr "Nepavyko automatiškai įjungti įvesties prieigos. Pakeiskite ją rankiniu būdu, tada visiškai išjunkite ir iš naujo paleiskite „{productName}“, kad sparčiuosius klavišus būtų galima naudoti."
-
-#. Description for a Linux Wayland input-access nagbar after automatic permission setup failed. {settingsMenuName} is the shared user settings tab label for shortcuts and {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:26
-msgid "Input access could not be enabled. Try again from {settingsMenuName} settings, then fully quit and restart {productName}."
-msgstr "Nepavyko įjungti įvesties prieigos. Bandykite dar kartą „{settingsMenuName}“ nustatymuose, tada visiškai išjunkite ir iš naujo paleiskite „{productName}“."
-
-#. Settings warning for Linux Wayland system-wide shortcuts. {productName} is the app name.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:18
-msgid "Input access is required for system-wide keyboard and mouse shortcuts on Wayland. After changing input access, fully quit and restart {productName} so shortcuts can use it."
-msgstr "Sisteminiams klaviatūros ir pelės spartiesiems klavišams „Wayland“ aplinkoje reikalinga įvesties prieiga. Pakeitę įvesties prieigą, visiškai išjunkite ir iš naujo paleiskite „{productName}“, kad spartieji klavišai galėtų ja naudotis."
-
-#. Description for a Linux Wayland input-access nagbar after access was changed. {productName} is the app name.
-#. Status text after Linux input access was changed. {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:21
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:31
-msgid "Input access was changed. Fully quit and restart {productName} so system-wide shortcuts can use it."
-msgstr "Pakeista įvesties prieiga. Visiškai išjunkite ir iš naujo paleiskite „{productName}“, kad sistemos spartieji klavišai galėtų ja naudotis."
-
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:180
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:182
 msgid "Input and output"
 msgstr "Įvestis ir išvestis"
 
@@ -18451,7 +18507,7 @@ msgid "Invalid authorization request"
 msgstr "Netinkama autorizacijos užklausa"
 
 #. OAuth authorize page error shown when the permissions query parameter is not a valid integer.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:63
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:64
 msgid "Invalid bot permissions."
 msgstr "Netinkami boto leidimai."
 
@@ -18494,14 +18550,14 @@ msgid "Invalid or expired code. Try again."
 msgstr "Neteisingas arba pasibaigęs kodas. Bandykite dar kartą."
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:79
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:80
 msgid "Invalid redirect_uri"
 msgstr "Neteisingas „redirect_uri“"
 
 #. Title on the mature content check callback page when the callback status is invalid.
 #: src/features/auth/components/pages/MatureContentCheckCallbackPage.tsx:27
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:56
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:269
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:78
 msgid "Invalid status"
 msgstr "Neteisinga būsena"
 
@@ -18598,7 +18654,7 @@ msgid "Invite link is hidden while sharing:"
 msgstr "Kvietimo nuoroda paslėpta, kol bendrinama:"
 
 #. Inline replacement text shown for invite links while streaming privacy is active.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:165
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:168
 msgid "Invite link masked while sharing"
 msgstr "Kvietimo nuoroda paslėpta, kol bendrinama"
 
@@ -19012,7 +19068,7 @@ msgid "Jump to {displayName}"
 msgstr "Pereiti prie {displayName}"
 
 #. Accessible label for an inline channel mention link. labelText is the channel display name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:111
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:114
 msgid "Jump to {labelText}"
 msgstr "Pereiti prie „{labelText}“"
 
@@ -19069,12 +19125,12 @@ msgid "Jump to the current call"
 msgstr "Pereiti prie dabartinio skambučio"
 
 #. Fallback accessible label for an inline channel mention when the target name is not known.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:115
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:118
 msgid "Jump to the linked channel"
 msgstr "Pereiti į susietą kanalą"
 
 #. Fallback accessible label for an inline message link when the target channel is not known.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:107
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:110
 msgid "Jump to the linked message"
 msgstr "Pereiti prie susietos žinutės"
 
@@ -19084,7 +19140,7 @@ msgid "Jump to the message from {authorNickname}"
 msgstr "Pereiti prie {authorNickname} žinutės"
 
 #. Accessible label for an inline message link that jumps to a specific message in a channel. labelText is the channel display name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:102
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:105
 msgid "Jump to the message in {labelText}"
 msgstr "Pereiti prie žinutės iš „{labelText}“"
 
@@ -19168,7 +19224,7 @@ msgid "Keep these safe. Regenerating will break existing integrations."
 msgstr "Saugokite juos. Sugeneravus iš naujo, esamos integracijos nutrūks."
 
 #. Description for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:82
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:84
 msgid "Keep transmitting briefly after release."
 msgstr "Tęsti perdavimą trumpą laiką po mygtuko atleidimo."
 
@@ -19204,6 +19260,11 @@ msgstr "Klaviatūra"
 msgctxt "accessibility-settings-section"
 msgid "Keyboard"
 msgstr "Klaviatūra"
+
+#. Linux warning when direct input device access is on but reading the keyboard failed. Not related to the "Direct input" voice processing profile. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:193
+msgid "Keyboard access couldn't start. Shortcuts only work while {productName} is focused."
+msgstr "Nepavyko įjungti prieigos prie klaviatūros. Spartieji klavišai veikia tik tada, kai {productName} yra aktyvus."
 
 #. Toggle label and settings search entry for controlling tooltip keyboard shortcut hints.
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:46
@@ -19578,6 +19639,16 @@ msgstr "Leisti bendruomenei moderuoti save"
 msgid "Let the member hear others in this community again"
 msgstr "Nariui vėl leista girdėti kitus šioje bendruomenėje"
 
+#. Description for the Linux direct input device access switch while it is on, on a desktop that can also run system-wide shortcuts itself (KDE, GNOME, Hyprland). {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:166
+msgid "Lets {productName} read your keyboard directly. Turn this off to set up shortcuts through your desktop instead."
+msgstr "Leidžia {productName} tiesiogiai skaityti jūsų klaviatūrą. Išjunkite, jei sparčiuosius klavišus norite nustatyti per savo darbalaukį."
+
+#. Description for the Linux direct input device access switch. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:162
+msgid "Lets {productName} read your keyboard directly. Your system already allows this."
+msgstr "Leidžia {productName} tiesiogiai skaityti jūsų klaviatūrą. Jūsų sistema tai jau leidžia."
+
 #: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:259
 msgid "Lets custom CSS reveal transparent window regions after restarting the desktop app."
 msgstr "Leidžia pasirinktiniam CSS atskleisti permatomas lango sritis iš naujo paleidus darbalaukio programą."
@@ -19761,7 +19832,7 @@ msgid "Link styling"
 msgstr "Nuorodų stilius"
 
 #. Title of the alert shown when clicking an internal link that is not available to the current account.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:157
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:160
 msgid "Link unavailable"
 msgstr "Nuoroda nepasiekiama"
 
@@ -19979,11 +20050,6 @@ msgstr "Vietinis laiko formatas"
 msgid "Localization"
 msgstr "Lokalizacija"
 
-#. Error modal body shown when the localized card pre-approval session cannot be started.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:208
-msgid "Localized card verification is not available right now. Try again later."
-msgstr "Lokalizuotas kortelės patvirtinimas šiuo metu nepasiekiamas. Bandykite dar kartą vėliau."
-
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:194
 #: src/features/user/components/modals/tabs/DevicesTab.tsx:151
 msgid "Location"
@@ -20037,7 +20103,7 @@ msgid "Look and feel"
 msgstr "Išvaizda ir stilius"
 
 #. placeholder {0}: externalProcessor.name
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:671
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:678
 msgid "Looks like you're using {0}. Stacking {PRODUCT_NAME}'s processing on top can cause pumping or distortion. Direct input passes your audio through untouched."
 msgstr "Panašu, kad naudojate „{0}“. Papildomas „{PRODUCT_NAME}“ apdorojimas gali sukelti garso pulsavimą arba iškraipymus. Tiesioginė įvestis perduoda jūsų garsą nepakeistą."
 
@@ -21145,7 +21211,7 @@ msgid "Message layout"
 msgstr "Žinučių išdėstymas"
 
 #. Type chip suffix in tooltips for inline rendered message links. Lowercase because it follows the channel name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:92
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:95
 msgid "message link"
 msgstr "nuoroda į žinutę"
 
@@ -21333,7 +21399,7 @@ msgstr "Mikrofonas"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:188
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:190
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:142
 msgid "Mic test"
 msgstr "Mikrofono patikra"
@@ -21473,7 +21539,7 @@ msgid "Miscellaneous"
 msgstr "Įvairūs"
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:37
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:38
 msgid "Missing client_id"
 msgstr "Trūksta client_id"
 
@@ -21691,7 +21757,7 @@ msgid "More options"
 msgstr "Daugiau parinkčių"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:59
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:61
 msgid "More shortcut options"
 msgstr "Daugiau sparčiųjų klavišų parinkčių"
 
@@ -22673,7 +22739,7 @@ msgid "No {sendMessagesPermission} permission"
 msgstr "Nėra leidimo „{sendMessagesPermission}“"
 
 #. Inline text shown inside a custom message link pill when the linked message cannot be accessed.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:145
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:148
 msgid "No access"
 msgstr "Nėra prieigos"
 
@@ -22985,7 +23051,7 @@ msgstr "Nieko nerasta"
 msgid "No mentions yet"
 msgstr "Kol kas nėra paminėjimų"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:541
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:548
 msgid "No microphone found"
 msgstr "Mikrofonas nerastas"
 
@@ -23135,7 +23201,7 @@ msgid "No settings found"
 msgstr "Nustatymų nerasta"
 
 #. Empty-state text in the keyboard shortcuts keybind recorder.
-#: src/features/input/components/KeybindRecorder.tsx:36
+#: src/features/input/components/KeybindRecorder.tsx:44
 msgid "No shortcut set"
 msgstr "Spartusis klavišas nenustatytas"
 
@@ -23358,6 +23424,11 @@ msgstr "Ne sveikasis skaičius"
 #: src/features/app/components/setup/SetupWizardSteps.tsx:395
 msgid "Not accepted"
 msgstr "Nepriimta"
+
+#. Shown instead of a key when the desktop has no key assigned to a system-wide shortcut.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:79
+msgid "Not assigned"
+msgstr "Nepriskirta"
 
 #. Fallback value when a saved billing payment method has no expiration date.
 #. Screen reader text for a cross in the Plutonium page comparison table.
@@ -23859,12 +23930,12 @@ msgid "Open {host} in your browser."
 msgstr "Atidarykite {host} naršyklėje."
 
 #. Accessible label for an inline chat link pill that opens an app page such as Discovery. labelText is the page name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:124
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:127
 msgid "Open {labelText}"
 msgstr "Atidarykite {labelText}"
 
 #. Accessible label for an inline settings deep-link pill. labelText is the resolved settings tab and section breadcrumb.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:119
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:122
 msgid "Open {labelText} in settings"
 msgstr "Atidaryti „{labelText}“ nustatymuose"
 
@@ -24470,11 +24541,6 @@ msgstr "Kita"
 msgid "Other devices"
 msgstr "Kiti įrenginiai"
 
-#. Plutonium checkout pre-approval prompt secondary button. Opens the alternative payment methods flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:75
-msgid "Other methods"
-msgstr "Kiti būdai"
-
 #. Privacy note in profile timezone settings. Preserve {timezoneIdentifierExample}; it is inserted by code as an IANA timezone identifier example. productName is the app name. Users should understand that only the UTC offset is shown to other people.
 #: src/features/user/components/modals/tabs/my_profile_tab/TimezoneProfileSettings.tsx:49
 msgid "Other people can only see your current UTC offset when you choose to share profile local time. They do not see your exact time zone identifier, such as {timezoneIdentifierExample}. {productName} stores that identifier only so the offset can update automatically when daylight saving time changes."
@@ -24612,7 +24678,7 @@ msgid "Page down"
 msgstr "Page Down"
 
 #. Role description announced for an inline chat link pill that opens an app page. Lowercase.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:129
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:132
 msgid "page link"
 msgstr "nuoroda į puslapį"
 
@@ -24869,16 +24935,16 @@ msgid "Pay once and get a gift link to share. Gifts never renew."
 msgstr "Mokėkite vieną kartą ir gaukite dovanos nuorodą pasidalinti. Dovanos niekada nepratęsiamos."
 
 #. Plutonium subscription payment method picker description for Brazil. Explains Pix recurring vs falling back to a card.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:40
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:39
 msgid "Pay with {pixPaymentMethod} Automático to authorize recurring charges directly from your Brazilian bank. Or choose \"Use card\" to enter a credit card on {paymentProviderName}'s next screen."
 msgstr "Mokėkite naudodami „{pixPaymentMethod} Automático“, kad leistumėte pasikartojančius mokėjimus tiesiai iš savo Brazilijos banko. Arba pasirinkite „Naudoti kortelę“, kad kitame „{paymentProviderName}“ ekrane įvestumėte kredito kortelės duomenis."
 
 #. Plutonium subscription payment method picker description for India. Explains UPI e-mandate vs falling back to a card.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:50
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:49
 msgid "Pay with {upiPaymentMethod} to set up an RBI-compliant e-mandate from your Indian bank. Or choose \"Use card\" to enter a credit card on {paymentProviderName}'s next screen."
 msgstr "Mokėkite naudodami „{upiPaymentMethod}“, kad nustatytumėte RBI reikalavimus atitinkantį elektroninį mokėjimo įgaliojimą iš savo Indijos banko. Arba pasirinkite „Naudoti kortelę“, kad kitame „{paymentProviderName}“ ekrane įvestumėte kredito kortelės duomenis."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:149
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:50
 msgid "Payment canceled"
 msgstr "Mokėjimas atšauktas"
 
@@ -24887,7 +24953,7 @@ msgstr "Mokėjimas atšauktas"
 msgid "Payment method"
 msgstr "Mokėjimo būdas"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:136
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:37
 msgid "Payment successful"
 msgstr "Mokėjimas sėkmingas"
 
@@ -25612,11 +25678,11 @@ msgstr "Buvimas prisijungus"
 msgid "Press {shortcut} to react"
 msgstr "Paspauskite {shortcut}, kad reaguotumėte"
 
-#: src/features/input/components/KeybindRecorder.tsx:381
+#: src/features/input/components/KeybindRecorder.tsx:421
 msgid "Press a key, mouse button, or gamepad button to bind. Escape cancels."
 msgstr "Norėdami susieti, paspauskite klavišą, pelės mygtuką arba žaidimų pultelio mygtuką. „Escape“ atšaukia."
 
-#: src/features/input/components/KeybindRecorder.tsx:407
+#: src/features/input/components/KeybindRecorder.tsx:447
 msgid "Press a shortcut…"
 msgstr "Paspauskite spartųjį klavišą…"
 
@@ -25773,7 +25839,7 @@ msgid "Pricing"
 msgstr "Kainodara"
 
 #. Error modal body shown when the user clicks a plan before price IDs have loaded.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:182
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:142
 msgid "Pricing is still loading."
 msgstr "Kainos vis dar įkeliamos."
 
@@ -26170,17 +26236,17 @@ msgid "Purchased gifts"
 msgstr "Įsigytos dovanos"
 
 #. Modal body shown on a self-hosted instance when purchases are disabled for the account.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:152
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:112
 msgid "Purchases are disabled for this account."
 msgstr "Pirkimai šiai paskyrai išjungti."
 
 #. Modal body shown when purchases are disabled. Provides the support email for appeals.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:148
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:108
 msgid "Purchases are disabled for this account. Contact {supportEmail} if this looks wrong."
 msgstr "Pirkimai šiai paskyrai išjungti. Jei tai atrodo neteisinga, susisiekite su {supportEmail}."
 
 #. Modal title shown when purchases are disabled on this account (server-side enforcement).
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:144
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:104
 msgid "Purchases unavailable"
 msgstr "Pirkimai negalimi"
 
@@ -26274,18 +26340,33 @@ msgid "Push to talk key"
 msgstr "Kalbėjimo paspaudus klavišas"
 
 #. Switch label in the voice tab toggling push-to-talk mode. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:115
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:361
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:117
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:360
 #: src/features/voice/components/VoiceSettingsMenus.tsx:419
 msgid "Push-to-talk"
 msgstr "Kalbėjimas paspaudus"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:103
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:105
 msgid "Push-to-talk (limited)"
 msgstr "Kalbėjimas paspaudus (ribotas)"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:701
+#. Voice settings warning on GNOME when the desktop has no key assigned to push-to-talk. Keep "Settings" and "Apps" as the GNOME menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:243
+msgid "Push-to-talk has no system-wide key yet. To set one, go to Settings > Apps > {productName}."
+msgstr "Kalbėjimui paspaudus dar nepriskirtas sistemos klavišas. Norėdami jį nustatyti, eikite į Nustatymai > Programos > {productName}."
+
+#. Voice settings warning on KDE Plasma when the desktop has no key assigned to push-to-talk. Keep "System Settings", "Keyboard" and "Shortcuts" as the KDE menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:237
+msgid "Push-to-talk has no system-wide key yet. To set one, go to System Settings > Keyboard > Shortcuts > {productName}."
+msgstr "Kalbėjimui paspaudus dar nepriskirtas sistemos klavišas. Norėdami jį nustatyti, eikite į Sistemos nuostatos > Klaviatūra > Spartieji klavišai > {productName}."
+
+#. Voice settings warning on an unrecognized Linux desktop when the desktop has no key assigned to push-to-talk.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:248
+msgid "Push-to-talk has no system-wide key yet. To set one, open your desktop's keyboard shortcut settings."
+msgstr "Kalbėjimui paspaudus dar nepriskirtas sistemos klavišas. Norėdami jį nustatyti, atidarykite darbalaukio klaviatūros sparčiųjų klavišų nustatymus."
+
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:708
 msgid "Push-to-talk is ignored in direct input. Switch to focused voice or custom to use it."
 msgstr "Kalbėjimas paspaudus tiesioginėje įvestyje ignoruojamas. Norėdami jį naudoti, perjunkite į fokusuotą balsą arba pasirinktinį."
 
@@ -26294,20 +26375,50 @@ msgstr "Kalbėjimas paspaudus tiesioginėje įvestyje ignoruojamas. Norėdami j�
 msgid "Push-to-talk is on. Hold {pushToTalkHint} to speak."
 msgstr "Įjungtas kalbėjimas paspaudus. Laikykite {pushToTalkHint}, kad kalbėtumėte."
 
+#. Tooltip and screen reader label on the mic button when push-to-talk is on but the key has no name to show, for example when the Linux desktop assigns it.
+#: src/features/input/utils/PushToTalkHint.ts:11
+msgid "Push-to-talk is on. Hold your push-to-talk key to speak."
+msgstr "Kalbėjimas paspaudus įjungtas. Norėdami kalbėti, laikykite nuspaudę kalbėjimo paspaudus klavišą."
+
+#. Voice settings warning on Linux when the desktop dialog for system-wide shortcuts was dismissed or failed. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:226
+msgid "Push-to-talk only works while {productName} is focused because your desktop didn't set up system-wide shortcuts."
+msgstr "Kalbėjimas paspaudus veikia tik tada, kai {productName} yra aktyvus, nes jūsų darbalaukis nenustatė sistemos sparčiųjų klavišų."
+
 #. Voice settings warning shown when macOS Input Monitoring is required for system-wide push-to-talk. {productName} is the app name and {permissionName} is the macOS permission name.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:135
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:137
 msgid "Push-to-talk only works while {productName} is focused until {permissionName} is enabled. After changing the permission, fully quit and restart {productName} so system-wide hotkeys can use it."
 msgstr "Kalbėjimas paspaudus veikia tik tada, kai „{productName}“ langas yra aktyvus, kol neįjungtas „{permissionName}“. Pakeitę leidimą, visiškai išjunkite ir iš naujo paleiskite „{productName}“, kad sistemos spartieji klavišai galėtų jį naudoti."
 
+#. Voice settings warning on Linux before system-wide shortcuts are set up. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:222
+msgid "Push-to-talk only works while {productName} is focused until you set up system-wide shortcuts."
+msgstr "Kalbėjimas paspaudus veikia tik tada, kai {productName} yra aktyvus, kol nenustatysite sistemos sparčiųjų klavišų."
+
 #. Voice settings warning shown when push-to-talk is enabled in a browser.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:131
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:133
 msgid "Push-to-talk only works while the browser tab is focused."
 msgstr "Kalbėjimas paspaudus veikia tik tada, kai naršyklės skirtukas yra aktyvus."
+
+#. Linux warning next to the direct input device access switch when push-to-talk only has a key assigned by the desktop. With direct input on, only the push-to-talk key set in the app works, and without one the microphone sends whenever you speak. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:187
+msgid "Push-to-talk will use the key you set in {productName}. Set one first, or your microphone will use voice activity."
+msgstr "Kalbėjimas paspaudus naudos klavišą, kurį nustatėte {productName}. Pirmiausia jį nustatykite, kitaip mikrofonas veiks pagal balso aktyvumą."
 
 #. Modal description shown when a push-to-talk shortcut is pressed while the user is self-deafened.
 #: src/features/app/keybindings/keybind_manager/shared.ts:22
 msgid "Push-to-talk won't unmute your microphone while you're deafened. Undeafen yourself to talk."
 msgstr "Kalbėjimas paspaudus neįjungs mikrofono, kol jūsų garsas išjungtas. Norėdami kalbėti, vėl įjunkite garsą."
+
+#. Voice settings note on the Hyprland desktop when the app id is unknown. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:259
+msgid "Push-to-talk works outside {productName} only after you bind it in your Hyprland config."
+msgstr "Kalbėjimas paspaudus veikia už {productName} ribų tik tada, kai jį susiesite savo Hyprland konfigūracijoje."
+
+#. Voice settings note on the Hyprland desktop, shown above config lines for hyprland.lua (Hyprland 0.55 and later) and for hyprland.conf (before 0.55). Keep "KEY" exactly as written. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:253
+msgid "Push-to-talk works outside {productName} only after you bind it in your Hyprland config. Add the line for your Hyprland version and replace KEY with the key you want."
+msgstr "Kalbėjimas paspaudus veikia už {productName} ribų tik tada, kai jį susiesite savo Hyprland konfigūracijoje. Pridėkite savo Hyprland versijai skirtą eilutę ir pakeiskite KEY norimu klavišu."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the theme studio. Keep it concise.
@@ -26407,7 +26518,7 @@ msgid "Raw embed JSON"
 msgstr "Neapdorotas įterptojo elemento JSON"
 
 #. Button or menu action label in the keybinds tab. Turns a disabled built-in shortcut back on. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:50
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:52
 msgid "Re-enable built-in shortcut"
 msgstr "Vėl įjungti integruotą spartųjį klavišą"
 
@@ -26566,13 +26677,6 @@ msgstr "Naujausi paminėjimai"
 msgid "Recent searches"
 msgstr "Naujausios paieškos"
 
-#. Button label in the Linux Wayland input-access nagbar after the user changes OS permissions.
-#. Button label in the keybind settings system-wide shortcuts section.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:36
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:27
-msgid "Recheck"
-msgstr "Patikrinti iš naujo"
-
 #. placeholder {0}: ChannelUtils.getIcon(channel, {size: 16, className: styles.channelIcon})
 #. placeholder {1}: channel.name
 #: src/features/invite/components/modals/InviteModal.tsx:360
@@ -26587,7 +26691,7 @@ msgid "Recommended"
 msgstr "Rekomenduojama"
 
 #. Description for the focused voice profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:86
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:88
 msgid "Recommended. Cleans up your mic for clear speech."
 msgstr "Rekomenduojama. Išvalo mikrofoną, kad kalba būtų aiški."
 
@@ -26601,6 +26705,11 @@ msgstr "Prisijungti iš naujo"
 msgid "Reconnect succeeded. Pick a screen again if you want to resume your previous stream."
 msgstr "Pavyko prisijungti iš naujo. Jei norite tęsti ankstesnę transliaciją, pasirinkite ekraną dar kartą."
 
+#. Status text on Linux while the app reconnects to the desktop service that runs system-wide shortcuts, for example after it restarted.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:48
+msgid "Reconnecting to your desktop…"
+msgstr "Jungiamasi iš naujo prie darbalaukio…"
+
 #. Overlay status in the voice call view while reconnecting after a drop. Trailing ellipsis indicates in-progress.
 #: src/features/voice/components/VoiceCallView.tsx:94
 msgid "Reconnecting..."
@@ -26612,7 +26721,7 @@ msgid "Reconnecting…"
 msgstr "Jungiamasi iš naujo…"
 
 #. Short label in the keyboard shortcuts keybind recorder. Keep it concise.
-#: src/features/input/components/KeybindRecorder.tsx:28
+#: src/features/input/components/KeybindRecorder.tsx:36
 msgid "Record shortcut"
 msgstr "Įrašyti spartųjį klavišą"
 
@@ -26852,7 +26961,7 @@ msgstr "Santykinis"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:78
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:80
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:94
 msgid "Release delay"
 msgstr "Atleidimo delsa"
@@ -27740,13 +27849,13 @@ msgstr "Išsiųsta iš naujo"
 
 #: src/features/app/components/dialogs/shared/UnsavedChangesBannerContent.tsx:51
 #: src/features/app/components/floating/ColorPickerPopover.tsx:190
-#: src/features/input/components/KeybindRecorder.tsx:459
+#: src/features/input/components/KeybindRecorder.tsx:499
 #: src/features/messaging/components/modals/ImageCropModal.tsx:1022
 msgid "Reset"
 msgstr "Atkurti"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:45
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:47
 msgid "Reset \"{label}\" to built-in"
 msgstr "Atkurti „{label}“ numatytuosius nustatymus"
 
@@ -27867,7 +27976,7 @@ msgid "Reset to actual values"
 msgstr "Atkurti tikrąsias reikšmes"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:37
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:39
 msgid "Reset to built-in"
 msgstr "Atkurti numatytuosius"
 
@@ -29510,7 +29619,7 @@ msgid "Select the account you want to sign in with on your new device."
 msgstr "Pasirinkite paskyrą, su kuria norite prisijungti naujame įrenginyje."
 
 #. Aria label for the voice processing radio group in the voice settings tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:123
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:125
 msgid "Select voice processing mode"
 msgstr "Pasirinkite balso apdorojimo režimą"
 
@@ -29815,7 +29924,7 @@ msgid "Sends raw mic audio with no processing."
 msgstr "Siunčia neapdorotą mikrofono garsą be apdorojimo."
 
 #. Description for the direct input profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:90
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:92
 msgid "Sends your audio untouched. Best if you're using external audio software."
 msgstr "Siunčia jūsų garsą be pakeitimų. Geriausia, jei naudojate išorinę garso programinę įrangą."
 
@@ -29914,12 +30023,12 @@ msgid "Set by the {preset} preset. Picking a value here switches to Custom."
 msgstr "Nustatyta pagal {preset} iš anksto nustatytą parinktį. Pasirinkus reikšmę čia, bus pereita prie pasirinktinio nustatymo."
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:29
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:31
 msgid "Set custom shortcut"
 msgstr "Nustatyti pasirinktinį spartųjį klavišą"
 
 #. Label in the keybinds tab. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:55
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:57
 msgid "Set custom shortcut for \"{label}\""
 msgstr "Nustatyti pasirinktinį spartųjį klavišą, skirtą „{label}“"
 
@@ -30067,6 +30176,11 @@ msgstr "Nustatytas balso regionas: {region}"
 msgid "Set the voice region to automatic"
 msgstr "Nustatytas automatinis balso regionas"
 
+#. Button that asks the Linux desktop to register system-wide shortcuts for the app. Keep it short.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:40
+msgid "Set up"
+msgstr "Nustatyti"
+
 #. Title for the self-host setup wizard modal.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:74
 msgid "Set up {productName}"
@@ -30119,7 +30233,7 @@ msgid "Settings"
 msgstr "Nustatymai"
 
 #. Type chip suffix in tooltips for inline rendered fluxer://settings/user deep links. Lowercase.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:133
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:136
 msgid "settings link"
 msgstr "nustatymų nuoroda"
 
@@ -30331,8 +30445,8 @@ msgstr "Trumpieji kodai"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:376
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:123
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:375
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:110
 msgid "Shortcut"
@@ -31494,7 +31608,7 @@ msgstr "Nepavyko įkelti veiklos žurnalo."
 #. Body of the error modal shown when opening the billing customer portal from the grace-period nagbar fails.
 #. Body of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Body of the generic fallback error modal shown when opening the billing customer portal fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:36
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:35
 #: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:18
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:34
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:34
@@ -31534,7 +31648,7 @@ msgid "Something went wrong while sending your verification email. Please try ag
 msgstr "Nepavyko išsiųsti patvirtinimo el. laiško. Bandykite dar kartą po akimirkos."
 
 #. Body of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:172
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:132
 msgid "Something went wrong while starting checkout. Please try again in a moment."
 msgstr "Nepavyko pradėti atsiskaitymo. Bandykite dar kartą po akimirkos."
 
@@ -32531,16 +32645,6 @@ msgstr "Šalinti sekimą"
 msgid "Strip tracking parameters from URLs"
 msgstr "Pašalinti sekimo parametrus iš URL"
 
-#. Premium checkout error shown when Stripe cannot verify a card for localized pricing. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:34
-msgid "Stripe could not verify this card for localized pricing. Use another card, or return to {productName} and choose another payment method."
-msgstr "„Stripe“ negalėjo patvirtinti šios kortelės, kad būtų galima atsiskaityti pagal vietos kainas. Naudokite kitą kortelę arba grįžkite į {productName} ir pasirinkite kitą mokėjimo būdą."
-
-#. Premium checkout error shown when card country does not match billing country. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:22
-msgid "Stripe reported a card issued in {countryName}. To pay in this localized currency, use a card issued in your billing country, or return to {productName} and choose another payment method."
-msgstr "„Stripe“ pranešė apie kortelę, išduotą šalyje {countryName}. Kad galėtumėte mokėti šia vietine valiuta, naudokite kortelę, išduotą jūsų atsiskaitymo šalyje, arba grįžkite į {productName} ir pasirinkite kitą mokėjimo būdą."
-
 #. Codec description in the screen share codec policy menu. Technical surface; keep Chromium as a literal proper noun.
 #: src/features/voice/utils/ScreenShareCodecPolicy.ts:15
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
@@ -32587,7 +32691,7 @@ msgid "Subscription"
 msgstr "Prenumerata"
 
 #. Modal title shown when checkout is blocked because the account already has an active Plutonium subscription.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:127
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:87
 msgid "Subscription already exists"
 msgstr "Prenumerata jau yra"
 
@@ -32760,7 +32864,7 @@ msgstr "Perjungti į patogų išdėstymą"
 msgid "Switch to dense layout"
 msgstr "Perjungti į tankų išdėstymą"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:666
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:673
 msgid "Switch to direct input"
 msgstr "Perjungti į tiesioginį įvedimą"
 
@@ -33028,9 +33132,24 @@ msgid "System-managed install"
 msgstr "Sistemos tvarkomas diegimas"
 
 #. Settings subsection title for keyboard and mouse shortcuts that work outside the app.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:14
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:24
 msgid "System-wide shortcuts"
 msgstr "Visos sistemos spartieji klavišai"
+
+#. Linux settings text when setting up system-wide shortcuts failed.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:148
+msgid "System-wide shortcuts could not be set up."
+msgstr "Nepavyko nustatyti sistemos sparčiųjų klavišų."
+
+#. Hint under a shortcut on Linux showing the key the desktop assigned. {trigger} is the key, as named by the desktop.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:30
+msgid "System-wide: {trigger}"
+msgstr "Visoje sistemoje: {trigger}"
+
+#. Hint under a shortcut on Linux when the desktop has no key assigned for it system-wide.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:35
+msgid "System-wide: Not assigned"
+msgstr "Visoje sistemoje: nepriskirta"
 
 #. Description text in the theme tab content.
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:58
@@ -33613,12 +33732,12 @@ msgid "The page you're looking for doesn't exist or has been moved."
 msgstr "Puslapis, kurio ieškote, neegzistuoja arba buvo perkeltas."
 
 #. OAuth authorize page error shown when the redirect_uri is not registered for this OAuth app.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:59
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:60
 msgid "The provided redirect_uri is not registered for this application."
 msgstr "Pateiktas „redirect_uri“ neužregistruotas šiai programai."
 
 #. Body text in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:50
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:51
 msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "Pateiktas „redirect_uri“ turi naudoti HTTP arba HTTPS."
 
@@ -33851,7 +33970,7 @@ msgid "This animation is too long or too large to crop. Try a shorter or smaller
 msgstr "Ši animacija yra per ilga arba per didelė, kad ją būtų galima apkarpyti. Pabandykite trumpesnį arba mažesnį failą."
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:83
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:84
 msgid "This application"
 msgstr "Ši programa"
 
@@ -33861,7 +33980,7 @@ msgid "This attachment has expired"
 msgstr "Šis priedas nebegalioja"
 
 #. OAuth authorize page error shown when a private bot cannot be added by non-owners.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:71
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:72
 msgid "This bot is not public and cannot be added by other users."
 msgstr "Šis botas nėra viešas, todėl kiti naudotojai negali jo pridėti."
 
@@ -33894,11 +34013,6 @@ msgstr "Šis skambutis yra užšifruotas nuo galo iki galo."
 #: src/features/user/components/modals/tabs/applications_tab/ApplicationDetail.tsx:699
 msgid "This cannot be undone. Removing the application also deletes its bot."
 msgstr "To negalima anuliuoti. Pašalinus programą, taip pat ištrinamas ir jos botas."
-
-#. Premium checkout error shown when card country does not match billing country and Stripe did not provide the issuing country. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:28
-msgid "This card does not match your billing country, so it cannot be used for this localized currency. Use a local card, or return to {productName} and choose another payment method."
-msgstr "Ši kortelė neatitinka jūsų atsiskaitymo šalies, todėl negali būti naudojama šia lokalizuota valiuta. Naudokite vietinę kortelę arba grįžkite į {productName} ir pasirinkite kitą mokėjimo būdą."
 
 #. Modal body shown when a category cannot accept another channel because the per-category limit is reached. Limit is interpolated.
 #: src/features/app/components/layout/ChannelListContent.tsx:83
@@ -34081,6 +34195,16 @@ msgstr "Šis pokalbis nebepasiekiamas."
 #: src/features/updater/commands/UpdaterModalCommands.tsx:69
 msgid "This desktop build cannot install updates inside {productName}. Download the latest desktop installer instead."
 msgstr "Ši darbalaukio versija negali diegti naujinimų programoje {productName}. Vietoj to atsisiųskite naujausią darbalaukio diegimo programą."
+
+#. Voice settings warning on Linux desktops without system-wide shortcut support. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:232
+msgid "This desktop doesn't offer system-wide shortcuts. Push-to-talk only works while {productName} is focused."
+msgstr "Šis darbalaukis nepalaiko sistemos sparčiųjų klavišų. Kalbėjimas paspaudus veikia tik tada, kai {productName} yra aktyvus."
+
+#. Linux settings text when the desktop has no system-wide shortcut support. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:144
+msgid "This desktop doesn't offer system-wide shortcuts. Shortcuts still work while {productName} is focused."
+msgstr "Šis darbalaukis nepalaiko sistemos sparčiųjų klavišų. Spartieji klavišai vis tiek veikia, kai {productName} yra aktyvus."
 
 #. Desktop updater modal body for development or unpackaged builds.
 #: src/features/updater/commands/UpdaterModalCommands.tsx:65
@@ -34295,6 +34419,11 @@ msgstr "Tai paskutinis jūsų prieigos raktas, o prieigos raktai yra jūsų antr
 msgid "This is your last passkey. Once it's gone you won't be able to use a passkey as your second factor."
 msgstr "Tai paskutinis jūsų prieigos raktas. Kai jo nebeliks, negalėsite naudoti prieigos rakto kaip antrojo veiksnio."
 
+#. Hint under the push-to-talk key recorder in voice settings on Linux when the desktop owns system-wide shortcuts. {settingsTabName} is the name of the settings tab with keyboard shortcuts and {sectionName} the title of its system-wide shortcuts section, both filled in by the app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:24
+msgid "This key works while {productName} is focused. Your desktop sets the system-wide key, under {settingsTabName} > {sectionName}."
+msgstr "Šis klavišas veikia, kai {productName} yra aktyvus. Sistemos klavišą nustato jūsų darbalaukis, jį rasite skiltyje {settingsTabName} > {sectionName}."
+
 #. Extra file-too-large alert sentence shown when premium upload-limit upgrades are unavailable.
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx:39
 msgid "This limit is configured by your instance administrator."
@@ -34306,7 +34435,7 @@ msgid "This link channel is marked for mature content and may open material that
 msgstr "Šis nuorodų kanalas pažymėtas kaip skirtas brandžiam turiniui ir gali atverti medžiagą, kuri kai kuriems naudotojams gali būti netinkama."
 
 #. Body of the link-unavailable alert.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:161
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:164
 msgid "This link is not available for your account."
 msgstr "Ši nuoroda nepasiekiama jūsų paskyrai."
 
@@ -34402,7 +34531,7 @@ msgid "This picker is only available in the desktop app."
 msgstr "Šis parinkiklis pasiekiamas tik darbalaukio programoje."
 
 #. Error modal body shown when the selected Plutonium plan has no price ID configured.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:186
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:146
 msgid "This plan isn't available. Contact support."
 msgstr "Šis planas nepasiekiamas. Susisiekite su palaikymo komanda."
 
@@ -34537,11 +34666,6 @@ msgstr "Šis naudotojas nebeegzistuoja. Atnaujinkite ir bandykite dar kartą."
 #: src/features/channel/components/guild_members_page/MemberTableRow.tsx:65
 msgid "This user was force-added to this community by a platform administrator."
 msgstr "Šį naudotoją į šią bendruomenę priverstinai pridėjo platformos administratorius."
-
-#. Premium checkout error shown when card verification expires before checkout. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:40
-msgid "This verification session expired. Return to {productName} and start checkout again."
-msgstr "Šis patvirtinimo seansas baigėsi. Grįžkite į „{productName}“ ir pradėkite atsiskaitymą iš naujo."
 
 #. Body of the voice-channel-full modal.
 #: src/features/voice/components/alerts/VoiceChannelFullModal.tsx:12
@@ -34778,6 +34902,21 @@ msgstr "Pavadinimo juosta"
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:252
 msgid "Title bar platform"
 msgstr "Pavadinimo juostos platforma"
+
+#. Instructions for GNOME. Keep "Settings" and "Apps" as the GNOME menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:92
+msgid "To change the keys, go to Settings > Apps > {productName}."
+msgstr "Norėdami pakeisti klavišus, eikite į Nustatymai > Programos > {productName}."
+
+#. Instructions for KDE Plasma. Keep "System Settings", "Keyboard" and "Shortcuts" as the KDE menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:87
+msgid "To change the keys, go to System Settings > Keyboard > Shortcuts > {productName}."
+msgstr "Norėdami pakeisti klavišus, eikite į Sistemos nuostatos > Klaviatūra > Spartieji klavišai > {productName}."
+
+#. Instructions for changing system-wide shortcut keys on an unrecognized Linux desktop.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:108
+msgid "To change the keys, open your desktop's keyboard shortcut settings."
+msgstr "Norėdami pakeisti klavišus, atidarykite savo darbalaukio klaviatūros sparčiųjų klavišų nustatymus."
 
 #: src/features/guild/components/modals/guild_tabs/GuildWebhooksTab.tsx:125
 msgid "To create a webhook, open <0>{channelWebhooksSettingsPath}</0>. You can still edit and organize all existing webhooks here."
@@ -35873,7 +36012,7 @@ msgid "Unknown"
 msgstr "Nežinoma"
 
 #. OAuth authorize page error shown when the application, session, or request is invalid.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:46
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:47
 msgid "Unknown application, expired session, or invalid authorization request."
 msgstr "Nežinoma programa, pasibaigusi sesija arba neteisinga autorizacijos užklausa."
 
@@ -36411,6 +36550,11 @@ msgstr "Iki 4K/60 kadr./s"
 msgid "Up to 720p at 30 FPS"
 msgstr "Iki 720p esant 30 kadrų per sekundę"
 
+#. Linux settings text when the installed desktop app is too old for system-wide shortcuts. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:152
+msgid "Update {productName} to use system-wide shortcuts on Wayland."
+msgstr "Atnaujinkite {productName}, kad galėtumėte naudoti sistemos sparčiuosius klavišus Wayland aplinkoje."
+
 #. Message placeholder shown when the app cannot render a newer message type.
 #: src/features/channel/components/UnknownMessage.tsx:23
 msgid "Update {productName} to view this message."
@@ -36736,7 +36880,7 @@ msgid "Use {everyoneMention}/{hereMention} and {rolesMention}"
 msgstr "Naudoti {everyoneMention}/{hereMention} ir {rolesMention}"
 
 #. Plutonium subscription payment method picker button. Selects Pix as the payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:46
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:45
 msgid "Use {pixPaymentMethod}"
 msgstr "Naudoti {pixPaymentMethod}"
 
@@ -36751,7 +36895,7 @@ msgid "Use {query} where the text to translate should be inserted."
 msgstr "Naudokite „{query}“ ten, kur turėtų būti įterptas verčiamas tekstas."
 
 #. Plutonium subscription payment method picker button. Selects UPI as the payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:56
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:55
 msgid "Use {upiPaymentMethod}"
 msgstr "Naudoti {upiPaymentMethod}"
 
@@ -36780,7 +36924,7 @@ msgid "Use actual value"
 msgstr "Naudoti tikrąją reikšmę"
 
 #. Plutonium subscription payment method picker button. Selects the alternative (non-card) method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:65
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:64
 msgid "Use alternative method"
 msgstr "Naudoti kitą būdą"
 
@@ -36811,7 +36955,7 @@ msgid "Use browser locale for time format"
 msgstr "Naudoti naršyklės lokalę laiko formatui"
 
 #. Modal secondary button to fall back to standard card checkout instead of an alternative payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:220
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:163
 msgid "Use card"
 msgstr "Naudoti kortelę"
 
@@ -36851,6 +36995,11 @@ msgstr "Naudoti tamsiąją temą visoje programėlėje"
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:45
 msgid "Use default"
 msgstr "Naudoti numatytąjį"
+
+#. Switch label on Linux. When on, the app reads keyboard devices directly for system-wide shortcuts. Not related to the "Direct input" voice processing profile.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:157
+msgid "Use direct input device access"
+msgstr "Naudoti tiesioginę prieigą prie įvesties įrenginių"
 
 #. Permission description in the channel-scoped permissions editor for the Use External Emoji permission. "Other communities" means custom emoji uploaded in a different Fluxer community.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:260
@@ -36902,36 +37051,6 @@ msgstr "Naudoti senąją tamsiąją temą (pradinė neutrali pilka paletė)"
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:50
 msgid "Use light theme"
 msgstr "Naudoti šviesiąją temą"
-
-#. Modal primary button to start the localized card pre-approval verification flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:216
-msgid "Use local card"
-msgstr "Naudoti vietinę kortelę"
-
-#. Plutonium checkout pre-approval prompt for Brazil. Explains the card verification flow and the Pix alternative.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:69
-msgid "Use local card to verify a card issued in Brazil before the paid BRL checkout. Choose other methods if you'd rather try {pixPaymentMethod} or another payment method {paymentProviderName} offers on the next screen."
-msgstr "Norėdami patvirtinti Brazilijoje išduotą kortelę prieš mokamą BRL atsiskaitymą, naudokite vietinę kortelę. Pasirinkite kitą būdą, jei norite išbandyti {pixPaymentMethod} ar kitą mokėjimo būdą, kurį {paymentProviderName} siūlo kitame ekrane."
-
-#. Plutonium checkout pre-approval prompt for India. Explains the card verification flow and the UPI alternative.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:79
-msgid "Use local card to verify a card issued in India before the paid INR checkout. Choose other methods if you'd rather try {upiPaymentMethod} or another payment method {paymentProviderName} offers on the next screen."
-msgstr "Norėdami patvirtinti Indijoje išduotą kortelę prieš mokamą atsiskaitymą INR, naudokite vietinę kortelę. Pasirinkite kitą būdą, jei norite išbandyti {upiPaymentMethod} ar kitą mokėjimo būdą, kurį {paymentProviderName} siūlo kitame ekrane."
-
-#. Plutonium checkout pre-approval prompt for Poland. Explains that BLIK is not supported for subscriptions; user must continue to the standard checkout.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:85
-msgid "Use local card to verify a card issued in Poland before the paid PLN checkout. {blikPaymentMethod} does not support subscriptions in {paymentProviderName} checkout, so continue only if you want {paymentProviderName2}'s standard payment screen instead."
-msgstr "Norėdami patvirtinti Lenkijoje išduotą kortelę prieš mokamą PLN atsiskaitymą, naudokite vietinę kortelę. „{blikPaymentMethod}“ nepalaiko prenumeratų „{paymentProviderName}“ atsiskaitymo metu, todėl tęskite tik tuo atveju, jei norite naudoti „{paymentProviderName2}“ standartinį mokėjimo ekraną."
-
-#. Plutonium checkout pre-approval prompt for Türkiye. Explains there is no local wallet method; continuing goes to the standard checkout.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:96
-msgid "Use local card to verify a card issued in Türkiye before the paid TRY checkout. There isn't an app-based local subscription method here, so continuing will take you to {paymentProviderName}'s standard payment screen."
-msgstr "Norėdami patvirtinti Turkijoje išduotą kortelę prieš mokamą TRY atsiskaitymą, naudokite vietinę kortelę. Čia nėra programėlėje veikiančio vietinio prenumeratos būdo, todėl tęsdami būsite nukreipti į {paymentProviderName} standartinį mokėjimo ekraną."
-
-#. Plutonium checkout pre-approval prompt default. Generic description for countries without specific localized payment guidance.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:102
-msgid "Use local card to verify a card issued in your billing country before the paid checkout. Choose other methods for any other payment method {paymentProviderName} offers on the next screen."
-msgstr "Naudokite vietinę kortelę, kad prieš mokamą atsiskaitymą patvirtintumėte jūsų atsiskaitymo šalyje išduotą kortelę. Pasirinkite kitą būdą, jei norite bet kurio kito mokėjimo būdo, kurį {paymentProviderName} siūlo kitame ekrane."
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced desktop preference.
@@ -37380,10 +37499,6 @@ msgstr "Patvirtinimo ir narystės apribojimai"
 msgid "Verification barrier"
 msgstr "Patvirtinimo barjeras"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:258
-msgid "Verification canceled"
-msgstr "Patvirtinimas atšauktas"
-
 #. Generic form-field label for a one-time verification code.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:219
 msgid "Verification code"
@@ -37401,13 +37516,11 @@ msgstr "Patvirtinimo el. laiškas išsiųstas. Patikrinkite gautuosius."
 
 #. Error title shown when the backup codes email verification expired and must be started again.
 #: src/features/auth/components/modals/BackupCodesViewModal.tsx:35
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:224
 msgid "Verification expired"
 msgstr "Patvirtinimo laikas baigėsi"
 
 #: src/features/auth/components/modals/SudoVerificationModal.tsx:82
 #: src/features/auth/components/pages/VerifyEmailPage.tsx:108
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:241
 msgid "Verification failed"
 msgstr "Patvirtinimas nepavyko"
 
@@ -37425,11 +37538,6 @@ msgstr "Patvirtinta bendruomenė"
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:165
 msgid "Verify"
 msgstr "Patvirtinti"
-
-#. Modal title for the mobile checkout confirmation when opening the localized card verification flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:190
-msgid "Verify card"
-msgstr "Patvirtinti kortelę"
 
 #: src/features/moderation/components/report/ReportStepVerification.tsx:91
 msgid "Verify code"
@@ -37509,7 +37617,7 @@ msgid "Verify your email before sending friend requests."
 msgstr "Prieš siųsdami draugystės užklausas, patvirtinkite savo el. pašto adresą."
 
 #. Title of the error modal shown when an unverified account tries to purchase Plutonium.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:108
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:68
 msgid "Verify your email first"
 msgstr "Pirmiausia patvirtinkite savo el. paštą"
 
@@ -37547,10 +37655,6 @@ msgstr "Patvirtinkite savo el. pašto adresą, kad įsigytumėte {premiumProduct
 #: src/features/channel/utils/CreateDMModalUtils.tsx:56
 msgid "Verify your email to start DMs."
 msgstr "Patvirtinkite el. paštą, kad galėtumėte pradėti tiesioginius pokalbius."
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:179
-msgid "Verifying card"
-msgstr "Kortelės tikrinimas"
 
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:144
 msgid "Verifying code…"
@@ -37993,7 +38097,7 @@ msgid "Visionary 2FA nagbar"
 msgstr "Visionary 2FA pranešimų juosta"
 
 #. Modal body shown when a Visionary user tries to subscribe. Reassures them and points out gift purchases stay available.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:121
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:81
 msgid "Visionary already includes permanent access, so a recurring subscription isn't needed. You can still buy gifts for others."
 msgstr "„Visionary“ jau apima nuolatinę prieigą, todėl pasikartojanti prenumerata nereikalinga. Vis tiek galite pirkti dovanų kitiems."
 
@@ -38219,7 +38323,7 @@ msgid "Voice participants"
 msgstr "Balso pokalbio dalyviai"
 
 #. Voice settings radio group label for microphone processing profile.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:661
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:668
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:55
 msgid "Voice processing"
 msgstr "Balso apdorojimas"
@@ -38265,7 +38369,7 @@ msgstr "Garso įjungimas"
 msgid "Voice unmute"
 msgstr "Mikrofono įjungimas"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:590
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:597
 msgid "Voice uses your system output device in this browser. Change it in your system settings."
 msgstr "Šioje naršyklėje balso pokalbiams naudojamas sistemos garso išvesties įrenginys. Pakeiskite jį sistemos nustatymuose."
 
@@ -38279,7 +38383,7 @@ msgstr "Anuliuota"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:383
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:184
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:186
 #: src/features/user/components/settings_utils/search_index/NotificationsIndex.ts:86
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:183
 msgid "Volume"
@@ -38346,6 +38450,11 @@ msgstr "Laukiama, kol pasibaigs lėtasis režimas viename ar keliuose pasirinktu
 msgid "Waiting for you to..."
 msgstr "Laukiama, kol jūs..."
 
+#. Status text while the Linux desktop shows its own dialog for confirming system-wide shortcuts.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:44
+msgid "Waiting for your desktop…"
+msgstr "Laukiama jūsų darbalaukio…"
+
 #: src/features/input/utils/KeybindUtils.ts:107
 msgctxt "keyboard-key-name"
 msgid "Wake up"
@@ -38409,11 +38518,6 @@ msgstr "„Wayland“ xdg-desktop-portal valdo parinkiklį ir rodo visus langus 
 #: src/features/voice/components/modals/screen_share_picker_modal/useNativePickerCopy.ts:33
 msgid "Wayland's xdg-desktop-portal owns the picker and shows every window and display together. There is no flag that filters it to windows only. Press \"Open system picker\", then choose a window there to get per-app audio."
 msgstr "„Wayland“ xdg-desktop-portal valdo parinkiklį ir rodo visus langus bei ekranus kartu. Nėra parinkties, kuri filtruotų tik langus. Paspauskite „Atidaryti sistemos parinkiklį“ ir ten pasirinkite langą, kad gautumėte atskiros programos garsą."
-
-#. Premium checkout error shown when card verification fails unexpectedly. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:44
-msgid "We could not confirm your card right now. Refresh this page or return to {productName} and try again."
-msgstr "Šiuo metu negalime patvirtinti jūsų kortelės. Atnaujinkite šį puslapį arba grįžkite į „{productName}“ ir bandykite dar kartą."
 
 #. Plutonium page hero subtitle while a failed renewal is in its grace period.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:66
@@ -38490,7 +38594,7 @@ msgid "We couldn't remove that account. Try again."
 msgstr "Nepavyko pašalinti paskyros. Bandykite dar kartą."
 
 #. Modal body for existing-subscription block. Directs the user to the billing portal and addresses the just-paid race case. Keep plain and reassuring.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:132
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:92
 msgid "We found an existing {premiumProductFullName} subscription for this account. Manage it in the secure billing portal to update payment details or check renewal status. If you just paid, wait a minute and reopen this page."
 msgstr "Radome esamą {premiumProductFullName} prenumeratą šiai paskyrai. Tvarkykite ją saugiame atsiskaitymo portale, kad atnaujintumėte mokėjimo duomenis arba patikrintumėte atnaujinimo būseną. Jei ką tik sumokėjote, palaukite minutę ir iš naujo atidarykite šį puslapį."
 
@@ -38927,7 +39031,7 @@ msgstr "Kurie pokalbiai"
 msgid "Which rule was broken?"
 msgstr "Kokia taisyklė buvo pažeista?"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:370
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:369
 msgid "While push-to-talk is on, your shortcut controls your microphone, so the mute button is disabled."
 msgstr "Kai įjungtas kalbėjimas paspaudus, mikrofoną valdo jūsų spartusis klavišas, todėl nutildymo mygtukas išjungtas."
 
@@ -39095,6 +39199,11 @@ msgstr "Be šio leidimo privaloma naudoti kalbėjimą paspaudus."
 msgid "Wordmark"
 msgstr "Žodinis logotipas"
 
+#. Hint under a shortcut on Linux when the desktop owns system-wide shortcuts. The key shown here only works inside the app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:19
+msgid "Works while {productName} is focused"
+msgstr "Veikia, kai {productName} yra aktyvus"
+
 #. Short label in the channel and chat textual attachment preview bottom sheet. Keep it concise.
 #. Short label in the channel and chat textual preview context menu. Keep it concise.
 #: src/features/channel/components/embeds/attachments/TextualAttachmentPreviewBottomSheet.tsx:23
@@ -39222,7 +39331,7 @@ msgid "You are now a developer!"
 msgstr "Dabar esate kūrėjas!"
 
 #. Modal body for the mobile checkout confirmation. Explains that the user is leaving the app to pay.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:203
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:154
 msgid "You are now navigating to {paymentProviderName} to complete the payment. Return to {productName} once you've completed it."
 msgstr "Dabar būsite nukreipti į {paymentProviderName}, kad užbaigtumėte mokėjimą. Kai tai padarysite, grįžkite į {productName}."
 
@@ -39282,7 +39391,7 @@ msgstr "Galite uždaryti šį langą. Importavimas tęsis fone."
 msgid "You can close this tab"
 msgstr "Galite uždaryti šį skirtuką"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:169
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:70
 msgid "You can now close this tab and return to the app."
 msgstr "Dabar galite uždaryti šį skirtuką ir grįžti į programėlę."
 
@@ -39522,7 +39631,7 @@ msgid "You changed your tag while on {PREMIUM_PRODUCT_NAME}. It will reroll rand
 msgstr "Pakeitėte savo žymą, kol naudojatės {PREMIUM_PRODUCT_NAME}. Ji bus atsitiktinai pakeista, kai baigs galioti jūsų {PREMIUM_PRODUCT_NAME}, nebent ji bus atnaujinta."
 
 #. Body of the access-denied alert for clicked message links.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:141
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:144
 msgid "You do not have access to the channel where this message was sent."
 msgstr "Neturite prieigos prie kanalo, kuriame buvo išsiųsta ši žinutė."
 
@@ -39737,7 +39846,7 @@ msgid "You need to verify your email address before you can start a direct messa
 msgstr "Prieš pradėdami tiesioginį pokalbį turite patvirtinti savo el. pašto adresą."
 
 #. Body of the error modal shown when the account email is unverified and the user tries to purchase Plutonium. Product name is interpolated.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:112
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:72
 msgid "You need to verify your email before you can purchase {premiumProductFullName}."
 msgstr "Prieš pirkdami „{premiumProductFullName}“ turite patvirtinti el. pašto adresą."
 
@@ -39819,7 +39928,7 @@ msgid "You're already friends with this user."
 msgstr "Jūs jau draugaujate su šiuo naudotoju."
 
 #. Modal title shown when a lifetime Visionary tier user tries to start a recurring Plutonium subscription.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:117
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:77
 msgid "You're already Visionary"
 msgstr "Jau esate Visionary"
 
@@ -39859,7 +39968,7 @@ msgid "You're being rate limited. Wait {duration} before trying again."
 msgstr "Jums taikomas užklausų ribojimas. Palaukite {duration} prieš bandydami dar kartą."
 
 #. Error modal body shown when a gift-subscription user tries to start a recurring subscription. Explains the extension/redemption path.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:176
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:136
 msgid "You're currently on a gift subscription. It won't renew. You can redeem more gift codes to extend it. Recurring subscriptions can be started after your gift time ends."
 msgstr "Šiuo metu naudojatės dovanų prenumerata. Ji nebus atnaujinta. Galite išpirkti daugiau dovanų kodų, kad ją pratęstumėte. Pasibaigus dovanų prenumeratos laikotarpiui, galėsite pradėti pasikartojančias prenumeratas."
 
@@ -40042,7 +40151,7 @@ msgid "You've seen all your recent mentions. More will appear here soon."
 msgstr "Peržiūrėjote visus naujausius paminėjimus. Netrukus čia atsiras daugiau."
 
 #. Modal body for existing-subscription block when the subscription was bought in a mobile app store. {storeName} is the store brand name, App Store or Google Play, and must not be translated. {premiumProductFullName} is the full premium product name.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:138
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:98
 msgid "Your {premiumProductFullName} subscription is billed through {storeName}. Manage it in your {storeName} account to change your plan or check renewal status."
 msgstr "Jūsų {premiumProductFullName} prenumerata apmokestinama per {storeName}. Tvarkykite ją savo {storeName} paskyroje, kad pakeistumėte planą arba patikrintumėte atnaujinimo būseną."
 
@@ -40057,7 +40166,7 @@ msgid "Your {premiumProductName} subscription has expired. You have lost all {pr
 msgstr "Jūsų „{premiumProductName}“ prenumerata baigėsi. Praradote visas „{premiumProductName}“ privilegijas. Norėdami atgauti prieigą, aktyvuokite prenumeratą iš naujo."
 
 #. OAuth authorize page error shown when the session expired mid-authorization. Keep plain. Preserve {productName}; it is inserted by code.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:41
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:42
 msgid "Your {productName} session expired. Sign in again to continue authorizing this application."
 msgstr "Jūsų „{productName}“ seanso laikas baigėsi. Prisijunkite iš naujo, kad tęstumėte šios programos autorizavimą."
 
@@ -40110,14 +40219,6 @@ msgstr "Jūsų paraiška laukia peržiūros. Vis dar galite atnaujinti savo įra
 msgid "Your browser requires user interaction before audio can be played. Click the button below to enable voice chat."
 msgstr "Jūsų naršyklė reikalauja naudotojo veiksmo, kad būtų galima paleisti garsą. Spustelėkite žemiau esantį mygtuką, kad įjungtumėte balso pokalbį."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:185
-msgid "Your card is being checked for localized pricing. This usually takes a moment."
-msgstr "Tikrinama, ar jūsų kortelei taikoma vietinė kainodara. Tai paprastai užtrunka akimirką."
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:183
-msgid "Your card is eligible. Redirecting you to the payment page now."
-msgstr "Jūsų kortelė tinkama. Dabar būsite nukreipti į mokėjimo puslapį."
-
 #. Body of the confirmation shown before saving an edit to a message published from an announcement channel.
 #: src/features/messaging/commands/MessageCommands.tsx:104
 msgid "Your changes reach every community that follows this channel, which can take a minute. Each published message allows 3 quick edits, then 1 every 20 minutes."
@@ -40144,6 +40245,26 @@ msgstr "Jūsų bendruomenėje turi būti bent {minMemberCount, plural, one {# na
 #: src/features/auth/components/pages/MatureContentCheckCallbackPage.tsx:14
 msgid "Your credit card has been checked. If the card is valid, mature content will unlock shortly. You can close this tab and return to the app."
 msgstr "Jūsų kredito kortelė patikrinta. Jei kortelė galioja, netrukus bus atrakintas suaugusiesiems skirtas turinys. Galite uždaryti šį skirtuką ir grįžti į programėlę."
+
+#. Linux settings text when the desktop dialog for system-wide shortcuts was dismissed or failed. Neutral wording, the user may not have declined anything.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:134
+msgid "Your desktop didn't set up system-wide shortcuts."
+msgstr "Jūsų darbalaukis nenustatė sistemos sparčiųjų klavišų."
+
+#. Linux settings note under the list of system-wide shortcuts the desktop runs (KDE, GNOME). A key assigned here stops reaching every other app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:64
+msgid "Your desktop keeps these keys for {productName}, so other apps can't use them."
+msgstr "Jūsų darbalaukis šiuos klavišus rezervuoja programai {productName}, todėl kitos programos negali jų naudoti."
+
+#. Linux settings note under the list of system-wide shortcuts the desktop runs (KDE, GNOME), shown when the "Use direct input device access" switch is offered below it. A key assigned here stops reaching every other app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:69
+msgid "Your desktop keeps these keys for {productName}, so other apps can't use them. To use the same key in other apps, turn on direct input device access below."
+msgstr "Jūsų darbalaukis šiuos klavišus rezervuoja programai {productName}, todėl kitos programos negali jų naudoti. Jei norite tą patį klavišą naudoti kitose programose, žemiau įjunkite tiesioginę prieigą prie įvesties įrenginių."
+
+#. Subtitle above the list of system-wide shortcuts assigned by the Linux desktop. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:53
+msgid "Your desktop runs these shortcuts even while {productName} is not focused."
+msgstr "Jūsų darbalaukis vykdo šiuos sparčiuosius klavišus net tada, kai {productName} nėra aktyvus."
 
 #. Body of the modal that asks the user to save an updated passkey. name is the name the user gave the passkey. Keep plain.
 #: src/features/auth/passkey_migration/PasskeyUpdateModal.tsx:28
@@ -40276,11 +40397,11 @@ msgstr "Jūsų naujausias pirkinys nebeatitinka pinigų grąžinimo termino. Dė
 msgid "Your new nickname, or leave blank to reset it."
 msgstr "Jūsų naujas slapyvardis arba palikite tuščią, kad jį atstatytumėte."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:152
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:53
 msgid "Your payment was canceled. You can now close this tab and return to the app."
 msgstr "Jūsų mokėjimas atšauktas. Dabar galite uždaryti šį skirtuką ir grįžti į programėlę."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:139
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:40
 msgid "Your payment was successful. You can now close this tab and return to the app."
 msgstr "Mokėjimas sėkmingas. Dabar galite uždaryti šį skirtuką ir grįžti į programėlę."
 

@@ -993,7 +993,7 @@ msgstr "{count, plural, one {# ערוץ עוקב} other {# ערוצים עוקב
 msgid "{count, plural, one {# community found} other {# communities found}}"
 msgstr "{count, plural, one {# קהילה נמצאה} other {# קהילות נמצאו}}"
 
-#: src/features/app/components/layout/GuildsLayout.tsx:1955
+#: src/features/app/components/layout/GuildsLayout.tsx:1954
 msgid "{count, plural, one {# community is temporarily unavailable due to a flux capacitor malfunction.} other {# communities are temporarily unavailable due to a flux capacitor malfunction.}}"
 msgstr "{count, plural, one {# קהילה אינה זמינה באופן זמני עקב תקלה בקבל השטף.} other {# קהילות אינן זמינות באופן זמני עקב תקלה בקבל השטף.}}"
 
@@ -1611,11 +1611,6 @@ msgstr "{overrideCount, plural, one {# עקיפה} other {# עקיפות}}"
 msgid "{PAYMENT_PROVIDER_NAME} handles payment securely."
 msgstr "{PAYMENT_PROVIDER_NAME} מטפל בתשלומים באופן מאובטח."
 
-#. Modal body for the mobile card verification confirmation. Explains the two-step flow and the return path.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:198
-msgid "{paymentProviderName} will first verify that your card is eligible for localized pricing, then take you to payment. Return to {productName} once you've completed it."
-msgstr "{paymentProviderName} יאמת תחילה שהכרטיס שלך זכאי לתמחור מקומי, ולאחר מכן יעביר אותך לתשלום. חזור ל-{productName} לאחר שתסיים את התהליך."
-
 #. Badge label with a date in the user profile badges popout. Preserve {premiumProductFullName}, {premiumSinceFormatted}; they are inserted by code. In English, keep "subscriber since" lowercase. Other locales should use natural local capitalization.
 #: src/features/user/components/popouts/UserProfileBadges.tsx:54
 msgid "{premiumProductFullName} subscriber since {premiumSinceFormatted}"
@@ -1707,6 +1702,31 @@ msgstr "{productName} נמנע משליחת התראות דחיפה למכשיר
 #: src/features/user/components/popouts/UserProfileBadges.tsx:39
 msgid "{productName} Bug Hunter"
 msgstr "צייד באגים של {productName}"
+
+#. Linux settings text before system-wide shortcuts are set up. The desktop environment owns the keys. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:28
+msgid "{productName} can ask your desktop to run its shortcuts while {productName} is not focused. Your desktop asks you to confirm and lets you pick the keys."
+msgstr "{productName} יכול לבקש משולחן העבודה שלך להפעיל את הקיצורים שלו כש-{productName} אינו ממוקד. שולחן העבודה יבקש ממך אישור ויאפשר לך לבחור את המקשים."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read, on an X11 session. The app now listens for shortcuts through the X11 display server itself. Keep "X11" as written. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:177
+msgid "{productName} can no longer read your keyboard, so it listens for shortcuts through X11 instead."
+msgstr "{productName} כבר לא יכול לקרוא את המקלדת שלך, ולכן הוא מאזין לקיצורי דרך באמצעות X11."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read, for example after a restart removed the access. The app already falls back to the shortcuts the desktop runs. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:172
+msgid "{productName} can no longer read your keyboard, so your desktop's shortcuts are used instead."
+msgstr "{productName} כבר לא יכול לקרוא את המקלדת שלך, ולכן נעשה שימוש בקיצורי הדרך של שולחן העבודה שלך."
+
+#. Description for the Linux direct input device access switch when it is on but the keyboard can no longer be read and nothing else runs system-wide shortcuts. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:182
+msgid "{productName} can no longer read your keyboard. Shortcuts only work while {productName} is focused."
+msgstr "{productName} כבר לא יכול לקרוא את המקלדת שלך. קיצורי הדרך פועלים רק כאשר {productName} ממוקד."
+
+#. Linux settings text before system-wide shortcuts are set up on the Hyprland desktop. Hyprland shows no dialog. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:34
+msgid "{productName} can register its shortcuts with Hyprland so they run while {productName} is not focused. You then bind the keys in your Hyprland config."
+msgstr "{productName} יכול לרשום את הקיצורים שלו ב-Hyprland כדי שיפעלו גם כש-{productName} אינו ממוקד. לאחר מכן תקצה את המקשים בקובץ התצורה של Hyprland."
 
 #. Inline notice body on Windows. Explains that desktop audio is disabled because productName cannot exclude its own WebRTC/call playback on this OS build.
 #. Inline notice body on macOS. Explains that desktop audio is disabled because productName cannot exclude its own WebRTC/call playback on this OS build.
@@ -1813,7 +1833,7 @@ msgid "{productName} needs camera access to list your devices."
 msgstr "{productName} זקוק לגישה למצלמה כדי להציג את המכשירים שלך."
 
 #. Voice settings notice shown when microphone permission has not been granted.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:141
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:143
 msgid "{productName} needs microphone access to list your devices."
 msgstr "{productName} זקוק לגישה למיקרופון כדי להציג את המכשירים שלך."
 
@@ -1836,6 +1856,11 @@ msgstr "{productName} נמצא כעת בכתובת {host}. התקן אותו מ�
 #: src/features/user/components/popouts/UserProfileBadges.tsx:34
 msgid "{productName} Partner"
 msgstr "שותף של {productName}"
+
+#. Subtitle for system-wide shortcuts on the Hyprland desktop after setup. Hyprland shows no list of assigned keys. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:58
+msgid "{productName} registered its shortcuts with Hyprland. Bind them in your Hyprland config to use them while {productName} is not focused."
+msgstr "{productName} רשם את הקיצורים שלו ב-Hyprland. הקצה להם מקשים בקובץ התצורה של Hyprland כדי להשתמש בהם כש-{productName} אינו ממוקד."
 
 #. Nagbar shown after the app restarts while the user was connected to a community voice channel. {productName} is Fluxer, {channelName} is the voice channel name, and {communityName} is the community name.
 #: src/features/app/components/layout/app_layout/nagbars/VoiceSessionRestoreNagbar.tsx:24
@@ -2586,7 +2611,7 @@ msgid "A profile that stands out"
 msgstr "פרופיל שיבלוט"
 
 #. OAuth authorize page error shown when the bot scope requires a redirect_uri that is missing. Technical message; keep "redirect_uri" and "bot" untranslated.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:54
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:55
 msgid "A redirect_uri is required when the bot scope is not the only scope."
 msgstr "נדרש redirect_uri כאשר ההרשאה bot אינה ההרשאה היחידה."
 
@@ -2847,7 +2872,7 @@ msgstr "רק בכל ההודעות הפרטיות הפתוחות"
 msgid "Across every community you're in"
 msgstr "בכל הקהילות שבהן אתה חבר"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:110
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:112
 msgid "Action"
 msgstr "פעולה"
 
@@ -2962,7 +2987,7 @@ msgid "Activity sharing"
 msgstr "שיתוף פעילות"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:488
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:495
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:102
 msgid "Activity threshold"
 msgstr "סף פעילות"
@@ -3091,7 +3116,7 @@ msgid "Add an extra layer of security to your account"
 msgstr "הוסף שכבת אבטחה נוספת לחשבונך"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:41
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:43
 msgid "Add another custom shortcut"
 msgstr "הוספת קיצור דרך מותאם אישית נוסף"
 
@@ -3427,7 +3452,7 @@ msgid "Address"
 msgstr "כתובת"
 
 #. Description for the custom profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:99
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:101
 msgid "Adjust each setting yourself: noise suppression, echo cancellation, and gain."
 msgstr "התאם כל הגדרה בעצמך: דיכוי רעשים, ביטול הד והגברה."
 
@@ -3625,7 +3650,7 @@ msgstr "כל ההודעות הפרטיות + הקהילות"
 msgid "All DMs only"
 msgstr "כל ההודעות הפרטיות בלבד"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:166
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:67
 msgid "All done"
 msgstr "הכול בוצע"
 
@@ -3696,11 +3721,11 @@ msgstr "אפשר {everyoneMention} ו-{hereMention}"
 msgid "Allow {PRODUCT_NAME} to access your camera in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_CAMERA_PERMISSION_NAME}."
 msgstr "אפשר ל-{PRODUCT_NAME} לגשת למצלמה שלך ב-{MACOS_SYSTEM_SETTINGS_NAME} ← {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} ← {MACOS_CAMERA_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:546
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:553
 msgid "Allow {PRODUCT_NAME} to access your microphone in {MACOS_SYSTEM_SETTINGS_NAME} → {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} → {MACOS_MICROPHONE_PERMISSION_NAME}."
 msgstr "אפשר ל-{PRODUCT_NAME} לגשת למיקרופון שלך ב-{MACOS_SYSTEM_SETTINGS_NAME} ← {MACOS_PRIVACY_AND_SECURITY_SETTINGS_NAME} ← {MACOS_MICROPHONE_PERMISSION_NAME}."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:551
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:558
 msgid "Allow {PRODUCT_NAME} to access your microphone. Check your browser's address bar or settings."
 msgstr "אפשר ל-{PRODUCT_NAME} לגשת למיקרופון שלך. בדוק את שורת הכתובת או את ההגדרות של הדפדפן."
 
@@ -3803,7 +3828,7 @@ msgstr "אפשר לחברים ללא הרשאת {readMessageHistoryPermissionLab
 msgid "Allow mentions for this role"
 msgstr "אפשר אזכורים לתפקיד זה"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:571
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:578
 msgid "Allow microphone"
 msgstr "אפשר מיקרופון"
 
@@ -4034,7 +4059,7 @@ msgid "An invalid status was provided. You can close this tab and return to the 
 msgstr "צוין סטטוס לא חוקי. ניתן לסגור את הכרטיסייה ולחזור לאפליקציה."
 
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:59
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:272
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:81
 msgid "An invalid status was provided. You can now close this tab and return to the app."
 msgstr "צוין סטטוס לא חוקי. עכשיו אפשר לסגור את הכרטיסייה הזו ולחזור לאפליקציה."
 
@@ -5003,7 +5028,7 @@ msgid "Authorization failed"
 msgstr "ההרשאה נכשלה"
 
 #. OAuth authorize page generic error toast shown when the authorize request fails unexpectedly.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:75
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:76
 msgid "Authorization failed. Try again."
 msgstr "ההרשאה נכשלה. יש לנסות שוב."
 
@@ -5092,8 +5117,8 @@ msgid "Auto-detect language"
 msgstr "זיהוי שפה אוטומטי"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:119
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:475
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:121
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:482
 msgid "Auto-set activity threshold"
 msgstr "קביעה אוטומטית של סף הפעילות"
 
@@ -5998,7 +6023,7 @@ msgid "Bot permissions"
 msgstr "הרשאות בוט"
 
 #. OAuth authorize page error shown when the permissions query parameter is a negative integer.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:67
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:68
 msgid "Bot permissions cannot be negative."
 msgstr "הרשאות בוט לא יכולות להיות שליליות."
 
@@ -6709,14 +6734,6 @@ msgstr "יישור כרטיס"
 msgid "Card alignment controls"
 msgstr "פקדי יישור כרטיס"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:200
-msgid "Card not eligible"
-msgstr "הכרטיס לא מתאים"
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:261
-msgid "Card verification was canceled. You can close this tab and return to the app."
-msgstr "אימות הכרטיס בוטל. ניתן לסגור את הלשונית ולחזור לאפליקציה."
-
 #. Heading above the category filter list in the Discovery search sidebar.
 #. Short label in the discovery category bottom sheet. Keep it concise.
 #: src/features/discovery/components/bottomsheets/DiscoveryCategoryBottomSheet.tsx:15
@@ -6868,6 +6885,11 @@ msgstr "שינוי הכינוי בקבוצה"
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/fields/GuildIconUploadField.tsx:35
 msgid "Change icon"
 msgstr "שינוי אייקון"
+
+#. Button that opens the Linux desktop dialog for changing the keys of system-wide shortcuts.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:83
+msgid "Change in system settings"
+msgstr "שינוי בהגדרות המערכת"
 
 #. Title of the modal where the user picks a community invite background source. Keep it concise. Keep the tone plain and specific.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/fields/GuildInviteSplashUploadField.tsx:37
@@ -7229,7 +7251,7 @@ msgid "Channel access"
 msgstr "גישה לערוץ"
 
 #. Title of the alert shown when clicking a message link the user does not have permission to view.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:137
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:140
 msgid "Channel access denied"
 msgstr "הגישה לערוץ נדחתה"
 
@@ -7294,7 +7316,7 @@ msgstr "מזהה הערוץ הועתק ללוח הגזירים"
 
 #. Short label in the messaging mention renderer. Keep it concise.
 #. Type chip suffix in tooltips for inline rendered channel mentions. Lowercase because it follows the channel name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:97
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:100
 #: src/features/messaging/components/markdown/renderers/MentionRenderer.tsx:39
 msgid "channel link"
 msgstr "קישור לערוץ"
@@ -7462,6 +7484,11 @@ msgstr "שדה הקלדה"
 msgid "Chat shortcuts"
 msgstr "קיצורי דרך לצ'אט"
 
+#. Button on Linux that checks again whether the desktop offers system-wide shortcuts, for example after the desktop service started. Keep it short.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:139
+msgid "Check again"
+msgstr "בדיקה חוזרת"
+
 #. Tray menu item. Triggers the auto-updater to look for a new desktop build.
 #: src/features/platform/utils/DesktopLocaleBridge.ts:225
 msgid "Check for updates"
@@ -7523,17 +7550,17 @@ msgid "Checkout"
 msgstr "תשלום"
 
 #. Modal body for the generic "checkout blocked" state on a self-hosted instance.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:164
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:124
 msgid "Checkout is blocked for this account."
 msgstr "התשלום חסום עבור חשבון זה."
 
 #. Modal body for the generic "checkout blocked" state. Provides the support email.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:160
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:120
 msgid "Checkout is blocked for this account. Contact {supportEmail} if you need help."
 msgstr "התשלום חסום עבור חשבון זה. צור קשר עם {supportEmail} אם אתה זקוק לעזרה."
 
 #. Modal title for the generic "checkout blocked" state when no more specific reason is known.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:156
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:116
 msgid "Checkout unavailable"
 msgstr "התשלום אינו זמין"
 
@@ -7645,7 +7672,7 @@ msgstr "בחר חלון מבורר המערכת שלך"
 msgid "Choose an account"
 msgstr "בחר חשבון"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:152
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:154
 msgid "Choose an action."
 msgstr "בחר פעולה."
 
@@ -7667,7 +7694,7 @@ msgid "Choose background"
 msgstr "בחר רקע"
 
 #. OAuth authorize page error shown when a bot invite request provides both guild_id and channel_id. Keep the parameter names literal.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:87
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:88
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "יש לבחור guild_id או channel_id, לא את שניהם."
 
@@ -7707,7 +7734,7 @@ msgid "Choose how times are displayed throughout the app"
 msgstr "בחר כיצד יוצג הזמן ברחבי האפליקציה"
 
 #. Plutonium subscription payment method picker description, generic fallback when no country-specific copy applies.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:60
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:59
 msgid "Choose how you'd like to pay for this subscription."
 msgstr "בחר איך לשלם על המינוי הזה."
 
@@ -7721,7 +7748,7 @@ msgid "Choose one of the methods below to prove domain ownership. You only need 
 msgstr "בחר אחת מהשיטות הבאות כדי להוכיח בעלות על הדומיין. עליך להשלים רק אחת."
 
 #. Modal title for the payment method picker (local card vs alternative method).
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:212
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:159
 msgid "Choose payment method"
 msgstr "בחירת אמצעי תשלום"
 
@@ -7990,7 +8017,7 @@ msgstr "מנקה את המיקרופון שלך לדיבור ברור."
 #: src/features/app/components/setup/SetupWizardSteps.tsx:120
 #: src/features/channel/components/message_search_bar/HistorySection.tsx:24
 #: src/features/guild/components/modals/guild_tabs/GuildMembersDateRangeModal.tsx:74
-#: src/features/input/components/KeybindRecorder.tsx:442
+#: src/features/input/components/KeybindRecorder.tsx:482
 #: src/features/theme_studio/sections/QuickCssSection.tsx:64
 #: src/features/theme_studio/sections/QuickCssSection.tsx:241
 msgid "Clear"
@@ -8191,7 +8218,7 @@ msgstr "יש ללחוץ כדי לפתוח את בורר הצבעים ולבחו�
 msgid "Click to react"
 msgstr "יש ללחוץ כדי להגיב"
 
-#: src/features/input/components/KeybindRecorder.tsx:411
+#: src/features/input/components/KeybindRecorder.tsx:451
 msgid "Click to record"
 msgstr "יש ללחוץ כדי להקליט"
 
@@ -8917,7 +8944,7 @@ msgid "Complete mature content check"
 msgstr "השלמת בדיקת התוכן למבוגרים"
 
 #. Modal title for the mobile checkout confirmation when opening the payment provider in a browser.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:194
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:150
 msgid "Complete payment"
 msgstr "השלם תשלום"
 
@@ -9110,7 +9137,7 @@ msgstr "אישור"
 msgid "Confirmation or double-click for community voice joins"
 msgstr "אישור או לחיצה כפולה להצטרפות לערוץ קולי בקהילה"
 
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:169
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:176
 msgid "Conflicts with {conflictLabel}"
 msgstr "מתנגש עם {conflictLabel}"
 
@@ -9127,7 +9154,7 @@ msgstr "חבר מצלמה או התקן לכידה וירטואלי, ואז נס
 msgid "Connect a display, then try again."
 msgstr "חבר צג, ואז נסה שוב."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:556
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:563
 msgid "Connect a microphone and try again."
 msgstr "חבר מיקרופון ונסה שוב."
 
@@ -9368,11 +9395,6 @@ msgstr "ניתן לפתוח תפריטי הקשר בלחיצה שמאלית (ע�
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx:182
 msgid "Continue"
 msgstr "המשך"
-
-#. Plutonium checkout pre-approval prompt secondary button. Continues straight to the standard checkout screen.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:91
-msgid "Continue to checkout"
-msgstr "המשך לתשלום"
 
 #. Button or menu action label in the report action utils helper. Keep it concise. Keep the tone plain and specific.
 #: src/features/moderation/utils/ReportActionUtils.tsx:37
@@ -9699,6 +9721,21 @@ msgstr "העתקת קישור להזמנה"
 #: src/features/channel/components/modals/channel_tabs/ChannelInvitesTab.tsx:49
 msgid "Copy invite URL"
 msgstr "העתקת כתובת ה-URL של ההזמנה"
+
+#. Button that copies Hyprland config lines to the clipboard.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:120
+msgid "Copy lines"
+msgstr "העתקת שורות"
+
+#. Screen reader name of the button that copies Hyprland config lines in the older hyprlang format. Starts with the visible button text "Copy lines". Keep "hyprland.conf" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:129
+msgid "Copy lines for hyprland.conf"
+msgstr "העתקת שורות עבור hyprland.conf"
+
+#. Screen reader name of the button that copies Hyprland config lines in the Lua format. Starts with the visible button text "Copy lines". Keep "hyprland.lua" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:124
+msgid "Copy lines for hyprland.lua"
+msgstr "העתקת שורות עבור hyprland.lua"
 
 #. Generic action label that copies a URL to the clipboard.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:750
@@ -10147,7 +10184,7 @@ msgstr "לא ניתן היה לפתוח את תוצאת החיפוש"
 #. Title of the error modal shown when opening the billing customer portal from the grace-period nagbar fails.
 #. Title of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Title of the generic fallback error modal shown when opening the billing customer portal fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:32
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:31
 #: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:14
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:29
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:29
@@ -10304,7 +10341,7 @@ msgid "Couldn't start {blueskyProviderName} authorization"
 msgstr "לא ניתן היה להתחיל את ההרשאה עבור {blueskyProviderName}"
 
 #. Title of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:168
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:128
 msgid "Couldn't start checkout"
 msgstr "לא ניתן להתחיל את התשלום"
 
@@ -10845,7 +10882,7 @@ msgstr "מותאם אישית"
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
 #. Voice input processing profile where the user configures processing manually.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:94
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:96
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:42
 #: src/features/voice/components/VoiceSettingsMenus.tsx:70
 msgctxt "voice-processing-profile"
@@ -10948,12 +10985,12 @@ msgid "Custom selection"
 msgstr "בחירה מותאמת אישית"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:42
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:44
 msgid "Custom shortcut action"
 msgstr "פעולה מותאמת אישית לקיצור דרך"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:38
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:40
 msgid "Custom shortcut options"
 msgstr "אפשרויות קיצור דרך מותאמות אישית"
 
@@ -11466,7 +11503,7 @@ msgstr "קיצורי דרך ברירת מחדל"
 msgid "Default translator"
 msgstr "מתרגם ברירת מחדל"
 
-#: src/features/input/components/KeybindRecorder.tsx:419
+#: src/features/input/components/KeybindRecorder.tsx:459
 msgid "Default:"
 msgstr "ברירת מחדל:"
 
@@ -11715,7 +11752,7 @@ msgid "Delete saved media"
 msgstr "מחיקת מדיה שמורה"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Keep the tone plain and specific.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:34
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:36
 msgid "Delete shortcut"
 msgstr "מחיקת קיצור דרך"
 
@@ -12102,13 +12139,13 @@ msgstr "מצב מפתח"
 #. Short label in the channel and chat utility buttons. Keep it concise.
 #. Title of the info alert shown when clicking an internal developer-tools deep link.
 #: src/features/channel/components/channel_header_components/UtilityButtons.tsx:20
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:149
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:152
 #: src/features/ui/action_menu/items/StaffDeveloperUserControlsMenuItem.tsx:13
 msgid "Developer tools"
 msgstr "כלי מפתחים"
 
 #. Body of the developer-tools info alert. Refers to the staff badge button in the channel header.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:153
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:156
 msgid "Developer tools are available from the staff badge in the channel header."
 msgstr "כלי מפתחים זמינים דרך תג הצוות בכותרת הערוץ."
 
@@ -12313,7 +12350,7 @@ msgid "Disable backend premium perks"
 msgstr "השבתת הטבות פרימיום בשרת"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:33
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:35
 msgid "Disable built-in shortcut"
 msgstr "השבת קיצור דרך מובנה"
 
@@ -12377,7 +12414,7 @@ msgid "Disable screen share picture-in-picture popouts?"
 msgstr "האם להשבית חלונות קופצים של שיתוף מסך?"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:26
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:28
 msgid "Disable shortcut"
 msgstr "השבת קיצור דרך"
 
@@ -12888,7 +12925,7 @@ msgstr "לתרום במקום זאת"
 #. Primary button in the favorite GIF import modal after a completed import.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthSuccessState.tsx:44
 #: src/features/channel/components/pickers/gif/ImportFavoriteGifsModal.tsx:54
-#: src/features/input/components/KeybindRecorder.tsx:470
+#: src/features/input/components/KeybindRecorder.tsx:510
 #: src/features/moderation/components/report_modal/IARModal.tsx:94
 #: src/features/moderation/components/report/ReportBreadcrumbs.tsx:31
 #: src/features/search/components/search/ChannelFilterSheet.tsx:165
@@ -12951,7 +12988,7 @@ msgid "Download button"
 msgstr "כפתור הורדה"
 
 #. Button or menu action label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:107
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:109
 msgid "Download desktop app"
 msgstr "הורדת אפליקציית המחשב"
 
@@ -13204,6 +13241,11 @@ msgstr "הולנדית"
 msgid "e.g., YubiKey, iPhone, work computer"
 msgstr "לדוגמה: YubiKey, iPhone, מחשב עבודה"
 
+#. Note under the list of system-wide shortcuts on Linux. The desktop cannot assign one key to two actions.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:75
+msgid "Each key can run only one system-wide shortcut."
+msgstr "כל מקש יכול להפעיל רק קיצור דרך כלל-מערכתי אחד."
+
 #. Body of the alert shown when a published announcement message hit its editing limit. {duration} is a localized short duration such as "12 minutes".
 #: src/features/messaging/components/alerts/PublishedMessageEditLimitModal.tsx:12
 msgid "Each published message allows 3 quick edits, then 1 every 20 minutes. Try again in {duration}."
@@ -13350,7 +13392,7 @@ msgid "Edit invite link"
 msgstr "עריכת קישור הזמנה"
 
 #. Button or menu action label in the keyboard shortcuts keybind recorder. Keep it concise.
-#: src/features/input/components/KeybindRecorder.tsx:32
+#: src/features/input/components/KeybindRecorder.tsx:40
 msgid "Edit keyboard shortcut"
 msgstr "עריכת קיצור מקלדת"
 
@@ -13425,7 +13467,7 @@ msgstr "טופס עריכת מדיה שמורה"
 msgid "Edit search engine"
 msgstr "עריכת מנוע חיפוש"
 
-#: src/features/input/components/KeybindRecorder.tsx:378
+#: src/features/input/components/KeybindRecorder.tsx:418
 msgid "Edit shortcut"
 msgstr "עריכת קיצור דרך"
 
@@ -13753,20 +13795,16 @@ msgstr "עריכה ריקה"
 msgid "Empty favorites"
 msgstr "אין מועדפים"
 
-#. Button label in the Linux Wayland input-access nagbar.
-#. Button label in the keybind settings system-wide shortcuts section.
 #. Button or menu action label in the invites disable invites button. Keep it concise.
 #. Primary button label in the enable-invites confirmation modal.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:32
 #: src/features/app/components/layout/GuildLayout.tsx:54
 #: src/features/invite/components/DisableInvitesButton.tsx:27
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx:360
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:23
 msgid "Enable"
 msgstr "הפעלה"
 
 #. Voice settings CTA label for opening a platform permission prompt.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:127
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:129
 msgid "Enable {permissionName} permission"
 msgstr "הפעלת הרשאת {permissionName}"
 
@@ -13876,11 +13914,6 @@ msgstr "הפעלת האצת חומרה והפעלה מחדש"
 msgid "Enable hardware acceleration?"
 msgstr "להפעיל האצת חומרה?"
 
-#. Description for a Linux Wayland input-access nagbar. {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:16
-msgid "Enable input access to use system-wide shortcuts on Wayland. After changing input access, fully quit and restart {productName} so shortcuts can use it."
-msgstr "כדי להשתמש בקיצורי דרך כלל-מערכתיים ב-Wayland, יש לאפשר גישת קלט. לאחר שינוי גישת הקלט, יש לצאת מ-{productName} לחלוטין ולהפעיל אותה מחדש כדי שקיצורי הדרך יוכלו להשתמש בה."
-
 #. Button label that re-enables invite links for a community.
 #: src/features/invite/components/DisableInvitesButton.tsx:40
 msgid "Enable invites"
@@ -13971,7 +14004,7 @@ msgid "Enable Shift to expand"
 msgstr "הפעל Shift כדי להרחיב"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:30
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:32
 msgid "Enable shortcut"
 msgstr "הפעל קיצור דרך"
 
@@ -14357,7 +14390,7 @@ msgstr "כל צלילי המערכת"
 #. Voice menu submenu label that contains per-user entrance sound mute and volume controls.
 #: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx:181
 #: src/features/ui/action_menu/items/VoiceParticipantMenuItems.tsx:310
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:192
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:194
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:150
 msgid "Entrance sound"
 msgstr "צליל כניסה"
@@ -14467,7 +14500,7 @@ msgstr "ערב"
 
 #. Description for the automatic gain control toggle in the voice processing settings.
 #. Description for the automatic gain control toggle in the voice processing settings.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:176
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:178
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:63
 msgid "Evens out your mic volume so you are not too quiet."
 msgstr "מאזן את עוצמת המיקרופון שלך כדי שלא תישמע שקט מדי."
@@ -15682,6 +15715,26 @@ msgstr "לעיניים בריטיות בלבד..."
 msgid "For me"
 msgstr "בשבילי"
 
+#. Warning on GNOME when the push-to-mute shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the microphone muted.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:204
+msgid "For push-to-mute, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the microphone can stay muted."
+msgstr "עבור השתקה בלחיצה, השתמש במקש יחיד ללא Ctrl, Alt או Shift. אם אתה משתמש בשילוב מקשים, שחרר קודם את המקש הראשי, אחרת המיקרופון עלול להישאר מושתק."
+
+#. Warning on GNOME when the push-to-talk shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the microphone on.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:198
+msgid "For push-to-talk, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the microphone can stay on."
+msgstr "עבור דיבור בלחיצה, השתמש במקש יחיד ללא Ctrl, Alt או Shift. אם אתה משתמש בשילוב מקשים, שחרר קודם את המקש הראשי, אחרת המיקרופון עלול להישאר פתוח."
+
+#. Warning on GNOME when a hold shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave the shortcut active.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:216
+msgid "For this shortcut, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or the shortcut can stay active."
+msgstr "עבור קיצור דרך זה, השתמש במקש יחיד ללא Ctrl, Alt או Shift. אם אתה משתמש בשילוב מקשים, שחרר קודם את המקש הראשי, אחרת הקיצור עלול להישאר פעיל."
+
+#. Warning on GNOME when the voice activity priority shortcut uses a key combination. Letting go of a modifier key such as Ctrl before the main key can leave priority speaking on. "Voice activity priority" is the shortcut name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:210
+msgid "For voice activity priority, use a single key without Ctrl, Alt or Shift. With a combination, let go of the main key first or priority can stay on."
+msgstr "עבור עדיפות לפעילות קולית, השתמש במקש יחיד ללא Ctrl, Alt או Shift. אם אתה משתמש בשילוב מקשים, שחרר קודם את המקש הראשי, אחרת העדיפות עלולה להישאר פעילה."
+
 #: src/features/auth/components/modals/SudoVerificationModal.tsx:268
 msgid "For your security, please confirm it's you to continue."
 msgstr "למען אבטחתך, יש לאמת את זהותך כדי להמשיך."
@@ -16600,8 +16653,8 @@ msgid "Global profile"
 msgstr "פרופיל גלובלי"
 
 #. Toggle in the keybinds tab. When on, the shortcut works even when Fluxer is not focused. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:81
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:63
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:83
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:65
 msgid "Global shortcut"
 msgstr "קיצור דרך גלובלי"
 
@@ -17434,6 +17487,11 @@ msgstr "החזק את Shift ולחץ על X כדי לבחור אפליקציות
 msgid "Hold to record. Drag up to lock, or release to send."
 msgstr "החזק כדי להקליט. גרור למעלה כדי לנעול, או שחרר כדי לשלוח."
 
+#. Hint under a system-wide hold shortcut such as push-to-talk on Linux. The desktop ignores the key while other modifier keys are held.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:39
+msgid "Holding Shift, Ctrl or Alt blocks this shortcut. Add alternates in your system settings."
+msgstr "החזקת Shift, Ctrl או Alt חוסמת את קיצור הדרך הזה. הוסף חלופות בהגדרות המערכת שלך."
+
 #. Action label in quick switcher for navigating to the Home tab.
 #: src/features/app/components/layout/MobileBottomNav.tsx:110
 #: src/features/search/state/QuickSwitcherCandidateBuilder.ts:47
@@ -17537,6 +17595,26 @@ msgstr "הידד! ההתראות מופעלות"
 msgid "Hyperlink"
 msgstr "קישור"
 
+#. Instructions for the Hyprland desktop, shown above config lines for hyprland.lua (Hyprland 0.55 and later) and for hyprland.conf (before 0.55). Keep "KEY" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:97
+msgid "Hyprland has no shortcut dialog. Add the lines for your Hyprland version to your Hyprland config and replace KEY with the key you want."
+msgstr "ל-Hyprland אין חלון קיצורי דרך. הוסף את השורות עבור גרסת ה-Hyprland שלך לקובץ התצורה של Hyprland והחלף את KEY במקש הרצוי."
+
+#. Instructions for the Hyprland desktop when the app id is unknown. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:103
+msgid "Hyprland has no shortcut dialog. Bind the keys in your Hyprland config."
+msgstr "ל-Hyprland אין חלון קיצורי דרך. הקצה את המקשים בקובץ התצורה של Hyprland."
+
+#. Label above Hyprland config lines in the older hyprlang format. Keep "hyprland.conf" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:116
+msgid "hyprland.conf (before Hyprland 0.55)"
+msgstr "hyprland.conf (לפני Hyprland 0.55)"
+
+#. Label above Hyprland config lines in the Lua format. Keep "hyprland.lua" exactly as written.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:112
+msgid "hyprland.lua (Hyprland 0.55 and later)"
+msgstr "hyprland.lua (Hyprland 0.55 ואילך)"
+
 #: src/features/auth/flow/RegistrationLegalConsent.tsx:83
 msgid "I agree to the <0>Privacy policy</0>"
 msgstr "אני מסכים/ה ל<0>מדיניות הפרטיות</0>"
@@ -17576,7 +17654,7 @@ msgstr "שיניתי את דעתי"
 
 #. Short label in the voice tab. Keep it concise.
 #: src/features/channel/components/MatureContentChannelGate.tsx:207
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:111
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:113
 msgid "I understand"
 msgstr "אני מבין/ה"
 
@@ -18000,7 +18078,7 @@ msgstr "בערוץ"
 msgid "In \"Operating system\" mode, dictionaries listed above are advisory. {PRODUCT_NAME} will pass these language tags to your OS spellchecker when supported. Tags it doesn't recognize are ignored."
 msgstr "במצב \"מערכת הפעלה\", המילונים המפורטים לעיל הם בגדר המלצה. {PRODUCT_NAME} יעביר את תגי השפה האלה לבודק האיות של מערכת ההפעלה שלך כאשר הדבר נתמך. הוא יתעלם מתגים שאינו מזהה."
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:322
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:324
 msgid "In a browser, push-to-talk only works while the {PRODUCT_NAME} tab is focused. Install the desktop app for system-wide push-to-talk."
 msgstr "בדפדפן, דיבור בלחיצה (push-to-talk) פועל רק כשהכרטיסייה של {PRODUCT_NAME} ממוקדת. התקן את אפליקציית המחשב כדי להשתמש בדיבור בלחיצה בכל המערכת."
 
@@ -18268,30 +18346,8 @@ msgctxt "chat-settings-section"
 msgid "Input"
 msgstr "קלט"
 
-#. Status text after Linux input access setup failed. {productName} is the app name.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:35
-msgid "Input access could not be enabled automatically. Change it manually, then fully quit and restart {productName} so shortcuts can use it."
-msgstr "לא ניתן היה להפעיל גישת קלט באופן אוטומטי. שנה זאת ידנית, ולאחר מכן צא לגמרי מ-{productName} והפעל מחדש כדי שקיצורי הדרך יוכלו להשתמש בה."
-
-#. Description for a Linux Wayland input-access nagbar after automatic permission setup failed. {settingsMenuName} is the shared user settings tab label for shortcuts and {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:26
-msgid "Input access could not be enabled. Try again from {settingsMenuName} settings, then fully quit and restart {productName}."
-msgstr "לא ניתן היה להפעיל גישת קלט. נסה שוב מהגדרות {settingsMenuName}, ולאחר מכן צא לגמרי מ-{productName} והפעל מחדש."
-
-#. Settings warning for Linux Wayland system-wide shortcuts. {productName} is the app name.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:18
-msgid "Input access is required for system-wide keyboard and mouse shortcuts on Wayland. After changing input access, fully quit and restart {productName} so shortcuts can use it."
-msgstr "נדרשת גישה לקלט עבור קיצורי מקלדת ועכבר כלל-מערכתיים ב-Wayland. לאחר שינוי גישת הקלט, צא לגמרי מ-{productName} והפעל מחדש כדי שקיצורי הדרך יוכלו להשתמש בה."
-
-#. Description for a Linux Wayland input-access nagbar after access was changed. {productName} is the app name.
-#. Status text after Linux input access was changed. {productName} is the app name.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:21
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:31
-msgid "Input access was changed. Fully quit and restart {productName} so system-wide shortcuts can use it."
-msgstr "גישת הקלט שונתה. צא לגמרי מ-{productName} והפעל מחדש כדי שקיצורי דרך כלל-מערכתיים יוכלו להשתמש בה."
-
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:180
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:182
 msgid "Input and output"
 msgstr "קלט ופלט"
 
@@ -18450,7 +18506,7 @@ msgid "Invalid authorization request"
 msgstr "בקשת הרשאה לא תקינה"
 
 #. OAuth authorize page error shown when the permissions query parameter is not a valid integer.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:63
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:64
 msgid "Invalid bot permissions."
 msgstr "הרשאות בוט לא תקינות."
 
@@ -18493,14 +18549,14 @@ msgid "Invalid or expired code. Try again."
 msgstr "קוד שגוי או שפג תוקפו. נסה שוב."
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:79
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:80
 msgid "Invalid redirect_uri"
 msgstr "כתובת הניתוב מחדש (redirect_uri) אינה תקינה"
 
 #. Title on the mature content check callback page when the callback status is invalid.
 #: src/features/auth/components/pages/MatureContentCheckCallbackPage.tsx:27
 #: src/features/connection/components/pages/ConnectionCallbackPage.tsx:56
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:269
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:78
 msgid "Invalid status"
 msgstr "סטטוס לא תקין"
 
@@ -18597,7 +18653,7 @@ msgid "Invite link is hidden while sharing:"
 msgstr "קישור ההזמנה מוסתר בזמן שיתוף:"
 
 #. Inline replacement text shown for invite links while streaming privacy is active.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:165
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:168
 msgid "Invite link masked while sharing"
 msgstr "קישור ההזמנה מוסתר בזמן שיתוף"
 
@@ -19011,7 +19067,7 @@ msgid "Jump to {displayName}"
 msgstr "קפוץ אל {displayName}"
 
 #. Accessible label for an inline channel mention link. labelText is the channel display name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:111
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:114
 msgid "Jump to {labelText}"
 msgstr "קפוץ אל {labelText}"
 
@@ -19068,12 +19124,12 @@ msgid "Jump to the current call"
 msgstr "קפיצה לשיחה הנוכחית"
 
 #. Fallback accessible label for an inline channel mention when the target name is not known.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:115
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:118
 msgid "Jump to the linked channel"
 msgstr "קפוץ לערוץ המקושר"
 
 #. Fallback accessible label for an inline message link when the target channel is not known.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:107
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:110
 msgid "Jump to the linked message"
 msgstr "קפוץ להודעה המקושרת"
 
@@ -19083,7 +19139,7 @@ msgid "Jump to the message from {authorNickname}"
 msgstr "קפוץ להודעה של {authorNickname}"
 
 #. Accessible label for an inline message link that jumps to a specific message in a channel. labelText is the channel display name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:102
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:105
 msgid "Jump to the message in {labelText}"
 msgstr "קפוץ להודעה ב-{labelText}"
 
@@ -19167,7 +19223,7 @@ msgid "Keep these safe. Regenerating will break existing integrations."
 msgstr "שמור עליהם במקום בטוח. יצירה מחדש תשבור אינטגרציות קיימות."
 
 #. Description for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:82
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:84
 msgid "Keep transmitting briefly after release."
 msgstr "המשך לשדר לזמן קצר לאחר השחרור."
 
@@ -19203,6 +19259,11 @@ msgstr "מקלדת"
 msgctxt "accessibility-settings-section"
 msgid "Keyboard"
 msgstr "מקלדת"
+
+#. Linux warning when direct input device access is on but reading the keyboard failed. Not related to the "Direct input" voice processing profile. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:193
+msgid "Keyboard access couldn't start. Shortcuts only work while {productName} is focused."
+msgstr "לא ניתן היה להפעיל את הגישה למקלדת. קיצורי הדרך פועלים רק כאשר {productName} ממוקד."
 
 #. Toggle label and settings search entry for controlling tooltip keyboard shortcut hints.
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:46
@@ -19577,6 +19638,16 @@ msgstr "אפשר לקהילה לנהל את עצמה"
 msgid "Let the member hear others in this community again"
 msgstr "מתן אפשרות לחבר לשמוע שוב אחרים בקהילה זו"
 
+#. Description for the Linux direct input device access switch while it is on, on a desktop that can also run system-wide shortcuts itself (KDE, GNOME, Hyprland). {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:166
+msgid "Lets {productName} read your keyboard directly. Turn this off to set up shortcuts through your desktop instead."
+msgstr "מאפשר ל-{productName} לקרוא את המקלדת שלך ישירות. כבה את האפשרות הזו כדי להגדיר קיצורי דרך באמצעות שולחן העבודה שלך במקום זאת."
+
+#. Description for the Linux direct input device access switch. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:162
+msgid "Lets {productName} read your keyboard directly. Your system already allows this."
+msgstr "מאפשר ל-{productName} לקרוא את המקלדת שלך ישירות. המערכת שלך כבר מאפשרת זאת."
+
 #: src/features/theme_studio/sections/ThemeStudioSettingsSection.tsx:259
 msgid "Lets custom CSS reveal transparent window regions after restarting the desktop app."
 msgstr "מאפשר ל-CSS מותאם אישית לחשוף אזורים שקופים בחלון לאחר הפעלה מחדש של אפליקציית המחשב."
@@ -19760,7 +19831,7 @@ msgid "Link styling"
 msgstr "עיצוב קישורים"
 
 #. Title of the alert shown when clicking an internal link that is not available to the current account.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:157
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:160
 msgid "Link unavailable"
 msgstr "הקישור אינו זמין"
 
@@ -19978,11 +20049,6 @@ msgstr "פורמט שעה מקומי"
 msgid "Localization"
 msgstr "לוקליזציה"
 
-#. Error modal body shown when the localized card pre-approval session cannot be started.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:208
-msgid "Localized card verification is not available right now. Try again later."
-msgstr "אימות כרטיס מקומי אינו זמין כעת. נסה שוב מאוחר יותר."
-
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:194
 #: src/features/user/components/modals/tabs/DevicesTab.tsx:151
 msgid "Location"
@@ -20036,7 +20102,7 @@ msgid "Look and feel"
 msgstr "מראה ותחושה"
 
 #. placeholder {0}: externalProcessor.name
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:671
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:678
 msgid "Looks like you're using {0}. Stacking {PRODUCT_NAME}'s processing on top can cause pumping or distortion. Direct input passes your audio through untouched."
 msgstr "נראה שאתה משתמש ב-{0}. הוספת עיבוד של {PRODUCT_NAME} עלולה לגרום לעיוות או להגברת יתר. קלט ישיר מעביר את השמע שלך ללא שינוי."
 
@@ -21144,7 +21210,7 @@ msgid "Message layout"
 msgstr "פריסת הודעות"
 
 #. Type chip suffix in tooltips for inline rendered message links. Lowercase because it follows the channel name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:92
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:95
 msgid "message link"
 msgstr "קישור להודעה"
 
@@ -21332,7 +21398,7 @@ msgstr "מיקרופון"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:188
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:190
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:142
 msgid "Mic test"
 msgstr "בדיקת מיקרופון"
@@ -21472,7 +21538,7 @@ msgid "Miscellaneous"
 msgstr "שונות"
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:37
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:38
 msgid "Missing client_id"
 msgstr "חסר client_id"
 
@@ -21690,7 +21756,7 @@ msgid "More options"
 msgstr "אפשרויות נוספות"
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:59
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:61
 msgid "More shortcut options"
 msgstr "אפשרויות נוספות לקיצורי דרך"
 
@@ -22672,7 +22738,7 @@ msgid "No {sendMessagesPermission} permission"
 msgstr "אין הרשאת {sendMessagesPermission}"
 
 #. Inline text shown inside a custom message link pill when the linked message cannot be accessed.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:145
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:148
 msgid "No access"
 msgstr "אין גישה"
 
@@ -22984,7 +23050,7 @@ msgstr "לא נמצאו התאמות"
 msgid "No mentions yet"
 msgstr "אין אזכורים עדיין"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:541
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:548
 msgid "No microphone found"
 msgstr "לא נמצא מיקרופון"
 
@@ -23134,7 +23200,7 @@ msgid "No settings found"
 msgstr "לא נמצאו הגדרות"
 
 #. Empty-state text in the keyboard shortcuts keybind recorder.
-#: src/features/input/components/KeybindRecorder.tsx:36
+#: src/features/input/components/KeybindRecorder.tsx:44
 msgid "No shortcut set"
 msgstr "לא הוגדר קיצור דרך"
 
@@ -23357,6 +23423,11 @@ msgstr "לא מספר שלם"
 #: src/features/app/components/setup/SetupWizardSteps.tsx:395
 msgid "Not accepted"
 msgstr "לא התקבלה"
+
+#. Shown instead of a key when the desktop has no key assigned to a system-wide shortcut.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:79
+msgid "Not assigned"
+msgstr "לא הוקצה"
 
 #. Fallback value when a saved billing payment method has no expiration date.
 #. Screen reader text for a cross in the Plutonium page comparison table.
@@ -23858,12 +23929,12 @@ msgid "Open {host} in your browser."
 msgstr "פתח את {host} בדפדפן שלך."
 
 #. Accessible label for an inline chat link pill that opens an app page such as Discovery. labelText is the page name.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:124
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:127
 msgid "Open {labelText}"
 msgstr "פתח את {labelText}"
 
 #. Accessible label for an inline settings deep-link pill. labelText is the resolved settings tab and section breadcrumb.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:119
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:122
 msgid "Open {labelText} in settings"
 msgstr "פתח את {labelText} בהגדרות"
 
@@ -24469,11 +24540,6 @@ msgstr "אחר"
 msgid "Other devices"
 msgstr "מכשירים אחרים"
 
-#. Plutonium checkout pre-approval prompt secondary button. Opens the alternative payment methods flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:75
-msgid "Other methods"
-msgstr "שיטות אחרות"
-
 #. Privacy note in profile timezone settings. Preserve {timezoneIdentifierExample}; it is inserted by code as an IANA timezone identifier example. productName is the app name. Users should understand that only the UTC offset is shown to other people.
 #: src/features/user/components/modals/tabs/my_profile_tab/TimezoneProfileSettings.tsx:49
 msgid "Other people can only see your current UTC offset when you choose to share profile local time. They do not see your exact time zone identifier, such as {timezoneIdentifierExample}. {productName} stores that identifier only so the offset can update automatically when daylight saving time changes."
@@ -24611,7 +24677,7 @@ msgid "Page down"
 msgstr "Page Down"
 
 #. Role description announced for an inline chat link pill that opens an app page. Lowercase.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:129
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:132
 msgid "page link"
 msgstr "קישור לדף"
 
@@ -24868,16 +24934,16 @@ msgid "Pay once and get a gift link to share. Gifts never renew."
 msgstr "שלם פעם אחת וקבל קישור מתנה לשתף. מתנות לעולם אינן מתחדשות."
 
 #. Plutonium subscription payment method picker description for Brazil. Explains Pix recurring vs falling back to a card.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:40
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:39
 msgid "Pay with {pixPaymentMethod} Automático to authorize recurring charges directly from your Brazilian bank. Or choose \"Use card\" to enter a credit card on {paymentProviderName}'s next screen."
 msgstr "שלם באמצעות {pixPaymentMethod} Automático כדי לאשר חיובים חוזרים ישירות מהבנק הברזילאי שלך. לחלופין, בחר באפשרות \"שימוש בכרטיס\" כדי להזין כרטיס אשראי במסך הבא של {paymentProviderName}."
 
 #. Plutonium subscription payment method picker description for India. Explains UPI e-mandate vs falling back to a card.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:50
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:49
 msgid "Pay with {upiPaymentMethod} to set up an RBI-compliant e-mandate from your Indian bank. Or choose \"Use card\" to enter a credit card on {paymentProviderName}'s next screen."
 msgstr "שלם באמצעות {upiPaymentMethod} כדי להגדיר הוראת קבע אלקטרונית תואמת RBI מהבנק ההודי שלך. לחלופין, בחר באפשרות \"שימוש בכרטיס\" כדי להזין כרטיס אשראי במסך הבא של {paymentProviderName}."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:149
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:50
 msgid "Payment canceled"
 msgstr "התשלום בוטל"
 
@@ -24886,7 +24952,7 @@ msgstr "התשלום בוטל"
 msgid "Payment method"
 msgstr "אמצעי תשלום"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:136
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:37
 msgid "Payment successful"
 msgstr "התשלום בוצע בהצלחה"
 
@@ -25611,11 +25677,11 @@ msgstr "נוכחות"
 msgid "Press {shortcut} to react"
 msgstr "הקש {shortcut} כדי להגיב"
 
-#: src/features/input/components/KeybindRecorder.tsx:381
+#: src/features/input/components/KeybindRecorder.tsx:421
 msgid "Press a key, mouse button, or gamepad button to bind. Escape cancels."
 msgstr "לחץ על מקש, לחצן עכבר או לחצן בקר משחק כדי להגדיר את הקיצור. מקש Escape מבטל."
 
-#: src/features/input/components/KeybindRecorder.tsx:407
+#: src/features/input/components/KeybindRecorder.tsx:447
 msgid "Press a shortcut…"
 msgstr "יש ללחוץ על קיצור דרך…"
 
@@ -25772,7 +25838,7 @@ msgid "Pricing"
 msgstr "תמחור"
 
 #. Error modal body shown when the user clicks a plan before price IDs have loaded.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:182
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:142
 msgid "Pricing is still loading."
 msgstr "המחירים עדיין נטענים."
 
@@ -26169,17 +26235,17 @@ msgid "Purchased gifts"
 msgstr "מתנות שנרכשו"
 
 #. Modal body shown on a self-hosted instance when purchases are disabled for the account.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:152
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:112
 msgid "Purchases are disabled for this account."
 msgstr "הרכישות מושבתות עבור חשבון זה."
 
 #. Modal body shown when purchases are disabled. Provides the support email for appeals.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:148
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:108
 msgid "Purchases are disabled for this account. Contact {supportEmail} if this looks wrong."
 msgstr "הרכישות מושבתות עבור חשבון זה. צור קשר עם {supportEmail} אם נראה לך שזו טעות."
 
 #. Modal title shown when purchases are disabled on this account (server-side enforcement).
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:144
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:104
 msgid "Purchases unavailable"
 msgstr "רכישות אינן זמינות"
 
@@ -26273,18 +26339,33 @@ msgid "Push to talk key"
 msgstr "מקש 'דיבור בלחיצה'"
 
 #. Switch label in the voice tab toggling push-to-talk mode. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:115
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:361
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:117
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:360
 #: src/features/voice/components/VoiceSettingsMenus.tsx:419
 msgid "Push-to-talk"
 msgstr "דיבור בלחיצה"
 
 #. Short label in the voice tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:103
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:105
 msgid "Push-to-talk (limited)"
 msgstr "דיבור בלחיצה (מוגבל)"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:701
+#. Voice settings warning on GNOME when the desktop has no key assigned to push-to-talk. Keep "Settings" and "Apps" as the GNOME menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:243
+msgid "Push-to-talk has no system-wide key yet. To set one, go to Settings > Apps > {productName}."
+msgstr "לדיבור בלחיצה עדיין אין מקש כלל-מערכתי. כדי להגדיר מקש, עבור אל הגדרות > יישומים > {productName}."
+
+#. Voice settings warning on KDE Plasma when the desktop has no key assigned to push-to-talk. Keep "System Settings", "Keyboard" and "Shortcuts" as the KDE menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:237
+msgid "Push-to-talk has no system-wide key yet. To set one, go to System Settings > Keyboard > Shortcuts > {productName}."
+msgstr "לדיבור בלחיצה עדיין אין מקש כלל-מערכתי. כדי להגדיר מקש, עבור אל הגדרות מערכת > מקלדת > קיצורי דרך > {productName}."
+
+#. Voice settings warning on an unrecognized Linux desktop when the desktop has no key assigned to push-to-talk.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:248
+msgid "Push-to-talk has no system-wide key yet. To set one, open your desktop's keyboard shortcut settings."
+msgstr "לדיבור בלחיצה עדיין אין מקש כלל-מערכתי. כדי להגדיר מקש, פתח את הגדרות קיצורי המקלדת של שולחן העבודה שלך."
+
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:708
 msgid "Push-to-talk is ignored in direct input. Switch to focused voice or custom to use it."
 msgstr "דיבור בלחיצה אינו פעיל בקלט ישיר. עבור לקול ממוקד או למצב מותאם אישית כדי להשתמש בו."
 
@@ -26293,20 +26374,50 @@ msgstr "דיבור בלחיצה אינו פעיל בקלט ישיר. עבור ל
 msgid "Push-to-talk is on. Hold {pushToTalkHint} to speak."
 msgstr "הדיבור בלחיצה מופעל. החזק את {pushToTalkHint} כדי לדבר."
 
+#. Tooltip and screen reader label on the mic button when push-to-talk is on but the key has no name to show, for example when the Linux desktop assigns it.
+#: src/features/input/utils/PushToTalkHint.ts:11
+msgid "Push-to-talk is on. Hold your push-to-talk key to speak."
+msgstr "הדיבור בלחיצה מופעל. החזק את מקש הדיבור בלחיצה כדי לדבר."
+
+#. Voice settings warning on Linux when the desktop dialog for system-wide shortcuts was dismissed or failed. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:226
+msgid "Push-to-talk only works while {productName} is focused because your desktop didn't set up system-wide shortcuts."
+msgstr "דיבור בלחיצה פועל רק כאשר {productName} ממוקד, כי שולחן העבודה שלך לא הגדיר קיצורי דרך כלל-מערכתיים."
+
 #. Voice settings warning shown when macOS Input Monitoring is required for system-wide push-to-talk. {productName} is the app name and {permissionName} is the macOS permission name.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:135
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:137
 msgid "Push-to-talk only works while {productName} is focused until {permissionName} is enabled. After changing the permission, fully quit and restart {productName} so system-wide hotkeys can use it."
 msgstr "דיבור בלחיצה פועל רק כש-{productName} ממוקד, עד שההרשאה {permissionName} מופעלת. לאחר שינוי ההרשאה, יש לצאת מ-{productName} לחלוטין ולהפעיל אותו מחדש כדי שקיצורי מקשים כלל-מערכתיים יוכלו להשתמש בה."
 
+#. Voice settings warning on Linux before system-wide shortcuts are set up. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:222
+msgid "Push-to-talk only works while {productName} is focused until you set up system-wide shortcuts."
+msgstr "עד שתגדיר קיצורי דרך כלל-מערכתיים, דיבור בלחיצה פועל רק כאשר {productName} ממוקד."
+
 #. Voice settings warning shown when push-to-talk is enabled in a browser.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:131
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:133
 msgid "Push-to-talk only works while the browser tab is focused."
 msgstr "דיבור בלחיצה עובד רק כשהכרטיסייה בדפדפן ממוקדת."
+
+#. Linux warning next to the direct input device access switch when push-to-talk only has a key assigned by the desktop. With direct input on, only the push-to-talk key set in the app works, and without one the microphone sends whenever you speak. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:187
+msgid "Push-to-talk will use the key you set in {productName}. Set one first, or your microphone will use voice activity."
+msgstr "דיבור בלחיצה ישתמש במקש שהגדרת ב-{productName}. הגדר מקש קודם, אחרת המיקרופון שלך יפעל לפי פעילות קולית."
 
 #. Modal description shown when a push-to-talk shortcut is pressed while the user is self-deafened.
 #: src/features/app/keybindings/keybind_manager/shared.ts:22
 msgid "Push-to-talk won't unmute your microphone while you're deafened. Undeafen yourself to talk."
 msgstr "דיבור בלחיצה לא יבטל את השתקת המיקרופון כל עוד השמע שלך מושתק. בטל את השתקת השמע כדי לדבר."
+
+#. Voice settings note on the Hyprland desktop when the app id is unknown. The config is hyprland.lua on Hyprland 0.55 and later, hyprland.conf before. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:259
+msgid "Push-to-talk works outside {productName} only after you bind it in your Hyprland config."
+msgstr "דיבור בלחיצה פועל מחוץ ל-{productName} רק אחרי שתקצה לו מקש בקובץ התצורה של Hyprland."
+
+#. Voice settings note on the Hyprland desktop, shown above config lines for hyprland.lua (Hyprland 0.55 and later) and for hyprland.conf (before 0.55). Keep "KEY" exactly as written. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:253
+msgid "Push-to-talk works outside {productName} only after you bind it in your Hyprland config. Add the line for your Hyprland version and replace KEY with the key you want."
+msgstr "דיבור בלחיצה פועל מחוץ ל-{productName} רק אחרי שתקצה לו מקש בקובץ התצורה של Hyprland. הוסף את השורה עבור גרסת Hyprland שלך והחלף את KEY במקש הרצוי."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the theme studio. Keep it concise.
@@ -26406,7 +26517,7 @@ msgid "Raw embed JSON"
 msgstr "JSON גולמי של ההטמעה"
 
 #. Button or menu action label in the keybinds tab. Turns a disabled built-in shortcut back on. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:50
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:52
 msgid "Re-enable built-in shortcut"
 msgstr "הפעלה מחדש של קיצור דרך מובנה"
 
@@ -26565,13 +26676,6 @@ msgstr "אזכורים אחרונים"
 msgid "Recent searches"
 msgstr "חיפושים אחרונים"
 
-#. Button label in the Linux Wayland input-access nagbar after the user changes OS permissions.
-#. Button label in the keybind settings system-wide shortcuts section.
-#: src/features/app/components/layout/app_layout/nagbars/LinuxInputAccessNagbar.tsx:36
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:27
-msgid "Recheck"
-msgstr "בדוק שוב"
-
 #. placeholder {0}: ChannelUtils.getIcon(channel, {size: 16, className: styles.channelIcon})
 #. placeholder {1}: channel.name
 #: src/features/invite/components/modals/InviteModal.tsx:360
@@ -26586,7 +26690,7 @@ msgid "Recommended"
 msgstr "מומלץ"
 
 #. Description for the focused voice profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:86
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:88
 msgid "Recommended. Cleans up your mic for clear speech."
 msgstr "מומלץ. מנקה את המיקרופון שלך לדיבור ברור."
 
@@ -26600,6 +26704,11 @@ msgstr "התחבר מחדש"
 msgid "Reconnect succeeded. Pick a screen again if you want to resume your previous stream."
 msgstr "ההתחברות מחדש הצליחה. בחר מסך שוב אם ברצונך להמשיך את השידור הקודם."
 
+#. Status text on Linux while the app reconnects to the desktop service that runs system-wide shortcuts, for example after it restarted.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:48
+msgid "Reconnecting to your desktop…"
+msgstr "מתחבר מחדש לשולחן העבודה שלך…"
+
 #. Overlay status in the voice call view while reconnecting after a drop. Trailing ellipsis indicates in-progress.
 #: src/features/voice/components/VoiceCallView.tsx:94
 msgid "Reconnecting..."
@@ -26611,7 +26720,7 @@ msgid "Reconnecting…"
 msgstr "מתחבר מחדש…"
 
 #. Short label in the keyboard shortcuts keybind recorder. Keep it concise.
-#: src/features/input/components/KeybindRecorder.tsx:28
+#: src/features/input/components/KeybindRecorder.tsx:36
 msgid "Record shortcut"
 msgstr "הקלט קיצור דרך"
 
@@ -26851,7 +26960,7 @@ msgstr "יחסי"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label for push-to-talk release delay.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:78
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:80
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:94
 msgid "Release delay"
 msgstr "השהיית שחרור"
@@ -27739,13 +27848,13 @@ msgstr "נשלח שוב"
 
 #: src/features/app/components/dialogs/shared/UnsavedChangesBannerContent.tsx:51
 #: src/features/app/components/floating/ColorPickerPopover.tsx:190
-#: src/features/input/components/KeybindRecorder.tsx:459
+#: src/features/input/components/KeybindRecorder.tsx:499
 #: src/features/messaging/components/modals/ImageCropModal.tsx:1022
 msgid "Reset"
 msgstr "איפוס"
 
 #. Button or menu action label in the keybinds tab. Keep it concise. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:45
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:47
 msgid "Reset \"{label}\" to built-in"
 msgstr "איפוס \"{label}\" לברירת מחדל"
 
@@ -27866,7 +27975,7 @@ msgid "Reset to actual values"
 msgstr "איפוס לערכים בפועל"
 
 #. Button or menu action label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:37
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:39
 msgid "Reset to built-in"
 msgstr "איפוס לברירת מחדל"
 
@@ -29509,7 +29618,7 @@ msgid "Select the account you want to sign in with on your new device."
 msgstr "בחר את החשבון שברצונך להתחבר איתו במכשיר החדש שלך."
 
 #. Aria label for the voice processing radio group in the voice settings tab. Keep it concise.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:123
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:125
 msgid "Select voice processing mode"
 msgstr "בחר מצב עיבוד קולי"
 
@@ -29814,7 +29923,7 @@ msgid "Sends raw mic audio with no processing."
 msgstr "שולח אודיו גולמי מהמיקרופון ללא עיבוד."
 
 #. Description for the direct input profile option in the voice tab.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:90
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:92
 msgid "Sends your audio untouched. Best if you're using external audio software."
 msgstr "שולח את האודיו שלך ללא שינוי. מומלץ אם אתה משתמש בתוכנת אודיו חיצונית."
 
@@ -29913,12 +30022,12 @@ msgid "Set by the {preset} preset. Picking a value here switches to Custom."
 msgstr "מוגדר על ידי קביעת התצורה של {preset}. בחירת ערך כאן תעבור ל'מותאם אישית'."
 
 #. Short label in the keybinds tab. Keep it concise.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:29
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:31
 msgid "Set custom shortcut"
 msgstr "הגדר קיצור דרך מותאם אישית"
 
 #. Label in the keybinds tab. Preserve {label}; it is inserted by code.
-#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:55
+#: src/features/user/components/modals/tabs/keybinds_tab/DefaultShortcutRow.tsx:57
 msgid "Set custom shortcut for \"{label}\""
 msgstr "הגדר קיצור דרך מותאם אישית עבור \"{label}\""
 
@@ -30066,6 +30175,11 @@ msgstr "הגדרת אזור הקול ל-{region}"
 msgid "Set the voice region to automatic"
 msgstr "הגדרת אזור הקול לאוטומטי"
 
+#. Button that asks the Linux desktop to register system-wide shortcuts for the app. Keep it short.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:40
+msgid "Set up"
+msgstr "הגדרה"
+
 #. Title for the self-host setup wizard modal.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx:74
 msgid "Set up {productName}"
@@ -30118,7 +30232,7 @@ msgid "Settings"
 msgstr "הגדרות"
 
 #. Type chip suffix in tooltips for inline rendered fluxer://settings/user deep links. Lowercase.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:133
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:136
 msgid "settings link"
 msgstr "קישור להגדרות"
 
@@ -30330,8 +30444,8 @@ msgstr "קודי קיצור"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
-#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:121
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:376
+#: src/features/user/components/modals/tabs/keybinds_tab/CustomKeybindRow.tsx:123
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:375
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts:38
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts:110
 msgid "Shortcut"
@@ -31493,7 +31607,7 @@ msgstr "משהו השתבש בזמן טעינת יומן הפעילות."
 #. Body of the error modal shown when opening the billing customer portal from the grace-period nagbar fails.
 #. Body of the error modal shown when opening the billing customer portal from the premium-expired nagbar fails.
 #. Body of the generic fallback error modal shown when opening the billing customer portal fails.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:36
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:35
 #: src/features/app/components/dialogs/components/plutonium/hooks/useSubscriptionActions.ts:18
 #: src/features/app/components/layout/app_layout/nagbars/PremiumExpiredNagbar.tsx:34
 #: src/features/app/components/layout/app_layout/nagbars/PremiumGracePeriodNagbar.tsx:34
@@ -31533,7 +31647,7 @@ msgid "Something went wrong while sending your verification email. Please try ag
 msgstr "משהו השתבש במהלך שליחת אימייל האימות שלך. יש לנסות שוב בעוד רגע."
 
 #. Body of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:172
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:132
 msgid "Something went wrong while starting checkout. Please try again in a moment."
 msgstr "משהו השתבש במהלך התחלת התשלום. יש לנסות שוב בעוד רגע."
 
@@ -32530,16 +32644,6 @@ msgstr "הסרת מעקב"
 msgid "Strip tracking parameters from URLs"
 msgstr "הסרת פרמטרי מעקב מכתובות URL"
 
-#. Premium checkout error shown when Stripe cannot verify a card for localized pricing. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:34
-msgid "Stripe could not verify this card for localized pricing. Use another card, or return to {productName} and choose another payment method."
-msgstr "Stripe לא הצליחה לאמת את הכרטיס הזה עבור תמחור מקומי. השתמש בכרטיס אחר, או חזור אל {productName} ובחר אמצעי תשלום אחר."
-
-#. Premium checkout error shown when card country does not match billing country. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:22
-msgid "Stripe reported a card issued in {countryName}. To pay in this localized currency, use a card issued in your billing country, or return to {productName} and choose another payment method."
-msgstr "Stripe דיווחה על כרטיס שהונפק ב-{countryName}. כדי לשלם במטבע המקומי, השתמש בכרטיס שהונפק במדינת החיוב שלך, או חזור אל {productName} ובחר אמצעי תשלום אחר."
-
 #. Codec description in the screen share codec policy menu. Technical surface; keep Chromium as a literal proper noun.
 #: src/features/voice/utils/ScreenShareCodecPolicy.ts:15
 msgid "Strong quality at moderate CPU cost. Good Chromium fallback for screen sharing."
@@ -32586,7 +32690,7 @@ msgid "Subscription"
 msgstr "מנוי"
 
 #. Modal title shown when checkout is blocked because the account already has an active Plutonium subscription.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:127
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:87
 msgid "Subscription already exists"
 msgstr "המנוי כבר קיים"
 
@@ -32759,7 +32863,7 @@ msgstr "החלף לפריסה נוחה"
 msgid "Switch to dense layout"
 msgstr "החלף לפריסה דחוסה"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:666
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:673
 msgid "Switch to direct input"
 msgstr "החלף לקלט ישיר"
 
@@ -33027,9 +33131,24 @@ msgid "System-managed install"
 msgstr "התקנה מנוהלת על ידי המערכת"
 
 #. Settings subsection title for keyboard and mouse shortcuts that work outside the app.
-#: src/features/user/components/modals/tabs/components/LinuxInputAccessSection.tsx:14
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:24
 msgid "System-wide shortcuts"
 msgstr "קיצורי דרך כלל-מערכתיים"
+
+#. Linux settings text when setting up system-wide shortcuts failed.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:148
+msgid "System-wide shortcuts could not be set up."
+msgstr "לא ניתן היה להגדיר קיצורי דרך כלל-מערכתיים."
+
+#. Hint under a shortcut on Linux showing the key the desktop assigned. {trigger} is the key, as named by the desktop.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:30
+msgid "System-wide: {trigger}"
+msgstr "כלל-מערכתי: {trigger}"
+
+#. Hint under a shortcut on Linux when the desktop has no key assigned for it system-wide.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:35
+msgid "System-wide: Not assigned"
+msgstr "כלל-מערכתי: לא הוקצה"
 
 #. Description text in the theme tab content.
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:58
@@ -33612,12 +33731,12 @@ msgid "The page you're looking for doesn't exist or has been moved."
 msgstr "הדף שחיפשת אינו קיים או הועבר."
 
 #. OAuth authorize page error shown when the redirect_uri is not registered for this OAuth app.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:59
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:60
 msgid "The provided redirect_uri is not registered for this application."
 msgstr "כתובת ה-redirect_uri שצוינה אינה רשומה עבור האפליקציה הזו."
 
 #. Body text in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:50
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:51
 msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "ה-redirect_uri שסופק חייב להשתמש ב-HTTP או ב-HTTPS."
 
@@ -33850,7 +33969,7 @@ msgid "This animation is too long or too large to crop. Try a shorter or smaller
 msgstr "האנימציה הזו ארוכה מדי או גדולה מדי לחיתוך. נסה קובץ קצר או קטן יותר."
 
 #. Short label in the authentication authorize flow. Keep the tone plain and specific.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:83
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:84
 msgid "This application"
 msgstr "האפליקציה הזו"
 
@@ -33860,7 +33979,7 @@ msgid "This attachment has expired"
 msgstr "פג תוקפו של הקובץ המצורף"
 
 #. OAuth authorize page error shown when a private bot cannot be added by non-owners.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:71
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:72
 msgid "This bot is not public and cannot be added by other users."
 msgstr "הבוט הזה אינו ציבורי ולא ניתן להוסיף אותו על ידי משתמשים אחרים."
 
@@ -33893,11 +34012,6 @@ msgstr "שיחה זו מוצפנת מקצה לקצה."
 #: src/features/user/components/modals/tabs/applications_tab/ApplicationDetail.tsx:699
 msgid "This cannot be undone. Removing the application also deletes its bot."
 msgstr "לא ניתן לבטל פעולה זו. הסרת האפליקציה תמחק גם את הבוט שלה."
-
-#. Premium checkout error shown when card country does not match billing country and Stripe did not provide the issuing country. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:28
-msgid "This card does not match your billing country, so it cannot be used for this localized currency. Use a local card, or return to {productName} and choose another payment method."
-msgstr "הכרטיס הזה אינו תואם למדינת החיוב שלך, ולכן לא ניתן להשתמש בו עבור המטבע המקומי הזה. השתמש בכרטיס מקומי, או חזור אל {productName} ובחר אמצעי תשלום אחר."
 
 #. Modal body shown when a category cannot accept another channel because the per-category limit is reached. Limit is interpolated.
 #: src/features/app/components/layout/ChannelListContent.tsx:83
@@ -34080,6 +34194,16 @@ msgstr "שיחה זו אינה זמינה עוד."
 #: src/features/updater/commands/UpdaterModalCommands.tsx:69
 msgid "This desktop build cannot install updates inside {productName}. Download the latest desktop installer instead."
 msgstr "גרסת שולחן העבודה הזו לא יכולה להתקין עדכונים בתוך {productName}. במקום זאת, הורד את הגרסה האחרונה של תוכנת ההתקנה לשולחן העבודה."
+
+#. Voice settings warning on Linux desktops without system-wide shortcut support. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:232
+msgid "This desktop doesn't offer system-wide shortcuts. Push-to-talk only works while {productName} is focused."
+msgstr "שולחן עבודה זה אינו תומך בקיצורי דרך כלל-מערכתיים. דיבור בלחיצה פועל רק כאשר {productName} ממוקד."
+
+#. Linux settings text when the desktop has no system-wide shortcut support. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:144
+msgid "This desktop doesn't offer system-wide shortcuts. Shortcuts still work while {productName} is focused."
+msgstr "שולחן עבודה זה אינו תומך בקיצורי דרך כלל-מערכתיים. קיצורי הדרך עדיין פועלים כאשר {productName} ממוקד."
 
 #. Desktop updater modal body for development or unpackaged builds.
 #: src/features/updater/commands/UpdaterModalCommands.tsx:65
@@ -34294,6 +34418,11 @@ msgstr "זהו מפתח הגישה האחרון שלך, ומפתחות גישה 
 msgid "This is your last passkey. Once it's gone you won't be able to use a passkey as your second factor."
 msgstr "זהו מפתח הגישה האחרון שלך. לאחר שיימחק, לא תוכל להשתמש במפתח גישה כשלב האימות השני שלך."
 
+#. Hint under the push-to-talk key recorder in voice settings on Linux when the desktop owns system-wide shortcuts. {settingsTabName} is the name of the settings tab with keyboard shortcuts and {sectionName} the title of its system-wide shortcuts section, both filled in by the app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:24
+msgid "This key works while {productName} is focused. Your desktop sets the system-wide key, under {settingsTabName} > {sectionName}."
+msgstr "המקש הזה פועל כאשר {productName} ממוקד. את המקש הכלל-מערכתי מגדיר שולחן העבודה שלך, תחת {settingsTabName} > {sectionName}."
+
 #. Extra file-too-large alert sentence shown when premium upload-limit upgrades are unavailable.
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx:39
 msgid "This limit is configured by your instance administrator."
@@ -34305,7 +34434,7 @@ msgid "This link channel is marked for mature content and may open material that
 msgstr "ערוץ קישור זה מסומן ככולל תוכן למבוגרים ועשוי להכיל חומר שאינו הולם עבור חלק מהמשתמשים."
 
 #. Body of the link-unavailable alert.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:161
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:164
 msgid "This link is not available for your account."
 msgstr "הקישור הזה אינו זמין לחשבון שלך."
 
@@ -34401,7 +34530,7 @@ msgid "This picker is only available in the desktop app."
 msgstr "בורר זה זמין רק באפליקציית המחשב."
 
 #. Error modal body shown when the selected Plutonium plan has no price ID configured.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:186
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:146
 msgid "This plan isn't available. Contact support."
 msgstr "התוכנית הזו אינה זמינה. יש ליצור קשר עם התמיכה."
 
@@ -34536,11 +34665,6 @@ msgstr "המשתמש הזה כבר לא קיים. רענן ונסה שוב."
 #: src/features/channel/components/guild_members_page/MemberTableRow.tsx:65
 msgid "This user was force-added to this community by a platform administrator."
 msgstr "משתמש זה נוסף בכפייה לקהילה על ידי מנהל פלטפורמה."
-
-#. Premium checkout error shown when card verification expires before checkout. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:40
-msgid "This verification session expired. Return to {productName} and start checkout again."
-msgstr "תוקף סשן האימות פג. יש לחזור אל {productName} ולהתחיל את תהליך התשלום מחדש."
 
 #. Body of the voice-channel-full modal.
 #: src/features/voice/components/alerts/VoiceChannelFullModal.tsx:12
@@ -34777,6 +34901,21 @@ msgstr "שורת כותרת"
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperOptionLabels.ts:252
 msgid "Title bar platform"
 msgstr "פלטפורמת שורת הכותרת"
+
+#. Instructions for GNOME. Keep "Settings" and "Apps" as the GNOME menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:92
+msgid "To change the keys, go to Settings > Apps > {productName}."
+msgstr "כדי לשנות את המקשים, עבור אל הגדרות > יישומים > {productName}."
+
+#. Instructions for KDE Plasma. Keep "System Settings", "Keyboard" and "Shortcuts" as the KDE menu names in your language. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:87
+msgid "To change the keys, go to System Settings > Keyboard > Shortcuts > {productName}."
+msgstr "כדי לשנות את המקשים, עבור אל הגדרות מערכת > מקלדת > קיצורי דרך > {productName}."
+
+#. Instructions for changing system-wide shortcut keys on an unrecognized Linux desktop.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:108
+msgid "To change the keys, open your desktop's keyboard shortcut settings."
+msgstr "כדי לשנות את המקשים, פתח את הגדרות קיצורי המקלדת של שולחן העבודה שלך."
 
 #: src/features/guild/components/modals/guild_tabs/GuildWebhooksTab.tsx:125
 msgid "To create a webhook, open <0>{channelWebhooksSettingsPath}</0>. You can still edit and organize all existing webhooks here."
@@ -35872,7 +36011,7 @@ msgid "Unknown"
 msgstr "לא ידוע"
 
 #. OAuth authorize page error shown when the application, session, or request is invalid.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:46
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:47
 msgid "Unknown application, expired session, or invalid authorization request."
 msgstr "אפליקציה לא ידועה, סשן שפג תוקפו או בקשת הרשאה שגויה."
 
@@ -36410,6 +36549,11 @@ msgstr "עד 4K/60fps"
 msgid "Up to 720p at 30 FPS"
 msgstr "עד 720p ב-30 FPS"
 
+#. Linux settings text when the installed desktop app is too old for system-wide shortcuts. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:152
+msgid "Update {productName} to use system-wide shortcuts on Wayland."
+msgstr "עדכן את {productName} כדי להשתמש בקיצורי דרך כלל-מערכתיים ב-Wayland."
+
 #. Message placeholder shown when the app cannot render a newer message type.
 #: src/features/channel/components/UnknownMessage.tsx:23
 msgid "Update {productName} to view this message."
@@ -36735,7 +36879,7 @@ msgid "Use {everyoneMention}/{hereMention} and {rolesMention}"
 msgstr "שימוש ב-{everyoneMention}/{hereMention} וב-{rolesMention}"
 
 #. Plutonium subscription payment method picker button. Selects Pix as the payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:46
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:45
 msgid "Use {pixPaymentMethod}"
 msgstr "שימוש ב-{pixPaymentMethod}"
 
@@ -36750,7 +36894,7 @@ msgid "Use {query} where the text to translate should be inserted."
 msgstr "השתמש ב-{query} במקום שבו יוכנס הטקסט לתרגום."
 
 #. Plutonium subscription payment method picker button. Selects UPI as the payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:56
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:55
 msgid "Use {upiPaymentMethod}"
 msgstr "שימוש ב-{upiPaymentMethod}"
 
@@ -36779,7 +36923,7 @@ msgid "Use actual value"
 msgstr "השתמש בערך האמיתי"
 
 #. Plutonium subscription payment method picker button. Selects the alternative (non-card) method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:65
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:64
 msgid "Use alternative method"
 msgstr "שימוש בשיטה חלופית"
 
@@ -36810,7 +36954,7 @@ msgid "Use browser locale for time format"
 msgstr "השתמש בהגדרות הדפדפן עבור פורמט השעה"
 
 #. Modal secondary button to fall back to standard card checkout instead of an alternative payment method.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:220
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:163
 msgid "Use card"
 msgstr "שימוש בכרטיס"
 
@@ -36850,6 +36994,11 @@ msgstr "השתמש בערכת נושא כהה בכל האפליקציה"
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts:45
 msgid "Use default"
 msgstr "השתמש בברירת מחדל"
+
+#. Switch label on Linux. When on, the app reads keyboard devices directly for system-wide shortcuts. Not related to the "Direct input" voice processing profile.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:157
+msgid "Use direct input device access"
+msgstr "השתמש בגישה ישירה להתקן הקלט"
 
 #. Permission description in the channel-scoped permissions editor for the Use External Emoji permission. "Other communities" means custom emoji uploaded in a different Fluxer community.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts:260
@@ -36901,36 +37050,6 @@ msgstr "שימוש בערכת הנושא הכהה הישנה (לוח צבעים 
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx:50
 msgid "Use light theme"
 msgstr "שימוש בערכת נושא בהירה"
-
-#. Modal primary button to start the localized card pre-approval verification flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:216
-msgid "Use local card"
-msgstr "שימוש בכרטיס מקומי"
-
-#. Plutonium checkout pre-approval prompt for Brazil. Explains the card verification flow and the Pix alternative.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:69
-msgid "Use local card to verify a card issued in Brazil before the paid BRL checkout. Choose other methods if you'd rather try {pixPaymentMethod} or another payment method {paymentProviderName} offers on the next screen."
-msgstr "השתמש בכרטיס מקומי כדי לאמת כרטיס שהונפק בברזיל לפני התשלום ב-BRL. בחר שיטות אחרות אם אתה מעדיף לנסות את {pixPaymentMethod} או אמצעי תשלום אחר ש-{paymentProviderName} מציע במסך הבא."
-
-#. Plutonium checkout pre-approval prompt for India. Explains the card verification flow and the UPI alternative.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:79
-msgid "Use local card to verify a card issued in India before the paid INR checkout. Choose other methods if you'd rather try {upiPaymentMethod} or another payment method {paymentProviderName} offers on the next screen."
-msgstr "השתמש בכרטיס מקומי כדי לאמת כרטיס שהונפק בהודו לפני התשלום ב-INR. בחר שיטות אחרות אם אתה מעדיף לנסות את {upiPaymentMethod} או אמצעי תשלום אחר ש-{paymentProviderName} מציע במסך הבא."
-
-#. Plutonium checkout pre-approval prompt for Poland. Explains that BLIK is not supported for subscriptions; user must continue to the standard checkout.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:85
-msgid "Use local card to verify a card issued in Poland before the paid PLN checkout. {blikPaymentMethod} does not support subscriptions in {paymentProviderName} checkout, so continue only if you want {paymentProviderName2}'s standard payment screen instead."
-msgstr "השתמש בכרטיס מקומי כדי לאמת כרטיס שהונפק בפולין לפני התשלום ב-PLN. {blikPaymentMethod} אינו תומך במנויים בתשלום דרך {paymentProviderName}, לכן המשך רק אם אתה רוצה את מסך התשלום הסטנדרטי של {paymentProviderName2} במקום זאת."
-
-#. Plutonium checkout pre-approval prompt for Türkiye. Explains there is no local wallet method; continuing goes to the standard checkout.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:96
-msgid "Use local card to verify a card issued in Türkiye before the paid TRY checkout. There isn't an app-based local subscription method here, so continuing will take you to {paymentProviderName}'s standard payment screen."
-msgstr "השתמש בכרטיס מקומי כדי לאמת כרטיס שהונפק בטורקיה לפני התשלום ב-TRY. אין כאן שיטת מנוי מקומית מבוססת אפליקציה, לכן המשך יוביל אותך למסך התשלום הסטנדרטי של {paymentProviderName}."
-
-#. Plutonium checkout pre-approval prompt default. Generic description for countries without specific localized payment guidance.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:102
-msgid "Use local card to verify a card issued in your billing country before the paid checkout. Choose other methods for any other payment method {paymentProviderName} offers on the next screen."
-msgstr "השתמש בכרטיס מקומי כדי לאמת כרטיס שהונפק במדינת החיוב שלך לפני התשלום. בחר שיטות אחרות עבור כל אמצעי תשלום אחר ש-{paymentProviderName} מציע במסך הבא."
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #. Short label for an advanced desktop preference.
@@ -37379,10 +37498,6 @@ msgstr "מחסומי אימות וחברות"
 msgid "Verification barrier"
 msgstr "מחסום אימות"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:258
-msgid "Verification canceled"
-msgstr "האימות בוטל"
-
 #. Generic form-field label for a one-time verification code.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:219
 msgid "Verification code"
@@ -37400,13 +37515,11 @@ msgstr "נשלחה הודעת אימות. יש לבדוק את תיבת הדוא
 
 #. Error title shown when the backup codes email verification expired and must be started again.
 #: src/features/auth/components/modals/BackupCodesViewModal.tsx:35
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:224
 msgid "Verification expired"
 msgstr "האימות פג תוקף"
 
 #: src/features/auth/components/modals/SudoVerificationModal.tsx:82
 #: src/features/auth/components/pages/VerifyEmailPage.tsx:108
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:241
 msgid "Verification failed"
 msgstr "האימות נכשל"
 
@@ -37424,11 +37537,6 @@ msgstr "קהילה מאומתת"
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:165
 msgid "Verify"
 msgstr "אימות"
-
-#. Modal title for the mobile checkout confirmation when opening the localized card verification flow.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:190
-msgid "Verify card"
-msgstr "אימות כרטיס"
 
 #: src/features/moderation/components/report/ReportStepVerification.tsx:91
 msgid "Verify code"
@@ -37508,7 +37616,7 @@ msgid "Verify your email before sending friend requests."
 msgstr "יש לאמת את כתובת האימייל שלך לפני שליחת בקשות חברות."
 
 #. Title of the error modal shown when an unverified account tries to purchase Plutonium.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:108
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:68
 msgid "Verify your email first"
 msgstr "יש לאמת את כתובת האימייל שלך קודם"
 
@@ -37546,10 +37654,6 @@ msgstr "אמת את האימייל שלך כדי לרכוש את {premiumProduct
 #: src/features/channel/utils/CreateDMModalUtils.tsx:56
 msgid "Verify your email to start DMs."
 msgstr "יש לאמת את כתובת האימייל שלך כדי להתחיל בצ'אטים פרטיים."
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:179
-msgid "Verifying card"
-msgstr "מאמת את הכרטיס"
 
 #: src/features/auth/flow/HandoffApprovalFlow.tsx:144
 msgid "Verifying code…"
@@ -37992,7 +38096,7 @@ msgid "Visionary 2FA nagbar"
 msgstr "באנר 2FA של Visionary"
 
 #. Modal body shown when a Visionary user tries to subscribe. Reassures them and points out gift purchases stay available.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:121
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:81
 msgid "Visionary already includes permanent access, so a recurring subscription isn't needed. You can still buy gifts for others."
 msgstr "Visionary כבר כולל גישה קבועה, ולכן אין צורך במנוי מתחדש. עדיין אפשר לקנות מתנות לאחרים."
 
@@ -38218,7 +38322,7 @@ msgid "Voice participants"
 msgstr "משתתפים בשיחה הקולית"
 
 #. Voice settings radio group label for microphone processing profile.
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:661
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:668
 #: src/features/voice/components/voice_connection_status/AudioProcessingModal.tsx:55
 msgid "Voice processing"
 msgstr "עיבוד קולי"
@@ -38264,7 +38368,7 @@ msgstr "ביטול השתקת שמע"
 msgid "Voice unmute"
 msgstr "ביטול השתקת מיקרופון"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:590
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:597
 msgid "Voice uses your system output device in this browser. Change it in your system settings."
 msgstr "הקול משתמש בהתקן הפלט של המערכת שלך בדפדפן זה. שנה אותו בהגדרות המערכת שלך."
 
@@ -38278,7 +38382,7 @@ msgstr "בוטל"
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Subsection title in the voice tab. Keep it concise.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts:383
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:184
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:186
 #: src/features/user/components/settings_utils/search_index/NotificationsIndex.ts:86
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts:183
 msgid "Volume"
@@ -38345,6 +38449,11 @@ msgstr "ממתין שתוקף מצב איטי באחד או יותר מהערו�
 msgid "Waiting for you to..."
 msgstr "מחכה לך כדי..."
 
+#. Status text while the Linux desktop shows its own dialog for confirming system-wide shortcuts.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:44
+msgid "Waiting for your desktop…"
+msgstr "ממתין לשולחן העבודה שלך…"
+
 #: src/features/input/utils/KeybindUtils.ts:107
 msgctxt "keyboard-key-name"
 msgid "Wake up"
@@ -38408,11 +38517,6 @@ msgstr "xdg-desktop-portal של Wayland הוא הבעלים של הבורר ומ
 #: src/features/voice/components/modals/screen_share_picker_modal/useNativePickerCopy.ts:33
 msgid "Wayland's xdg-desktop-portal owns the picker and shows every window and display together. There is no flag that filters it to windows only. Press \"Open system picker\", then choose a window there to get per-app audio."
 msgstr "xdg-desktop-portal של Wayland הוא הבעלים של הבורר ומציג כל חלון ותצוגה יחד. אין דגל שמסנן אותו לחלונות בלבד. לחץ על 'פתיחת בורר המערכת', ואז בחר שם חלון כדי לקבל שמע לפי אפליקציה."
-
-#. Premium checkout error shown when card verification fails unexpectedly. productName is the app name.
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:44
-msgid "We could not confirm your card right now. Refresh this page or return to {productName} and try again."
-msgstr "לא הצלחנו לאשר את הכרטיס שלך כרגע. רענן את הדף או חזור אל {productName} ונסה שוב."
 
 #. Plutonium page hero subtitle while a failed renewal is in its grace period.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:66
@@ -38489,7 +38593,7 @@ msgid "We couldn't remove that account. Try again."
 msgstr "לא הצלחנו להסיר את החשבון הזה. יש לנסות שוב."
 
 #. Modal body for existing-subscription block. Directs the user to the billing portal and addresses the just-paid race case. Keep plain and reassuring.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:132
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:92
 msgid "We found an existing {premiumProductFullName} subscription for this account. Manage it in the secure billing portal to update payment details or check renewal status. If you just paid, wait a minute and reopen this page."
 msgstr "מצאנו מינוי קיים ל-{premiumProductFullName} עבור חשבון זה. נהל אותו בפורטל החיובים המאובטח כדי לעדכן פרטי תשלום או לבדוק סטטוס חידוש. אם שילמת זה עתה, המתן דקה ופתח מחדש דף זה."
 
@@ -38926,7 +39030,7 @@ msgstr "אילו שיחות"
 msgid "Which rule was broken?"
 msgstr "איזה כלל הופר?"
 
-#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:370
+#: src/features/user/components/modals/tabs/UserVoiceTab.tsx:369
 msgid "While push-to-talk is on, your shortcut controls your microphone, so the mute button is disabled."
 msgstr "כאשר דיבור בלחיצה מופעל, קיצור הדרך שולט במיקרופון שלך, ולכן כפתור ההשתקה מושבת."
 
@@ -39094,6 +39198,11 @@ msgstr "ללא הרשאה זו, נדרש דיבור בלחיצה."
 msgid "Wordmark"
 msgstr "סימן מילולי"
 
+#. Hint under a shortcut on Linux when the desktop owns system-wide shortcuts. The key shown here only works inside the app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/keybinds_tab/SystemShortcutRowHint.tsx:19
+msgid "Works while {productName} is focused"
+msgstr "פועל כאשר {productName} ממוקד"
+
 #. Short label in the channel and chat textual attachment preview bottom sheet. Keep it concise.
 #. Short label in the channel and chat textual preview context menu. Keep it concise.
 #: src/features/channel/components/embeds/attachments/TextualAttachmentPreviewBottomSheet.tsx:23
@@ -39221,7 +39330,7 @@ msgid "You are now a developer!"
 msgstr "כעת אתה מפתח!"
 
 #. Modal body for the mobile checkout confirmation. Explains that the user is leaving the app to pay.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:203
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:154
 msgid "You are now navigating to {paymentProviderName} to complete the payment. Return to {productName} once you've completed it."
 msgstr "אתה עובר כעת אל {paymentProviderName} כדי להשלים את התשלום. חזור אל {productName} לאחר שתסיים."
 
@@ -39281,7 +39390,7 @@ msgstr "אפשר לסגור את החלון הזה. הייבוא יימשך בר
 msgid "You can close this tab"
 msgstr "אפשר לסגור את הלשונית הזו"
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:169
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:70
 msgid "You can now close this tab and return to the app."
 msgstr "כעת ניתן לסגור את הלשונית ולחזור לאפליקציה."
 
@@ -39521,7 +39630,7 @@ msgid "You changed your tag while on {PREMIUM_PRODUCT_NAME}. It will reroll rand
 msgstr "שינית את התג שלך בזמן שהיית ב-{PREMIUM_PRODUCT_NAME}. הוא ישתנה באופן אקראי כשתוקף ה-{PREMIUM_PRODUCT_NAME} שלך יפוג, אלא אם כן הוא יתחדש."
 
 #. Body of the access-denied alert for clicked message links.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:141
+#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx:144
 msgid "You do not have access to the channel where this message was sent."
 msgstr "אין לך גישה לערוץ שבו נשלחה ההודעה הזו."
 
@@ -39736,7 +39845,7 @@ msgid "You need to verify your email address before you can start a direct messa
 msgstr "עליך לאמת את כתובת האימייל שלך לפני שתוכל להתחיל צ'אט."
 
 #. Body of the error modal shown when the account email is unverified and the user tries to purchase Plutonium. Product name is interpolated.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:112
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:72
 msgid "You need to verify your email before you can purchase {premiumProductFullName}."
 msgstr "יש לאמת את כתובת האימייל שלך לפני שתוכל לרכוש את {premiumProductFullName}."
 
@@ -39818,7 +39927,7 @@ msgid "You're already friends with this user."
 msgstr "אתה כבר חבר של המשתמש הזה."
 
 #. Modal title shown when a lifetime Visionary tier user tries to start a recurring Plutonium subscription.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:117
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:77
 msgid "You're already Visionary"
 msgstr "אתה כבר Visionary"
 
@@ -39858,7 +39967,7 @@ msgid "You're being rate limited. Wait {duration} before trying again."
 msgstr "הגעת למגבלת הקצב. המתן {duration} לפני שתנסה שוב."
 
 #. Error modal body shown when a gift-subscription user tries to start a recurring subscription. Explains the extension/redemption path.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:176
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:136
 msgid "You're currently on a gift subscription. It won't renew. You can redeem more gift codes to extend it. Recurring subscriptions can be started after your gift time ends."
 msgstr "כרגע יש לך מנוי מתנה. הוא לא יתחדש. באפשרותך לממש קודי מתנה נוספים כדי להאריך אותו. ניתן להתחיל מנויים חוזרים לאחר שתקופת המתנה שלך תסתיים."
 
@@ -40041,7 +40150,7 @@ msgid "You've seen all your recent mentions. More will appear here soon."
 msgstr "ראית את כל האזכורים האחרונים שלך. נוספים יופיעו כאן בקרוב."
 
 #. Modal body for existing-subscription block when the subscription was bought in a mobile app store. {storeName} is the store brand name, App Store or Google Play, and must not be translated. {premiumProductFullName} is the full premium product name.
-#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:138
+#: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx:98
 msgid "Your {premiumProductFullName} subscription is billed through {storeName}. Manage it in your {storeName} account to change your plan or check renewal status."
 msgstr "המינוי שלך ל-{premiumProductFullName} מחויב דרך {storeName}. נהל אותו בחשבון {storeName} שלך כדי לשנות תוכנית או לבדוק סטטוס חידוש."
 
@@ -40056,7 +40165,7 @@ msgid "Your {premiumProductName} subscription has expired. You have lost all {pr
 msgstr "תוקף המנוי שלך ל-{premiumProductName} פג. איבדת את כל ההטבות של {premiumProductName}. הפעל מחדש את המנוי שלך כדי לקבל גישה שוב."
 
 #. OAuth authorize page error shown when the session expired mid-authorization. Keep plain. Preserve {productName}; it is inserted by code.
-#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:41
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts:42
 msgid "Your {productName} session expired. Sign in again to continue authorizing this application."
 msgstr "הסשן שלך ב-{productName} פג. היכנס שוב כדי להמשיך ולאשר את האפליקציה הזו."
 
@@ -40109,14 +40218,6 @@ msgstr "הבקשה שלך ממתינה לבדיקה. עדיין באפשרותך
 msgid "Your browser requires user interaction before audio can be played. Click the button below to enable voice chat."
 msgstr "הדפדפן שלך דורש אינטראקציה של המשתמש לפני שניתן להשמיע אודיו. לחץ על הכפתור למטה כדי לאפשר צ'אט קולי."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:185
-msgid "Your card is being checked for localized pricing. This usually takes a moment."
-msgstr "הכרטיס שלך נבדק להתאמת מחיר מקומי. זה בדרך כלל לוקח רגע."
-
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:183
-msgid "Your card is eligible. Redirecting you to the payment page now."
-msgstr "הכרטיס שלך מתאים. אנו מעבירים אותך עכשיו לדף התשלום."
-
 #. Body of the confirmation shown before saving an edit to a message published from an announcement channel.
 #: src/features/messaging/commands/MessageCommands.tsx:104
 msgid "Your changes reach every community that follows this channel, which can take a minute. Each published message allows 3 quick edits, then 1 every 20 minutes."
@@ -40143,6 +40244,26 @@ msgstr "הקהילה שלך צריכה לפחות {minMemberCount, plural, one {
 #: src/features/auth/components/pages/MatureContentCheckCallbackPage.tsx:14
 msgid "Your credit card has been checked. If the card is valid, mature content will unlock shortly. You can close this tab and return to the app."
 msgstr "כרטיס האשראי שלך נבדק. אם הכרטיס תקף, תוכן למבוגרים ייפתח בקרוב. באפשרותך לסגור את הכרטיסייה הזו ולחזור לאפליקציה."
+
+#. Linux settings text when the desktop dialog for system-wide shortcuts was dismissed or failed. Neutral wording, the user may not have declined anything.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:134
+msgid "Your desktop didn't set up system-wide shortcuts."
+msgstr "שולחן העבודה שלך לא הגדיר קיצורי דרך כלל-מערכתיים."
+
+#. Linux settings note under the list of system-wide shortcuts the desktop runs (KDE, GNOME). A key assigned here stops reaching every other app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:64
+msgid "Your desktop keeps these keys for {productName}, so other apps can't use them."
+msgstr "שולחן העבודה שלך שומר את המקשים האלה עבור {productName}, ולכן אפליקציות אחרות לא יכולות להשתמש בהם."
+
+#. Linux settings note under the list of system-wide shortcuts the desktop runs (KDE, GNOME), shown when the "Use direct input device access" switch is offered below it. A key assigned here stops reaching every other app. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:69
+msgid "Your desktop keeps these keys for {productName}, so other apps can't use them. To use the same key in other apps, turn on direct input device access below."
+msgstr "שולחן העבודה שלך שומר את המקשים האלה עבור {productName}, ולכן אפליקציות אחרות לא יכולות להשתמש בהם. כדי להשתמש באותו מקש באפליקציות אחרות, הפעל למטה את הגישה הישירה להתקן הקלט."
+
+#. Subtitle above the list of system-wide shortcuts assigned by the Linux desktop. {productName} is the app name.
+#: src/features/user/components/modals/tabs/components/SystemShortcutsSection.tsx:53
+msgid "Your desktop runs these shortcuts even while {productName} is not focused."
+msgstr "שולחן העבודה שלך מפעיל את הקיצורים האלה גם כש-{productName} אינו ממוקד."
 
 #. Body of the modal that asks the user to save an updated passkey. name is the name the user gave the passkey. Keep plain.
 #: src/features/auth/passkey_migration/PasskeyUpdateModal.tsx:28
@@ -40275,11 +40396,11 @@ msgstr "הרכישה האחרונה שלך אינה עומדת עוד בחלון
 msgid "Your new nickname, or leave blank to reset it."
 msgstr "הכינוי החדש שלך, או השאר ריק כדי לאפס אותו."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:152
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:53
 msgid "Your payment was canceled. You can now close this tab and return to the app."
 msgstr "התשלום שלך בוטל. עכשיו אפשר לסגור את הכרטיסייה הזו ולחזור לאפליקציה."
 
-#: src/features/premium/components/pages/PremiumCallbackPage.tsx:139
+#: src/features/premium/components/pages/PremiumCallbackPage.tsx:40
 msgid "Your payment was successful. You can now close this tab and return to the app."
 msgstr "התשלום בוצע בהצלחה. עכשיו אפשר לסגור את הכרטיסייה הזו ולחזור לאפליקציה."
 
