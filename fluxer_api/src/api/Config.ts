@@ -187,6 +187,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		headersTimeoutMs: master.services.api.headers_timeout_ms,
 		requestTimeoutMs: master.services.api.request_timeout_ms,
 		maxInflightRequests: master.services.api.max_inflight_requests,
+		automatedMessageDeletionDelayDays: master.services.api.automated_message_deletion_delay_days,
 		ipBanExemptIps: normalizeIpBanExemptIps(master.services.api.ip_ban_exempt_ips),
 		cassandra: {
 			hosts: cassandraSource?.hosts.join(',') ?? '',
@@ -391,6 +392,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		auth: {
 			sudoModeSecret: master.auth.sudo_mode_secret,
 			connectionInitiationSecret: master.auth.connection_initiation_secret,
+			profilePseudonymSecret: master.auth.profile_pseudonym_secret,
 			ssoAllowPrivateAddresses: master.auth.sso_allow_private_addresses,
 			passkeys: {
 				rpName: master.auth.passkeys.rp_name,
@@ -412,6 +414,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 		},
 		instance: {
 			selfHosted: master.instance.self_hosted,
+			baseDomain: master.domain.base_domain,
 			autoJoinInviteCode: master.instance.auto_join_invite_code,
 			visionariesGuildId: master.instance.visionaries_guild_id,
 			visionariesGuildVisionaryRoleId: master.instance.visionaries_guild_visionary_role_id,
@@ -429,6 +432,8 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			setup: {
 				configured: master.instance.setup.configured,
 			},
+			accountIdentity: master.instance.account_identity,
+			tagStyle: master.instance.tag_style,
 		},
 		discovery: {
 			enabled: master.discovery.enabled,
