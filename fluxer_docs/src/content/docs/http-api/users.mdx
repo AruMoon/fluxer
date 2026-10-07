@@ -38,6 +38,8 @@ The public account representation embedded by messages, relationships, guild mem
 
 <sup>1</sup> An animated avatar hash has the `a_` prefix, and the prefix is removed while the account has no animated avatar entitlement
 
+On an instance that applies the [account tiers](#account-tiers), an account that cannot yet reach other people shows them only its username and discriminator. `global_name` and `avatar` are null in every partial user that other accounts read, and the account's own reads are unchanged.
+
 ### Example
 
 ```json
@@ -151,7 +153,13 @@ The private representation of the current account, returned by [Get current user
 | pending_bulk_message_deletion<sup>3</sup> | ?[pending bulk message deletion](#pending-bulk-message-deletion-object) object | The message deletion the account scheduled for itself, or null when none is pending |
 | age_verified_adult? | boolean | Whether adult age verification is complete, omitted when false |
 | terms_agreed_at | ?ISO8601 timestamp | The time of the most recent terms acceptance, or null |
-| privacy_agreed_at | ?ISO8601 timestamp | The time of the most recent privacy policy acceptance, or null |
+| privacy_agreed_at | ?ISO8601 timestamp | The time the account was last shown the current privacy policy, or null |
+| claimed? | boolean | Whether the account can be signed in to from another device, through a confirmed email, a password or a passkey |
+| account_tier? | string | The [account tier](#account-tiers), one of `unclaimed`, `unverified` or `verified` |
+| verification_need?<sup>18</sup> | ?string | What the account still has to do to become verified, or null once it is |
+| has_password? | boolean | Whether the account has a password |
+| date_of_birth_required?<sup>17</sup> | boolean | Whether the account still has to [set its date of birth](/http-api/users/current-user/#set-date-of-birth). Clients ask for it before anything else |
+| profile_restricted? | boolean | Whether other accounts see only the username and discriminator, as described under [account tiers](#account-tiers) |
 
 <sup>1</sup> An animated avatar hash has the `a_` prefix, and the prefix is removed while the account has no animated avatar entitlement
 
@@ -185,6 +193,11 @@ The private representation of the current account, returned by [Get current user
 
 <sup>16</sup> Reports whether unread gifts exist and how many. An account with no gifts reports `false` and `0`
 
+<sup>17</sup> True for every account without a date of birth on an instance that collects dates of birth. When the [accounts configuration](/admin-api/instance/#accounts-configuration-object) enforces the date for the account, every route except a short list returns 403 `DATE_OF_BIRTH_REQUIRED`, and the Gateway reports no guilds for the account. The list is get current user, set date of birth, get current user settings, the account disable and delete routes, accept current policies, the data harvest routes, the experiment assignments and get Gateway, plus every authentication and sudo route
+
+<sup>18</sup> One of `add_email`, `confirm_email` or `password`. The same value is the `need` in an `ACCOUNT_VERIFICATION_REQUIRED` [error response](/http-api/#error-response)
+
+
 :::note[A bearer read returns zero values]
 `acls`, `traits`, and `required_actions` become empty arrays. `email_bounced` and `authenticator_types` are dropped. Every field marked <sup>3</sup> above that is a boolean becomes `false`, every timestamp or nullable field becomes `null`, and `unread_gift_inventory_count` becomes `0`.
 :::
@@ -210,10 +223,6 @@ A scheduled deletion of every message the account has sent. The field is this ob
 | 0 | TOTP | Time-based one-time password authenticator |
 | 2 | WEBAUTHN | WebAuthn authenticator |
 
-The value `1` is unassigned. Any stored authenticator value outside this registry is excluded from `authenticator_types`.
-
-`WEBAUTHN` is present only while the account chose passkeys as a second factor through [Set WebAuthn two-factor authentication](/http-api/users/mfa/#set-webauthn-two-factor-authentication). Registering a credential does not add it, so an account can hold passkeys without the type.
-
 ## Premium types
 
 | Value | Name | Description |
@@ -238,6 +247,35 @@ An account is limited while its [user object](#user-object) reports `account_lim
 - Setting a custom status through [Modify current user settings](/http-api/users/settings/#modify-current-user-settings) or a [presence update](/gateway/commands/#presence-update)
 - [Initiate connection](/http-api/connections/#initiate-connection), [Verify and create connection](/http-api/connections/#verify-and-create-connection), and [Start Bluesky authorisation](/http-api/connections/#start-bluesky-authorisation)
 - [Upload entrance sound](/http-api/entrance-sounds/#upload-entrance-sound) and [Set entrance sound selection](/http-api/entrance-sounds/#set-entrance-sound-selection)
+
+## Account tiers
+
+Every account is in one of three tiers. It is unclaimed while it has no email address on an instance that signs in with email. It is unverified while its email address is not confirmed. Every other account is verified. On a `username` instance, and on an instance that sends no email, an account with a password or a passkey counts as verified and one without counts as unclaimed.
+
+An instance chooses with `interaction_tier` in its [accounts configuration](/admin-api/instance/#accounts-configuration-object) how the tiers apply. In `legacy` mode the earlier email verification rules stay as they were. In `enforced` mode an account that is not verified can read, edit its own profile and settings, write personal notes, and join communities, but cannot do anything that reaches another person. Those operations fail with an error that names what is missing. An action that had its own error code before keeps it, such as `UNCLAIMED_ACCOUNT_CANNOT_SEND_MESSAGES` or `EMAIL_VERIFICATION_REQUIRED`, so older clients still understand it. Every other action returns 403 `ACCOUNT_VERIFICATION_REQUIRED`, with `action` and `tier` in the [error response](/http-api/#error-response).
+
+| Action | Operations |
+| --- | --- |
+| `message` | Create, modify and crosspost a message, start a thread |
+| `typing` | Trigger typing indicator |
+| `reaction` | Add own reaction |
+| `direct_message` | Open a direct message |
+| `group_dm` | Create or join a group direct message |
+| `friend_request` | Send a friend request |
+| `friend_accept` | Accept a friend request |
+| `invite_create` | Create an invite |
+| `guild_create` | Create a guild |
+| `voice` | Join a voice channel |
+| `call` | Start or ring a call |
+| `thread_join` | Join a thread |
+| `channel_follow` | Follow an announcement channel |
+| `ownership_transfer` | Receive guild ownership |
+| `application_create` | Create an application |
+| `gift_redeem` | Redeem a gift, for unclaimed accounts only |
+
+Reports from accounts that are not verified are accepted on an `enforced` instance, up to 5 a day for each account and 10 a day for each IP address. A second report on the same target from the same network within a day is accepted and then dropped.
+
+The join gate applies to people assigned [guild visits](/admin-api/instance/#guild-visits-configuration-object) on every client. An instance that sets `guild_join_gate` to `visits_capable` applies it only when the client sends the `X-Fluxer-Capabilities: guild_visits` request header.
 
 ## Profile field privacy flags
 
@@ -433,8 +471,6 @@ One entry of the saved, user-owned guild sidebar layout. Joining a guild prepend
 
 ## Guild sensitive media filters
 
-Guild channels accept only these values.
-
 | Value | Name | Description |
 | --- | --- | --- |
 | 0 | SHOW | Show sensitive media |
@@ -541,9 +577,10 @@ The profile read returned by [Get user profile](#get-user-profile) for one targe
 | user_profile | [user profile](#user-profile-object) object | The account-wide profile customisation |
 | guild_member?<sup>1</sup> | [guild member](/http-api/guild-members/#guild-member-object) object | The membership the target account holds in the named guild |
 | guild_member_profile?<sup>1</sup> | [guild member profile](#guild-member-profile-object) object | The per-guild profile customisation of the target account |
-| premium_type?<sup>2</sup> | integer | The [premium type](#premium-types) visible to the caller |
-| premium_since?<sup>2</sup> | ISO8601 timestamp | The premium activation time visible to the caller |
-| premium_lifetime_sequence?<sup>2</sup> | integer | The lifetime premium sequence visible to the caller |
+| premium_type?<sup>2</sup> <sup>7</sup> | integer | The [premium type](#premium-types) visible to the caller |
+| premium_since?<sup>2</sup> <sup>7</sup> | ISO8601 timestamp | The premium activation time visible to the caller |
+| premium_lifetime_sequence?<sup>2</sup> <sup>7</sup> | integer | The lifetime premium sequence visible to the caller |
+| profile_badges | array[[profile badge](#profile-badge-object) object] | The badges to show on the profile, in display order |
 | mutual_friends?<sup>3</sup> | array[[partial user](#partial-user-object) object] | The mutual friends in descending account identifier order |
 | mutual_guilds?<sup>3</sup> | array[[mutual guild](#mutual-guild-object) object] | The guilds the caller and the target are both members of |
 | connected_accounts<sup>4</sup> | array[[connection](/http-api/connections/#connection-object) object] | The verified connections the caller is permitted to see |
@@ -562,7 +599,55 @@ The profile read returned by [Get user profile](#get-user-profile) for one targe
 
 <sup>6</sup> The field is present only on a restricted read
 
+<sup>7</sup> Deprecated for badge display. Render `profile_badges` instead, which applies the same privacy rules and adds localised labels
+
 A lifetime target that masks its badge reports `premium_type` of `1`, not `2`.
+
+## Profile badge object
+
+One badge on a [full user profile](#full-user-profile-object). The server decides which badges apply, their order, and their text, so a client renders the list as it comes.
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| kind<sup>1</sup> | string | A stable key for the badge |
+| label | string | The full badge description in the caller's locale, for the tooltip, and the alt text when there is no caption |
+| asset<sup>2</sup> | ?string | The 16-character hex hash of the badge image, or null for a text badge |
+| aspect_ratio<sup>3</sup> | ?number | The image width divided by its height, or null for a square badge |
+| caption<sup>4</sup> | ?string | The short text the badge stands for, or null |
+| href | ?string | The absolute URL a click opens, or null |
+| small_asset? | string | The image hash for 20 pixels and smaller, served like `asset`. Use it instead of `asset` at those sizes |
+| count? | ?integer | Never present on a self-hosted instance |
+| accessible_label? | ?string | The label for screen readers, used in place of `label` |
+| details?<sup>5</sup> | ?[badge details](#badge-details-object) object | The content of the richer vertical tooltip |
+
+<sup>1</sup> The known values are `staff` and `premium`, which appears only while premium tiers are active on the instance. New values can appear at any time, so a client renders an unknown kind from the other fields
+
+<sup>2</sup> The image is served at `{static_cdn}/badges/{asset}.webp`, where `static_cdn` is the `endpoints.static_cdn` value from [instance discovery](/http-api/instance/). Square badges are 128 by 128 pixels and also have a PNG at `{static_cdn}/badges/{asset}.png`. A hashed file never changes, so it can be cached forever
+
+<sup>3</sup> Render the image at the badge height and `aspect_ratio` times that height wide
+
+<sup>4</sup> A badge with a null `asset` shows its caption as text instead
+
+<sup>5</sup> When present, show a vertical tooltip with the badge art larger at the top, then `title`, then each line. Otherwise `label` is the whole tooltip
+
+### Badge details object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| title | string | The first line under the badge art |
+| lines | array[string] | The further lines, in order |
+
+### Visibility
+
+| Condition | Effect |
+| --- | --- |
+| The target is hidden or under enforcement | The list is empty |
+| The profile is restricted for the caller | Only `staff` remains |
+| The target hides the premium badge | `premium` is dropped |
+| The target hides the premium activation time | The premium label has no date |
+| The target hides its staff flag | `staff` is dropped |
 
 ## Get user
 
@@ -622,7 +707,7 @@ Returns a [full user profile](#full-user-profile-object) object for one target a
 <sup>2</sup> The value is trimmed and read as true only for the exact strings `true`, `True`, and `1`. Every other value, including absence, is false
 
 :::note[Profile privacy is a field filter]
-A read that passes the access check can still be restricted. A restricted read nulls `bio` and `pronouns` in both profile objects, empties `connected_accounts`, nulls `timezone_offset`, and sets `profile_limited` to true. It also removes the premium fields from the body.
+A read that passes the access check can still be restricted. A restricted read nulls `bio` and `pronouns` in both profile objects, empties `connected_accounts`, nulls `timezone_offset`, and sets `profile_limited` to true. It also removes the premium fields from the body and keeps only the staff, partner, and bug hunter entries in `profile_badges`.
 :::
 
 ### Response

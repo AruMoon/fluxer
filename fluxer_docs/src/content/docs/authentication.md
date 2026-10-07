@@ -113,7 +113,6 @@ An instance can enforce single sign-on once it is configured and enabled. While 
 - [Register an account](/http-api/authentication/#register-an-account) and [Log in with a password](/http-api/authentication/#log-in-with-a-password).
 - [Get discoverable WebAuthn options](/http-api/authentication/#get-discoverable-webauthn-options) and [Authenticate with WebAuthn](/http-api/authentication/#authenticate-with-webauthn).
 - [Complete login with TOTP](/http-api/authentication/#complete-login-with-totp), [Get WebAuthn MFA options](/http-api/authentication/#get-webauthn-mfa-options), and [Complete login with WebAuthn MFA](/http-api/authentication/#complete-login-with-webauthn-mfa).
-- [Start passkey bridge sign-in](/http-api/authentication/#start-passkey-bridge-sign-in) and [Redeem passkey bridge sign-in](/http-api/authentication/#redeem-passkey-bridge-sign-in).
 - [Verify an email address](/http-api/authentication/#verify-an-email-address) and [Resend email verification](/http-api/authentication/#resend-email-verification).
 - [Request password recovery](/http-api/authentication/#request-password-recovery), [Validate a password reset token](/http-api/authentication/#validate-a-password-reset-token), and [Reset a password](/http-api/authentication/#reset-a-password).
 - [Revert an email change](/http-api/authentication/#revert-an-email-change).
@@ -122,11 +121,13 @@ An instance can enforce single sign-on once it is configured and enabled. While 
 
 The single sign-on callback returns the same code when the provider claims match no existing account and the instance does not auto-provision.
 
-Enforcement applies at those operations only, and does not gate password change or multi-factor management on an already authenticated account. Enabling it leaves an already issued session token, bot token, OAuth2 access token, or Admin API key valid.
+An account linked to the provider also loses its own credentials while enforcement is active. Every [email change](/http-api/users/email-and-password/) and password change operation returns 403 `SSO_REQUIRED` for it, and so does [Update current user](/http-api/users/current-user/) when the body sets `new_password` or `email_token`. Profile edits and multi-factor management stay open, and an account with no provider link keeps its email and password operations. On an instance where people sign in with an email, each sign-in through the provider replaces the account email with the verified email the provider sends, unless another account already holds that address. Enabling it leaves an already issued session token, bot token, OAuth2 access token, or Admin API key valid.
 
 ## Account state gates
 
 A [limited account](/http-api/users/#account-limitation) keeps its credentials and sessions. The operations listed there return 403 `ACCOUNT_LIMITED`, and every other operation accepts the account as usual.
+
+An account that still has to [set its date of birth](/http-api/users/current-user/#set-date-of-birth) gets 403 `DATE_OF_BIRTH_REQUIRED` from most operations until it does. An account that is not yet verified can be refused operations that reach other people, as described under [account tiers](/http-api/users/#account-tiers).
 
 No shared gate rejects a deleted or disabled account. Each operation that reads account state applies its own rule, and login, password, and email operations refuse a deleted account outright.
 
@@ -142,7 +143,7 @@ Sudo mode is a short-lived proof that the account holder recently re-verified a 
 
 A sudo proof lasts five minutes. Present it in the `X-Fluxer-Sudo-Mode-JWT` request header. An invalid, expired, or account-mismatched token produces the same response as a missing one.
 
-Fluxer issues a token only for an account holding a TOTP secret or a registered WebAuthn credential, so a password-only account re-verifies for each operation that requires sudo mode. A passkey counts here whether or not the account enabled passkeys as a second factor. The `methods` object reports `totp`, `webauthn`, and `backup_codes`, and an account holding no TOTP secret presents an unconsumed backup code under `mfa_method` of `totp`. [Create WebAuthn registration options](/http-api/users/mfa/#create-webauthn-registration-options) and [Disable current account](/http-api/users/current-user/#disable-current-account) issue no sudo token and return no `X-Fluxer-Sudo-Mode-JWT` response header, even for an account that can prove a credential. A bot account satisfies sudo mode immediately. So does an account that has no password, no TOTP secret, and no registered WebAuthn credential.
+Fluxer issues a token for an account holding a TOTP secret or a registered WebAuthn credential, and after an emailed code. A password-only account that proves sudo mode with its password re-verifies for each operation that requires it. A passkey counts here whether or not the account enabled passkeys as a second factor. The `methods` object reports `totp`, `webauthn`, and `backup_codes`, and an account holding no TOTP secret presents an unconsumed backup code under `mfa_method` of `totp`. [Create WebAuthn registration options](/http-api/users/mfa/#create-webauthn-registration-options) and [Disable current account](/http-api/users/current-user/#disable-current-account) issue no sudo token and return no `X-Fluxer-Sudo-Mode-JWT` response header, even for an account that can prove a credential. A bot account satisfies sudo mode immediately. So does an account that has no password, no TOTP secret, no registered WebAuthn credential and no confirmed email address. An account without those but with a confirmed address proves sudo mode with an [emailed code](/http-api/users/mfa/#send-a-sudo-email-code).
 
 :::note[A sudo proof covers every account session]
 Revoking the session that obtained a proof leaves that proof valid until it expires.

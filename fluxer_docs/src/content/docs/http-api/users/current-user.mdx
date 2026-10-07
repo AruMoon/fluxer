@@ -16,12 +16,54 @@ Security-sensitive fields and destructive lifecycle operations on this page requ
 
 | Account state | Accepted proof |
 | --- | --- |
-| No TOTP secret and no registered WebAuthn credential | The current `password` |
+| No TOTP secret and no registered WebAuthn credential | The current `password`, or an emailed code when the account has a confirmed email address |
 | A TOTP secret or a registered WebAuthn credential | `mfa_method` of `totp` with `mfa_code`, or `mfa_method` of `webauthn` with `webauthn_response` and `webauthn_challenge` |
 | A registered WebAuthn credential and no TOTP secret | `mfa_method` of `webauthn` as above, or `mfa_method` of `totp` with `mfa_code` holding an unconsumed backup code |
-| No password credential and neither of those | None, the requirement is already satisfied |
+| No password, no confirmed email address and neither of those | None, the requirement is already satisfied |
 
 Once an account holds a TOTP secret or a registered WebAuthn credential, its `password` stops working here. A passkey counts whether or not the account enabled passkeys as a second factor. The `methods` object on a 403 `SUDO_MODE_REQUIRED` reports `backup_codes` so a client knows whether the code input is worth offering.
+
+## Guild entry object
+
+The community an account entered after signing up with an invite.
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| guild_id | snowflake | The guild the account entered |
+| mode | string | `member` when the account joined, `visit` when it looks around without joining |
+
+## Date of birth result object
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| user | [user](/http-api/users/#user-object) object | The updated account |
+| entry | ?[guild entry](#guild-entry-object) object | The community to open next, or null |
+
+## Email code delivery object
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| code_expires_at | ISO8601 timestamp | When the emailed code stops working, 10 minutes after sending |
+| resend_available_at | ISO8601 timestamp | When another code can be requested, 30 seconds after sending |
+
+## Claim result object
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| next_step | string | `confirm_email` when the emailed code still has to be entered, `none` when the account is already set up |
+| user | [user](/http-api/users/#user-object) object | The updated account |
+| code_expires_at?<sup>1</sup> | ISO8601 timestamp | When the emailed code stops working |
+| resend_available_at?<sup>1</sup> | ISO8601 timestamp | When another code can be requested |
+
+<sup>1</sup> Present only when `next_step` is `confirm_email`
 
 ## Get current user
 
@@ -83,10 +125,12 @@ Modifies the current account and returns the resulting [user](/http-api/users/#u
 | has_unread_gift_inventory?<sup>13</sup> | boolean | Whether the gift inventory still holds unread items |
 | mention_flags? | integer | [Reply mention preference](/http-api/users/#reply-mention-preferences), one of `0`, `1`, or `2` |
 | email_token?<sup>14</sup> | string | Email token (1-256 characters) issued by [verify new email](/http-api/users/email-and-password/#verify-new-email) |
-| mfa_method? | string | [Sudo verification](/http-api/users/mfa/#sudo-mode) method, either `totp` or `webauthn` |
+| mfa_method? | string | [Sudo verification](/http-api/users/mfa/#sudo-mode) method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | [Sudo verification](/http-api/users/mfa/#sudo-mode) authenticator or backup code (1-32 characters) |
 | webauthn_response? | [WebAuthn assertion](/http-api/users/mfa/#webauthn-assertion-object) object | [Sudo verification](/http-api/users/mfa/#sudo-mode) WebAuthn assertion |
 | webauthn_challenge? | string | [Sudo verification](/http-api/users/mfa/#sudo-mode) WebAuthn challenge (1-256 characters) |
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 <sup>1</sup> The value cannot be `everyone` or `here` and cannot contain `fluxer` or `system message`, on every instance including a self-hosted one. On an instance with the `none` tag style, a username another account holds in any letter case returns `USERNAME_ALREADY_TAKEN`
 
@@ -123,6 +167,8 @@ To skip the body proof fields, send the sudo token in the `X-Fluxer-Sudo-Mode-JW
 A body that has no `email_token` and nothing beyond `mfa_method`, `mfa_code`, `webauthn_response`, and `webauthn_challenge` returns the current account unchanged. Supplying `password` alone is an update with nothing to change, and it still emits [User Update](/gateway/events/#user-update).
 
 A claimed account needs a verified email before changing the username, discriminator, display name, avatar, banner, biography, pronouns, accent colour, timezone, timezone privacy, or any premium badge field. A request without one returns 403 [`PROFILE_EMAIL_VERIFICATION_REQUIRED`](/http-api/errors/).
+
+While the instance [enforces single sign-on](/authentication/#single-sign-on-enforcement), an account linked to the provider that sets `new_password` or `email_token` gets 403 [`SSO_REQUIRED`](/http-api/errors/) and nothing changes.
 
 A [limited account](/http-api/users/#account-limitation) cannot change any of those fields. A request that sets one returns 403 [`ACCOUNT_LIMITED`](/http-api/errors/).
 
@@ -168,6 +214,7 @@ Supplying `new_password` on a claimed account deletes every other authentication
 | 400 | [error response](/http-api/#error-response) | Body, image, tag, password, entitlement, secondary control, or sudo proof is invalid |
 | 403 | [error response](/http-api/#error-response) | Email verification, sudo verification, or a staff-only field is required, or content is blocked |
 | 403 | [error response](/http-api/#error-response) | The account is limited and the body changes a profile field, and the request returns `ACCOUNT_LIMITED` |
+| 403 | [error response](/http-api/#error-response) | Single sign-on is enforced and an account linked to it sets a password or email, returning `SSO_REQUIRED` |
 
 ### Side effects
 
@@ -176,6 +223,129 @@ A successful change emits [User Update](/gateway/events/#user-update) to the acc
 ### Rate limit
 
 20 requests per minute for each authenticated user, on the `user:update` bucket, which is shared with [Accept current policies](#accept-current-policies) and [Reset current premium state](#reset-current-premium-state).
+
+## Set date of birth
+
+<RouteHeader method="PUT" path="/v1/users/@me/date-of-birth" />
+
+Sets the date of birth of an account that has none. Returns a [date of birth result](#date-of-birth-result-object) object.
+
+An instance that does not [collect date of birth](/http-api/instance/#public-registration-fields-object) returns 404 `NOT_FOUND`. An account that already has one returns 409 `DATE_OF_BIRTH_ALREADY_SET`, because a date of birth cannot be changed once set.
+
+### JSON body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| date_of_birth<sup>1</sup> | string | The date of birth in exact `YYYY-MM-DD` form |
+
+<sup>1</sup> A date that does not exist, is today or later, or lies more than 120 years before today (UTC) returns the field code `INVALID_DATE_OF_BIRTH_FORMAT`
+
+Fluxer resolves the region from the client IP address, with the same minimum age as [register an account](/http-api/authentication/#register-an-account). An age below it returns 403 `ACCOUNT_BELOW_MINIMUM_AGE`. The account is then closed at once, its sessions end, its username is released, and it is deleted after 72 hours. Signing in does not cancel that deletion.
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | [date of birth result](#date-of-birth-result-object) object | The date of birth was set |
+| 400 | [error response](/http-api/#error-response) | The date is invalid |
+| 403 | [error response](/http-api/#error-response) | The person is below the minimum age |
+| 404 | [error response](/http-api/#error-response) | The instance does not collect dates of birth |
+| 409 | [error response](/http-api/#error-response) | The account already has a date of birth |
+
+### Side effects
+
+The account leaves the [date of birth step](/http-api/users/#user-object). Settings still on their defaults change to the adult defaults when the person is an adult, with [User Settings Update](/gateway/events/#user-settings-update). Fluxer emits [User Update](/gateway/events/#user-update), adds the account's guilds to its Gateway sessions, and accepts the invite held from sign-up.
+
+### Rate limit
+
+5 requests per hour for each authenticated user, on the `user:date_of_birth` bucket.
+
+## Claim an account
+
+<RouteHeader method="POST" path="/v1/users/@me/claim" />
+
+Adds an email address, and optionally a password, to an unclaimed account, so it can be signed in to from another device. Returns a [claim result](#claim-result-object) object.
+
+An account that is not unclaimed returns 400 `ACCOUNT_ALREADY_CLAIMED`.
+
+### JSON body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| email?<sup>1</sup> | string | The email address to add |
+| password?<sup>2</sup> | string | The password to set (8-256 characters) |
+
+<sup>1</sup> Required on an `email` instance, where a missing value returns the field code `EMAIL_IS_REQUIRED`. Ignored on a `username` instance. The address gets the checks of [register an account](/http-api/authentication/#register-an-account)
+
+<sup>2</sup> Required on a `username` instance, on an instance that sends no email and on an instance whose `verification_basis` is `local_credential`, unless the account has a passkey. A missing value there returns 400 `PASSWORD_REQUIRED_TO_CLAIM`. A breached password returns the field code `PASSWORD_IS_TOO_COMMON`
+
+An address stored on another account, confirmed or not, returns the field code `EMAIL_ALREADY_IN_USE`. On an instance that sends email, the address is stored on the account at once and waits for [confirm the email address](#confirm-the-email-address).
+
+On an instance that sends no email, the address is confirmed at once. The claim result then has `next_step` set to `none` and no timestamps. On a `username` instance `next_step` is always `none`.
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | [claim result](#claim-result-object) object | The account was claimed, or the address waits for its code |
+| 400 | [error response](/http-api/#error-response) | The body, address or password is invalid, the address is in use, or the account is already claimed |
+| 429 | [rate limit response](/topics/rate-limits/#rate-limit-response-object) | A route, global, address or IP bucket denies the request, or codes to the address are waiting longer |
+
+### Side effects
+
+Fluxer emits [User Update](/gateway/events/#user-update) to the account and emails the code.
+
+### Rate limit
+
+5 requests per hour for each authenticated user, on the `user:claim` bucket.
+
+## Send an email confirmation code
+
+<RouteHeader method="POST" path="/v1/users/@me/email-verification/send" />
+
+Emails a 6-digit code to the unconfirmed address of the account. Returns an [email code delivery](#email-code-delivery-object) object.
+
+An unclaimed account returns 400 `USE_CLAIM_ROUTE`, and an account whose address is already confirmed returns 400 `ACCOUNT_ALREADY_CLAIMED`.
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | [email code delivery](#email-code-delivery-object) object | The code was sent |
+| 400 | [error response](/http-api/#error-response) | The account has no unconfirmed address |
+| 429 | [rate limit response](/topics/rate-limits/#rate-limit-response-object) | A route, global, address or IP bucket denies the request, or codes to the address are waiting longer |
+
+### Rate limit
+
+3 requests per 15 minutes for each authenticated user, on the `user:email_verification` bucket.
+
+## Confirm the email address
+
+<RouteHeader method="POST" path="/v1/users/@me/email-verification/confirm" />
+
+Confirms the address of the account with the emailed code. Returns the updated [user](/http-api/users/#user-object) object.
+
+### JSON body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| code | string | The 6-digit code from the email |
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | [user](/http-api/users/#user-object) object | The address was confirmed |
+| 400 | [error response](/http-api/#error-response) | The code is wrong or expired |
+| 429 | [rate limit response](/topics/rate-limits/#rate-limit-response-object) | Route or global bucket denies the request |
+
+### Side effects
+
+Fluxer emits [User Update](/gateway/events/#user-update) to the account.
+
+### Rate limit
+
+10 requests per minute for each authenticated user, on the `user:email_verification:confirm` bucket.
 
 ## Forget authorised IPs
 
@@ -274,7 +444,7 @@ Fluxer marks the account for deletion at the configured deadline and queues it f
 
 <RouteHeader method="POST" path="/v1/users/@me/terms-acceptance" />
 
-Records acceptance of the current terms of service and privacy policy. Returns the updated [user](/http-api/users/#user-object) object.
+Records acceptance of the current terms of service, and that the current privacy policy was shown. Returns the updated [user](/http-api/users/#user-object) object.
 
 ### JSON body
 
@@ -284,7 +454,7 @@ The body is an empty object, and an absent or empty body is read as one. Any sup
 
 | Status | Body | Condition |
 | --- | --- | --- |
-| 200 | [user](/http-api/users/#user-object) object | Policy acceptance was recorded |
+| 200 | [user](/http-api/users/#user-object) object | The acceptance was recorded |
 | 400 | [error response](/http-api/#error-response) | The body is not valid JSON, or it parses as JSON that is not an object |
 
 ### Side effects
@@ -294,6 +464,39 @@ Fluxer sets both `terms_agreed_at` and `privacy_agreed_at` to the request time a
 ### Rate limit
 
 20 requests per minute for each authenticated user, on the `user:update` bucket, which is shared with [Modify current user](#modify-current-user) and [Reset current premium state](#reset-current-premium-state).
+
+## Preview profile badges
+
+<RouteHeader method="POST" path="/v1/users/@me/profile-badges/preview" />
+
+Returns the current account's [profile badges](/http-api/users/#profile-badge-object) as other people would see them with the given badge settings applied. Nothing is saved.
+
+### JSON body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| premium_badge_hidden? | boolean | Preview with the premium badge hidden |
+| premium_badge_masked? | boolean | Preview with the premium badge masked |
+| premium_badge_timestamp_hidden? | boolean | Preview with the premium badge date hidden |
+| premium_badge_sequence_hidden? | boolean | Preview with the lifetime sequence hidden |
+
+Each field has the meaning it has on [Modify current user](#modify-current-user). A field that is left out keeps the value the account has saved.
+
+### Response body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| profile_badges | array[[profile badge](/http-api/users/#profile-badge-object) object] | The badges in display order, localised for the current account |
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | response body | Badges were returned |
+
+### Rate limit
+
+100 requests per 10 seconds for each authenticated user, on the `user:profile::target_id` bucket.
 
 ## Reset current premium state
 
