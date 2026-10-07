@@ -9,10 +9,6 @@ on:
         type: string
         required: false
         default: ""
-  workflow_run:
-    workflows: [Tests]
-    types: [completed]
-    branches: [main]
 
 permissions:
   actions: read
