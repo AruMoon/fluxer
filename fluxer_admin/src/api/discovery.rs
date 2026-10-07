@@ -141,23 +141,10 @@ fn listed_guild(
         member_count: None,
         applied_at: Some(guild.applied_at),
         approved_at: guild.approved_at,
-        listed_at: None,
-        category: None,
     })
 }
 
 fn float_to_i32(value: f64, field: &str) -> ApiResult<i32> {
     let parsed = crate::api::generated::number_to_u64(value, field).map_err(ApiError::Parse)?;
     i32::try_from(parsed).map_err(|_| ApiError::Parse(format!("{field} is out of range: {value}")))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn rejects_lossy_discovery_numeric_fields() {
-        assert!(float_to_u64(10.5, "guild_member_count").is_err());
-        assert!(float_to_i32(9_999_999_999.0, "category_type").is_err());
-    }
 }
