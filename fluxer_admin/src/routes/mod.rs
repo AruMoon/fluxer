@@ -12,8 +12,11 @@ pub mod enforcement;
 mod guild_tabs;
 pub mod guilds;
 pub mod jobs;
+mod limit_config_actions;
 mod message_actions;
 pub mod messages;
+pub mod operator_pass;
+pub mod payment_disputes;
 pub mod registrations;
 pub mod reports;
 pub mod system;
@@ -64,6 +67,8 @@ pub fn build_router(config: AdminConfig) -> Router {
         .merge(bans::router())
         .merge(applications::router())
         .merge(codes::router())
+        .merge(operator_pass::router().route_layer(from_fn_with_state(state.clone(), hosted_only)))
+        .merge(payment_disputes::router())
         .merge(discovery::router())
         .merge(enforcement::router())
         .merge(registrations::router())
@@ -78,6 +83,7 @@ pub fn build_router(config: AdminConfig) -> Router {
             state.clone(),
             middleware::account_identity::scope_account_identity,
         ))
+        .layer(from_fn(middleware::default_avatars::scope_default_avatars))
         .layer(from_fn(middleware::htmx::flash_redirect_to_toast))
         .layer(from_fn_with_state(
             state.clone(),
@@ -133,16 +139,31 @@ async fn security_headers_middleware(
 }
 
 fn build_admin_csp(config: &AdminConfig) -> String {
-    let static_cdn = csp_origin(&config.static_cdn_endpoint);
-    let media = csp_origin(&config.media_endpoint);
+    let api = if config.api_public_endpoint.is_empty() {
+        &config.api_endpoint
+    } else {
+        &config.api_public_endpoint
+    };
+    let mut img_sources = vec!["'self'".to_owned(), "data:".to_owned(), "blob:".to_owned()];
+    for source in [
+        csp_origin(&config.static_cdn_endpoint),
+        csp_origin(&config.media_endpoint),
+        csp_origin(&config.web_app_endpoint),
+        csp_origin(&config.reports_bucket_origin),
+        csp_origin(api),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        if !img_sources.contains(&source) {
+            img_sources.push(source);
+        }
+    }
     [
         "default-src 'self'".to_owned(),
         "script-src 'self' 'unsafe-inline'".to_owned(),
         "style-src 'self' 'unsafe-inline'".to_owned(),
-        format!(
-            "img-src 'self' data: blob: {static_cdn} {media} {}",
-            config.reports_bucket_origin
-        ),
+        format!("img-src {}", img_sources.join(" ")),
         "font-src 'self'".to_owned(),
         "connect-src 'self'".to_owned(),
         "object-src 'none'".to_owned(),
@@ -154,11 +175,9 @@ fn build_admin_csp(config: &AdminConfig) -> String {
     .join("; ")
 }
 
-fn csp_origin(endpoint: &str) -> String {
-    match url::Url::parse(endpoint) {
-        Ok(u) => u.origin().ascii_serialization(),
-        Err(_) => endpoint.trim_end_matches('/').to_owned(),
-    }
+fn csp_origin(endpoint: &str) -> Option<String> {
+    let origin = url::Url::parse(endpoint).ok()?.origin();
+    origin.is_tuple().then(|| origin.ascii_serialization())
 }
 
 async fn cache_headers_middleware(request: Request, next: Next) -> Response {
@@ -240,6 +259,13 @@ async fn dashboard(State(state): State<AppState>) -> impl IntoResponse {
         ],
         "",
     )
+}
+
+async fn hosted_only(State(state): State<AppState>, request: Request, next: Next) -> Response {
+    if state.config().self_hosted {
+        return not_found(State(state)).await.into_response();
+    }
+    next.run(request).await
 }
 
 async fn not_found(State(state): State<AppState>) -> impl IntoResponse {
