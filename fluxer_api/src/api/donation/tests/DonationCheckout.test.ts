@@ -43,6 +43,24 @@ describe('POST /donations/checkout', () => {
 		const session = stripeHandlers.spies.createdCheckoutSessions[0];
 		expect(session?.customer_email).toBe(TEST_DONOR_EMAIL);
 	});
+	test('a one-time donation gets a Stripe invoice only when given as a business', async () => {
+		await createDonationCheckoutBuilder(harness)
+			.body({...createValidCheckoutBody(), interval: null, is_business: true})
+			.expect(200)
+			.execute();
+		await createDonationCheckoutBuilder(harness)
+			.body({...createValidCheckoutBody(), interval: null, is_business: false})
+			.expect(200)
+			.execute();
+		const [business, personal] = stripeHandlers.spies.createdCheckoutSessions as unknown as Array<{
+			mode?: string;
+			customer_creation?: string;
+			invoice_creation?: {enabled?: string};
+		}>;
+		expect(business).toMatchObject({mode: 'payment', customer_creation: 'always', invoice_creation: {enabled: 'true'}});
+		expect(personal).toMatchObject({mode: 'payment', customer_creation: 'always'});
+		expect(personal?.invoice_creation).toBeUndefined();
+	});
 	test('sets subscription mode', async () => {
 		await createDonationCheckoutBuilder(harness).body(createValidCheckoutBody()).expect(200).execute();
 		expect(stripeHandlers.spies.createdCheckoutSessions).toHaveLength(1);
