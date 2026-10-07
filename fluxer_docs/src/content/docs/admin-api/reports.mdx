@@ -465,19 +465,6 @@ One entry of the [report reason](/http-api/reports/#report-reasons) catalogue, a
 | legacy_category_user | string | The category a user report stores |
 | legacy_category_guild | string | The category a guild report stores |
 
-### Example
-
-```json
-{
-  "key": "csam",
-  "label": "Child sexual abuse material",
-  "highest_priority": true,
-  "legacy_category_message": "child_safety",
-  "legacy_category_user": "child_safety",
-  "legacy_category_guild": "child_safety"
-}
-```
-
 ## Report resolution object
 
 A report resolution is the reduced view [Update report](#update-report) returns. It has the fields the update writes and nothing else.
@@ -512,16 +499,6 @@ A report resolution is the reduced view [Update report](#update-report) returns.
 | legal_hold_until | ?ISO8601 timestamp | When the hold ends, or null when the report has no hold |
 | legal_hold_reason | ?string | Why the report is held, or null when the report has no hold |
 
-### Example
-
-```json
-{
-  "report_id": "1502771904419102720",
-  "legal_hold_until": "2027-06-30T00:00:00.000Z",
-  "legal_hold_reason": "Preservation request from a court"
-}
-```
-
 ## Report note object
 
 A note is internal context a staff member adds to a report. Notes are staff only. Fluxer never shows them to the reporter or the reported account, and never puts them in a notice, email or direct message. A note never changes once it is written. Notes have no retention period of their own and are deleted together with the report.
@@ -534,17 +511,6 @@ A note is internal context a staff member adds to a report. Notes are staff only
 | author_id | snowflake | The staff member who wrote it |
 | body | string | The note |
 | created_at | ISO8601 timestamp | When it was written |
-
-### Example
-
-```json
-{
-  "note_id": "1502771904419102999",
-  "author_id": "1483920011884392001",
-  "body": "Reporter sent more context by email",
-  "created_at": "2026-03-05T09:14:02.118Z"
-}
-```
 
 ## Report retention
 
@@ -563,7 +529,7 @@ An evidence copy that a retained report also uses is kept for that report.
 The job runs once a day in `worker`. Each run logs one `Processed report retention` line with the counts it found, deleted and cleared and the periods it used. A report that fails to delete or clear keeps its record and is retried on the next run. [Delete report](#delete-report) deletes one report straight away.
 
 :::caution[Deleted evidence cannot be restored]
-Retention deletes for real unless `FLUXER_REPORT_RETENTION_DRY_RUN` is `true` on `worker`. In a dry run each run only counts what it would delete or clear and changes nothing. The [operator configuration](/operator/configuration/#moderation-and-abuse) describes the two settings.
+Retention deletes for real unless `FLUXER_REPORT_RETENTION_DRY_RUN` is `true` on `worker`. In a dry run each run only counts what it would delete or clear and changes nothing.
 :::
 
 ## List reports
@@ -748,7 +714,7 @@ The report moves to RESOLVED and records `resolved_at`, `resolved_by_admin_id`, 
 
 Fluxer records one [Admin audit entry](/admin-api/#admin-audit-entry-object) with target type `report`, target ID equal to the report ID, and action `resolve_report`. The metadata is `report_id`, `report_type`, `notify_reporter`, `reporter_dm_sent`, `reporter_email_sent`, `reporter_dsa_email_sent`, `resolution`, `duplicate_of` for a duplicate, and `outcome`, which a duplicate of a report with no outcome leaves out. When Fluxer does not attempt a notice, `reporter_notice_skipped` names the reason: `reporter_account_deleted`, `reporter_report_banned`, `reporter_lookup_failed`, `no_reporter_email`, or `duplicate_outcome_unknown`.
 
-Fluxer tells the reporter the decision about the item they reported: that the content was removed, that the account was restricted without saying how, that action was taken without saying what, or that it broke no rule and was left as it is. A reporter with an account receives a system direct message, and an email when the account has an address. A Digital Services Act notice has no reporter account, so its verified address receives the same decision by email. Each notice gives the report ID, the comment when one is shared, and on hosted instances how to appeal within 60 days and the EU redress routes. It never names a decision, a sanction or the other account's history. Nothing is sent when the reporter account is deleted, or was barred from reporting when the report was filed.
+Fluxer tells the reporter the decision about the item they reported: that the content was removed, that the account was restricted without saying how, that action was taken without saying what, or that it broke no rule and was left as it is. A reporter with an account receives a system direct message, and an email when the account has an address. A Digital Services Act notice has no reporter account, so its verified address receives the same decision by email. Each notice gives the report ID and the comment when one is shared. It never names a decision, a sanction or the other account's history. Nothing is sent when the reporter account is deleted, or was barred from reporting when the report was filed.
 
 A reporter who does not already have the system channel open receives [Channel Create](/gateway/events/#channel-create), and every session of the reporter receives [Message Create](/gateway/events/#message-create). Fluxer logs a delivery failure, and the request still succeeds.
 

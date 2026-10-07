@@ -127,8 +127,6 @@ A submission stores the locale the reporter saw, resolved the same way from its 
 
 ## Report flow object
 
-[Get report flow](#get-report-flow) returns every screen of one variant in this object.
-
 ### Structure
 
 | Field | Type | Description |
@@ -144,11 +142,9 @@ A submission stores the locale the reporter saw, resolved the same way from its 
 
 <sup>1</sup> 16 lowercase hexadecimal characters
 
-<sup>2</sup> The guidelines URL the operator set. Without one, a hosted instance links its own guidelines page and a self-hosted instance has null. A client links its summary disclaimer to it
+<sup>2</sup> The guidelines URL the operator set, or null without one. A client links its summary disclaimer to it
 
 ### Example
-
-An abridged user flow:
 
 ```json
 {
@@ -157,24 +153,8 @@ An abridged user flow:
   "revision_hash": "9c41d2a07e5b18f3",
   "locale": "en-US",
   "start_screen_id": "profile_intro",
-  "guidelines_url": "https://fluxer.app/guidelines",
+  "guidelines_url": "https://example.com/guidelines",
   "screens": [
-    {
-      "id": "profile_intro",
-      "title": "Report profile",
-      "subtitle": "Tell us what's wrong with this profile. They won't be told who reported them.",
-      "urgent": false,
-      "options": [
-        {
-          "id": "learn_more",
-          "label": "Read the Fluxer Community Guidelines",
-          "outcome": {"type": "link", "screen_id": null, "reason": null, "notice_id": null, "url": "https://fluxer.app/guidelines"}
-        }
-      ],
-      "options_heading": "Learn more",
-      "checklist": null,
-      "next_screen_id": "profile_parts"
-    },
     {
       "id": "profile_parts",
       "title": "Which parts of their profile are a problem?",
@@ -206,8 +186,6 @@ An abridged user flow:
 
 ## Report flow screen object
 
-One question, checklist, or information page in a [report flow](#report-flows).
-
 ### Structure
 
 | Field | Type | Description |
@@ -220,8 +198,6 @@ One question, checklist, or information page in a [report flow](#report-flows).
 | options_heading | ?string | A heading shown above the options |
 | checklist | ?[report flow checklist](#report-flow-checklist-object) object | The checklist, set only on a checklist screen |
 | next_screen_id | ?string | The screen the Next button leads to, set only on an info screen |
-
-<sup>1</sup> Empty on a checklist screen, and holding only link options on an info screen
 
 ## Report flow option object
 
@@ -246,8 +222,6 @@ Every member is always present. The members that do not apply to `type` are null
 | reason<sup>1</sup> | ?string | The [report reason](#report-reasons) when `type` is `submit` |
 | notice_id | ?string | The notice to show when `type` is `end`, or null for the thank-you screen |
 | url | ?string | The page to open when `type` is `link` |
-
-<sup>1</sup> A plain string, so a client MUST tolerate a reason the [catalogue](#report-reasons) does not list yet
 
 ## Report flow checklist object
 
@@ -308,8 +282,6 @@ One answered screen in a submission. A submission lists its steps in walk order.
 
 ## Report object
 
-Fluxer returns this receipt when it records a submission.
-
 ### Structure
 
 | Field | Type | Description |
@@ -334,8 +306,6 @@ Fluxer returns this receipt when it records a submission.
 
 ## Success object
 
-The fixed acknowledgement returned by [Send DSA report email](#send-dsa-report-email).
-
 ### Structure
 
 | Field | Type | Description |
@@ -351,8 +321,6 @@ The fixed acknowledgement returned by [Send DSA report email](#send-dsa-report-e
 ```
 
 ## Ticket object
-
-The single credential [Create DSA report](#create-dsa-report) accepts. Fluxer binds the ticket to the verified address it was issued for, and that address becomes the reporter identity on the resulting notice.
 
 ### Structure
 
@@ -499,8 +467,6 @@ Every report stores one category from this registry. A report filed through a fl
 A user report only ever stores `harassment`, `hate_speech`, `spam_account`, `impersonation`, `underage_user`, `inappropriate_profile`, `child_safety`, or `other`.
 
 ## EU country codes
-
-No instance configuration changes this registry. A value outside it returns 400 `INVALID_FORM_BODY`.
 
 | Value | Description |
 | --- | --- |

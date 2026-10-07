@@ -16,7 +16,7 @@ A self-hosted instance whose [premium mode](/admin-api/instance/#premium-modes) 
 
 ## Gift duration units
 
-The unit and the quantity together define the span a redeemed code grants. At redemption, Fluxer adds the span to the entitlement anchor, which is the latest of the current time, the end of the redeemer's premium, and the end of any earlier gift extension. Lifetime gifts are not supported.
+The unit and the quantity together define the span a redeemed code grants. At redemption, Fluxer adds the span to the entitlement anchor, which is the latest of the current time, the end of the redeemer's premium, and the end of any earlier gift extension. A `lifetime` code grants premium that never ends instead.
 
 | Value | Description |
 | --- | --- |
@@ -24,8 +24,11 @@ The unit and the quantity together define the span a redeemed code grants. At re
 | weeks | The quantity counts weeks added to the entitlement anchor |
 | months<sup>1</sup> | The quantity counts calendar months added to the entitlement anchor |
 | years<sup>1</sup> | The quantity counts calendar years, applied as twelve calendar months each |
+| lifetime<sup>2</sup> | The code grants lifetime premium, and the quantity is ignored |
 
 <sup>1</sup> A calendar month is added in UTC and clamped to the last day of the target month, so an anchor of 31 January extended by one month lands on 28 or 29 February
+
+<sup>2</sup> Accepted only when generating codes. The stored code reports `duration_type` `months` with `duration_quantity` `0`, the shape every lifetime gift has, and a redeemer who already has lifetime premium cannot redeem it. Redeeming one takes no lifetime sequence number, so the redeemer's `premium_lifetime_sequence` stays null
 
 ## Create gift codes
 
@@ -39,7 +42,7 @@ Generates the requested number of unredeemed gift codes. Requires `gift_codes:ge
 | --- | --- | --- |
 | count | integer | The number of codes to generate (1-100) |
 | duration_type | string | The [gift duration unit](#gift-duration-units) the quantity is counted in |
-| duration_quantity | integer | The quantity of the selected unit (1-3650) |
+| duration_quantity | integer | The quantity of the selected unit (1-3650), ignored for `lifetime` |
 
 ### Response body
 
@@ -70,15 +73,3 @@ Generates the requested number of unredeemed gift codes. Requires `gift_codes:ge
 :::caution[The codes are returned once]
 Reading a code back requires presenting it to [Get gift](/http-api/gifts/#get-gift), so a lost response cannot be recovered.
 :::
-
-### Side effects
-
-Each code is 32 characters drawn from the uppercase letters, the lowercase letters, and the digits. Fluxer creates it unredeemed and records the system account with ID `0` as its creator, which is the creator the [gift object](/http-api/gifts/#gift-object) reports to the redeemer.
-
-A failed request can leave some codes redeemable without returning them. Retrying can therefore create additional codes.
-
-The operation records one [Admin audit entry](/admin-api/#admin-audit-entry-object) with action `generate_gift_codes`, target type `gift_code`, target ID `0`, and metadata keys `count`, `duration_type`, and `duration_quantity`. The codes are not recorded. It emits no Gateway Dispatch.
-
-### Rate limit
-
-30 requests per minute for each authenticated user, on the `admin:code:generation` bucket.

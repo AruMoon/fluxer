@@ -75,8 +75,6 @@ An archive is in one of these lifecycle states. It is building while `completed_
 | user | The archive captures one user account |
 | guild | The archive captures one guild |
 
-[List archives](#list-archives) also accepts `all` as a filter value, and it is the default there. No path segment accepts it.
-
 ## Archive download object
 
 This object uses camelCase field names, unlike every other Admin response body.
@@ -88,7 +86,7 @@ This object uses camelCase field names, unlike every other Admin response body.
 | downloadUrl<sup>1</sup> | string | The time-limited URL the archive file is fetched from |
 | expiresAt<sup>2</sup> | ISO8601 timestamp | The time this URL stops working |
 
-<sup>1</sup> The URL is a presigned object storage link with no Admin credential, so possession of it grants access until it expires
+<sup>1</sup> A presigned object storage link, or a [signed download](#download-signed-file) link on the API while presigned harvest downloads are disabled. Neither carries an Admin credential, so possession of it grants access until it expires
 
 <sup>2</sup> The value is seven days after the grant was issued, regardless of the archive's own `expires_at`
 
@@ -202,14 +200,6 @@ Issues a temporary download URL for a completed archive. Returns an [archive dow
 The URL has its own signature and works for seven days for anyone who holds it. It is bound to no Admin account, and no operation revokes it. Each repeat of the operation issues a further independent grant.
 :::
 
-### Path parameters
-
-| Field | Type | Description |
-| --- | --- | --- |
-| subject_type | string | The [archive subject type](#archive-subject-types), either `user` or `guild` |
-| subject_id | snowflake | The user or guild the archive was taken of |
-| archive_id | snowflake | The ID of a completed archive |
-
 ### Response
 
 | Status | Body | Condition |
@@ -225,10 +215,61 @@ The URL has its own signature and works for seven days for anyone who holds it. 
 
 ### Side effects
 
-The operation creates a presigned download URL valid for seven days and changes no field of the archive, including `download_url_expires_at`.
+The operation creates a download URL valid for seven days and changes no field of the archive, including `download_url_expires_at`. While presigned harvest downloads are disabled, which is the self-hosted default, the URL points at [Download signed file](#download-signed-file) on the public API endpoint instead of object storage.
 
 The operation records one [Admin audit entry](/admin-api/#admin-audit-entry-object) with action `get_archive_download_url`, target type equal to `subject_type`, target ID equal to `subject_id`, and metadata key `archive_id`. The entry has no URL. A request that returns 400 or 404 records no entry.
 
 ### Rate limit
 
 200 requests per minute for each authenticated user, on the `admin:lookup` bucket.
+
+## Download signed file
+
+<RouteHeader method="GET" path="/v1/signed-downloads/{filename}" unauthenticated />
+
+Streams an archive or a file kept with a report, from a link the Admin API issued in place of a presigned object storage link.
+
+[Create archive download](#create-archive-download), and the attachment and profile image URLs of a [report](/admin-api/reports/), use this route while presigned harvest downloads are disabled. The `token` query parameter names the stored file and its expiry, and is signed by the instance. Use the complete issued URL and keep it secret.
+
+:::note[Every rejection looks identical]
+A missing, malformed, forged, or expired token and an object that no longer exists all return 404 with the plain text body `Not Found`. So does every request while the instance issues presigned URLs.
+:::
+
+### Path parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| filename | string | File name the download is saved as (1-512 characters) |
+
+### Query parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| token | string | Signed download token issued with the link (1-2,048 characters) |
+
+### Request headers
+
+| Field | Type | Description |
+| --- | --- | --- |
+| Range? | string | Standard byte range, answered with 206 and a `Content-Range` header |
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | file bytes | The complete file was streamed |
+| 206 | file bytes | The requested byte range was streamed |
+| 404 | `Not Found` | The token is missing, invalid, or expired, the file is gone, or the instance issues presigned URLs instead |
+| 416 | `Range Not Satisfiable` | The requested range lies outside the file |
+
+### Response headers
+
+The 200 has the stored `Content-Type`, `Content-Disposition: attachment` with the file name from the path, `Content-Length`, `Accept-Ranges: bytes`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`, and a sandboxing `Content-Security-Policy`. The 206 adds `Content-Range`.
+
+### Side effects
+
+The file is read and streamed. The token is not consumed, so it stays usable until its own expiry, which is seven days for an archive and five minutes for a report file.
+
+### Rate limit
+
+60 requests per minute for each client IP address, or for the authenticated account when the request has a resolvable credential, on the `user:harvest:download_file` bucket.
