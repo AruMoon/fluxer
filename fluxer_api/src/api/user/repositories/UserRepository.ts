@@ -155,6 +155,10 @@ export class UserRepository {
 		return this.lookupRepo.findByStripeCustomerId(stripeCustomerId);
 	}
 
+	async listUserIdsWithAcl(acl: string): Promise<Array<UserID>> {
+		return this.lookupRepo.listUserIdsWithAcl(acl);
+	}
+
 	async listUserIdsByLastActiveIp(
 		lastActiveIp: string,
 		limit: number,
@@ -190,6 +194,10 @@ export class UserRepository {
 	}> {
 		const result = await this.accountRepo.getActivityTracking(userId);
 		return result ?? {last_active_at: null, last_active_ip: null};
+	}
+
+	async indexUserAcls(user: User): Promise<void> {
+		return this.accountRepo.indexUserAcls(user);
 	}
 
 	async deleteUserSecondaryIndices(userId: UserID): Promise<void> {
@@ -487,10 +495,6 @@ export class UserRepository {
 		return this.channelRepo.listPrivateChannelSummaries(userId);
 	}
 
-	async deleteAllPrivateChannels(userId: UserID): Promise<void> {
-		return this.channelRepo.deleteAllPrivateChannels(userId);
-	}
-
 	async findExistingDmState(user1Id: UserID, user2Id: UserID): Promise<Channel | null> {
 		return this.channelRepo.findExistingDmState(user1Id, user2Id);
 	}
@@ -505,10 +509,6 @@ export class UserRepository {
 
 	async isDmChannelOpen(userId: UserID, channelId: ChannelID): Promise<boolean> {
 		return this.channelRepo.isDmChannelOpen(userId, channelId);
-	}
-
-	async openDmForUser(userId: UserID, channelId: ChannelID, isGroupDm?: boolean): Promise<void> {
-		return this.channelRepo.openDmForUser(userId, channelId, isGroupDm);
 	}
 
 	async openPrivateChannelForUser(userId: UserID, channel: Channel): Promise<void> {

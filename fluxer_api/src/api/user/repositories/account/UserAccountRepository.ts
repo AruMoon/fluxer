@@ -219,6 +219,10 @@ export class UserAccountRepository {
 		}
 	}
 
+	async indexUserAcls(user: User): Promise<void> {
+		await this.indexRepo.indexAcls(user.id, user.acls);
+	}
+
 	async deleteUserSecondaryIndices(userId: UserID): Promise<void> {
 		const user = await this.findUnique(userId);
 		if (!user) return;
@@ -230,6 +234,7 @@ export class UserAccountRepository {
 			user.stripeCustomerId,
 			user.stripeSubscriptionId,
 			user.lastActiveIp,
+			user.acls,
 		);
 	}
 

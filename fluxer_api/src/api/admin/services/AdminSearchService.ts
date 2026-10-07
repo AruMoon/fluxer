@@ -38,6 +38,11 @@ interface AdminSearchServiceDeps {
 	auditService: AdminAuditService;
 }
 
+function compareUserIds(a: UserID, b: UserID): number {
+	if (a === b) return 0;
+	return a < b ? -1 : 1;
+}
+
 export class AdminSearchService {
 	constructor(private readonly deps: AdminSearchServiceDeps) {}
 
@@ -94,10 +99,12 @@ export class AdminSearchService {
 			query?: string;
 			email?: string;
 			last_active_ip?: string;
+			acl?: string;
 			limit: number;
 			offset: number;
 		},
 		acls: ReadonlySet<string>,
+		locale?: string,
 	) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const email = data.email?.trim();
@@ -106,17 +113,24 @@ export class AdminSearchService {
 			if (!user) {
 				return {users: [], total: 0};
 			}
-			const response = await mapUserToAdminResponse(user, cacheService, acls);
+			const response = await mapUserToAdminResponse(user, cacheService, acls, locale);
 			return {users: [response], total: 1};
 		}
 		const lastActiveIp = data.last_active_ip?.trim();
 		if (lastActiveIp) {
 			const {userIds, total} = await userRepository.listUserIdsByLastActiveIp(lastActiveIp, data.limit, data.offset);
-			const response = await this.mapOrderedUsers(userIds, acls);
+			const response = await this.mapOrderedUsers(userIds, acls, locale);
 			return {
 				users: response,
 				total,
 			};
+		}
+		if (data.acl !== undefined) {
+			const userIds = (await userRepository.listUserIdsWithAcl(data.acl))
+				.filter((userId) => !isSyntheticUserId(userId))
+				.sort(compareUserIds);
+			const response = await this.mapOrderedUsers(userIds.slice(data.offset, data.offset + data.limit), acls, locale);
+			return {users: response, total: userIds.length};
 		}
 		const userSearchService = getUserSearchService();
 		if (!userSearchService) {
@@ -135,11 +149,11 @@ export class AdminSearchService {
 		]);
 		const {hits, total} = searchResult;
 		const userIds = hits.map((hit) => createUserID(BigInt(hit.id)));
-		const response = await this.mapOrderedUsers(userIds, acls);
+		const response = await this.mapOrderedUsers(userIds, acls, locale);
 		if (directUser && data.offset === 0) {
 			const directId = directUser.id.toString();
 			if (!response.some((u) => u.id === directId)) {
-				response.unshift(await mapUserToAdminResponse(directUser, cacheService, acls));
+				response.unshift(await mapUserToAdminResponse(directUser, cacheService, acls, locale));
 			}
 		}
 		return {
@@ -250,7 +264,7 @@ export class AdminSearchService {
 		return status;
 	}
 
-	private async mapOrderedUsers(userIds: Array<UserID>, acls: ReadonlySet<string>) {
+	private async mapOrderedUsers(userIds: Array<UserID>, acls: ReadonlySet<string>, locale?: string) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const users = await userRepository.listUsers(userIds);
 		const usersById = new Map(users.map((user) => [user.id.toString(), user]));
@@ -259,6 +273,6 @@ export class AdminSearchService {
 			const user = usersById.get(userId.toString());
 			if (user) orderedUsers.push(user);
 		}
-		return Promise.all(orderedUsers.map((user) => mapUserToAdminResponse(user, cacheService, acls)));
+		return Promise.all(orderedUsers.map((user) => mapUserToAdminResponse(user, cacheService, acls, locale)));
 	}
 }

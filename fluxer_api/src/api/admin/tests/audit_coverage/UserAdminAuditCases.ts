@@ -160,6 +160,29 @@ export const UserAdminAuditCases: ReadonlyArray<AdminAuditCoverageCase> = [
 	{
 		method: 'GET',
 		route: '/admin/users',
+		name: 'acl',
+		async prepare() {
+			return {
+				request: {path: `/admin/users?acl=${encodeURIComponent(AdminACLs.WILDCARD)}&limit=10&offset=0`},
+				expected: {
+					action: 'search_users',
+					targetType: 'user',
+					targetId: '0',
+					metadata: {
+						selector: 'acl',
+						acl: AdminACLs.WILDCARD,
+						limit: '10',
+						offset: '0',
+						result_count: '1',
+						total: '1',
+					},
+				},
+			};
+		},
+	},
+	{
+		method: 'GET',
+		route: '/admin/users',
 		name: 'search',
 		search: 'enabled',
 		async prepare() {
