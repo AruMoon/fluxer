@@ -87,8 +87,6 @@ An OAuth2 bearer access token is accepted only where a route opts in, and the re
 
 ## Standard request headers
 
-These headers are accepted across resources. An operation-specific header is documented in that operation's request header table.
-
 | Field | Type | Description |
 | --- | --- | --- |
 | Authorization? | string | The single credential for an authenticated request, in one of the [accepted schemes](/authentication/#authorization-schemes) |
@@ -173,7 +171,7 @@ A global denial has `Retry-After`, `X-RateLimit-Scope`, and `X-RateLimit-Global`
 
 ## Conditional routes
 
-A small set of routes depends on the deployment. A self-hosted deployment serves some of them only while its operator runs a premium tier or sells it, never serves the rest, and answers an unserved one with 404 `NOT_FOUND`. [Deployment availability](/http-api/deployment-availability/) lists every such route and states how a client reads which ones a deployment serves before authenticating.
+A small set of routes depends on the deployment. A self-hosted deployment serves them only while its operator runs a premium tier or sells it, and answers an unserved one with 404 `NOT_FOUND`. [Deployment availability](/http-api/deployment-availability/) lists every such route and states how a client reads which ones a deployment serves before authenticating.
 
 ## Cross-origin requests
 
@@ -184,10 +182,6 @@ The paths below are readable from any origin. `/v1/webhooks/{webhook_id}/{token}
 [Get instance discovery](/http-api/instance/#get-instance-discovery) on `/.well-known/fluxer`, [Get OpenAPI document](/http-api/instance/#get-openapi-document) on `/v1/openapi.json`, and [Get client geolocation](/http-api/instance/#get-client-geolocation) on `/v1/ip` set `Access-Control-Allow-Origin: *` in the operation itself. A request whose `Origin` is absent or outside the allow-list receives `*`. For an allowed origin, the policy replaces `*` with that exact origin and sends `Vary: Origin`.
 
 `Access-Control-Expose-Headers` is the value `X-Fluxer-Version, ETag`. Every other Fluxer response header, the rate limit headers and `X-Request-ID` included, is hidden from cross-origin script. `Access-Control-Allow-Headers` is `Content-Type, Authorization, X-Requested-With, Accept-Language, X-Request-ID, If-None-Match`, so a cross-origin client revalidates an [ETag](/http-api/experiments/#get-experiment-assignments) it was served.
-
-:::caution[Same-host mutations require a matching origin]
-A production deployment rejects a non-`GET` request whose `Host` is `web.fluxer.app` or `web.canary.fluxer.app` unless its `Origin` is exactly `https://` followed by that same host, returning 403 `INVALID_API_ORIGIN`. A request sent to the API host is unaffected.
-:::
 
 <a id="error-response"></a>
 
@@ -255,61 +249,3 @@ Each entry identifies one failed input field. A 400 response whose top-level cod
   ]
 }
 ```
-
-Fluxer produces at most one entry for each distinct pair of `path` and `code`, so a field that fails several constraints with the same `code` appears once.
-
-## Resource pages
-
-| Page | Covers |
-| --- | --- |
-| [Errors](/http-api/errors/) | The error envelope, status fallback mapping, and the API and validation code registries |
-| [Deployment availability](/http-api/deployment-availability/) | Routes that exist only on the hosted deployment |
-| [Authentication operations](/http-api/authentication/) | Registration, login, MFA, WebAuthn, SSO, email verification, recovery, sessions, IP authorisation, desktop handoff |
-| [Gateway](/http-api/gateway/) | Bot discovery of the main Gateway endpoint and session start budget |
-| [Instance](/http-api/instance/) | Instance discovery, client geolocation, the limit key registry, the served OpenAPI document |
-| [OAuth2](/http-api/oauth2/) | Authorisation, consent, token exchange, introspection, revocation, granted authorisations |
-| [Applications](/http-api/applications/) | Application, bot account, client secret, and bot token management, plus public lookup |
-| [Connections](/http-api/connections/) | External account connection initiation, verification, visibility, and deletion |
-| [Users](/http-api/users/) | The user object and the shared user enumerations |
-| [Current user](/http-api/users/current-user/) | Current account retrieval, profile mutation, lifecycle, policy acceptance, authorised IP state |
-| [User settings](/http-api/users/settings/) | Account, notification, and privacy settings, guild folders, voice activity sharing |
-| [User settings Protobuf](/http-api/users/settings-protobuf/) | Every structured client preference message and enumeration |
-| [Email and password changes](/http-api/users/email-and-password/) | The ticketed credential replacement flows |
-| [Multi-factor authentication](/http-api/users/mfa/) | TOTP, backup codes, WebAuthn credentials, sudo verification |
-| [Relationships](/http-api/users/relationships/) | Friend requests, friendships, blocks, relationship nicknames |
-| [User notes](/http-api/users/notes/) | Private notes attached to user IDs |
-| [Private channels](/http-api/users/private-channels/) | Direct message and group DM discovery, creation, preload, pin state |
-| [User content collections](/http-api/users/content/) | Recent mentions, saved messages, asynchronous message deletion |
-| [Gift inventory](/http-api/users/gifts/) | Premium gift codes created by the current account |
-| [Data harvests](/http-api/users/data-harvest/) | Data harvest creation, status, and download |
-| [Read states](/http-api/read-states/) | Message watermark and mention count acknowledgements |
-| [Memes](/http-api/memes/) | The saved image, video, and audio collection and batch GIF URL resolution |
-| [Themes](/http-api/themes/) | Shareable custom CSS theme creation |
-| [Channels](/http-api/channels/) | Channel objects, private recipients, permission overwrites, slowmode, RTC regions |
-| [Threads](/http-api/threads/) | Thread objects, starting and archiving threads, archived thread lists, thread search, thread permissions |
-| [Thread members](/http-api/thread-members/) | Joining and leaving threads, member lists, thread notification settings |
-| [Forums](/http-api/forums/) | Forum and media channels, forum tags, post data, webhooks that post into a forum |
-| [Calls](/http-api/calls/) | Call eligibility, region selection, ringing, and termination |
-| [Streams](/http-api/streams/) | Go Live stream keys, stream regions, preview image lifecycle |
-| [Entrance sounds](/http-api/entrance-sounds/) | The entrance sound collection, its per-scope selections, and playback |
-| [Messages](/http-api/messages/) | Messages, attachments, embeds, history, acknowledgements, pins, reactions, typing |
-| [Guilds](/http-api/guilds/) | Guild objects and lifecycle operations |
-| [Guild channels](/http-api/guild-channels/) | Listing, creation, hierarchy, permission inheritance, bulk positioning |
-| [Guild members](/http-api/guild-members/) | Member objects, profiles, voice moderation, ownership, removal, role assignment |
-| [Guild member search](/http-api/guild-member-search/) | Indexed search filters, sorting, pagination, supplemental join metadata |
-| [Guild moderation](/http-api/guild-moderation/) | Bans, temporary bans, ban replacement, and the blocks a ban has |
-| [Guild emojis](/http-api/guild-emojis/) | Guild emoji objects, uploads, metadata changes, deletion |
-| [Guild stickers](/http-api/guild-stickers/) | Guild sticker objects, uploads, metadata changes, deletion |
-| [Expressions](/http-api/expressions/) | Emoji and sticker metadata reads across both |
-| [Guild audit logs](/http-api/guild-audit-logs/) | Audit entries, typed targets, contexts, changes, filters, the audit reason contract |
-| [Roles and permissions](/http-api/permissions/) | Permission flags, computation order, role objects and lifecycle |
-| [Discovery](/http-api/discovery/) | Public guild listings, categories, the listing application lifecycle, joining without an invite |
-| [Invites](/http-api/invites/) | Invite lookup, creation, acceptance, deletion, code generation |
-| [Webhooks](/http-api/webhooks/) | Webhook management, message execution, GitHub, Slack, Instatus, and Libredesk callbacks |
-| [Search](/http-api/search/) | Authenticated global message search |
-| [Unfurl](/http-api/unfurl/) | Authenticated external URL metadata resolution |
-| [Billing](/http-api/billing/) | Stripe checkout, gift purchase, age verification, refunds, the Stripe webhook |
-| [Premium](/http-api/premium/) | Premium pricing, entitlement state, subscription self-service, billing portal handoff |
-| [Gifts](/http-api/gifts/) | Public gift code lookup and authenticated redemption |
-| [Donations](/http-api/donations/) | Donation currencies and intervals, checkout sessions, the donor management link |
-| [Reports](/http-api/reports/) | Authenticated safety reports and email-verified Digital Services Act notices |

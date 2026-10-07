@@ -82,7 +82,7 @@ The listing is not paginated, so it accepts no query parameter and returns no cu
 
 An unredeemed code is listed indefinitely. A redeemed code is listed only while its redemption is less than seven days old, so an account whose codes were all redeemed longer ago receives an empty array.
 
-A revoked code is omitted at every age. Fluxer revokes a code when a dispute or refund reaches the purchase while the code is still unredeemed, and no route reports the reversal to the buyer. A code already redeemed when the reversal arrived is not revoked, so it stays listed under the seven-day rule while Fluxer recomputes the redeemer's entitlement from their remaining redeemed gifts.
+A revoked code is omitted at every age. Fluxer revokes a code when a refund, or a dispute that closes as `lost`, reaches the purchase while the code is still unredeemed, and no route reports the reversal to the buyer. A code already redeemed when the reversal arrived is not revoked, so it stays listed under the seven-day rule while Fluxer recomputes the redeemer's entitlement from their remaining redeemed gifts.
 
 A redeemed code that has dropped out of the listing still exists, still resolves through the [Gifts resource](/http-api/gifts/), and is still permanently spent. A revoked code stops resolving through that resource with 404 `UNKNOWN_GIFT_CODE`.
 

@@ -71,8 +71,6 @@ Each route accepts these bases:
 | [Delete message](/admin-api/messages/#delete-message) | `holder_request`, `housekeeping` |
 | [Delete guild](/admin-api/guilds/#delete-guild) | `enforcement`, `holder_request` |
 
-The audit entry of each route records the basis in a `basis` metadata key.
-
 ### Feature limits
 
 Each feature limit decision limits one feature, so ending or expiring one never touches another.
@@ -105,7 +103,7 @@ The notice says the account's networks were blocked and until when, and never na
 
 ### Automated decisions and the review queue
 
-A Stripe early fraud warning or chargeback records a `purchases` limit with reason code 12, `automation` `automated`, `payment_at` set to the time of the payment, and the system user (ID 0) as `decided_by`. Fluxer never suspends or closes an account, or blocks its email, because of a payment signal. The decision is placed in the review queue until a person ends it or records a warning, suspension or closure on the same account. A won dispute ends the decision as `reversed`, with the system user as `ended_by`.
+A Stripe early fraud warning records a `purchases` limit with reason code 12, `automation` `automated`, `payment_at` set to the time of the payment, and the system user (ID 0) as `decided_by`. Fluxer never suspends or closes an account, or blocks its email, because of a payment signal alone. The decision is placed in the review queue until a person ends it or records a warning, suspension or closure on the same account. A won dispute ends the decision as `reversed`, with the system user as `ended_by`.
 
 ## Enforcement decision input
 
@@ -139,7 +137,7 @@ The `X-Audit-Log-Reason` header is required on every route that takes a decision
 Fluxer checks ACLs before it looks anything up, so a caller without the ACL learns nothing about the messages or reports it names. Evidence needs `message:lookup`, reports need `report:view` and `report:resolve`, and `block_networks` needs `ban:ip:add` and `user:view:ip`. Each other failure is a 400 `INVALID_FORM_BODY` whose error has one of these codes.
 
 - `ENFORCEMENT_INTERNAL_NOTE_REQUIRED`: the `X-Audit-Log-Reason` header is missing
-- `ENFORCEMENT_KIND_NOT_ALLOWED`: the reason code does not allow this kind, a bot is given anything other than a suspension or closure, or a restricted reason is used to delete all of an account's messages
+- `ENFORCEMENT_KIND_NOT_ALLOWED`: the reason code does not allow this kind, a bot is given anything other than a suspension or closure, a restricted reason is used to delete all of an account's messages, or a self-hosted instance is given reason code 34
 - `ENFORCEMENT_LIMIT_NOT_ALLOWED`: the reason code does not allow this feature limit
 - `ENFORCEMENT_LIMIT_END_INVALID`: a reports limit ends in the past or more than 365 days from now, or another limit is given an end
 - `ENFORCEMENT_REPORT_REQUIRED`: `source` is `report` and no report is linked
