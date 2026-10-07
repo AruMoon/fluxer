@@ -18,6 +18,7 @@ import {
 	getGuildDiscoveryRepository,
 	getInviteRepository,
 } from '@app/api/middleware/ServiceSingletons';
+import {queuePaymentDisputeClosures} from '@app/api/payment_disputes/PaymentDisputeEnforcement';
 import type {SystemDmDeps} from '@app/api/user/services/SystemDmMessage';
 import {UserChannelService} from '@app/api/user/services/UserChannelService';
 import type {WorkerDependencies} from '@app/api/worker/WorkerDependencies';
@@ -97,6 +98,7 @@ export function createWorkerEnforcementServices(deps: WorkerDependencies): Worke
 			userCacheService: deps.userCacheService,
 			reporterResolutionNotifier,
 		}),
+		onClosureEnded: queuePaymentDisputeClosures,
 	});
 	return {apiContext, auditService, banManagementService, reporterResolutionNotifier, delivery, enforcementService};
 }

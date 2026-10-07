@@ -16,8 +16,11 @@ import {InstanceConfigAdminController} from '@app/api/admin/controllers/Instance
 import {JobsAdminController} from '@app/api/admin/controllers/JobsAdminController';
 import {LimitConfigAdminController} from '@app/api/admin/controllers/LimitConfigAdminController';
 import {MessageAdminController} from '@app/api/admin/controllers/MessageAdminController';
+import {OperatorPassAdminController} from '@app/api/admin/controllers/OperatorPassAdminController';
+import {PaymentDisputeAdminController} from '@app/api/admin/controllers/PaymentDisputeAdminController';
 import {ReportAdminController} from '@app/api/admin/controllers/ReportAdminController';
 import {SearchAdminController} from '@app/api/admin/controllers/SearchAdminController';
+import {SsoIdentityAdminController} from '@app/api/admin/controllers/SsoIdentityAdminController';
 import {StoreBillingAdminController} from '@app/api/admin/controllers/StoreBillingAdminController';
 import {SystemDmAdminController} from '@app/api/admin/controllers/SystemDmAdminController';
 import {ThreadAdminController} from '@app/api/admin/controllers/ThreadAdminController';
@@ -31,6 +34,8 @@ export function registerAdminControllers(app: HonoApp) {
 	UserAdminController(app);
 	EnforcementAdminController(app);
 	StoreBillingAdminController(app);
+	OperatorPassAdminController(app);
+	PaymentDisputeAdminController(app);
 	CodesAdminController(app);
 	GuildAdminController(app);
 	ThreadAdminController(app);
@@ -46,6 +51,7 @@ export function registerAdminControllers(app: HonoApp) {
 	VoiceAdminController(app);
 	GatewayAdminController(app);
 	SearchAdminController(app);
+	SsoIdentityAdminController(app);
 	DiscoveryAdminController(app);
 	SystemDmAdminController(app);
 	JobsAdminController(app);
