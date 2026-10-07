@@ -1,0 +1,118 @@
+---
+# SPDX-License-Identifier: AGPL-3.0-or-later
+title: Run your instance
+description: Upgrade, back up, move and manage your Fluxer instance with rexctl.
+---
+
+Run these commands on the machine where you installed Fluxer. The [command reference](/operator/rexctl/) lists every flag for each one.
+
+## Upgrade
+
+```sh
+rexctl upgrade
+```
+
+This upgrades rexctl and Fluxer together. It backs up your instance first, and if the new version doesn't start, it goes back to the version you had before.
+
+To see whether there's a new version without upgrading, run `rexctl upgrade --check`.
+
+## Roll back
+
+```sh
+rexctl rollback
+```
+
+This goes back to the version you had before your last upgrade.
+
+## Back up and restore
+
+```sh
+rexctl backup
+```
+
+This saves your settings, database and uploads in one file in the `backups` folder of your instance. Keep a copy of your backups on another machine. `rexctl backup list` shows the backups you have.
+
+To put your instance back the way it was when a backup was made, run `rexctl restore` with the path that `rexctl backup list` shows:
+
+```sh
+rexctl restore /opt/fluxer/backups/fluxer-chat.example.com-20261105-120000.tar.zst
+```
+
+## Move to a new machine
+
+Back up your instance on the old machine and copy the backup file to the new one. On the new machine, install rexctl and restore the backup in one go:
+
+```sh
+curl -fsSL https://fluxer.dev/install.sh | sh -s -- restore fluxer-chat.example.com-20261105-120000.tar.zst
+```
+
+Then change your domain's `A` record to the new machine's address.
+
+## Manage people
+
+Create an invite link that 10 people can use within a week:
+
+```sh
+rexctl invites create --uses 10 --expires 7d
+```
+
+Choose who can create an account with `open`, `approval`, `invite` or `closed`:
+
+```sh
+rexctl registration set approval
+```
+
+When registration needs approval, `rexctl registration pending` lists the people waiting and `rexctl registration approve <id>` lets someone in.
+
+Make someone an admin:
+
+```sh
+rexctl admins add alex
+```
+
+Ban an account and delete its messages:
+
+```sh
+rexctl users ban spammer42 --reason "Spam" --delete-messages
+```
+
+When someone has lost their password and can't reset it themselves, [create a reset link](/operator/sign-in/#lost-passwords) for them.
+
+## Email and branding
+
+Set up email for your instance, then send yourself a test email:
+
+```sh
+rexctl email set
+rexctl email test
+```
+
+Change your instance's name, colour, logo or icon:
+
+```sh
+rexctl branding set --name "Example Chat" --logo logo.png
+```
+
+You can do both in the admin panel too, at your instance's address followed by `/admin`.
+
+## Change a setting
+
+```sh
+rexctl config list
+```
+
+This lists every setting with its value and a line of help, and says which settings restart Fluxer when you change them. To change one, pass its name and the new value to `rexctl config set`:
+
+```sh
+rexctl config set <key> <value>
+```
+
+To manage your instance yourself without rexctl, run `rexctl eject`. When you want rexctl to manage it again, run `rexctl takeover`.
+
+## When something is wrong
+
+```sh
+rexctl doctor
+```
+
+This checks your instance and the machine, and tells you how to fix each problem it finds. `rexctl doctor --fix` fixes the problems that are safe to fix for you. `rexctl status` shows whether each Fluxer service is running, and `rexctl logs` shows what it's been doing.

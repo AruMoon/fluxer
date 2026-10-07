@@ -162,12 +162,12 @@ export default defineConfig({
 				{
 					label: 'Self-hosting',
 					items: [
-						'operator/get-started',
-						'operator/sign-in',
-						'operator/configuration',
+						'operator',
+						'operator/running',
 						'operator/reverse-proxy',
-						'operator/upgrading',
+						'operator/sign-in',
 						'operator/kubernetes',
+						'operator/rexctl',
 					],
 				},
 				{
@@ -247,13 +247,7 @@ export default defineConfig({
 				},
 				{
 					label: 'Commerce',
-					items: [
-						'http-api/billing',
-						'http-api/premium',
-						'http-api/in-app-purchases',
-						'http-api/gifts',
-						'http-api/donations',
-					],
+					items: ['http-api/billing', 'http-api/premium', 'http-api/gifts'],
 				},
 				{
 					label: 'Client surfaces',
@@ -343,6 +337,17 @@ export default defineConfig({
 		}),
 	},
 	output: 'server',
+	redirects: {
+		'/admin-api/operator-pass': '/admin-api/',
+		'/admin-api/payment-disputes': '/admin-api/',
+		'/http-api/donations': '/http-api/billing/',
+		'/http-api/in-app-purchases': '/http-api/premium/',
+		'/http-api/operator-pass': '/http-api/premium/',
+		'/http-api/operator-pass-waitlist': '/http-api/premium/',
+		'/operator/configuration': '/operator/running/',
+		'/operator/get-started': '/operator/',
+		'/operator/upgrading': '/operator/running/',
+	},
 	publicDir: path.join(staticDirectory, 'web'),
 	site: docsEndpoint.origin,
 	server: {

@@ -8,7 +8,7 @@ Fluxer is a self-hostable chat platform.
 
 - To build a client or a bot, start with the [HTTP API](/http-api/) and the [Gateway](/gateway/overview/).
 - For voice and screen sharing, read [Voice](/voice/).
-- To run an instance, start with [Get started](/operator/get-started/).
+- To run an instance, start with [Self-hosting](/operator/).
 
 ## Protocol surfaces
 
@@ -40,8 +40,6 @@ Start with `GET /.well-known/fluxer` on the instance origin. It requires no auth
 ```text
 GET https://example.com/.well-known/fluxer
 ```
-
-For the hosted instance, use `https://fluxer.app/.well-known/fluxer`.
 
 Read base URLs from the response's [endpoints](/http-api/instance/#instance-endpoints-object). Do not derive them from the origin or hard-code Fluxer domains.
 

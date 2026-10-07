@@ -1,0 +1,44 @@
+---
+# SPDX-License-Identifier: AGPL-3.0-or-later
+title: Self-hosting
+description: Install your own Fluxer instance on one machine with rexctl.
+sidebar:
+  label: Install
+---
+
+rexctl installs Fluxer on one machine and keeps it running. It checks the machine, gets a certificate for your domain and helps you create your admin account. To run Fluxer on a Kubernetes cluster, use the [Helm chart](/operator/kubernetes/).
+
+## What you need
+
+- A 64-bit Linux, macOS or Windows machine with at least 4 GB of memory. On Linux, rexctl installs Docker for you if it's missing. On macOS and Windows, install [Docker Desktop](https://docs.docker.com/desktop/) first.
+- A domain or subdomain for your instance, such as `chat.example.com`.
+
+Add an `A` record for the domain that points to the machine's public IP address. rexctl checks the record before it asks for a certificate.
+
+Your hosting provider or home router may have a firewall of its own. Open TCP ports 80, 443 and 7881 and UDP ports 443 and 7882 there, and forward them to the machine. rexctl can open these ports in the machine's own firewall, but it can't change a firewall outside the machine.
+
+## Install
+
+On Linux or macOS:
+
+```sh
+curl -fsSL https://fluxer.dev/install.sh | sh
+```
+
+On Windows, run this in PowerShell:
+
+```powershell
+irm https://fluxer.dev/install.ps1 | iex
+```
+
+The script downloads rexctl and starts it. Answer Rex's questions, and when he's done, rexctl prints your instance's address.
+
+rexctl asks where you want to create your admin account. If you choose "In my browser", it prints a setup token at the end, and your instance asks for that token the first time you open it.
+
+People can then open your instance's address in a browser, or enter it in the desktop and mobile apps.
+
+## After you install
+
+Once your instance is running, rexctl also [upgrades it, backs it up and manages accounts](/operator/running/). If another web server on the machine already uses ports 80 and 443, you can [put Fluxer behind your own proxy](/operator/reverse-proxy/). The [command reference](/operator/rexctl/) lists every rexctl command and flag.
+
+If you get stuck, ask in [Fluxer Developers](https://fluxer.gg/fluxer-developers) or open an issue on [GitHub](https://github.com/fluxerapp/fluxer).
