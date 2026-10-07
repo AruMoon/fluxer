@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		libssl-dev \
 		pkg-config \
 		openssl \
-		libvips-dev \
 		python3 && \
 	rm -rf /var/lib/apt/lists/*
 
@@ -61,14 +60,16 @@ RUN npm install -g pnpm@11.27.0
 
 COPY --from=deploy /out ./
 COPY --from=deploy /usr/src/app/fluxer_api/dist ./dist
+COPY --from=deploy /usr/src/app/fluxer_api/bin ./bin
 COPY --from=deploy /usr/src/app/tsconfigs /usr/src/app/tsconfigs
 
 RUN rm -rf pkgs && \
-	chown -R 65532:65532 /usr/src/app
+	mkdir -p /run/fluxer && \
+	chmod 700 /run/fluxer && \
+	chown -R 65532:65532 /usr/src/app /run/fluxer
 
 ENV HOME=/usr/src/app
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--enable-source-maps"
 ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 ENV BUILD_VERSION=${BUILD_VERSION}
 

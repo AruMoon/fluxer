@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {createAPIApp} from '@app/api/App';
+import {OPERATOR_SOCKET_PATH} from '@app/api/admin/operator/OperatorRequests';
+import {listenOperatorSocket} from '@app/api/admin/operator/OperatorSocket';
 import {buildAPIServerOptions, initializeConfig} from '@app/api/Config';
 import {initializeLogger} from '@app/api/Logger';
 import {Config} from '@app/Config';
@@ -35,9 +37,13 @@ async function main(): Promise<void> {
 	});
 	const server = createServer(app, buildAPIServerOptions(Config));
 	Logger.info({port: Config.port}, `Starting Fluxer API on port ${Config.port}`);
+	const operatorServer = await listenOperatorSocket(app, OPERATOR_SOCKET_PATH, Logger);
 	setupGracefulShutdown(
 		async () => {
 			await closeHttpServer(server);
+			if (operatorServer) {
+				await closeHttpServer(operatorServer);
+			}
 			await shutdown();
 		},
 		{logger: Logger, timeoutMs: 30000},
