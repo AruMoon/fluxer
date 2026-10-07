@@ -160,6 +160,7 @@ jobs:
           tags: ghcr.io/${{ env.GHCR_OWNER }}/fluxer-app-proxy:${{ needs.meta.outputs.build_version }}-${{ matrix.platform }}
           build-args: |
             BUILD_VERSION=${{ needs.meta.outputs.build_version }}
+            FLUXER_SELF_HOSTED=true
             SOURCE_SHA=${{ github.sha }}
             SOURCE_DATE=${{ steps.source.outputs.date }}
             FLUXER_APP_PROXY_TIME_FREEZE_ENABLED=false
