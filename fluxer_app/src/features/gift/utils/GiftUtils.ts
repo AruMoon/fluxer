@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import type {Gift, GiftDurationType} from '@app/features/gift/commands/GiftCommands';
 import {getPremiumProductName} from '@app/features/premium/utils/PremiumUtils';
 import type {I18n} from '@lingui/core';
@@ -77,7 +78,9 @@ function formatGiftDurationText(
 
 function getPlutoniumDurationConfig(i18n: I18n): GiftDurationTextConfig {
 	return {
-		lifetime: i18n._(VISIONARY_LIFETIME_DESCRIPTOR, {premiumProductName: getPremiumProductName()}),
+		lifetime: i18n._(RuntimeConfig.isSelfHosted() ? LIFETIME_DESCRIPTOR : VISIONARY_LIFETIME_DESCRIPTOR, {
+			premiumProductName: getPremiumProductName(),
+		}),
 		days: (durationQuantity: number) =>
 			i18n._(OTHER_OF_DESCRIPTOR, {durationQuantity, premiumProductName: getPremiumProductName()}),
 		weeks: (durationQuantity: number) =>
