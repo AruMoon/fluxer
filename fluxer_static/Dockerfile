@@ -30,6 +30,7 @@ COPY --chown=65532:65532 fluxer_static/avatars /srv/fluxer-static/avatars
 COPY --chown=65532:65532 fluxer_static/badges /srv/fluxer-static/badges
 COPY --chown=65532:65532 fluxer_static/desktop /srv/fluxer-static/desktop
 COPY --chown=65532:65532 --from=spellcheck-dictionaries /dictionaries /srv/fluxer-static/desktop/spellcheck/dictionaries
+COPY --chown=65532:65532 fluxer_static/email /srv/fluxer-static/email
 COPY --chown=65532:65532 fluxer_static/emoji /srv/fluxer-static/emoji
 COPY --chown=65532:65532 fluxer_static/web /srv/fluxer-static/web
 
