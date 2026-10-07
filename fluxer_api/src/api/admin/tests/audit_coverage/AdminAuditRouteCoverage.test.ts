@@ -18,8 +18,10 @@ import {InstanceConfigAdminAuditCases} from '@app/api/admin/tests/audit_coverage
 import {JobsAdminAuditCases} from '@app/api/admin/tests/audit_coverage/JobsAdminAuditCases';
 import {LimitConfigAdminAuditCases} from '@app/api/admin/tests/audit_coverage/LimitConfigAdminAuditCases';
 import {MessageAdminAuditCases} from '@app/api/admin/tests/audit_coverage/MessageAdminAuditCases';
+import {PaymentDisputeAdminAuditCases} from '@app/api/admin/tests/audit_coverage/PaymentDisputeAdminAuditCases';
 import {ReportAdminAuditCases} from '@app/api/admin/tests/audit_coverage/ReportAdminAuditCases';
 import {SearchAdminAuditCases} from '@app/api/admin/tests/audit_coverage/SearchAdminAuditCases';
+import {SsoIdentityAdminAuditCases} from '@app/api/admin/tests/audit_coverage/SsoIdentityAdminAuditCases';
 import {StoreBillingAdminAuditCases} from '@app/api/admin/tests/audit_coverage/StoreBillingAdminAuditCases';
 import {SystemDmAdminAuditCases} from '@app/api/admin/tests/audit_coverage/SystemDmAdminAuditCases';
 import {ThreadAdminAuditCases} from '@app/api/admin/tests/audit_coverage/ThreadAdminAuditCases';
@@ -47,8 +49,10 @@ const ALL_CASES = [
 	...JobsAdminAuditCases,
 	...LimitConfigAdminAuditCases,
 	...MessageAdminAuditCases,
+	...PaymentDisputeAdminAuditCases,
 	...ReportAdminAuditCases,
 	...SearchAdminAuditCases,
+	...SsoIdentityAdminAuditCases,
 	...StoreBillingAdminAuditCases,
 	...SystemDmAdminAuditCases,
 	...ThreadAdminAuditCases,
