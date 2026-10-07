@@ -119,6 +119,7 @@ export function runtimeSnapshotFromDiscovery(document: InstanceDiscoveryDocument
 		appPublic: discovery.appPublic,
 		agePolicy: discovery.agePolicy,
 		domainMigration: discovery.domainMigration,
+		notice: discovery.notice ?? null,
 	});
 }
 
@@ -156,9 +157,15 @@ function sameOriginApiEndpoint(origin: string): string {
 	return `${origin}${SAME_ORIGIN_API_PATH}`;
 }
 
-function adoptsDocumentOrigin(apiEndpoint: string): boolean {
+function adoptsDocumentOrigin(apiEndpoint: string): boolean | 'when-api-routed' {
 	const origin = browserDocumentOrigin();
-	return origin !== null && documentServesItsOwnApi() && apiEndpoint === sameOriginApiEndpoint(origin);
+	if (origin === null) {
+		return false;
+	}
+	if (documentServesItsOwnApi() && apiEndpoint === sameOriginApiEndpoint(origin)) {
+		return true;
+	}
+	return apiEndpoint === normalizeInstanceEndpoint(origin, InstanceEndpointKind.API) ? 'when-api-routed' : false;
 }
 
 export function resolveDiscoveryApiEndpoint(input: string): string {
