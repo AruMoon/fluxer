@@ -8,13 +8,18 @@ import type {UserRow} from '@app/api/database/types/UserTypes';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import type {GuildService} from '@app/api/guild/services/GuildService';
 import {getCacheService, getPremiumStateReconciliationQueueService} from '@app/api/middleware/ServiceSingletons';
-import {findUser} from '@app/api/store_billing/tests/StoreBillingTestUtils';
+import {addGiftCodeDuration} from '@app/api/models/GiftCode';
+import {findUser, uninstallStoreBillingWorker} from '@app/api/store_billing/tests/StoreBillingTestUtils';
 import {getStripeClient} from '@app/api/stripe/StripeClient';
 import {StripeGiftReversalHandler} from '@app/api/stripe/services/StripeGiftReversalHandler';
 import {StripePremiumService} from '@app/api/stripe/services/StripePremiumService';
 import {StripeSubscriptionService} from '@app/api/stripe/services/StripeSubscriptionService';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {createStripeApiHandlers, type StripeApiHandlers} from '@app/api/test/msw/handlers/StripeApiHandlers';
+import {
+	createStripeApiHandlers,
+	createSubscriptionDeletedEvent,
+	type StripeApiHandlers,
+} from '@app/api/test/msw/handlers/StripeApiHandlers';
 import {server} from '@app/api/test/msw/server';
 import {NoopGatewayService} from '@app/api/test/NoopGatewayService';
 import {HTTP_STATUS} from '@app/api/test/TestConstants';
