@@ -586,6 +586,11 @@ export interface UserByStripeSubscriptionIdRow {
 	user_id: UserID;
 }
 
+export interface UserByAclRow {
+	acl: string;
+	user_id: UserID;
+}
+
 export interface UserByLastActiveIpRow {
 	last_active_ip: string;
 	user_id: UserID;
@@ -615,6 +620,7 @@ export const USER_BY_STRIPE_SUBSCRIPTION_ID_COLUMNS = [
 	'stripe_subscription_id',
 	'user_id',
 ] as const satisfies ReadonlyArray<keyof UserByStripeSubscriptionIdRow>;
+export const USER_BY_ACL_COLUMNS = ['acl', 'user_id'] as const satisfies ReadonlyArray<keyof UserByAclRow>;
 export const USER_BY_LAST_ACTIVE_IP_COLUMNS = [
 	'last_active_ip',
 	'user_id',
