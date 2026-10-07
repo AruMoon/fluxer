@@ -46,7 +46,7 @@ Read `endpoints.gateway` from the [instance discovery document](/http-api/instan
 
 ## Connection parameters
 
-Append the connection parameters to the discovered URL.
+Add the connection parameters to the query of the discovered URL. The URL an instance derives from its domain has no query, but an operator can set one that has its own query. Parse the URL and set each parameter on it, and don't append `?` and a string.
 
 | Field | Type | Description |
 | --- | --- | --- |

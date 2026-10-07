@@ -31,6 +31,16 @@ Each challenge is accepted once and expires 10 minutes after it is issued. A rep
 
 The route rate limit on registration, login, password recovery and account recovery runs before the check. The challenge response and the retry each use one request from that allowance.
 
+## Rising cost
+
+Some operations raise the cost of their challenge with recent use. Each step doubles `cost`, up to 6 steps, which is 64 times the base cost. The challenge in the error response always has the cost the retry needs, and a token solved for a cheaper challenge returns `INVALID_CAPTCHA`.
+
+| Operation | What raises the cost |
+| --- | --- |
+| Sign-up without an email through [register an account](/http-api/authentication/#register-an-account) or the website | Each such account from the IP address in the last hour, and instance-wide volume |
+| Registration with an email address and [identify an account](/http-api/authentication/#identify-an-account) | Each lookup of the same address past 10 in an hour |
+| [Send an email code](/http-api/authentication/#send-an-email-code) | Each code to the same address past 5 in an hour |
+
 ## Token format
 
 The token is the base64 encoding of the UTF-8 JSON object `{"challenge": {"parameters": ..., "signature": ...}, "solution": {"counter": ..., "derivedKey": ...}}`. The solution can also have `time`. Copy `parameters` and `signature` unchanged from `altcha_challenge`. A token longer than 4096 characters, or one that does not decode to this shape, returns `INVALID_CAPTCHA`.
@@ -42,6 +52,7 @@ The following operations verify a CAPTCHA while the check is on.
 | Method | Route | Operation |
 | --- | --- | --- |
 | POST | /v1/auth/register | [Register an account](/http-api/authentication/#register-an-account) |
+| POST | /v1/auth/register/handoff | [Start an account for the website](/http-api/authentication/#start-an-account-for-the-website) |
 | POST | /v1/auth/login | [Log in with a password](/http-api/authentication/#log-in-with-a-password) |
 | POST | /v1/auth/forgot | [Request password recovery](/http-api/authentication/#request-password-recovery) |
 | POST | /v1/auth/recover | [Recover an account](/http-api/authentication/#recover-an-account) |
@@ -49,6 +60,8 @@ The following operations verify a CAPTCHA while the check is on.
 | POST | /v1/gifts/{code}/redeem | [Redeem gift](/http-api/gifts/#redeem-gift) |
 | POST | /v1/users/@me/channels | [Create private channel](/http-api/users/private-channels/#create-private-channel) |
 | PUT | /v1/channels/{channel_id}/recipients/{user_id} | [Add group direct message recipient](/http-api/channels/#add-group-direct-message-recipient) |
+
+[Identify an account](/http-api/authentication/#identify-an-account) and [send an email code](/http-api/authentication/#send-an-email-code) ask for a challenge only after heavy use, as described on each, and a sign-up through send an email code always asks for one.
 
 Create private channel is gated only on the group direct message path, where the request body has a `recipients` member. A one-to-one direct message request omits the field and is never gated.
 
