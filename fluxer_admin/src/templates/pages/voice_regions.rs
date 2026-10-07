@@ -244,7 +244,7 @@ fn create_region_form(config: &AdminConfig, csrf_token: &str) -> Markup {
                         (form_field("Emoji", "new-region-emoji", "emoji", "text", "", "Flag emoji", true))
                         (form_field("Latitude", "new-region-latitude", "latitude", "number", "", "40.7128", true))
                         (form_field("Longitude", "new-region-longitude", "longitude", "number", "", "-74.0060", true))
-                        (form_field("Country Codes", "new-region-country-codes", "country_codes", "text", "", "RU,BY", true))
+                        (form_field("Country Codes", "new-region-country-codes", "country_codes", "text", "", "RU, BY", true))
                     }
                     (checkbox("is_default", "true", "Set as default region", false, true))
                     (voice_restriction_fields("create", false, "", ""))
