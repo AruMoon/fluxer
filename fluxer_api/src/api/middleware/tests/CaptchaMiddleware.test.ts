@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {Config} from '@app/api/Config';
-import type {InstanceConfigRepository} from '@app/api/instance/InstanceConfigRepository';
 import {CaptchaMiddleware} from '@app/api/middleware/CaptchaMiddleware';
 import {CAPTCHA_TEST_HEADER} from '@app/api/test/CaptchaTestUtils';
 import type {HonoEnv} from '@app/api/types/HonoEnv';
+import {CaptchaProviders} from '@fluxer/constants/src/CaptchaConstants';
 import {AppErrorHandler} from '@fluxer/errors/src/domains/core/ErrorHandlers';
 import {type CaptchaConfig, DEFAULT_CAPTCHA_CONFIG} from '@fluxer/schema/src/domains/admin/CaptchaSchemas';
 import {Hono} from 'hono';
@@ -40,7 +40,7 @@ describe('CaptchaMiddleware', () => {
 	});
 
 	it('passes every request while the captcha is disabled', async () => {
-		const response = await createHarness({...CHEAP_CAPTCHA_CONFIG, enabled: false})({});
+		const response = await createHarness({...CHEAP_CAPTCHA_CONFIG, provider: CaptchaProviders.NONE})({});
 		expect(response.status).toBe(200);
 	});
 
