@@ -6,6 +6,8 @@ import {formatAssetUploadExtensions, formatKnownAnimatedAssetExtensions} from '@
 import {THE_OTHER_PLATFORM} from '@fluxer/constants/src/ExternalPlatformConstants';
 
 export {PRODUCT_NAME};
+export const PRODUCT_LABS_COMMUNITY_NAME = `${PRODUCT_NAME} Labs`;
+export const OPERATOR_PASS_NAME = 'Operator Pass';
 export const DESKTOP_ENTRY_NAME = 'Fluxer';
 export const CANARY_DESKTOP_ENTRY_NAME = 'Fluxer Canary';
 export const PAYMENT_PROVIDER_NAME = 'Stripe';
