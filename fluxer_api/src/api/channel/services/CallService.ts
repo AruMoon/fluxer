@@ -14,9 +14,11 @@ import type {UserCacheService} from '@app/api/infrastructure/UserCacheService';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import type {Channel} from '@app/api/models/Channel';
 import type {ReadStateService} from '@app/api/read_state/ReadStateService';
+import {canTierPerform, NO_TIER_CONTEXT} from '@app/api/user/AccountTier';
 import {assertMayStartConversation} from '@app/api/user/NewConversationLimit';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import type {VoiceAccessContext, VoiceAvailabilityService} from '@app/api/voice/VoiceAvailabilityService';
+import {TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';
 import {AUTOMATIC_VOICE_REGION_ID, ChannelTypes, MessageTypes} from '@fluxer/constants/src/ChannelConstants';
 import {IncomingCallFlags, RelationshipTypes} from '@fluxer/constants/src/UserConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
@@ -66,8 +68,8 @@ export class CallService {
 	}> {
 		const channel = await this.requireCallChannel(channelId, userId);
 		const caller = await this.userRepository.findUnique(userId);
-		const isUnclaimedCaller = caller?.isUnclaimedAccount() ?? false;
-		if (isUnclaimedCaller && channel.type === ChannelTypes.DM) {
+		const callAction = channel.type === ChannelTypes.DM ? TierGatedActions.CALL : TierGatedActions.GROUP_CALL;
+		if (caller && !canTierPerform(caller, callAction, NO_TIER_CONTEXT)) {
 			return {ringable: false};
 		}
 		const call = await this.gatewayService.getCall(channelId);

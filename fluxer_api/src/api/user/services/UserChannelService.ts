@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {ApiContext} from '@app/api/ApiContext';
-import {requireEmailVerified} from '@app/api/auth/EmailVerificationUtils';
 import type {ChannelID, UserID} from '@app/api/BrandedTypes';
 import {createChannelID, createMessageID, createUserID} from '@app/api/BrandedTypes';
 import {mapChannelToResponse} from '@app/api/channel/ChannelMappers';
@@ -26,10 +25,12 @@ import type {Channel} from '@app/api/models/Channel';
 import type {Message} from '@app/api/models/Message';
 import type {User} from '@app/api/models/User';
 import {assertAccountNotLimited} from '@app/api/user/AccountLimit';
+import {assertTierAllows, NO_TIER_CONTEXT} from '@app/api/user/AccountTier';
 import {assertMayStartConversation} from '@app/api/user/NewConversationLimit';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {isDirectDeliverySuppressed} from '@app/api/user/UserHelpers';
 import type {UserPermissionUtils} from '@app/api/utils/UserPermissionUtils';
+import {TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';
 import {ChannelTypes, MessageTypes} from '@fluxer/constants/src/ChannelConstants';
 import type {LimitKey} from '@fluxer/constants/src/LimitConfigMetadata';
 import {MAX_GROUP_DM_RECIPIENTS, MAX_GROUP_DMS_PER_USER} from '@fluxer/constants/src/LimitConstants';
@@ -39,11 +40,8 @@ import type {GroupDmUnaddableRecipient} from '@fluxer/errors/src/domains/channel
 import {GroupDmRecipientsNotAddableError} from '@fluxer/errors/src/domains/channel/GroupDmRecipientsNotAddableError';
 import {MaxGroupDmRecipientsError} from '@fluxer/errors/src/domains/channel/MaxGroupDmRecipientsError';
 import {MaxGroupDmsError} from '@fluxer/errors/src/domains/channel/MaxGroupDmsError';
-import {UnclaimedAccountCannotJoinGroupDmsError} from '@fluxer/errors/src/domains/channel/UnclaimedAccountCannotJoinGroupDmsError';
-import {UnclaimedAccountCannotSendDirectMessagesError} from '@fluxer/errors/src/domains/channel/UnclaimedAccountCannotSendDirectMessagesError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {MissingAccessError} from '@fluxer/errors/src/domains/core/MissingAccessError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
 import type {CreatePrivateChannelRequest} from '@fluxer/schema/src/domains/user/UserRequestSchemas';
 import * as BucketUtils from '@fluxer/snowflake/src/SnowflakeBuckets';
@@ -141,13 +139,12 @@ export class UserChannelService {
 	}): Promise<Channel> {
 		const callingUser = await this.userRepository.findUnique(userId);
 		if (!callingUser) throw new UnknownUserError();
-		if (callingUser.isUnclaimedAccount()) {
-			if (data.recipients !== undefined) {
-				throw new UnclaimedAccountCannotJoinGroupDmsError();
-			}
-			throw new UnclaimedAccountCannotSendDirectMessagesError();
-		}
-		requireEmailVerified(callingUser, 'direct_message');
+		assertTierAllows(
+			callingUser,
+			data.recipients !== undefined ? TierGatedActions.GROUP_DM : TierGatedActions.DIRECT_MESSAGE,
+			NO_TIER_CONTEXT,
+		);
+		assertTierAllows(callingUser, TierGatedActions.DIRECT_MESSAGE_OPEN, NO_TIER_CONTEXT);
 		if (data.recipients !== undefined) {
 			assertAccountNotLimited(callingUser);
 			return await this.createGroupDMChannel({
@@ -347,7 +344,7 @@ export class UserChannelService {
 		return await this.createNewDmForBothUsers({userId, recipientId, userCacheService, requestCache});
 	}
 
-	async createNewDmForBothUsers({
+	private async createNewDmForBothUsers({
 		userId,
 		recipientId,
 		userCacheService,
