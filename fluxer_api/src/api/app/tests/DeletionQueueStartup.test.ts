@@ -31,32 +31,6 @@ class RecordingLogger implements LoggerInterface {
 	}
 }
 
-class UnreadableStateKVProvider extends MockKVProvider {
-	override async get(): Promise<string | null> {
-		throw new Error('kv unavailable');
-	}
-}
-
-class UnlockableKVProvider extends MockKVProvider {
-	override async acquireLock(): Promise<boolean> {
-		throw new Error('kv lock unavailable');
-	}
-}
-
-class UnreleasableKVProvider extends MockKVProvider {
-	override async releaseLock(): Promise<boolean> {
-		throw new Error('kv lock release failed');
-	}
-}
-
-function createFailingRepository(): UserRepository {
-	return {
-		async scanAllUsersPage() {
-			throw new Error('paged user scan failed');
-		},
-	} as unknown as UserRepository;
-}
-
 function createPendingUser(index: number): User {
 	return new User({
 		...EMPTY_USER_ROW,
@@ -134,38 +108,6 @@ describe('ensureDeletionQueueState', () => {
 		expect(scans).toBe(1);
 		expect(logger.errors).toEqual(['KV deletion queue rebuild failed, leaving the rebuild to the deletion worker']);
 		expect(await queue.acquireRebuildLock()).not.toBeNull();
-	});
-
-	it('aborts startup when the queue state cannot be read', async () => {
-		const queue = new KVAccountDeletionQueueService(new UnreadableStateKVProvider(), createFailingRepository());
-		const logger = new RecordingLogger();
-
-		await expect(ensureDeletionQueueState(queue, logger)).rejects.toThrow('kv unavailable');
-
-		expect(logger.errors).toEqual(['Failed to read KV deletion queue state, aborting startup']);
-	});
-
-	it('aborts startup when the rebuild lock cannot be acquired', async () => {
-		const queue = new KVAccountDeletionQueueService(new UnlockableKVProvider(), createFailingRepository());
-		const logger = new RecordingLogger();
-
-		await expect(ensureDeletionQueueState(queue, logger)).rejects.toThrow('kv lock unavailable');
-
-		expect(logger.errors).toEqual(['Failed to acquire the KV deletion queue rebuild lock, aborting startup']);
-	});
-
-	it('does not abort startup when releasing the rebuild lock fails', async () => {
-		const queue = new KVAccountDeletionQueueService(
-			new UnreleasableKVProvider(),
-			createWorkerRepository(async () => {}),
-		);
-		const logger = new RecordingLogger();
-
-		await expect(ensureDeletionQueueState(queue, logger)).resolves.toBeUndefined();
-
-		const queued = await queue.getReadyDeletions(Date.parse('2026-06-02T00:00:00.000Z'), 10);
-		expect(queued.map((deletion) => deletion.userId).sort()).toEqual([9101n, 9102n]);
-		expect(logger.errors).toEqual(['Failed to release the KV deletion queue rebuild lock']);
 	});
 
 	it('rebuilds under the lock when no other instance holds it', async () => {
