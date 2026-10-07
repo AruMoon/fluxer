@@ -3,14 +3,26 @@
 import {SmtpEmailProvider} from '@pkgs/email/src/SmtpEmailProvider';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {createTransport} = vi.hoisted(() => ({createTransport: vi.fn()}));
+const {sendMail, close, createTransport} = vi.hoisted(() => {
+	const sendMail = vi.fn();
+	const close = vi.fn();
+	return {
+		sendMail,
+		close,
+		createTransport: vi.fn((_options: Record<string, unknown>) => ({sendMail, close, verify: vi.fn()})),
+	};
+});
 
-vi.mock('nodemailer', () => ({default: {createTransport}}));
+vi.mock('nodemailer', () => ({
+	default: {createTransport},
+}));
 
 describe('SmtpEmailProvider', () => {
 	beforeEach(() => {
-		createTransport.mockReset();
-		createTransport.mockReturnValue({sendMail: vi.fn(), verify: vi.fn()});
+		createTransport.mockClear();
+		close.mockReset();
+		sendMail.mockReset();
+		sendMail.mockResolvedValue({});
 	});
 
 	it.each([
@@ -26,32 +38,49 @@ describe('SmtpEmailProvider', () => {
 		expect(createTransport).toHaveBeenCalledWith(expect.objectContaining(expected));
 	});
 
-	const message = {
-		to: 'user@example.com',
-		from: {email: 'noreply@example.com', name: 'Example'},
-		subject: 'Hi',
-		text: 'Body',
-	};
-
-	it('sends the configured headers verbatim', async () => {
-		const provider = new SmtpEmailProvider({
-			host: 'smtp.example.com',
-			port: 587,
-			username: 'user',
-			password: 'pass',
-			headers: {'X-Tracking': '{"enable":0}'},
+	it('passes the html part, custom headers and a one-click unsubscribe link', async () => {
+		await createProvider().sendEmail({
+			...MESSAGE,
+			html: '<p>Body</p>',
+			headers: {'X-Entity-Ref-ID': 'ref'},
+			listUnsubscribe: {url: 'https://api.example.com/unsubscribe?token=abc', post: true},
 		});
-		await provider.sendEmail(message);
-		const {sendMail} = createTransport.mock.results[0].value;
-		expect(sendMail).toHaveBeenCalledWith(
-			expect.objectContaining({headers: {'X-Tracking': {prepared: true, value: '{"enable":0}'}}}),
-		);
+		expect(sendMail).toHaveBeenCalledWith({
+			to: 'user@example.com',
+			from: 'Fluxer <noreply@example.com>',
+			subject: 'Subject',
+			text: 'Body',
+			html: '<p>Body</p>',
+			list: {unsubscribe: {url: 'https://api.example.com/unsubscribe?token=abc'}},
+			headers: {'X-Entity-Ref-ID': 'ref', 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'},
+		});
 	});
 
-	it('sends no extra headers when none are configured', async () => {
-		const provider = new SmtpEmailProvider({host: 'smtp.example.com', port: 587, username: 'user', password: 'pass'});
-		await provider.sendEmail(message);
-		const {sendMail} = createTransport.mock.results[0].value;
-		expect(sendMail.mock.calls[0][0]).not.toHaveProperty('headers');
+	it('leaves out the one-click header when the unsubscribe link does not accept a POST', async () => {
+		await createProvider().sendEmail({
+			...MESSAGE,
+			listUnsubscribe: {url: 'https://example.com/unsubscribe', post: false},
+		});
+		expect(sendMail.mock.calls[0][0]).toEqual({
+			...MESSAGE,
+			from: 'Fluxer <noreply@example.com>',
+			list: {unsubscribe: {url: 'https://example.com/unsubscribe'}},
+		});
+	});
+
+	it('opens a pooled transport for bulk sends and closes it', async () => {
+		const bulk = createProvider().openBulk();
+		expect(createTransport).toHaveBeenCalledTimes(2);
+		expect(createTransport.mock.calls[1][0]).toMatchObject({
+			host: 'smtp.example.com',
+			port: 587,
+			auth: {user: 'user', pass: 'pass'},
+			pool: true,
+			maxConnections: 4,
+			maxMessages: 100,
+		});
+		await expect(bulk.sendEmail(MESSAGE)).resolves.toBe(true);
+		await bulk.close();
+		expect(close).toHaveBeenCalledTimes(1);
 	});
 });
