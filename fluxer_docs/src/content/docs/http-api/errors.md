@@ -25,8 +25,8 @@ The error code determines which supplementary members a failure has, and most co
 `GLOBAL_IP_BANNED` and `GLOBAL_IP_TEMPORARILY_BANNED` have their own members:
 
 - `ip_address` is the normalised client address.
-- `appeal_email` is the address to write to about the block. It is the appeals address when `reason` is present and the support address otherwise. It is `null` on a self-hosted instance, where `message` names no address.
-- `appeals_supported` is `true` on the hosted service and `false` on a self-hosted instance.
+- `appeal_email` is always `null` on a self-hosted instance, and `message` names no address.
+- `appeals_supported` is always `false` on a self-hosted instance.
 - `ban_kind` is `permanent` or `temporary_24h`. `temporary_24h` covers every ban that records an expiry, whatever its length.
 - `expires_at` is an ISO 8601 timestamp when the ban records an expiry, and `null` otherwise, including on every permanent ban.
 - `reason` is the rule behind the block, as `title` and `url`, or `null`. It is present only when an account decision placed the block and its rule is one Fluxer names on this screen, such as spam or service abuse. Every other block, including a decision whose rule is withheld, returns a response identical to a plain block of the same kind, so `null` says nothing about why the network was blocked. `url` is `null` when the instance has no policy page for the rule.
@@ -142,7 +142,7 @@ A temporary ban lasts 24 hours by default. Requests from the banned address retu
 
 ## API error code registry
 
-These codes appear in the top-level `code` field of an error response, sent as the exact JSON string shown. The registry is closed. Each entry states the leading sentence of the English source message, without its final full stop. Those messages call a [guild](/http-api/guilds/) a community.
+These codes appear in the top-level `code` field of an error response, sent as the exact JSON string shown. The registry is closed. Each entry states the leading sentence of the English source message, without its final full stop. Those messages call a [guild](/http-api/guilds/) a community. When a message picks its wording from a value in the error, such as `need` or `reason`, the entry states the wording of its `other` case and then describes the rest.
 
 The [OpenAPI document](/http-api/instance/#get-openapi-document) and the Admin API specification publish the same list as the `APIErrorCode` schema. The `code` member of their error schemas stays a plain string that refers to it.
 
@@ -157,6 +157,14 @@ Several source messages append a further recovery sentence with a template value
 ### `ACCESS_DENIED`
 
 You don't have access to this resource or feature
+
+### `ACCOUNT_ALREADY_CLAIMED`
+
+This account is already set up to sign in from other devices. Only an [unclaimed](/http-api/users/#account-tiers) account can be claimed
+
+### `ACCOUNT_BELOW_MINIMUM_AGE`
+
+You aren't old enough to have an account here
 
 ### `ACCOUNT_IDENTITY_LOCKED`
 
@@ -178,6 +186,10 @@ This account has been temporarily suspended
 
 Your account is too new to send messages in this community
 
+### `ACCOUNT_VERIFICATION_REQUIRED`
+
+Claim your account to do this. The message says which step is missing, based on `need`, and which action was refused, based on `action`. `add_email` asks for an email, `confirm_email` asks for the email to be confirmed and `password` asks for a password. For `ownership_transfer` the message is about the member who would become the owner. The body has `action`, `tier` and `need`, as described under [account tiers](/http-api/users/#account-tiers)
+
 ### `ACLS_MUST_BE_NON_EMPTY`
 
 ACLs must be non-empty
@@ -185,10 +197,6 @@ ACLs must be non-empty
 ### `ADMIN_API_KEY_NOT_FOUND`
 
 Admin API key wasn't found
-
-### `AGE_VERIFICATION_ALREADY_VERIFIED`
-
-You've already completed age verification
 
 ### `ALREADY_FRIENDS`
 
@@ -268,7 +276,7 @@ You can't edit system messages
 
 ### `CANNOT_REDEEM_PLUTONIUM_WITH_VISIONARY`
 
-You can't redeem {premium_tier_name} with Visionary
+You already have lifetime {premium_tier_name}
 
 ### `CANNOT_REPORT_GUILD`
 
@@ -330,30 +338,6 @@ Channels with threads can't be converted to announcement channels
 
 Only text and announcement channels can be converted into each other
 
-### `ENFORCEMENT_ACCOUNT_CLOSED`
-
-This account is closed, so it can't be suspended
-
-### `ENFORCEMENT_DECISION_ENDED`
-
-This decision has already ended
-
-### `ENFORCEMENT_DECISION_OWNS_STATE`
-
-An enforcement decision owns this restriction
-
-### `ENFORCEMENT_DECISION_REPLACED`
-
-A later decision replaced this one, so it can no longer be ended
-
-### `ENFORCEMENT_DELETION_STARTED`
-
-The deletion of this account has already started, so the decision can no longer be ended
-
-### `NEW_CONVERSATIONS_LIMITED`
-
-You can't start new conversations right now. Please try again later
-
 ### `COMMUNICATION_DISABLED`
 
 Communication is disabled
@@ -390,13 +374,21 @@ Connection verification failed
 
 This content was blocked by safety systems
 
+### `DATE_OF_BIRTH_ALREADY_SET`
+
+Your date of birth is already set
+
+### `DATE_OF_BIRTH_REQUIRED`
+
+Enter your date of birth to continue
+
 ### `DELETION_FAILED`
 
 We couldn't delete the resource
 
 ### `DIRECT_MESSAGES_DISABLED`
 
-Direct messages and friend requests are disabled on this instance
+Direct messages are disabled on this instance
 
 ### `DIRECT_MESSAGE_EMAIL_VERIFICATION_REQUIRED`
 
@@ -404,47 +396,47 @@ Email verification is required for this action
 
 ### `DISCOVERY_ALREADY_APPLIED`
 
-This community has already applied for discovery
+This community has already applied to be listed in Explore
 
 ### `DISCOVERY_APPLICATION_ALREADY_REVIEWED`
 
-This discovery application has already been reviewed
+This application to Explore has already been reviewed
 
 ### `DISCOVERY_APPLICATION_NOT_FOUND`
 
-Discovery application wasn't found
+The application to Explore wasn't found
 
 ### `DISCOVERY_DISABLED`
 
-Discovery isn't available on this instance
+Explore isn't available on this instance
 
 ### `DISCOVERY_INSUFFICIENT_MEMBERS`
 
-This community doesn't meet the minimum member count for discovery
+This community doesn't have enough members to be listed in Explore
 
 ### `DISCOVERY_NOT_DISCOVERABLE`
 
-This community isn't listed in discovery
+This community isn't listed in Explore
 
 ### `DISCRIMINATOR_REQUIRED`
 
 Discriminator is required
 
-### `DONATION_AMOUNT_INVALID`
+### `EMAIL_CODES_UNAVAILABLE`
 
-Donation amount is invalid
+This instance can't send email codes. A request for an email code gets this when the instance has no working email delivery, when it is a username instance or when the account has no email of its own
 
-### `DONATION_MAGIC_LINK_EXPIRED`
+### `PASSWORD_SIGN_IN_REQUIRED`
 
-Magic link has expired
+Sign in to this account with its password. No code was sent, and a client shows the password step
 
-### `DONATION_MAGIC_LINK_INVALID`
+### `EMAIL_CODE_RESEND_COOLDOWN`
 
-Magic link is invalid
+Wait a moment before asking for another code
 
-### `DONATION_MAGIC_LINK_USED`
+### `EMAIL_DELIVERY_OFF`
 
-Magic link has already been used
+This instance doesn't send email. Create a password reset link instead
 
 ### `EMAIL_SERVICE_NOT_TESTABLE`
 
@@ -457,6 +449,26 @@ This instance doesn't use email
 ### `EMAIL_VERIFICATION_REQUIRED`
 
 Email verification is required for this action
+
+### `ENFORCEMENT_ACCOUNT_CLOSED`
+
+This account is closed, so it can't be suspended
+
+### `ENFORCEMENT_DECISION_ENDED`
+
+This decision has already ended
+
+### `ENFORCEMENT_DECISION_OWNS_STATE`
+
+An enforcement decision owns this restriction
+
+### `ENFORCEMENT_DECISION_REPLACED`
+
+A later decision replaced this one, so it can no longer be ended
+
+### `ENFORCEMENT_DELETION_STARTED`
+
+The deletion of this account has already started, so the decision can no longer be ended
 
 ### `EXPLICIT_CONTENT_CANNOT_BE_SENT`
 
@@ -501,6 +513,10 @@ User does not accept friend requests at this time
 ### `FRIEND_REQUEST_EMAIL_VERIFICATION_REQUIRED`
 
 Email verification is required for this action
+
+### `FRIENDS_DISABLED`
+
+Friend requests are disabled on this instance
 
 ### `GATEWAY_TIMEOUT`
 
@@ -552,7 +568,19 @@ The community template data is invalid or malformed
 
 ### `GUILD_VERIFICATION_REQUIRED`
 
-Community verification is required
+Claim your account to talk in this community. An unclaimed account gets this in a community whose verification level is above None. In a community with the High level, a member who joined less than 10 minutes ago gets it too, and the message then says "You can talk here once you've been a member for 10 minutes."
+
+### `GUILD_VISITS_DISABLED`
+
+This community asks people to join before previewing it
+
+### `GUILD_VISIT_AGE_RESTRICTED`
+
+This community is for adults only
+
+### `GUILD_VISIT_NOT_FOUND`
+
+You're not previewing this community anymore
 
 ### `HANDOFF_CODE_EXPIRED`
 
@@ -578,13 +606,21 @@ Hiding media download options is only available in media channels
 
 This instance policy change is not allowed
 
+### `INSTANT_ACCOUNTS_DISABLED`
+
+Creating an account from just a display name isn't available right now
+
 ### `INTERNAL_SERVER_ERROR`
 
 Internal server error
 
+### `INVALID_ACCOUNT_HANDOFF_NONCE`
+
+This sign-up link isn't valid
+
 ### `INVALID_ACLS_FORMAT`
 
-Invalid ACLs format
+Invalid ACL format
 
 ### `INVALID_API_ORIGIN`
 
@@ -642,10 +678,6 @@ Invalid handoff code
 
 This sign-in transfer doesn't match the one you started
 
-### `INVALID_PASSKEY_BRIDGE_NONCE`
-
-This passkey request could not be confirmed
-
 ### `INVALID_PERMISSIONS_INTEGER`
 
 Permissions must be a valid integer
@@ -662,6 +694,9 @@ These answers don't match the report form
 
 Invalid request
 
+### `INVALID_SIGN_IN_CODE`
+
+That code isn't right
 ### `INVALID_STREAM_KEY_FORMAT`
 
 Invalid stream key format
@@ -748,7 +783,7 @@ You've reached the maximum of {count, plural, one {# emoji} other {# emojis}}
 
 ### `MAX_FAVORITE_MEMES`
 
-You've reached the maximum of {count, plural, one {# favorite meme} other {# favorite memes}}
+You've reached the maximum of {count, plural, one {# saved media item} other {# saved media items}}
 
 ### `MAX_FORUM_TAGS`
 
@@ -832,7 +867,7 @@ Method not allowed
 
 ### `MFA_EMAIL_VERIFICATION_REQUIRED`
 
-Email verification is required for this action
+Confirm your email address to use two-factor authentication or passkeys
 
 ### `MISSING_ACCESS`
 
@@ -853,6 +888,10 @@ The requested scope isn't supported or you don't have permission to request it
 ### `MISSING_PERMISSIONS`
 
 You don't have the permissions required to perform this action
+
+### `NEW_CONVERSATIONS_LIMITED`
+
+You can't start new conversations right now. Please try again later
 
 ### `NOT_A_BOT_APPLICATION`
 
@@ -902,6 +941,10 @@ NSFW content is age restricted
 
 Passkey authentication failed
 
+### `PASSWORD_REQUIRED_TO_CLAIM`
+
+Set a password to keep this account. A claim with no password and no passkey gets this on a username instance, on an email instance that can't send email codes and on an instance whose `verification_basis` is `local_credential`. The message says which of these applies
+
 ### `PREMIUM_PURCHASE_BLOCKED`
 
 No active subscription
@@ -926,6 +969,10 @@ This published message has reached its editing limit
 
 Email verification is required for this action
 
+### `PURCHASE_RECEIPT_EMAIL_REQUIRED`
+
+Purchases need an email address to send receipts to, and this account doesn't have one. A verified account with no email, such as any account on a username instance, gets this when it starts a checkout
+
 ### `RATE_LIMITED`
 
 You're being rate limited
@@ -936,11 +983,15 @@ Email verification is required for this action
 
 ### `REGISTRATION_CLOSED`
 
-Registration is closed on this instance
+Registration is closed on this instance. A self-hosted instance also returns it for every new account from the moment its first admin account exists until setup finishes
 
 ### `REGISTRATION_CREDENTIALS_REQUIRED`
 
 This instance reviews new accounts. Sign up from the sign-up page with a password so you can sign in once approved
+
+### `REGISTRATION_CREDENTIAL_REQUIRED`
+
+Choose a password to sign up. A sign-up with an email and no password gets this on an email instance that can't send email codes
 
 ### `REGISTRATION_PENDING_APPROVAL`
 
@@ -994,6 +1045,10 @@ Service unavailable
 
 Session token mismatch
 
+### `SIGN_IN_CODE_EXPIRED`
+
+This code has expired
+
 ### `SINGLE_COMMUNITY_CANNOT_CREATE_GUILDS`
 
 This instance is a single community, so additional communities cannot be created
@@ -1012,27 +1067,7 @@ Slowmode rate limited
 
 ### `SSO_REQUIRED`
 
-Invalid request
-
-### `STORE_BILLING_UNAVAILABLE`
-
-In-app purchases are unavailable right now
-
-### `STORE_NOTIFICATION_UNAUTHORIZED`
-
-The notification signature is invalid
-
-### `STORE_PURCHASE_INVALID`
-
-This purchase could not be verified
-
-### `STORE_PURCHASE_OWNED_BY_OTHER_ACCOUNT`
-
-This purchase is linked to a different account
-
-### `STORE_PURCHASE_SANDBOX_NOT_ENTITLED`
-
-Test purchases cannot be applied to this account
+This instance requires single sign-on. A local sign-in or sign-up gets this while an admin requires single sign-on, and the message points to the SSO button on the sign-in page. An account linked to the SSO provider gets it when it tries to change its email or password, and an SSO sign-in gets it when automatic account creation is off and no account matches. The message says which of these applies
 
 ### `STREAM_KEY_CHANNEL_MISMATCH`
 
@@ -1074,14 +1109,6 @@ No subscription found
 
 Payment processing is temporarily unavailable
 
-### `STRIPE_REFUND_COOLDOWN_ACTIVE`
-
-You can self-serve refund once every 30 days
-
-### `STRIPE_REFUND_OUTSIDE_WINDOW`
-
-This purchase is outside the 3-day self-serve refund window
-
 ### `STRIPE_SUBSCRIPTION_ALREADY_CANCELING`
 
 Subscription is already set to cancel at period end
@@ -1106,6 +1133,9 @@ Stripe webhook signature is missing
 
 Sudo mode is required
 
+### `SUDO_SECOND_FACTOR_REQUIRED`
+
+Confirm it's you with your authenticator app, passkey or a backup code. An email code isn't accepted here
 ### `SYNCED_PREFERENCES_CONFLICT`
 
 Your preferences changed on another device
@@ -1152,51 +1182,55 @@ Unauthorized
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS`
 
-You're not friends with this user
+Claim your account to accept friend requests
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_ADD_REACTIONS`
 
-Invalid request
+Claim your account to add reactions
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_CREATE_APPLICATIONS`
 
-Invalid request
+Claim your account to create applications
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_CREATE_GUILDS`
 
-You need to complete your account setup before you can create communities
+Claim your account to create communities
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_JOIN_GROUP_DMS`
 
-You can't add yourself to a group DM
+Claim your account to join group chats
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_JOIN_ONE_ON_ONE_VOICE_CALLS`
 
-Invalid request
+Claim your account to start or join calls
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_JOIN_VOICE_CHANNELS`
 
-Invalid request
+Claim your account to join voice channels
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_MAKE_PURCHASES`
 
-Invalid request
+Claim your account to make purchases
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_SEND_DIRECT_MESSAGES`
 
-You can't send messages to this user
+Claim your account to send direct messages
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_SEND_FRIEND_REQUESTS`
 
-Bots can't send friend requests
+Claim your account to send friend requests
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_SEND_MESSAGES`
 
-Invalid request
+Claim your account to send messages
 
 ### `UNCLAIMED_ACCOUNT_CANNOT_SUBMIT_REPORTS`
 
-You need to complete your account setup before you can submit reports
+Claim your account to submit reports
+
+### `UNKNOWN_ACCOUNT_HANDOFF`
+
+This sign-up link has expired or was already used
 
 ### `UNKNOWN_APPLICATION`
 
@@ -1216,7 +1250,7 @@ Unknown enforcement decision
 
 ### `UNKNOWN_FAVORITE_MEME`
 
-Unknown favorite meme
+Unknown saved media
 
 ### `UNKNOWN_FORUM_TAG`
 
@@ -1232,7 +1266,7 @@ Community wasn't found
 
 ### `UNKNOWN_HARVEST`
 
-Unknown harvest
+Unknown data export
 
 ### `UNKNOWN_INVITE`
 
@@ -1250,14 +1284,6 @@ Message wasn't found
 
 This sign-in transfer has expired or was already used
 
-### `UNKNOWN_PASSKEY_BRIDGE`
-
-This passkey request has expired
-
-### `UNKNOWN_PASSKEY_MIGRATION`
-
-There is no passkey to update right now
-
 ### `UNKNOWN_REPORT`
 
 Unknown report
@@ -1266,13 +1292,13 @@ Unknown report
 
 Role wasn't found
 
+### `UNKNOWN_SIGN_IN_TICKET`
+
+This sign-in attempt has expired
+
 ### `UNKNOWN_STICKER`
 
 Unknown sticker
-
-### `UNKNOWN_STORE_PURCHASE`
-
-Unknown store purchase
 
 ### `UNKNOWN_THREAD_MEMBER`
 
@@ -1330,6 +1356,10 @@ This user isn't in voice
 
 This user owns communities
 
+### `USE_CLAIM_ROUTE`
+
+Add an email address to your account first
+
 ### `VALIDATION_ERROR`
 
 Validation failed
@@ -1377,7 +1407,7 @@ AFK channel must be a voice channel
 
 ### `AGE_RESTRICTED`
 
-This sensitive content filter isn't available for your age
+This sensitive content filter isn't available for your age group
 
 ### `ALL_CHANNELS_MUST_BELONG_TO_GUILD`
 
@@ -1402,10 +1432,6 @@ Attachment with ID {attachmentId} wasn't found in the message
 ### `ATTACHMENT_MUST_BE_IMAGE`
 
 Attachment "{filename}" must be an image file (png, jpg, jpeg, webp, or gif)
-
-### `AT_LEAST_ONE_RECIPIENT_REQUIRED`
-
-At least one recipient is required
 
 ### `AVATAR_CHANGED_TOO_MANY_TIMES`
 
@@ -1483,6 +1509,10 @@ You can't set hoist position for the @everyone role
 
 You can't specify both `before` and `after`
 
+### `CAPTCHA_REQUIRED_BY_INSTANT_ACCOUNTS`
+
+Turn off instant accounts before turning off the captcha
+
 ### `CATEGORIES_CANNOT_HAVE_PARENTS`
 
 Categories can't have parents
@@ -1553,7 +1583,7 @@ Custom sticker wasn't found
 
 ### `DISCOVERABLE_GUILD_VERIFICATION_LEVEL_TOO_LOW`
 
-Discoverable communities must have a verification level of at least Low
+Communities listed in Explore must have a verification level of at least Low
 
 ### `DISCRIMINATOR_INVALID_FORMAT`
 
@@ -1582,6 +1612,14 @@ Duplicate recipients aren't allowed
 ### `EMAIL_ALREADY_IN_USE`
 
 Email is already in use
+
+### `EMAIL_DELIVERY_REQUIRES_EMAIL_IDENTITY`
+
+Email delivery only works when people sign in with an email
+
+### `EMAIL_DOMAIN_NOT_ALLOWED`
+
+This instance only accepts email addresses from certain domains
 
 ### `EMAIL_DOMAIN_NOT_ALLOWED_FOR_SSO`
 
@@ -1745,11 +1783,11 @@ We couldn't upload the image
 
 ### `FAVORITE_MEME_NAME_REQUIRED`
 
-Favorite meme name is required
+Saved media name is required
 
 ### `FAVORITE_MEME_NOT_FOUND`
 
-Favorite meme wasn't found
+Saved media wasn't found
 
 ### `FILENAME_LENGTH_INVALID`
 
@@ -1797,11 +1835,15 @@ This feature cannot be toggled
 
 ### `GUILD_ID_MUST_MATCH_REFERENCED_MESSAGE`
 
-Community ID must match the channel the referenced message was fetched from
+Community ID must match the community containing the channel the referenced message was fetched from
 
 ### `GUILD_ID_REQUIRED_FOR_SEARCH_INDEX`
 
 Community ID is required for channel message and member search indexes
+
+### `IDENTIFIER_FIRST_REQUIRES_EMAIL_IDENTITY`
+
+Email-first sign-in only works when people sign in with an email
 
 ### `IMAGE_SIZE_EXCEEDS_LIMIT`
 
@@ -1809,11 +1851,19 @@ Image size exceeds {maxSize} bytes
 
 ### `INSTANCE_ADDRESS_REQUIRED`
 
-This server uses usernames. Enter the username you want followed by @{host}
+This instance uses usernames. Enter the username you want followed by @{host}
+
+### `INSTANT_ACCOUNTS_REQUIRE_CAPTCHA`
+
+Turn on the captcha before allowing instant accounts
 
 ### `INTEGER_OUT_OF_INT64_RANGE`
 
 Integer value is out of the valid int64 range
+
+### `INVALID_ALLOWED_DOMAIN`
+
+"{domain}" isn't a valid domain
 
 ### `INVALID_AUDIT_LOG_REASON`
 
@@ -1833,7 +1883,7 @@ Invalid code
 
 ### `INVALID_DATE_OF_BIRTH_FORMAT`
 
-Invalid date of birth format
+Enter your real date of birth
 
 ### `INVALID_EMAIL_ADDRESS`
 
@@ -1849,7 +1899,7 @@ Invalid email address format
 
 ### `INVALID_EMAIL_OR_PASSWORD`
 
-Invalid email or password
+Check your email and password
 
 ### `INVALID_EMAIL_TOKEN`
 
@@ -1929,7 +1979,7 @@ Invalid parent channel
 
 ### `INVALID_PASSWORD`
 
-Invalid email or password
+Check your email and password
 
 ### `INVALID_PROOF_TOKEN`
 
@@ -1969,7 +2019,7 @@ Invalid timeout value
 
 ### `INVALID_TIMEZONE_IDENTIFIER`
 
-Invalid timezone identifier
+Invalid time zone identifier
 
 ### `INVALID_TRUSTED_DOMAINS`
 
@@ -1993,11 +2043,11 @@ Invite splash requires INVITE_SPLASH feature
 
 ### `MAX_FAVORITE_MEME_TAGS_EXCEEDED`
 
-You can only add up to {limit, plural, one {# tag} other {# tags}} per favorite meme
+You can only add up to {limit, plural, one {# tag} other {# tags}} per saved media item
 
 ### `MEDIA_ALREADY_IN_FAVORITE_MEMES`
 
-This media is already in your favorite memes
+This media is already in your saved media
 
 ### `MESSAGES_ARRAY_REQUIRED_AND_NOT_EMPTY`
 
@@ -2029,7 +2079,7 @@ Multiple files for index {index} aren't allowed
 
 ### `MUST_AGREE_TO_TOS_AND_PRIVACY_POLICY`
 
-You must agree to the Terms of Service and Privacy Policy
+You need to accept the terms of service to create an account
 
 ### `MUST_BE_MINIMUM_AGE`
 
@@ -2057,7 +2107,7 @@ New email must be different from your current email
 
 ### `NOT_A_VALID_UNICODE_EMOJI`
 
-Not a valid unicode emoji
+Not a valid Unicode emoji
 
 ### `NO_FILE_FOR_ATTACHMENT`
 
@@ -2135,14 +2185,6 @@ You've changed your pronouns too often recently
 
 Recipient IDs can't be empty
 
-### `RECIPIENT_IDS_MUST_BE_STRINGS`
-
-Recipient IDs must be strings
-
-### `RECIPIENT_IDS_MUST_BE_VALID_SNOWFLAKES`
-
-Recipient IDs must be valid snowflakes
-
 ### `REFERENCED_ATTACHMENT_NOT_FOUND`
 
 Referenced attachment "{filename}" wasn't found in message attachments
@@ -2150,6 +2192,9 @@ Referenced attachment "{filename}" wasn't found in message attachments
 ### `REPORT_OUTCOME_INVALID`
 
 An actioned resolution needs an outcome other than no violation. A duplicate needs the report it repeats and takes no outcome. A no violation resolution takes no other outcome
+### `SEARCH_FILTER_NEEDS_MEMBERSHIP`
+
+Join this community to search by person or mention
 
 ### `SESSION_TIMEOUT`
 
@@ -2163,9 +2208,25 @@ That setup token is not correct. Check the token and try again.
 
 This instance is not set up yet. Finish setup in a web browser with the setup token before creating accounts.
 
+### `SMTP_HOST_REQUIRED`
+
+Enter an SMTP server before turning on email delivery.
+
 ### `SNOWFLAKE_OUT_OF_RANGE`
 
 Invalid snowflake
+
+### `SSO_ACCOUNT_LINKED_TO_ANOTHER_IDENTITY`
+
+This account is already linked to a different SSO identity
+
+### `SSO_EMAIL_NOT_VERIFIED`
+
+Your SSO provider has not verified your email address
+
+### `SSO_IDENTITY_LINKED_TO_ANOTHER_ACCOUNT`
+
+This SSO identity is already linked to a different account
 
 ### `SSO_IDENTITY_MISMATCH`
 
@@ -2189,7 +2250,7 @@ We couldn't allocate a discriminator for your SSO account
 
 ### `STRING_LENGTH_EXACT`
 
-String must be exactly {length} characters
+String must be exactly {length, plural, one {# character} other {# characters}}
 
 ### `STRING_LENGTH_INVALID`
 
@@ -2245,11 +2306,11 @@ There are too many users with this username
 
 ### `TOTP_NOT_ENABLED`
 
-Authenticator app two-factor isn't enabled for this account
+Two-factor authentication using an authenticator app isn't enabled for this account
 
 ### `UNCLAIMED_ACCOUNTS_CAN_ONLY_SET_EMAIL_VIA_TOKEN`
 
-Unclaimed accounts can only set email via token
+Claim your account before changing your profile. An unclaimed account gets this when it changes anything except the details needed to claim it, and the message says which step comes first, based on `need`
 
 ### `UNRESOLVED_ATTACHMENT_URL`
 
@@ -2262,6 +2323,10 @@ Uploaded attachment {filename} wasn't found
 ### `URL_LENGTH_INVALID`
 
 URL must be between {min} and {max} characters
+
+### `URL_MUST_USE_HTTPS`
+
+URL must start with https://
 
 ### `URL_NOT_PUBLICLY_ROUTABLE`
 
@@ -2331,6 +2396,10 @@ Vanity URL can only contain lowercase letters (a-z), digits (0-9), and hyphens (
 
 Vanity URL requires VANITY_URL feature
 
+### `VERIFICATION_BASIS_REQUIRES_EMAIL_DELIVERY`
+
+Accounts can only be verified by a confirmed email while email delivery is on
+
 ### `VERIFICATION_CODE_EXPIRED`
 
 Verification code has expired
@@ -2373,7 +2442,7 @@ Voice messages can't have embeds
 
 ### `VOICE_MESSAGES_CANNOT_HAVE_FAVORITE_MEMES`
 
-Voice messages can't have favorite memes
+Voice messages can't have saved media
 
 ### `VOICE_MESSAGES_CANNOT_HAVE_STICKERS`
 

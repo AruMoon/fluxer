@@ -18,8 +18,6 @@ A deleted account has the deleted flag with no pending deletion timestamp, and i
 
 ## Relationship object
 
-A relationship record belongs to one account and names one other account. Every field describes the owning account's side. The caller reads its own record on every operation except the friendly bot auto-acceptance of [Send friend request by user ID](#send-friend-request-by-user-id), which returns the bot's record.
-
 ### Structure
 
 | Field | Type | Description |
@@ -66,8 +64,6 @@ A relationship record belongs to one account and names one other account. Every 
 | 4 | OUTGOING_REQUEST | The caller has sent the related account a friend request |
 
 ## Bulk ignore result object
-
-A bulk ignore result reports how many incoming friend requests one call removed.
 
 ### Structure
 
@@ -129,11 +125,11 @@ Fluxer resolves the tag to exactly one account before any relationship rule runs
 | Field | Type | Description |
 | --- | --- | --- |
 | username<sup>1</sup> | string | The username of the target account |
-| discriminator<sup>2</sup> | string \| integer | The discriminator of the target account |
+| discriminator?<sup>2</sup> | string \| integer | The discriminator of the target account |
 
 <sup>1</sup> Trimmed before validation, then 1 to 32 characters of ASCII letters, digits, and underscores. It cannot be `everyone` or `here`, or contain `fluxer` or `system message`, in any casing
 
-<sup>2</sup> An integer and a decimal string of 1 to 4 digits are both accepted, and `0007` and `7` resolve the same account. On an instance with the `none` tag style a person is reached by their username with the discriminator `0` or `"0000"`. A bot keeps its own discriminator
+<sup>2</sup> An integer and a decimal string of 1 to 4 digits are both accepted, and `0007` and `7` resolve the same account. On an instance with the `none` tag style a person is reached by their username alone, or with the discriminator `0` or `"0000"`. Elsewhere a request without a discriminator returns 400 `DISCRIMINATOR_REQUIRED`. A bot keeps its own discriminator
 
 ### Response
 
@@ -158,7 +154,7 @@ The side effects are those of [Send friend request by user ID](#send-friend-requ
 
 Sends a friend request to the selected account. Returns a [relationship](#relationship-object) object on success.
 
-Admission is ordered. The deployment direct message policy runs first, so an ordinary caller receives 400 `DIRECT_MESSAGES_DISABLED` while that policy disables direct messages. A caller with the `STAFF` flag skips that first evaluation, whether or not it requests forced acceptance. When the target has already sent a request, a staff caller's send turns into an acceptance and still receives 400 `DIRECT_MESSAGES_DISABLED`. An unresolved caller then returns 404 `UNKNOWN_USER`.
+Admission is ordered. The deployment friends policy runs first, so an ordinary caller receives 400 `FRIENDS_DISABLED` while the [community policy](/http-api/instance/#community-policy-object) sets `friends_disabled`. A caller with the `STAFF` flag skips that first evaluation, whether or not it requests forced acceptance. When the target has already sent a request, a staff caller's send turns into an acceptance and still receives 400 `FRIENDS_DISABLED`. An unresolved caller then returns 404 `UNKNOWN_USER`.
 
 The caller's own ID returns 400 `CANNOT_SEND_FRIEND_REQUEST_TO_SELF`. An unresolved target returns 404 `UNKNOWN_USER`. A deleted target returns 400 `FRIEND_REQUEST_BLOCKED`.
 
@@ -225,9 +221,9 @@ Staff forced acceptance replaces every existing record between the two accounts,
 
 Accepts a pending incoming friend request, or blocks the selected account when the body selects BLOCKED. Returns a [relationship](#relationship-object) object on success.
 
-Acceptance evaluates the deployment direct message policy first and returns 400 `DIRECT_MESSAGES_DISABLED` while that policy disables direct messages, with no staff exemption. An unresolved caller or requester returns 404 `UNKNOWN_USER`. A deleted account on either side returns 400 `FRIEND_REQUEST_BLOCKED`. An unclaimed caller returns 400 `UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS`. A missing pending incoming request returns 404 `UNKNOWN_USER`, and the [relationship limit](#relationship-limit) then applies to both accounts. Acceptance has no email verification requirement.
+Acceptance evaluates the deployment friends policy first and returns 400 `FRIENDS_DISABLED` while the community policy sets `friends_disabled`, with no staff exemption. An unresolved caller or requester returns 404 `UNKNOWN_USER`. A deleted account on either side returns 400 `FRIEND_REQUEST_BLOCKED`. An unclaimed caller returns 400 `UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS`. A missing pending incoming request returns 404 `UNKNOWN_USER`, and the [relationship limit](#relationship-limit) then applies to both accounts. Acceptance has no email verification requirement.
 
-Blocking returns 404 `UNKNOWN_USER` for an unresolved target and 400 `CANNOT_BLOCK_SYSTEM_USER` for the Fluxer system account. Those are its only admission rules, so blocking runs regardless of the deployment direct message policy, the unclaimed account rule, the email verification rule, and the [relationship limit](#relationship-limit). It applies no self-target rule.
+Blocking returns 404 `UNKNOWN_USER` for an unresolved target and 400 `CANNOT_BLOCK_SYSTEM_USER` for the Fluxer system account. Those are its only admission rules, so blocking runs regardless of the deployment friends policy, the unclaimed account rule, the email verification rule, and the [relationship limit](#relationship-limit). It applies no self-target rule.
 
 :::caution[The type member selects the operation]
 Only the exact value BLOCKED selects blocking. Every other accepted [relationship type](#relationship-types), an omitted `type`, and an omitted body all select acceptance of a pending incoming request. Sending FRIEND does not force a friendship where no request exists.
