@@ -13,7 +13,7 @@ import type {SearchOptions, SearchResult} from '@fluxer/schema/src/contracts/sea
 const MAX_SEARCH_LIMIT = 1000;
 const MAX_TOTAL_HITS = 10000;
 
-export const MEILISEARCH_MAX_TRACKED_BULK_TASKS = 4096;
+const MEILISEARCH_MAX_TRACKED_BULK_TASKS = 4096;
 
 interface MeilisearchIndexAdapterOptions<TFilters> {
 	client: MeilisearchClient;

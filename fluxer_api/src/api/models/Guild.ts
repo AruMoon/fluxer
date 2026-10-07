@@ -46,7 +46,7 @@ export class Guild {
 	readonly afkTimeout: number;
 	readonly disabledOperations: number;
 	readonly memberCount: number;
-	readonly auditLogsIndexedAt: Date | null;
+	private readonly auditLogsIndexedAt: Date | null;
 	readonly membersIndexedAt: Date | null;
 	readonly messageHistoryCutoff: Date | null;
 	readonly invitesPausedUntil: Date | null;

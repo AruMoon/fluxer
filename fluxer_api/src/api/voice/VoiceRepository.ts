@@ -111,7 +111,7 @@ export class VoiceRepository {
 		return fullRegion;
 	}
 
-	async listServersForRegion(regionId: string): Promise<Array<VoiceServerRecord>> {
+	private async listServersForRegion(regionId: string): Promise<Array<VoiceServerRecord>> {
 		const rows = await fetchMany<VoiceServerRow>(LIST_SERVERS_FOR_REGION_CQL, {region_id: regionId});
 		return rows.map((row) => this.mapServerRow(row));
 	}
