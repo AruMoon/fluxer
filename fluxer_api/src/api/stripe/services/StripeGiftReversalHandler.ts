@@ -18,6 +18,7 @@ import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {clearPerksSanitizedFlag} from '@app/api/user/UserHelpers';
 import {dispatchUserUpdate} from '@app/api/user/UserMappers';
 import {UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
+import {MS_PER_MINUTE, MS_PER_SECOND} from '@fluxer/date_utils/src/DateConstants';
 import {StripeError} from '@fluxer/errors/src/domains/payment/StripeError';
 import Stripe from 'stripe';
 
@@ -33,7 +34,7 @@ interface GiftTrialCut {
 	premiumUntil: Date;
 }
 
-const MIN_REMAINING_TRIAL_MS = 60_000;
+const MIN_REMAINING_TRIAL_MS = MS_PER_MINUTE;
 
 export class StripeGiftReversalHandler {
 	constructor(
@@ -304,7 +305,7 @@ export class StripeGiftReversalHandler {
 			user.premiumGiftExtensionEndsAt?.getTime() ?? 0,
 		);
 		const patch: Partial<UserRow> = {
-			premium_gift_extension_ends_at: new Date(anchorMs + seconds * 1000),
+			premium_gift_extension_ends_at: new Date(anchorMs + seconds * MS_PER_SECOND),
 			premium_grace_ends_at: null,
 		};
 		if ((user.premiumType ?? 0) <= 0) {
@@ -343,7 +344,7 @@ export class StripeGiftReversalHandler {
 		if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
 			return null;
 		}
-		if (!subscription.trial_end || subscription.trial_end * 1000 <= now.getTime()) {
+		if (!subscription.trial_end || subscription.trial_end * MS_PER_SECOND <= now.getTime()) {
 			return null;
 		}
 		const giftSeconds = getGiftTrialSeconds(subscription, giftCode.code);
@@ -351,7 +352,7 @@ export class StripeGiftReversalHandler {
 			return null;
 		}
 		const cutEndMs = Math.max(
-			subscription.trial_end * 1000 - giftSeconds * 1000,
+			subscription.trial_end * MS_PER_SECOND - giftSeconds * MS_PER_SECOND,
 			getGiftTrialPaidUntil(subscription, now.getTime())?.getTime() ?? 0,
 		);
 		const endsNow = cutEndMs <= now.getTime() + MIN_REMAINING_TRIAL_MS;
@@ -373,21 +374,24 @@ export class StripeGiftReversalHandler {
 			throw new StripeError('Stripe client not available for gift trial reversal');
 		}
 		const idempotencyKey = `gift_trial_reverse:${redeemer.id}:${giftCode.code}`;
-		const subscription = cut.cancel
-			? await stripe.subscriptions.cancel(
-					cut.subscriptionId,
-					{invoice_now: false, prorate: false, cancellation_details: {comment: 'gift_reversal'}},
-					{idempotencyKey},
-				)
-			: await stripe.subscriptions.update(
-					cut.subscriptionId,
-					{
-						trial_end: cut.trialEnd ? Math.floor(cut.trialEnd.getTime() / 1000) : 'now',
-						proration_behavior: 'none',
-						metadata: {[getGiftTrialMetadataKey(giftCode.code)]: ''},
-					},
-					{idempotencyKey},
-				);
+		let subscription: Stripe.Subscription;
+		if (cut.cancel) {
+			subscription = await stripe.subscriptions.cancel(
+				cut.subscriptionId,
+				{invoice_now: false, prorate: false, cancellation_details: {comment: 'gift_reversal'}},
+				{idempotencyKey},
+			);
+		} else {
+			subscription = await stripe.subscriptions.update(
+				cut.subscriptionId,
+				{
+					trial_end: cut.trialEnd ? Math.floor(cut.trialEnd.getTime() / MS_PER_SECOND) : 'now',
+					proration_behavior: 'none',
+					metadata: {[getGiftTrialMetadataKey(giftCode.code)]: ''},
+				},
+				{idempotencyKey},
+			);
+		}
 		await mirrorSubscription(
 			subscription,
 			redeemer.id,
@@ -460,10 +464,10 @@ export class StripeGiftReversalHandler {
 			redeemer.premiumGiftExtensionEndsAt?.getTime() ?? 0,
 		);
 		const afterMs = Math.max(nowMs, nextUntil?.getTime() ?? 0, nextGiftEnd?.getTime() ?? 0);
-		return Math.max(0, Math.ceil((beforeMs - afterMs) / 1000));
+		return Math.max(0, Math.ceil((beforeMs - afterMs) / MS_PER_SECOND));
 	}
 
-	computeRemainingGiftEntitlement(
+	private computeRemainingGiftEntitlement(
 		redeemedGifts: Array<GiftCode>,
 		excludedCode: string | null,
 	): RemainingGiftEntitlement {
