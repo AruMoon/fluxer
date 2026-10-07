@@ -92,7 +92,7 @@ export const UserFlagsDescriptions: Record<keyof typeof UserFlags, string> = {
 	HAS_DISMISSED_PREMIUM_ONBOARDING: 'User has dismissed premium onboarding',
 	APP_STORE_REVIEWER: 'User is an app store reviewer',
 	STAFF_HIDDEN: 'User staff status is hidden from public flags',
-	AGE_VERIFIED_ADULT: 'User has verified their age as an adult via credit card verification',
+	AGE_VERIFIED_ADULT: 'User has verified their age as an adult',
 	LIMIT_EXEMPT: 'User is permanently exempt from account limitation',
 };
 export const PremiumFlags = {
@@ -105,6 +105,9 @@ export const PremiumFlags = {
 	PURCHASE_DISABLED: 1 << 6,
 	ENABLED_OVERRIDE: 1 << 7,
 	PERKS_DISABLED: 1 << 8,
+	OPERATOR_PASS_BADGE_HIDDEN: 1 << 9,
+	OPERATOR_PASS_BADGE_TIMESTAMP_HIDDEN: 1 << 11,
+	OPERATOR_PASS_BADGE_COUNT_HIDDEN: 1 << 12,
 } as const;
 export const PremiumFlagsDescriptions: Record<keyof typeof PremiumFlags, string> = {
 	DISCRIMINATOR: 'User has a premium discriminator',
@@ -116,6 +119,9 @@ export const PremiumFlagsDescriptions: Record<keyof typeof PremiumFlags, string>
 	PURCHASE_DISABLED: 'Premium purchase is disabled for this user',
 	ENABLED_OVERRIDE: 'Premium status is enabled via override',
 	PERKS_DISABLED: 'User has temporarily disabled premium perks',
+	OPERATOR_PASS_BADGE_HIDDEN: 'User has chosen to hide their Operator Pass badge',
+	OPERATOR_PASS_BADGE_TIMESTAMP_HIDDEN: 'User has hidden when they first got the Operator Pass',
+	OPERATOR_PASS_BADGE_COUNT_HIDDEN: 'User has hidden how many Operator Passes they hold',
 };
 const LEGACY_PREMIUM_FLAG_BITS_TO_NEW: ReadonlyArray<readonly [bigint, number]> = [
 	[1n << 37n, PremiumFlags.DISCRIMINATOR],
