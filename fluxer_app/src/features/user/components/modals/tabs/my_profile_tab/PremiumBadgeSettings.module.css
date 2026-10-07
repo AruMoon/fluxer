@@ -1,5 +1,11 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
 
+.sections {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
 .header {
 	margin-bottom: 1rem;
 }
