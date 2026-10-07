@@ -4,7 +4,7 @@ You are localizing the Fluxer client into Modern Standard Arabic for locale `ar`
 
 ## Core rules
 
-- Preserve product names exactly: Fluxer, Fluxer Desktop, Fluxer API, Plutonium, Fluxer Plutonium, Fluxer HQ, FluxerTag.
+- Preserve product names exactly: Fluxer, Fluxer Desktop, Fluxer API, Plutonium, Fluxer Plutonium, Fluxer HQ, FluxerTag, Operator Pass, Fluxer Labs, Visionary. Keep channel names such as #operators unchanged.
 - Use sentence case according to Modern Standard Arabic conventions. Do not copy English Title Case, including for English source badge titles such as Fluxer Staff or Fluxer Bug Hunter; use natural Modern Standard Arabic capitalization or title style for those badge titles.
 - Keep the tone fresh, clean, trustworthy, concise, and lightly humorous where the surface is low stakes.
 - Keep auth, billing, privacy, safety, moderation, outages, and destructive actions calm and plain.

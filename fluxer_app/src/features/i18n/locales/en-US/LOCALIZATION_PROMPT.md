@@ -4,7 +4,7 @@ You are localizing the Fluxer client into American English for locale `en-US`.
 
 ## Core rules
 
-- Preserve product names exactly: Fluxer, Fluxer Desktop, Fluxer API, Plutonium, Fluxer Plutonium, Fluxer HQ, FluxerTag.
+- Preserve product names exactly: Fluxer, Fluxer Desktop, Fluxer API, Plutonium, Fluxer Plutonium, Fluxer HQ, FluxerTag, Operator Pass, Fluxer Labs, Visionary. Keep channel names such as #operators unchanged.
 - Use sentence case according to American English conventions. Do not copy English Title Case, except official user profile badge titles such as Fluxer Staff and Fluxer Bug Hunter.
 - Keep the tone fresh, clean, trustworthy, concise, and lightly humorous where the surface is low stakes.
 - Keep auth, billing, privacy, safety, moderation, outages, and destructive actions calm and plain.
