@@ -5,13 +5,23 @@ import {LimitResolver} from '@app/features/app/utils/LimitResolverAdapter';
 import DeveloperOptions from '@app/features/devtools/state/DeveloperOptions';
 import {getPremiumGraceEndDate} from '@app/features/premium/utils/PremiumGrace';
 import {formatUserTag} from '@app/features/user/utils/UserTagUtils';
+import {
+	type AccountTier,
+	AccountTiers,
+	type AccountVerificationNeed,
+	type LocalCredentialKind,
+	localCredentialKindOf,
+} from '@fluxer/constants/src/AccountTierConstants';
+import {resolveAccountTier, resolveVerificationNeed} from '@fluxer/constants/src/AccountTierRules';
 import type {LimitKey} from '@fluxer/constants/src/LimitConfigMetadata';
 import {
 	type MentionReplyPreference,
 	ProfileFieldPrivacyFlags,
 	PublicUserFlags,
+	UserAuthenticatorTypes,
 	UserPremiumTypes,
 } from '@fluxer/constants/src/UserConstants';
+import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {DEFAULT_STOCK_LIMITS} from '@fluxer/limits/src/LimitDefaults';
 import type {UserPartial, UserPrivate, User as WireUser} from '@fluxer/schema/src/domains/user/UserResponseSchemas';
 import * as SnowflakeUtils from '@fluxer/snowflake/src/SnowflakeUtils';
@@ -161,6 +171,10 @@ export class User {
 	readonly premiumBadgeMasked: boolean | undefined;
 	readonly premiumBadgeTimestampHidden: boolean | undefined;
 	readonly premiumBadgeSequenceHidden: boolean | undefined;
+	readonly operatorPassBadgeHidden: boolean | undefined;
+	readonly operatorPassBadgeTimestampHidden: boolean | undefined;
+	readonly operatorPassBadgeCountHidden: boolean | undefined;
+	readonly operatorPassSince: Date | null | undefined;
 	readonly premiumEnabledOverride: boolean | undefined;
 	readonly premiumPerksDisabled: boolean | undefined;
 	readonly passwordLastChangedAt: Date | null | undefined;
@@ -174,6 +188,11 @@ export class User {
 	private readonly _termsAgreedAt: Date | null | undefined;
 	private readonly _privacyAgreedAt: Date | null | undefined;
 	private readonly _traits: ReadonlyArray<string>;
+	private readonly _claimed: boolean | undefined;
+	private readonly _accountTier: AccountTier | undefined;
+	private readonly _verificationNeed: AccountVerificationNeed | null | undefined;
+	private readonly _hasPassword: boolean | undefined;
+	private readonly _dateOfBirthRequired: boolean | undefined;
 
 	constructor(user: WireUser, options?: UserRecordOptions) {
 		this.instanceId = options?.instanceId ?? RuntimeConfig.localInstanceDomain;
@@ -227,6 +246,18 @@ export class User {
 		this.premiumBadgeSequenceHidden = hasKey(user, 'premium_badge_sequence_hidden')
 			? user.premium_badge_sequence_hidden
 			: undefined;
+		this.operatorPassBadgeHidden = hasKey(user, 'operator_pass_badge_hidden')
+			? user.operator_pass_badge_hidden
+			: undefined;
+		this.operatorPassBadgeTimestampHidden = hasKey(user, 'operator_pass_badge_timestamp_hidden')
+			? user.operator_pass_badge_timestamp_hidden
+			: undefined;
+		this.operatorPassBadgeCountHidden = hasKey(user, 'operator_pass_badge_count_hidden')
+			? user.operator_pass_badge_count_hidden
+			: undefined;
+		this.operatorPassSince = hasKey(user, 'operator_pass_since')
+			? parseDateOrNull(user.operator_pass_since)
+			: undefined;
 		this.premiumEnabledOverride = hasKey(user, 'premium_enabled_override') ? user.premium_enabled_override : undefined;
 		this.premiumPerksDisabled = hasKey(user, 'premium_perks_disabled') ? user.premium_perks_disabled : undefined;
 		this.passwordLastChangedAt = hasKey(user, 'password_last_changed_at')
@@ -250,6 +281,11 @@ export class User {
 		this._termsAgreedAt = hasKey(user, 'terms_agreed_at') ? parseDateOrNull(user.terms_agreed_at) : undefined;
 		this._privacyAgreedAt = hasKey(user, 'privacy_agreed_at') ? parseDateOrNull(user.privacy_agreed_at) : undefined;
 		this._traits = mergeTraitsArray(EMPTY_STRING_ARRAY, user, {clearMissing: true});
+		this._claimed = hasKey(user, 'claimed') ? user.claimed : undefined;
+		this._accountTier = hasKey(user, 'account_tier') ? user.account_tier : undefined;
+		this._verificationNeed = hasKey(user, 'verification_need') ? user.verification_need : undefined;
+		this._hasPassword = hasKey(user, 'has_password') ? user.has_password : undefined;
+		this._dateOfBirthRequired = hasKey(user, 'date_of_birth_required') ? user.date_of_birth_required : undefined;
 	}
 
 	get email(): string | null | undefined {
@@ -450,6 +486,28 @@ export class User {
 			opts,
 		);
 		if (premiumBadgeSequenceHidden !== undefined) result.premium_badge_sequence_hidden = premiumBadgeSequenceHidden;
+		const operatorPassBadgeHidden = pickField(this.operatorPassBadgeHidden, u, 'operator_pass_badge_hidden', opts);
+		if (operatorPassBadgeHidden !== undefined) result.operator_pass_badge_hidden = operatorPassBadgeHidden;
+		const operatorPassBadgeTimestampHidden = pickField(
+			this.operatorPassBadgeTimestampHidden,
+			u,
+			'operator_pass_badge_timestamp_hidden',
+			opts,
+		);
+		if (operatorPassBadgeTimestampHidden !== undefined) {
+			result.operator_pass_badge_timestamp_hidden = operatorPassBadgeTimestampHidden;
+		}
+		const operatorPassBadgeCountHidden = pickField(
+			this.operatorPassBadgeCountHidden,
+			u,
+			'operator_pass_badge_count_hidden',
+			opts,
+		);
+		if (operatorPassBadgeCountHidden !== undefined) {
+			result.operator_pass_badge_count_hidden = operatorPassBadgeCountHidden;
+		}
+		const operatorPassSince = pickDateField(this.operatorPassSince, u, 'operator_pass_since', opts);
+		if (operatorPassSince !== undefined) result.operator_pass_since = dateToIsoOrNull(operatorPassSince);
 		const premiumEnabledOverride = pickField(this.premiumEnabledOverride, u, 'premium_enabled_override', opts);
 		if (premiumEnabledOverride !== undefined) result.premium_enabled_override = premiumEnabledOverride;
 		const premiumPerksDisabled = pickField(this.premiumPerksDisabled, u, 'premium_perks_disabled', opts);
@@ -488,6 +546,16 @@ export class User {
 		const privacyAgreedAt = pickDateField(this._privacyAgreedAt, u, 'privacy_agreed_at', opts);
 		if (privacyAgreedAt !== undefined) result.privacy_agreed_at = dateToIsoOrNull(privacyAgreedAt);
 		result.traits = mergeTraitsArray(this._traits, u, opts);
+		const claimed = pickField(this._claimed, u, 'claimed', opts);
+		if (claimed !== undefined) result.claimed = claimed;
+		const accountTier = pickField(this._accountTier, u, 'account_tier', opts);
+		if (accountTier !== undefined) result.account_tier = accountTier;
+		const verificationNeed = pickField(this._verificationNeed, u, 'verification_need', opts);
+		if (verificationNeed !== undefined) result.verification_need = verificationNeed;
+		const hasPassword = pickField(this._hasPassword, u, 'has_password', opts);
+		if (hasPassword !== undefined) result.has_password = hasPassword;
+		const dateOfBirthRequired = pickField(this._dateOfBirthRequired, u, 'date_of_birth_required', opts);
+		if (dateOfBirthRequired !== undefined) result.date_of_birth_required = dateOfBirthRequired;
 		return result;
 	}
 
@@ -547,6 +615,13 @@ export class User {
 		return this.resolveRuntimeLimit('max_favorite_meme_tags', DEFAULT_STOCK_LIMITS.max_favorite_meme_tags);
 	}
 
+	get guildVisitHistoryDays(): number {
+		return this.resolveRuntimeLimit(
+			'guild_visit_history_days_unverified',
+			DEFAULT_STOCK_LIMITS.guild_visit_history_days_unverified,
+		);
+	}
+
 	get maxGroupDmRecipients(): number {
 		return this.resolveRuntimeLimit('max_group_dm_recipients', DEFAULT_STOCK_LIMITS.max_group_dm_recipients);
 	}
@@ -564,8 +639,60 @@ export class User {
 	}
 
 	isClaimed(): boolean {
-		if (!RuntimeConfig.usesUsernameSignIn) return !!this.email;
-		return this.passwordLastChangedAt != null || this._traits.includes('sso');
+		return this.accountTier !== AccountTiers.UNCLAIMED;
+	}
+
+	get reportsAccountTier(): boolean {
+		return this._accountTier !== undefined || this._claimed !== undefined;
+	}
+
+	get localCredential(): LocalCredentialKind {
+		return localCredentialKindOf({
+			hasPassword: this.hasPassword,
+			hasPasskey:
+				this._traits.includes(UserTraits.PASSKEY) ||
+				(this.authenticatorTypes?.includes(UserAuthenticatorTypes.WEBAUTHN) ?? false),
+		});
+	}
+
+	get accountTier(): AccountTier {
+		if (DeveloperOptions.unclaimedAccountOverride === true) return AccountTiers.UNCLAIMED;
+		const usesServerTier = DeveloperOptions.emailVerifiedOverride == null;
+		if (usesServerTier && this._accountTier !== undefined) return this._accountTier;
+		const derived = resolveAccountTier({
+			isBot: this.bot,
+			isSystem: this.system,
+			traits: this._traits,
+			identityMode: RuntimeConfig.accountIdentity,
+			effectiveBasis: RuntimeConfig.verificationBasis,
+			hasEmail: this.email != null,
+			emailVerified: this.verified === true,
+			localCredential: this.localCredential,
+		});
+		if (this._claimed === undefined) return derived;
+		if (!this._claimed) return AccountTiers.UNCLAIMED;
+		return derived === AccountTiers.UNCLAIMED ? AccountTiers.VERIFIED : derived;
+	}
+
+	get verificationNeed(): AccountVerificationNeed | null {
+		const tier = this.accountTier;
+		if (
+			this._verificationNeed !== undefined &&
+			this._accountTier === tier &&
+			DeveloperOptions.unclaimedAccountOverride !== true &&
+			DeveloperOptions.emailVerifiedOverride == null
+		) {
+			return this._verificationNeed;
+		}
+		return resolveVerificationNeed({tier, identityMode: RuntimeConfig.accountIdentity, hasEmail: this.email != null});
+	}
+
+	get hasPassword(): boolean {
+		return this._hasPassword ?? this.passwordLastChangedAt != null;
+	}
+
+	get dateOfBirthRequired(): boolean {
+		return this._dateOfBirthRequired === true;
 	}
 
 	equals(other: User): boolean {
@@ -608,6 +735,10 @@ export class User {
 			this.premiumBadgeMasked === other.premiumBadgeMasked &&
 			this.premiumBadgeTimestampHidden === other.premiumBadgeTimestampHidden &&
 			this.premiumBadgeSequenceHidden === other.premiumBadgeSequenceHidden &&
+			this.operatorPassBadgeHidden === other.operatorPassBadgeHidden &&
+			this.operatorPassBadgeTimestampHidden === other.operatorPassBadgeTimestampHidden &&
+			this.operatorPassBadgeCountHidden === other.operatorPassBadgeCountHidden &&
+			datesEqual(this.operatorPassSince, other.operatorPassSince) &&
 			this.premiumEnabledOverride === other.premiumEnabledOverride &&
 			this.premiumPerksDisabled === other.premiumPerksDisabled &&
 			datesEqual(this.passwordLastChangedAt, other.passwordLastChangedAt) &&
@@ -620,7 +751,12 @@ export class User {
 			this._ageVerifiedAdult === other._ageVerifiedAdult &&
 			datesEqual(this._termsAgreedAt, other._termsAgreedAt) &&
 			datesEqual(this._privacyAgreedAt, other._privacyAgreedAt) &&
-			arraysShallowEqual(this._traits, other._traits)
+			arraysShallowEqual(this._traits, other._traits) &&
+			this._claimed === other._claimed &&
+			this._accountTier === other._accountTier &&
+			this._verificationNeed === other._verificationNeed &&
+			this._hasPassword === other._hasPassword &&
+			this._dateOfBirthRequired === other._dateOfBirthRequired
 		);
 	}
 
@@ -672,6 +808,13 @@ export class User {
 		setOptional('premium_badge_masked', this.premiumBadgeMasked);
 		setOptional('premium_badge_timestamp_hidden', this.premiumBadgeTimestampHidden);
 		setOptional('premium_badge_sequence_hidden', this.premiumBadgeSequenceHidden);
+		setOptional('operator_pass_badge_hidden', this.operatorPassBadgeHidden);
+		setOptional('operator_pass_badge_timestamp_hidden', this.operatorPassBadgeTimestampHidden);
+		setOptional('operator_pass_badge_count_hidden', this.operatorPassBadgeCountHidden);
+		setOptional(
+			'operator_pass_since',
+			this.operatorPassSince === undefined ? undefined : dateToIsoOrNull(this.operatorPassSince),
+		);
 		setOptional('premium_enabled_override', this.premiumEnabledOverride);
 		setOptional('premium_perks_disabled', this.premiumPerksDisabled);
 		setOptional(
@@ -699,6 +842,11 @@ export class User {
 			this._privacyAgreedAt === undefined ? undefined : dateToIsoOrNull(this._privacyAgreedAt),
 		);
 		privateFields.traits = [...this._traits];
+		setOptional('claimed', this._claimed);
+		setOptional('account_tier', this._accountTier);
+		setOptional('verification_need', this._verificationNeed);
+		setOptional('has_password', this._hasPassword);
+		setOptional('date_of_birth_required', this._dateOfBirthRequired);
 		return {
 			...baseFields,
 			...(privateFields as Partial<UserPrivate>),
