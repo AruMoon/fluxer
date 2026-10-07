@@ -1,252 +1,139 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {Routes} from '@app/app/Routes';
-
 import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import * as PremiumModalCommands from '@app/features/premium/commands/PremiumModalCommands';
-import {getPremiumProductFullName, shouldShowPremiumFeatures} from '@app/features/premium/utils/PremiumUtils';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
 import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
 import {handleExternalLinkClick} from '@app/features/ui/utils/NativeUtils';
 import styles from '@app/features/user/components/popouts/UserProfileBadges.module.css';
-import type {Profile} from '@app/features/user/models/Profile';
-import type {User} from '@app/features/user/models/User';
-import * as DateUtils from '@app/features/user/utils/DateFormatting';
-import bugHunterBadgeUrl from '@app/media/images/badges/bug-hunter.svg';
-import partnerBadgeUrl from '@app/media/images/badges/partner.svg';
-import plutoniumBadgeUrl from '@app/media/images/badges/plutonium.svg';
-import staffBadgeUrl from '@app/media/images/badges/staff.svg';
-import {PublicUserFlags, UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
-import {msg} from '@lingui/core/macro';
-import {useLingui} from '@lingui/react/macro';
+import type {ProfileBadgeResponse} from '@fluxer/schema/src/domains/user/ProfileBadgeSchemas';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
 import type React from 'react';
-import {useMemo} from 'react';
-
-const STAFF_DESCRIPTOR = msg({
-	message: '{productName} Staff',
-	comment:
-		'Short badge title in the user profile badges popout. Preserve {productName}; it is inserted by code. English locales use Title Case for official badge titles; other locales should use natural local capitalization.',
-});
-const PARTNER_DESCRIPTOR = msg({
-	message: '{productName} Partner',
-	comment:
-		'Short badge title in the user profile badges popout. Preserve {productName}; it is inserted by code. English locales use Title Case for official badge titles; other locales should use natural local capitalization.',
-});
-const BUG_HUNTER_DESCRIPTOR = msg({
-	message: '{productName} Bug Hunter',
-	comment:
-		'Short badge title in the user profile badges popout. Preserve {productName}; it is inserted by code. English locales use Title Case for official badge titles; other locales should use natural local capitalization.',
-});
-const VISIONARY_SINCE_DESCRIPTOR = msg({
-	message: '{productName} Visionary since {premiumSinceFormatted}',
-	comment:
-		'Badge title with a date in the user profile badges popout. Preserve {productName}, {premiumSinceFormatted}; they are inserted by code. English locales use Title Case for the badge title part; other locales should use natural local capitalization.',
-});
-const VISIONARY_DESCRIPTOR = msg({
-	message: '{productName} Visionary',
-	comment:
-		'Short badge title in the user profile badges popout. Preserve {productName}; it is inserted by code. English locales use Title Case for official badge titles; other locales should use natural local capitalization.',
-});
-const SUBSCRIBER_SINCE_DESCRIPTOR = msg({
-	message: '{premiumProductFullName} subscriber since {premiumSinceFormatted}',
-	comment:
-		'Badge label with a date in the user profile badges popout. Preserve {premiumProductFullName}, {premiumSinceFormatted}; they are inserted by code. In English, keep "subscriber since" lowercase. Other locales should use natural local capitalization.',
-});
-const VISIONARY_ID_DESCRIPTOR = msg({
-	message: 'Visionary ID {visionaryIdLabel}',
-	comment:
-		'Short label in the user profile badges popout. Keep it concise. Preserve {visionaryIdLabel}; it is inserted by code.',
-});
-
-interface BaseBadge {
-	key: string;
-	tooltip: string;
-	url?: string;
-	onClick?: () => void;
-}
-
-interface IconBadge extends BaseBadge {
-	type: 'icon';
-	iconUrl: string;
-}
-
-interface TextBadge extends BaseBadge {
-	type: 'text';
-	text: string;
-}
-
-type Badge = IconBadge | TextBadge;
 
 interface UserProfileBadgesProps {
-	user: User;
-	profile: Profile | null;
+	badges: ReadonlyArray<ProfileBadgeResponse>;
 	isModal?: boolean;
 	isMobile?: boolean;
+	'data-flx'?: string;
+}
+
+function badgeImageUrl(asset: string): string {
+	return `${RuntimeConfig.staticCdnEndpoint}/badges/${asset}.webp`;
+}
+
+function ProfileBadgeDetailsTooltip({
+	badge,
+	details,
+	'data-flx': dataFlx,
+}: {
+	badge: ProfileBadgeResponse;
+	details: NonNullable<ProfileBadgeResponse['details']>;
+	'data-flx': string;
+}) {
+	return (
+		<div className={styles.details} data-flx={dataFlx}>
+			{badge.asset !== null && (
+				<img
+					src={badgeImageUrl(badge.asset)}
+					alt=""
+					className={styles.detailsArt}
+					style={badge.aspect_ratio ? {width: 'auto', aspectRatio: badge.aspect_ratio} : undefined}
+					data-flx={`${dataFlx}.art`}
+				/>
+			)}
+			<span className={styles.detailsTitle} data-flx={`${dataFlx}.title`}>
+				{details.title}
+			</span>
+			{details.lines.map((line) => (
+				<span key={line} className={styles.detailsLine} data-flx={`${dataFlx}.line`}>
+					{line}
+				</span>
+			))}
+		</div>
+	);
+}
+
+function opensPremiumModal(badge: ProfileBadgeResponse): boolean {
+	if (badge.kind === 'premium') return badge.href === null;
+	return badge.kind === 'plutonium';
 }
 
 export const UserProfileBadges: React.FC<UserProfileBadgesProps> = observer(
-	({user, profile, isModal = false, isMobile = false}) => {
-		const {i18n} = useLingui();
-		const selfHosted = RuntimeConfig.isSelfHosted();
-		const showPremium = shouldShowPremiumFeatures();
-		const premiumInfoUrl = RuntimeConfig.premiumInfoUrl;
-		const badges = useMemo(() => {
-			const result: Array<Badge> = [];
-			if (user.flags & PublicUserFlags.STAFF) {
-				result.push({
-					type: 'icon',
-					key: 'staff',
-					iconUrl: staffBadgeUrl,
-					tooltip: i18n._(STAFF_DESCRIPTOR, {productName: RuntimeConfig.productName}),
-					url: Routes.careers(),
-				});
-			}
-			if (!selfHosted && user.flags & PublicUserFlags.PARTNER) {
-				result.push({
-					type: 'icon',
-					key: 'partner',
-					iconUrl: partnerBadgeUrl,
-					tooltip: i18n._(PARTNER_DESCRIPTOR, {productName: RuntimeConfig.productName}),
-					url: Routes.partners(),
-				});
-			}
-			if (!selfHosted && user.flags & PublicUserFlags.BUG_HUNTER) {
-				result.push({
-					type: 'icon',
-					key: 'bug_hunter',
-					iconUrl: bugHunterBadgeUrl,
-					tooltip: i18n._(BUG_HUNTER_DESCRIPTOR, {productName: RuntimeConfig.productName}),
-					url: Routes.bugs(),
-				});
-			}
-			if (showPremium && profile?.premiumType && profile.premiumType !== UserPremiumTypes.NONE) {
-				let tooltipText = getPremiumProductFullName();
-				let badgeUrl: string | undefined = premiumInfoUrl ?? undefined;
-				const badgeOnClick = badgeUrl ? undefined : () => PremiumModalCommands.open();
-				if (!selfHosted && profile.premiumType === UserPremiumTypes.LIFETIME) {
-					if (profile.premiumSince) {
-						const premiumSinceFormatted = DateUtils.getFormattedShortDate(profile.premiumSince);
-						tooltipText = i18n._(VISIONARY_SINCE_DESCRIPTOR, {
-							productName: RuntimeConfig.productName,
-							premiumSinceFormatted,
-						});
-					} else {
-						tooltipText = i18n._(VISIONARY_DESCRIPTOR, {productName: RuntimeConfig.productName});
-					}
-					badgeUrl = Routes.helpArticle('visionary') ?? undefined;
-				} else if (profile.premiumSince) {
-					const premiumSinceFormatted = DateUtils.getFormattedShortDate(profile.premiumSince);
-					tooltipText = i18n._(SUBSCRIBER_SINCE_DESCRIPTOR, {
-						premiumProductFullName: getPremiumProductFullName(),
-						premiumSinceFormatted,
-					});
-				}
-				result.push({
-					type: 'icon',
-					key: 'premium',
-					iconUrl: plutoniumBadgeUrl,
-					tooltip: tooltipText,
-					url: badgeUrl,
-					onClick: badgeOnClick,
-				});
-				if (
-					!selfHosted &&
-					profile.premiumType === UserPremiumTypes.LIFETIME &&
-					profile.premiumLifetimeSequence != null
-				) {
-					const visionaryIdLabel = `#${profile.premiumLifetimeSequence}`;
-					result.push({
-						type: 'text',
-						key: 'premium_sequence',
-						text: visionaryIdLabel,
-						tooltip: i18n._(VISIONARY_ID_DESCRIPTOR, {visionaryIdLabel}),
-						url: badgeUrl,
-					});
-				}
-			}
-			return result;
-		}, [
-			selfHosted,
-			showPremium,
-			premiumInfoUrl,
-			user.flags,
-			profile?.premiumType,
-			profile?.premiumSince,
-			profile?.premiumLifetimeSequence,
-			i18n.locale,
-		]);
+	({badges, isModal = false, isMobile = false, 'data-flx': dataFlx = 'user.user-profile-badges'}) => {
 		if (badges.length === 0) {
 			return null;
 		}
 		const containerClassName = isModal
 			? clsx(styles.containerModal, isMobile ? styles.containerModalMobile : styles.containerModalDesktop)
 			: styles.containerPopout;
-		const badgeClassName = isModal && isMobile ? styles.badgeMobile : styles.badgeDesktop;
-		const isDesktopInteractions = !isMobile;
-		const renderInteractiveWrapper = (
-			url: string | undefined,
-			onClick: (() => void) | undefined,
-			children: React.ReactNode,
-		) => {
-			if (onClick && isDesktopInteractions) {
+		const touch = isModal && isMobile;
+		const renderInteractiveWrapper = (badge: ProfileBadgeResponse, children: React.ReactNode) => {
+			if (!isMobile && opensPremiumModal(badge)) {
 				return (
 					<button
 						type="button"
 						className={clsx(styles.link, styles.linkButton)}
-						onClick={onClick}
-						data-flx="user.user-profile-badges.render-interactive-wrapper.button"
+						onClick={() => PremiumModalCommands.open()}
+						data-flx={`${dataFlx}.button`}
 					>
 						{children}
 					</button>
 				);
 			}
-			if (url && isDesktopInteractions) {
+			const href = badge.href;
+			if (href && !isMobile) {
 				return (
 					<a
-						href={url}
+						href={href}
 						target="_blank"
 						rel="noopener noreferrer"
 						className={styles.link}
-						onClick={(event) => handleExternalLinkClick(event, url)}
-						data-flx="user.user-profile-badges.render-interactive-wrapper.link"
+						onClick={(event) => handleExternalLinkClick(event, href)}
+						data-flx={`${dataFlx}.link`}
 					>
 						{children}
 					</a>
 				);
 			}
 			return (
-				<div className={styles.link} data-flx="user.user-profile-badges.render-interactive-wrapper.link--2">
+				<div className={styles.link} data-flx={`${dataFlx}.static`}>
 					{children}
 				</div>
 			);
 		};
 		return (
-			<div className={containerClassName} data-flx="user.user-profile-badges.div">
+			<div className={containerClassName} data-flx={dataFlx}>
 				{badges.map((badge) => {
-					const sequenceClassName = isModal && isMobile ? styles.sequenceBadgeMobile : styles.sequenceBadgeDesktop;
-					const badgeContent =
-						badge.type === 'icon' ? (
+					const content =
+						badge.asset !== null ? (
 							<img
-								src={badge.iconUrl}
-								alt={badge.tooltip}
-								className={badgeClassName}
-								data-flx="user.user-profile-badges.img"
+								src={badgeImageUrl(badge.asset)}
+								alt={badge.accessible_label ?? badge.caption ?? badge.label}
+								className={touch ? styles.badgeMobile : styles.badgeDesktop}
+								style={badge.aspect_ratio ? {width: 'auto', aspectRatio: badge.aspect_ratio} : undefined}
+								data-flx={`${dataFlx}.img`}
 							/>
 						) : (
 							<span
-								className={clsx(styles.sequenceBadge, sequenceClassName)}
+								className={clsx(styles.captionBadge, touch ? styles.captionBadgeMobile : styles.captionBadgeDesktop)}
 								aria-hidden="true"
-								data-flx="user.user-profile-badges.sequence-badge"
+								data-flx={`${dataFlx}.caption`}
 							>
-								{badge.text}
+								{badge.caption}
 							</span>
 						);
+					const details = badge.details ?? null;
+					const tooltipText =
+						details && !touch
+							? () => (
+									<ProfileBadgeDetailsTooltip badge={badge} details={details} data-flx={`${dataFlx}.tooltip-details`} />
+								)
+							: badge.label;
 					return (
-						<Tooltip key={badge.key} text={badge.tooltip} maxWidth="xl" data-flx="user.user-profile-badges.tooltip">
-							<FocusRing offset={-2} data-flx="user.user-profile-badges.focus-ring">
-								{renderInteractiveWrapper(badge.url, badge.onClick, badgeContent)}
+						<Tooltip key={badge.kind} text={tooltipText} maxWidth="xl" data-flx={`${dataFlx}.tooltip`}>
+							<FocusRing offset={-2} data-flx={`${dataFlx}.focus-ring`}>
+								{renderInteractiveWrapper(badge, content)}
 							</FocusRing>
 						</Tooltip>
 					);
