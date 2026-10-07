@@ -31,6 +31,8 @@ interface InstanceBrandingConfig {
 	logo_url?: string;
 	wordmark_url?: string;
 	favicon_url?: string;
+	favicon_dark_url?: string;
+	sign_in_backdrop_url?: string;
 	theme_color?: string;
 	status_page_url?: string;
 	status_page_incident_history_url?: string;
@@ -189,6 +191,7 @@ export interface MasterConfig {
 		email: {
 			enabled: boolean;
 			provider: 'smtp' | 'none';
+			delivery?: 'off' | 'smtp';
 			from_email: string;
 			from_name: string;
 			reply_to_email: string;
@@ -216,7 +219,7 @@ export interface MasterConfig {
 			p2p_stun_urls?: Array<string>;
 		};
 		search: {
-			engine: 'elasticsearch' | 'meilisearch';
+			engine: 'elasticsearch' | 'meilisearch' | 'none';
 			url: string;
 			api_key: string;
 			username: string;
@@ -261,20 +264,6 @@ export interface MasterConfig {
 		breached_password_check: {
 			enabled?: boolean;
 		};
-		push: {
-			apns: {
-				enabled: boolean;
-				team_id?: string;
-				key_id?: string;
-				private_key?: string;
-				private_key_path?: string;
-				apps?: Array<{
-					app_id?: string;
-					topic?: string;
-					environment?: 'production' | 'development';
-				}>;
-			};
-		};
 		app_store: {
 			enabled: boolean;
 			issuer_id?: string;
@@ -298,6 +287,7 @@ export interface MasterConfig {
 			products?: Record<string, StoreProductSlotName>;
 			push_audience?: string;
 			push_service_account_email?: string;
+			self_service_refunds: boolean;
 		};
 		store_billing: {
 			sandbox_user_ids?: Array<string>;
@@ -316,6 +306,25 @@ export interface MasterConfig {
 		};
 		account_identity: AccountIdentityModeName | null;
 		tag_style: TagStyleName | null;
+	};
+	payment_disputes: {
+		closure_effective_at?: string;
+	};
+	operator_pass: {
+		sale_opens_at?: string;
+		price_rises_at?: string;
+		grace_minutes: number;
+		now_override?: string;
+		labs_guild_id?: string;
+		labs_operator_role_id?: string;
+		standard_prices_minor?: Partial<Record<string, number>>;
+		release_lists?: string;
+		transfer_lock_hours?: number;
+		withdrawal_countries?: string;
+		stopped_countries?: string;
+		localized_prices_enabled?: Partial<Record<string, boolean>>;
+		wall_tiers?: string;
+		max_quantity?: number;
 	};
 	dev: {
 		relax_registration_rate_limits: boolean;
@@ -337,7 +346,7 @@ export interface MasterConfig {
 	};
 	attachment_decay_enabled: boolean;
 	deletion_grace_period_hours: number;
-	inactivity_deletion_threshold_days: number;
+	inactivity_deletion_threshold_days?: number;
 	report_retention: {
 		days: number;
 		dry_run: boolean;
