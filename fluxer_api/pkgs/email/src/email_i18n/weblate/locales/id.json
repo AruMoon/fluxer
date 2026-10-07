@@ -1,94 +1,458 @@
 {
 	"account_deletion_cancelled": {
-		"subject": "Penghapusan akun {product_name} kamu telah dibatalkan",
-		"body": "Halo {username},\n\nPenghapusan terjadwal untuk akun {product_name} kamu telah dibatalkan. Akunmu tidak akan dihapus.\n\n{safety_email, select, null {Jika kamu punya pertanyaan, silakan hubungi administrator instance ini.} other {Jika kamu punya pertanyaan, silakan hubungi {safety_email}.}}\n\n– Tim {product_name}"
+		"footer_reason": "Kamu menerima email ini karena penghapusan akun {product_name} kamu dibatalkan.",
+		"intro": "Kami membatalkan penghapusan terjadwal untuk akun {product_name} kamu.",
+		"note": "{reply, select, yes {Jika bukan kamu yang melakukannya, balas email ini.} other {Jika bukan kamu yang melakukannya, hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Akun {product_name} kamu tidak jadi dihapus"
 	},
 	"account_deletion_scheduled_inactivity": {
-		"subject": "Akun {product_name} kamu akan dihapus karena tidak aktif",
-		"body": "Halo {username},\n\nAkun {product_name} kamu sudah lama tidak aktif, jadi kami menjadwalkan penghapusannya pada {deletion_date}.\n\nUntuk mempertahankan akunmu, masuklah sebelum tanggal tersebut. {support_email, select, null {Jika kamu punya pertanyaan, hubungi administrator instance ini.} other {Jika kamu punya pertanyaan, hubungi {support_email}.}}\n\nTim {product_name}"
+		"footer_reason": "Kamu menerima email ini karena akun {product_name} kamu sudah lama tidak aktif.",
+		"intro": "Akun {product_name} kamu sudah lama tidak aktif, jadi kami akan menghapusnya pada {deletion_date}.",
+		"note": "{reply, select, yes {Untuk mempertahankannya, masuk sebelum tanggal itu. Ada pertanyaan? Balas email ini.} other {Untuk mempertahankannya, masuk sebelum tanggal itu. Jika ada pertanyaan, hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Akun {product_name} kamu yang tidak aktif akan dihapus"
 	},
 	"account_deletion_scheduled_requested": {
-		"subject": "Penghapusan akun {product_name} kamu telah dijadwalkan",
-		"body": "Halo {username},\n\nSesuai permintaanmu, kami menjadwalkan penghapusan akun {product_name} kamu pada {deletion_date}.\n\nUntuk mempertahankan akunmu, masuklah sebelum {deletion_date}. {safety_email, select, null {Jika kamu tidak memintanya, hubungi administrator instance ini.} other {Jika kamu tidak memintanya, hubungi {safety_email}.}}\n\nTim {product_name}"
+		"footer_reason": "Kamu menerima email ini karena penghapusan akun {product_name} kamu telah diminta.",
+		"intro": "Sesuai permintaanmu, kami akan menghapus akun {product_name} kamu pada {deletion_date}.",
+		"note": "{reply, select, yes {Untuk mempertahankannya, masuk sebelum tanggal itu. Jika kamu tidak memintanya, balas email ini.} other {Untuk mempertahankannya, masuk sebelum tanggal itu. Jika kamu tidak memintanya, hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Akun {product_name} kamu akan dihapus pada {deletion_date}"
+	},
+	"bulk_message_deletion_completed": {
+		"footer_reason": "Kamu menerima email ini karena penghapusan pesan diminta untuk akun {product_name} kamu.",
+		"intro": "Kami sudah selesai menghapus pesanmu. Kami menghapus {message_count, plural, =0 {0 pesan} other {# pesan}} dari {channel_count, plural, =0 {0 tempat} other {# tempat}}.",
+		"note": "{reply, select, yes {Jika kamu tidak meminta ini, segera ganti kata sandimu dan balas email ini.} other {Jika kamu tidak meminta ini, segera ganti kata sandimu dan hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami selesai menghapus pesan {product_name} kamu"
 	},
 	"donation_confirmation": {
-		"subject": "Terima kasih atas donasimu untuk {product_name}",
-		"body": "Halo,\n\nTerima kasih atas donasimu untuk {product_name}! Donasi {interval, select,\n  month {berulang}\n  year {berulang}\n  other {satu kali}\n} kamu telah berhasil {interval, select,\n  month {diatur}\n  year {diatur}\n  other {diproses}\n}.\n\nDetail donasi:\nJumlah: {amount} {interval, select,\n  month {per bulan}\n  year {per tahun}\n  other {}\n}\n\nStripe akan segera mengirimi kamu email tanda terima terpisah beserta PDF fakturmu. Ini mencakup semua detail pembayaran dan bisa dipakai untuk keperluan pajak.\n\nKamu bisa melihat riwayat donasimu, mengunduh faktur, {interval, select,\n  month {dan mengelola atau membatalkan langgananmu}\n  year {dan mengelola atau membatalkan langgananmu}\n  other {dan mengelola donasi di masa mendatang}\n} kapan saja lewat tautan ini:\n\n{manageUrl}\n\nDukunganmu membantu {product_name} tetap berjalan. Terima kasih!\n\n– Tim {product_name}"
+		"amount_label": "Jumlah",
+		"amount_value": "{interval, select, month {{amount} per bulan} year {{amount} per tahun} other {{amount}}}",
+		"cta": "{interval, select, month {Kelola atau batalkan} year {Kelola atau batalkan} other {Kelola donasi}}",
+		"currency_label": "Mata uang",
+		"footer_reason": "Kamu menerima email ini karena kamu berdonasi ke {product_name} dengan alamat email ini.",
+		"intro": "{interval, select, month {Donasi bulananmu untuk {product_name} sudah aktif.} year {Donasi tahunanmu untuk {product_name} sudah aktif.} other {Kami sudah menerima donasimu untuk {product_name}.}}",
+		"lead": "Stripe akan mengirimkan tanda terima terpisah beserta fakturmu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Terima kasih atas donasimu untuk {product_name}"
 	},
 	"donation_magic_link": {
-		"subject": "Kelola donasimu untuk {product_name}",
-		"body": "Halo,\n\nKlik tautan di bawah untuk mengakses portal donaturmu:\n\n{manageUrl}\n\nDi portal itu, kamu bisa mengelola langganan, mengunduh faktur, dan melihat riwayat donasimu.\n\nTautan ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta tautan ini, kamu bisa mengabaikan email ini dengan aman.\n\n– Tim {product_name}"
+		"cta": "Kelola donasi",
+		"expiry": "Tautan ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena tautan portal donatur diminta untuk alamat email ini.",
+		"intro": "Gunakan tautan ini untuk mengelola donasimu dan mengunduh fakturmu.",
+		"note": "Jika kamu tidak meminta tautan ini, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kelola donasimu untuk {product_name}"
 	},
 	"dsa_report_resolved": {
-		"subject": "Kami telah mengambil keputusan atas laporanmu di {product_name}",
-		"body": "Halo,\n\nKami telah meninjau laporanmu (ID: {reportId}).\n\n{outcome, select, removed {Kami menghapus konten yang kamu laporkan karena melanggar aturan kami.} restricted {Kami menemukan bahwa akun yang kamu laporkan melanggar aturan kami, dan kami telah membatasinya. Kami tidak membagikan tindakan apa yang kami ambil terhadap akun lain, karena itu adalah data pribadi pemiliknya.} action_taken {Kami menemukan bahwa yang kamu laporkan melanggar aturan kami, dan kami telah mengambil tindakan. Kami tidak membagikan tindakan apa yang kami ambil terhadap akun lain, karena itu adalah data pribadi pemiliknya.} no_violation {Kami menemukan bahwa konten atau akun yang kamu laporkan tidak melanggar aturan kami, jadi kami membiarkannya apa adanya.} other {Kami menutup laporanmu.}}{hasComment, select, yes {\n\nCatatan dari tim kami: {publicComment}} other {}}{appeals_email, select, null {} other {\n\nJika kamu tidak setuju, kirim email ke {appeals_email} dalam 60 hari dan sertakan ID laporan. Jika kamu berada di UE, kamu juga bisa membawa hal ini ke badan penyelesaian sengketa di luar pengadilan yang tersertifikasi atau mengajukan pengaduan ke Koordinator Layanan Digital di negaramu.}}\n\nTim {product_name}"
+		"comment_label": "Catatan dari tim kami",
+		"footer_reason": "Kamu menerima email ini karena kamu mengirimkan laporan Digital Services Act di {product_name}.",
+		"intro": "{outcome, select, removed {Kami menghapus konten yang kamu laporkan karena melanggar aturan kami.} restricted {Akun yang kamu laporkan melanggar aturan kami, dan kami membatasinya. Kami tidak memberi tahu tindakan apa yang kami ambil terhadap akun orang lain.} action_taken {Hal yang kamu laporkan melanggar aturan kami, dan kami sudah mengambil tindakan. Kami tidak memberi tahu tindakan apa yang kami ambil terhadap akun orang lain.} no_violation {Hal yang kamu laporkan tidak melanggar aturan kami, jadi kami membiarkannya seperti apa adanya.} other {Kami telah menutup laporanmu.}}",
+		"note": "{reply, select, yes {Jika kamu tidak setuju, balas email ini dalam 60 hari.} other {{appeals_email, select, null {} other {Jika kamu tidak setuju, kirim email ke <mail>{appeals_email}</mail> dalam 60 hari dan sertakan ID laporan.}}}}{appeals_email, select, null {} other { Jika kamu berada di UE, kamu juga bisa membawanya ke <dsa>badan penyelesaian sengketa di luar pengadilan</dsa> yang tersertifikasi atau mengadu ke Koordinator Layanan Digital di negaramu.}}",
+		"report_label": "ID laporan",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami telah mengambil keputusan atas laporanmu di {product_name}"
 	},
 	"dsa_report_verification": {
-		"subject": "Verifikasi emailmu untuk laporan DSA",
-		"body": "Halo,\n\nGunakan kode verifikasi di bawah ini untuk mengirimkan laporan Digital Services Act kamu di {product_name}:\n\n{code}\n\nKode ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta ini, kamu bisa mengabaikan email ini.\n\n– Tim Keamanan {product_name}"
+		"expiry": "Kode ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena alamat ini dimasukkan pada formulir laporan Digital Services Act di {product_name}.",
+		"intro": "Gunakan kode ini untuk mengirim laporan Digital Services Act kamu ke {product_name}.",
+		"note": "Jika kamu tidak memintanya, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim keamanan {product_name}",
+		"subject": "Kode {product_name} kamu untuk laporan DSA"
 	},
 	"email_change_new": {
-		"subject": "Verifikasi email {product_name} barumu",
-		"body": "Halo {username},\n\nMasukkan kode ini di aplikasi untuk memverifikasi email {product_name} barumu:\n\n{code}\n\nKode ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta ini, kamu bisa mengabaikan email ini.\n\n– Tim {product_name}"
+		"expiry": "Kode ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena alamat ini dimasukkan sebagai email baru untuk akun {product_name}.",
+		"intro": "Masukkan kode ini di aplikasi untuk mengonfirmasi alamat email barumu.",
+		"note": "Jika kamu tidak memintanya, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi alamat email {product_name} kamu yang baru"
 	},
 	"email_change_original": {
-		"subject": "Konfirmasi perubahan email {product_name} kamu",
-		"body": "Halo {username},\n\nKami menerima permintaan untuk mengubah alamat email di akun {product_name} kamu.\n\nUntuk mengonfirmasi perubahan ini, masukkan kode ini di aplikasi:\n\n{code}\n\nKode ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta ini, segera amankan akunmu.\n\n– Tim {product_name}"
+		"expiry": "Kode ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena seseorang meminta untuk mengubah alamat email di akun {product_name} kamu.",
+		"intro": "Untuk mengubah alamat email di akun {product_name} kamu, masukkan kode ini di aplikasi.",
+		"note": "Jika kamu tidak memintanya, segera ubah kata sandimu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi perubahan email {product_name} kamu"
 	},
 	"email_change_revert": {
-		"subject": "Email {product_name} kamu telah diubah",
-		"body": "Halo {username},\n\nAlamat email di akun {product_name} kamu telah diubah menjadi {newEmail}.\n\nJika ini memang kamu, tidak ada yang perlu dilakukan. Jika bukan, kamu bisa membatalkan perubahan itu dan mengamankan akunmu lewat tautan ini:\n\n{revertUrl}\n\nTindakan ini akan mengembalikan email lamamu, mengeluarkanmu dari semua perangkat, menonaktifkan MFA, dan mengharuskanmu membuat kata sandi baru.\n\n– Tim Keamanan {product_name}"
+		"cta": "Batalkan dan amankan akun saya",
+		"footer_reason": "Kamu menerima email ini karena ini adalah alamat email di akun {product_name} kamu sebelum perubahan.",
+		"intro": "Alamat email di akun {product_name} kamu telah diubah.",
+		"lead": "Jika kamu tidak melakukan ini, batalkan perubahan ini dan amankan akunmu.",
+		"new_email_label": "Alamat email baru",
+		"note": "Ini akan mengembalikan alamat email lamamu, mengeluarkanmu dari semua perangkat, menonaktifkan autentikasi dua faktor, dan memintamu membuat kata sandi baru.",
+		"signoff": "Tim keamanan {product_name}",
+		"subject": "Alamat email {product_name} kamu telah diubah"
 	},
 	"email_verification": {
-		"subject": "Verifikasi alamat email {product_name} kamu",
-		"body": "Halo {username},\n\nSilakan verifikasi alamat email untuk akun {product_name} kamu dengan mengeklik tautan di bawah ini:\n\n{verifyUrl}\n\nJika kamu tidak membuat akun {product_name}, kamu bisa mengabaikan email ini dengan aman.\n\nTautan ini berlaku selama 24 jam.\n\n– Tim {product_name}"
+		"cta": "Konfirmasi alamat email",
+		"expiry": "Tautan ini kedaluwarsa dalam 24 jam.",
+		"footer_reason": "Kamu menerima email ini karena alamat ini digunakan untuk akun {product_name}.",
+		"intro": "Konfirmasi alamat email ini untuk menyelesaikan pembuatan akun {product_name} kamu.",
+		"note": "Jika kamu tidak membuat akun {product_name}, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi alamat email {product_name} kamu"
+	},
+	"email_verification_code": {
+		"expiry": "Kode ini akan kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena alamat ini ditambahkan ke akun {product_name}.",
+		"intro": "Masukkan kode ini di aplikasi untuk mengonfirmasi alamat emailmu.",
+		"note": "Jangan bagikan kode ini kepada siapa pun. Staf {product_name} tidak akan pernah memintanya. Jika kamu tidak menambahkan alamat email ini ke akun, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kode konfirmasi email {product_name} kamu"
 	},
 	"enforcement_ended": {
-		"subject": "{outcome, select, reversed {Kami membatalkan keputusan tentang akun {product_name} kamu} other {Pembatasan pada akun {product_name} kamu telah berakhir}}",
-		"body": "Halo {username},\n\n{outcome, select, reversed {{decision_id, select, null {Kami meninjau ulang keputusan tentang akunmu dan membatalkannya.} other {Kami meninjau ulang keputusan {decision_id} dan membatalkannya.}} Kami mohon maaf atas ketidaknyamanannya.} other {{decision_id, select, null {Kami telah mencabut pembatasan pada akunmu.} other {Kami telah mencabut pembatasan dari keputusan {decision_id}.}}}}{restores_access, select, yes { Kamu bisa masuk dan menggunakan {product_name} lagi.} other {}}{statement, select, null {} other {\n\nCatatan dari tim kami: {statement}}}{content_removed, select, yes {\n\nKonten yang kami hapus tidak dapat dipulihkan.} other {}}\n\nTim {product_name}"
+		"content_removed": "{content_removed, select, yes {Konten yang kami hapus tidak dapat dipulihkan.} other {}}",
+		"footer_reason": "Kamu menerima email ini karena keputusan tentang akun {product_name} kamu telah berubah.",
+		"intro": "{outcome, select, reversed {{decision_id, select, null {Kami meninjau ulang keputusan tentang akunmu dan membatalkannya.} other {Kami meninjau ulang keputusan {decision_id} dan membatalkannya.}} Kami mohon maaf atas ketidaknyamanannya.} other {{decision_id, select, null {Kami telah mencabut pembatasan pada akunmu.} other {Kami telah mencabut pembatasan dari keputusan {decision_id}.}}}}{restores_access, select, yes { Kamu bisa masuk dan menggunakan {product_name} lagi.} other {}}",
+		"signoff": "Tim {product_name}",
+		"statement": "{statement, select, null {} other {Catatan dari tim kami: {statement}}}",
+		"subject": "{outcome, select, reversed {Kami membatalkan keputusan tentang akun {product_name} kamu} other {Pembatasan pada akun {product_name} kamu telah berakhir}}"
 	},
 	"enforcement_notice": {
+		"appeal_body": "{appeals_email, select, null {} other {{reply, select, yes {Jika menurutmu kami keliru, balas email ini paling lambat {appeal_deadline}.} other {Jika menurutmu kami keliru, kirim email ke <mail>{appeals_email}</mail> paling lambat {appeal_deadline} dan sertakan ID keputusan.}} Banding tidak dipungut biaya, dan setiap banding ditinjau oleh seseorang di tim kami.}}",
+		"appeal_title": "Cara mengajukan banding",
+		"decision_label": "ID keputusan",
+		"effects": "{effects}",
+		"footer_reason": "Kamu menerima email ini karena kami mengambil keputusan tentang akun {product_name} kamu.",
+		"how_body": "{how_we_decided}",
+		"how_title": "Cara kami memutuskan",
+		"intro": "{summary}",
+		"redress": "{redress, select, null {} other {{redress}}}",
+		"rule_label": "Aturan",
+		"signoff": "Tim {product_name}",
+		"statement": "{statement, select, null {} other {Catatan dari tim kami: {statement}}}",
 		"subject": "{neutral, select, yes {Kabar terbaru tentang akun {product_name} kamu} other {{kind_label, select, warning {Peringatan tentang akun {product_name} kamu} suspension {Akun {product_name} kamu ditangguhkan} ban {Akun {product_name} kamu diblokir} closure {Akun {product_name} kamu ditutup} feature_limit {Beberapa fitur di akun {product_name} kamu dibatasi} content_removal {Kami menghapus pesan yang kamu kirim di {product_name}} profile_reset {Kami mengatur ulang sebagian profil {product_name} kamu} community_removal {Kami menghapus komunitasmu di {product_name}} bot {Kabar terbaru tentang botmu di {product_name}} other {Kabar terbaru tentang akun {product_name} kamu}}}}",
-		"body": "Halo {username},\n\n{summary}\n\n{effects}\n\nAlasan\nAturan: {rule_title}{rule_url, select, null {} other { ({rule_url})}}\n{facts}{statement, select, null {} other {\n\nCatatan dari tim kami: {statement}}}\n\nCara kami memutuskan\n{how_we_decided}{appeals_email, select, null {} other {\n\nCara mengajukan banding\nJika menurutmu kami keliru, kirim email ke {appeals_email} paling lambat {appeal_deadline}. Jika bisa, kirim dari alamat email akunmu, dan sertakan ID keputusan. Banding tidak dipungut biaya, dan setiap banding ditinjau oleh manusia.{redress, select, null {} other {\n\n{redress}}}}}\n\nID keputusan: {decision_id}\n\nTim {product_name}"
+		"why_body": "{facts}",
+		"why_title": "Alasan"
 	},
 	"gift_chargeback_notification": {
-		"subject": "Manfaat dari hadiah yang kamu tukarkan telah dihapus",
-		"body": "Halo {username},\n\nKode hadiah yang kamu tukarkan awalnya dibayar oleh orang lain. Pembayaran itu kemudian dibatalkan (chargeback).\n\nKarena itu, kami menghapus manfaat yang ditambahkan ke akunmu saat kamu menukarkan hadiah tersebut.\n\n{support_email, select, null {Jika kamu merasa ini keliru, silakan hubungi administrator instance ini dan sertakan detail apa pun yang kamu punya tentang kode hadiah itu dan kapan kamu menukarkannya.} other {Jika kamu merasa ini keliru, silakan hubungi tim dukungan kami dan sertakan detail apa pun yang kamu punya tentang kode hadiah itu dan kapan kamu menukarkannya.}}\n\n– Tim {product_name}"
+		"footer_reason": "Kamu menerima email ini karena manfaat telah dihapus dari akun {product_name} kamu.",
+		"intro": "Pembayaran untuk kode hadiah yang kamu tukarkan dibatalkan, jadi kami mencabut manfaat yang ditambahkannya ke akunmu.",
+		"note": "{reply, select, yes {Jika menurutmu ini kesalahan, balas email ini dan ceritakan apa yang kamu ketahui tentang kode hadiah itu.} other {Jika menurutmu ini kesalahan, hubungi admin instance ini dan ceritakan apa yang kamu ketahui tentang kode hadiah itu.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami mencabut manfaat dari hadiah {product_name} yang kamu tukarkan"
 	},
 	"harvest_completed": {
-		"subject": "Ekspor data {product_name} kamu siap diunduh",
-		"body": "Halo {username},\n\nEkspor datamu sudah siap.\n\nTautan unduh:\n{downloadUrl}\n\nPesan yang disertakan: {totalMessages, number}\nUkuran file: {fileSizeMB, number} MB\n\nTautan ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\n{support_email, select, null {Jika kamu tidak meminta ekspor ini, segera ubah kata sandimu dan hubungi administrator instance ini.} other {Jika kamu tidak meminta ekspor ini, segera ubah kata sandimu dan hubungi tim dukungan kami.}}\n\n– Tim {product_name}"
+		"cta": "Unduh data kamu",
+		"expiry": "Unduh sebelum {expiresAt, date, long}.",
+		"footer_reason": "Kamu menerima email ini karena ekspor data diminta untuk akun {product_name} kamu.",
+		"intro": "Ekspor data {product_name} kamu siap diunduh.",
+		"messages": "{totalMessages, number}",
+		"messages_label": "Pesan",
+		"note": "{reply, select, yes {Jika kamu tidak meminta ekspor ini, segera ganti kata sandimu dan balas email ini.} other {Jika kamu tidak meminta ekspor ini, segera ganti kata sandimu dan hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"size": "{fileSizeMB, number} MB",
+		"size_label": "Ukuran file",
+		"subject": "Ekspor data {product_name} kamu sudah siap"
 	},
 	"inactivity_warning": {
-		"subject": "Akun {product_name} kamu akan dihapus karena tidak aktif",
-		"body": "Halo {username},\n\nKami belum melihat aktivitas apa pun di akun {product_name} kamu sejak {lastActiveDate, date, full}.\n\nJika kamu tidak masuk sebelum {deletionDate, date, full} pukul {deletionDate, time, short}, akunmu akan dihapus permanen karena tidak aktif.\n\nMasuk di sini:\n{loginUrl}\n\n{support_email, select, null {Jika kamu baru saja menggunakan {product_name}, segera hubungi administrator instance ini.} other {Jika kamu baru saja menggunakan {product_name}, segera hubungi tim dukungan kami.}}\n\n– Tim {product_name}"
+		"cta": "Masuk ke {product_name}",
+		"footer_reason": "Kamu menerima email ini karena akun {product_name} kamu sudah lama tidak aktif.",
+		"intro": "Akun {product_name} kamu tidak aktif sejak {lastActiveDate, date, long}. Masuk sebelum {deletionDate, date, long}, atau kami akan menghapusnya.",
+		"note": "{reply, select, yes {Jika kamu baru-baru ini menggunakan {product_name}, balas email ini.} other {Jika kamu baru-baru ini menggunakan {product_name}, hubungi admin instance ini.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Masuk untuk mempertahankan akun {product_name} kamu"
 	},
 	"ip_authorization": {
-		"subject": "Otorisasi masuk dari alamat IP baru",
-		"body": "Halo {username},\n\nKami mendeteksi upaya masuk ke akun {product_name} kamu dari alamat IP baru:\n\nAlamat IP: {ipAddress}\nLokasi: {location}\n\nJika ini memang kamu, silakan otorisasi alamat IP ini dengan mengeklik tautan di bawah ini:\n\n{authUrl}\n\nJika kamu tidak mencoba masuk, segera ubah kata sandimu.\n\nTautan ini berlaku selama 30 menit.\n\n– Tim {product_name}"
+		"cta": "Otorisasi alamat IP ini",
+		"expiry": "Tautan ini kedaluwarsa dalam 30 menit.",
+		"footer_reason": "Kamu menerima email ini karena seseorang mencoba masuk ke akun {product_name} kamu dari alamat IP baru.",
+		"intro": "Seseorang mencoba masuk ke akun {product_name} kamu dari alamat IP baru.",
+		"ip_label": "Alamat IP",
+		"lead": "Jika itu kamu, otorisasi alamat IP ini.",
+		"location_label": "Lokasi",
+		"note": "Jika itu bukan kamu, segera ubah kata sandimu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Otorisasi upaya masuk ke {product_name} dari alamat IP baru"
 	},
 	"mfa_backup_codes_view": {
-		"subject": "Konfirmasi akses ke kode cadangan {product_name} kamu",
-		"body": "Halo {username},\n\nKami menerima permintaan untuk melihat kode cadangan di akun {product_name} kamu.\n\nUntuk mengonfirmasi permintaan ini, masukkan kode ini di aplikasi:\n\n{code}\n\nKode ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta ini, seseorang mungkin punya akses ke akunmu. Ubah kata sandimu segera.\n\n– Tim {product_name}"
+		"expiry": "Kode ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena seseorang meminta untuk melihat kode cadangan di akun {product_name} kamu.",
+		"intro": "Untuk melihat kode cadangan {product_name} kamu, masukkan kode ini di aplikasi.",
+		"note": "Jika kamu tidak memintanya, mungkin ada orang lain yang bisa mengakses akunmu. Segera ubah kata sandimu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi akses ke kode cadangan {product_name} kamu"
+	},
+	"operator_pass_offer_accepted": {
+		"footer_reason": "Kamu menerima email ini karena kamu meneruskan Operator Pass di {product_name}.",
+		"intro": "{recipientName} menerima Operator Pass yang kamu teruskan, dan pass itu sekarang ada di akunnya.",
+		"note": "{remainingCount, plural, =0 {Operator Pass-mu sudah habis, jadi lencana dan pencantumanmu di dinding sudah tidak ada.} =1 {Kamu masih punya # Operator Pass.} other {Kamu masih punya # Operator Pass.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "{recipientName} menerima Operator Pass {product_name} kamu"
+	},
+	"operator_pass_offer_ended": {
+		"footer_reason": "Kamu menerima email ini karena ada tawaran Operator Pass di {product_name}.",
+		"intro": "{ended, select, withdrawn {{otherName} menarik kembali tawaran Operator Pass-nya.} declined {{otherName} menolak Operator Pass-mu. Pass itu tetap milikmu, dan kamu bisa menawarkannya ke orang lain.} other {Tawaran Operator Pass dengan {otherName} dibatalkan karena pass atau pembayarannya berubah.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "{ended, select, withdrawn {Tawaran Operator Pass ditarik kembali} declined {Tawaran Operator Pass-mu ditolak} other {Tawaran Operator Pass dibatalkan}}"
+	},
+	"operator_pass_offer_received": {
+		"cta": "Lihat tawaran",
+		"footer_reason": "Kamu menerima email ini karena seseorang menawarkan untuk meneruskan Operator Pass kepadamu di {product_name}.",
+		"intro": "{senderName} ingin meneruskan salah satu Operator Pass-nya kepadamu.",
+		"lead": "Terima atau tolak di {product_name}. Jika kamu menerimanya, pass ini masuk ke akunmu pada {arrivesAt, date, long}.",
+		"signoff": "Tim {product_name}",
+		"subject": "{senderName} ingin meneruskan Operator Pass kepadamu"
+	},
+	"operator_pass_perks_removed": {
+		"appeal_body": "{reply, select, yes {Balas email ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.} other {Hubungi admin instance ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.}} Banding ini gratis, dan ditinjau oleh orang yang tidak mengambil keputusan ini.",
+		"appeal_title": "Cara mengajukan banding",
+		"automated_text": "{automated, select, yes {Alat otomatis membantu kami menemukan ini. Keputusannya diambil oleh seseorang di tim kami.} other {Keputusan ini diambil oleh seseorang di tim kami tanpa alat otomatis.}}",
+		"facts_label": "Fakta yang kami jadikan dasar",
+		"footer_reason": "Kamu menerima email ini karena keputusan Operator Pass pada akun {product_name} kamu.",
+		"ground": "Bagian 8 ketentuan Operator Pass",
+		"ground_label": "Dasar",
+		"intro": "{scope, select, permanent {Kami mencabut manfaat Operator Pass-mu secara permanen.} other {Kami mencabut manfaat Operator Pass-mu sampai {until, date, long}. Setelah itu, manfaat tersebut kembali dengan tanggal lencana aslimu.}} Ini termasuk pencantumanmu di dinding, lencana, #operators, dan peran Operator. Akun {product_name} kamu tidak ditangguhkan.",
+		"redress": "Kamu juga bisa menggunakan <dsa>badan penyelesaian sengketa di luar pengadilan</dsa> yang tersertifikasi atau menempuh jalur pengadilan. Jika kamu konsumen, kamu bisa membawa sengketa ini ke Badan Nasional Swedia untuk Sengketa Konsumen (<arn>ARN</arn>), dan kami akan ikut serta.",
+		"refund": "{scope, select, permanent {Kamu tidak bisa membeli atau menerima Operator Pass lagi selama keputusan ini berlaku. } other {}}Manfaat yang dicabut tidak dikembalikan dananya. Jika kamu masih punya hak penarikan diri, keputusan ini tidak menghapusnya.",
+		"rule_label": "Aturan",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami mencabut manfaat Operator Pass {product_name} kamu"
+	},
+	"operator_pass_purchase_confirmation": {
+		"bonus_heading": "Bonus",
+		"bonus_line": "Selama kami menjalankan Fluxer Labs, kamu juga mendapatkan peran Operator dan #operators di sana. Bonus ini bukan bagian dari harga dan bisa berubah atau berakhir.",
+		"consent_heading": "Persetujuanmu",
+		"consent_line": "Saat pembayaran pada {waiverConsentAt, date, long}, kamu mencentang kotak “{consentText}”",
+		"currency_label": "Mata uang",
+		"footer_reason": "Kamu menerima email ini karena kamu membeli Operator Pass di {product_name}.",
+		"included_heading": "Yang kamu dapatkan",
+		"included_pass_on": "Setiap pass bisa diteruskan satu kali.",
+		"included_perks": "Hak atas tempat di dinding Operators, kapan pun kamu mau memakainya, dan lencana Operator, selamanya, selama kami menjalankan {product_name}.",
+		"intro": "Terima kasih atas pesananmu. Email ini adalah tanda terimamu, dan ketentuan Operator Pass yang kamu setujui (versi {termsVersion}) terlampir sebagai PDF.",
+		"order_date_label": "Tanggal pesanan",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Nomor pesanan",
+		"payment_label": "Pembayaran",
+		"price_label": "Total",
+		"price_value": "{priceFormatted}, sekali bayar",
+		"product_label": "Produk",
+		"product_value": "{quantity, plural, =1 {Operator Pass {product_name}} other {# Operator Pass {product_name}}}",
+		"seller": "Penjual: Fluxer Platform AB, 559537-3993, <mail>{sellerEmail}</mail>",
+		"signoff": "Tim {product_name}",
+		"subject": "Tanda terima Operator Pass {product_name} kamu",
+		"terms_link": "Ketentuan Operator Pass",
+		"unit_price_label": "Harga per pass",
+		"wall_status": "{wallOptOut, select, yes {Kamu memilih untuk tidak dicantumkan. Kamu bisa menambahkan namamu ke dinding kapan saja di <settings>pengaturanmu</settings>.} other {Kamu dicantumkan sebagai {wallName}. Kamu bisa mengubahnya atau keluar dari dinding di <settings>pengaturanmu</settings>.}}",
+		"withdrawal_cancel_until": "{quantity, plural, =1 {Kamu bisa membatalkan sampai {withdrawalEndsOn, date, long} dengan pengembalian dana penuh.} other {Kamu bisa membatalkan setiap pass sampai {withdrawalEndsOn, date, long} dengan pengembalian dana penuh.}} Gunakan tombol Batalkan di samping pass di <settings>pengaturanmu</settings>.",
+		"withdrawal_heading": "Hak penarikan diri",
+		"withdrawal_rule_cancel_until": "{quantity, plural, =1 {Aturan di negaramu menggantikan kotak yang kamu centang, jadi kamu tetap bisa membatalkan sampai {withdrawalEndsOn, date, long} dengan pengembalian dana penuh.} other {Aturan di negaramu menggantikan kotak yang kamu centang, jadi kamu tetap bisa membatalkan setiap pass sampai {withdrawalEndsOn, date, long} dengan pengembalian dana penuh.}} Gunakan tombol Batalkan di samping pass di <settings>pengaturanmu</settings>.",
+		"withdrawal_waived": "{quantity, plural, =1 {Hak penarikan dirimu berakhir saat kami mengirimkan pass-mu, sesuai permintaanmu.} other {Hak penarikan dirimu berakhir saat kami mengirimkan semua pass-mu, sesuai permintaanmu.}}"
+	},
+	"operator_pass_removal_notice": {
+		"facts_label": "Fakta yang kami jadikan dasar",
+		"footer_reason": "Kamu menerima email ini karena keputusan Operator Pass pada akun {product_name} kamu.",
+		"ground": "Bagian 8 ketentuan Operator Pass",
+		"ground_label": "Dasar",
+		"intro": "Kami bermaksud menghapus Operator Pass-mu secara permanen. Kamu punya waktu {replyDays, plural, other {# hari}} untuk membalas sebelum kami memutuskan.",
+		"next": "Jika kami melanjutkannya, kami akan mengirim email berisi keputusan dan cara mengajukan banding. Jika kamu konsumen, kamu juga bisa membawa sengketa tentang penghapusan ke Badan Nasional Swedia untuk Sengketa Konsumen (<arn>ARN</arn>), dan kami akan ikut serta.",
+		"reply": "{reply, select, yes {Balas email ini dan sampaikan apa pun yang perlu kami ketahui.} other {Hubungi admin instance ini dan sampaikan apa pun yang perlu kami ketahui.}} Seseorang di tim kami membaca setiap balasan sebelum kami memutuskan. Sampai saat itu, pencantumanmu di dinding, lencana, #operators, dan peran Operator tetap seperti sekarang.",
+		"rule_label": "Aturan",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami bermaksud menghapus Operator Pass {product_name} kamu"
+	},
+	"operator_pass_revoked": {
+		"footer_reason": "Kamu menerima email ini karena sebuah Operator Pass di akun {product_name} kamu telah berakhir.",
+		"intro": "{cause, select, dispute {Pembayaran untuk Operator Pass yang kamu terima dibatalkan melalui sengketa pembayaran, jadi pass tersebut telah berakhir.} withdrawal {Orang yang membeli Operator Pass yang kamu terima menarik diri dari pembeliannya, jadi pass tersebut telah berakhir.} other {Pembayaran untuk Operator Pass yang kamu terima telah dikembalikan, jadi pass tersebut telah berakhir.}} Ini tidak terkait dengan apa pun yang kamu lakukan.",
+		"note": "{lastPass, select, yes {Itu pass terakhirmu, jadi lencana dan pencantumanmu di dinding sudah tidak ada.} other {Pass-mu yang lain tetap ada.}}",
+		"signoff": "Tim {product_name}",
+		"subject": "Sebuah Operator Pass di akun {product_name} kamu telah berakhir"
+	},
+	"operator_pass_sale_open": {
+		"cta": "Dapatkan Operator Pass",
+		"footer_reason": "Kamu menerima email ini karena kamu bergabung dengan daftar tunggu Operator Pass. Ini email terakhir yang kami kirim tentang pass ini.",
+		"included_bonus": "Selama kami menjalankan Fluxer Labs, kamu juga mendapatkan peran Operator dan #operators di sana. Bonus ini bukan bagian dari harga.",
+		"included_perks": "Hak atas tempat di dinding Operators, kapan pun kamu mau memakainya, dan lencana Operator, selamanya, selama kami menjalankan {product_name}.",
+		"intro": "Kamu meminta kami memberi tahu saat Operator Pass mulai dijual. Sekarang pass ini sudah dijual.",
+		"price_label": "Harga early bird",
+		"price_value": "{priceFormatted}, sekali bayar, sampai {priceEndsOn, date, long}",
+		"signoff": "Tim {product_name}",
+		"subject": "Operator Pass {product_name} sudah dijual",
+		"terms_link": "Ketentuan Operator Pass",
+		"unsubscribe": "Berhenti berlangganan"
+	},
+	"operator_pass_waitlist_verification": {
+		"cta": "Gabung daftar tunggu",
+		"expiry": "Tautan ini kedaluwarsa dalam 48 jam.",
+		"footer_reason": "Kamu menerima email ini karena alamat ini dimasukkan dalam daftar tunggu Operator Pass di situs web {product_name}.",
+		"intro": "Konfirmasi alamat email ini untuk bergabung dengan daftar tunggu Operator Pass. Kami akan mengirim email sekali saja, saat pass mulai dijual.",
+		"note": "Jika kamu tidak memintanya, abaikan email ini dan kami tidak akan menghubungimu lagi.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi pendaftaran daftar tunggu Operator Pass {product_name} kamu"
+	},
+	"operator_pass_wall_hidden": {
+		"appeal_body": "{reply, select, yes {Balas email ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.} other {Hubungi admin instance ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.}} Banding ini gratis, dan ditinjau oleh orang yang tidak mengambil keputusan ini.",
+		"appeal_title": "Cara mengajukan banding",
+		"automated_text": "Keputusan ini diambil oleh seseorang di tim kami tanpa alat otomatis.",
+		"facts_label": "Fakta yang kami jadikan dasar",
+		"footer_reason": "Kamu menerima email ini karena ada keputusan tentang pencantumanmu di dinding Operators {product_name}.",
+		"ground": "Bagian 8 ketentuan Operator Pass",
+		"ground_label": "Dasar",
+		"intro": "Kami menurunkan pencantumanmu dari dinding Operators untuk sementara. Pass dan lencanamu tetap ada, dan tidak ada yang ditarik atau dikembalikan dananya.",
+		"next": "Pencantumanmu kembali dengan ukuran dan posisi yang sama jika kami menampilkannya lagi atau bandingmu berhasil.",
+		"reason_label": "Alasan",
+		"reason_value": "{reason, select, impersonation {Menyamar sebagai orang lain} rights {Memakai nama atau gambar tanpa hak atasnya} age_suitability {Tidak sesuai untuk pengguna yang lebih muda} other {Melanggar panduan komunitas}}",
+		"redress": "Kamu juga bisa menggunakan <dsa>badan penyelesaian sengketa di luar pengadilan</dsa> yang tersertifikasi atau menempuh jalur pengadilan. Jika kamu konsumen, kamu bisa membawa sengketa ini ke Badan Nasional Swedia untuk Sengketa Konsumen (<arn>ARN</arn>), dan kami akan ikut serta.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami menurunkan pencantumanmu dari dinding Operators {product_name} untuk sementara"
+	},
+	"operator_pass_wall_name_replaced": {
+		"appeal_body": "{reply, select, yes {Balas email ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.} other {Hubungi admin instance ini dalam 60 hari dan jelaskan mengapa kamu tidak setuju.}} Banding ini gratis, dan ditinjau oleh orang yang tidak mengambil keputusan ini.",
+		"appeal_title": "Cara mengajukan banding",
+		"automated_text": "Keputusan ini diambil oleh seseorang di tim kami tanpa alat otomatis.",
+		"facts_label": "Fakta yang kami jadikan dasar",
+		"footer_reason": "Kamu menerima email ini karena ada keputusan tentang pencantumanmu di dinding Operators {product_name}.",
+		"ground": "Bagian 2.1 ketentuan Operator Pass",
+		"ground_label": "Dasar",
+		"intro": "{target, select, avatar {Kami menolak avatarmu untuk dinding Operators.} both {Kami menolak nama dan avatarmu untuk dinding Operators.} other {Kami menolak namamu untuk dinding Operators.}} {shown, select, previous {Dinding tetap menampilkan versi terakhirmu yang disetujui.} username {Sampai kamu mengirim yang baru, dinding menampilkan nama penggunamu dan avatar default.} other {Sampai kamu mengirim yang baru, dinding menampilkan kata Operator dan avatar default.}} Tempat, ukuran, dan lencanamu tetap ada, dan tidak ada yang ditarik atau dikembalikan dananya.",
+		"next": "Kamu bisa mengirim nama atau avatar baru kapan saja di <settings>pengaturanmu</settings>.",
+		"reason_label": "Alasan",
+		"reason_value": "{reason, select, impersonation {Menyamar sebagai orang lain} rights {Memakai nama atau gambar tanpa hak atasnya} age_suitability {Tidak sesuai untuk pengguna yang lebih muda} other {Melanggar panduan komunitas}}",
+		"redress": "Kamu juga bisa menggunakan <dsa>badan penyelesaian sengketa di luar pengadilan</dsa> yang tersertifikasi atau menempuh jalur pengadilan. Jika kamu konsumen, kamu bisa membawa sengketa ini ke Badan Nasional Swedia untuk Sengketa Konsumen (<arn>ARN</arn>), dan kami akan ikut serta.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kami menolak nama atau avatarmu untuk dinding Operators {product_name}"
+	},
+	"operator_pass_welcome": {
+		"badge_line": "Lencanamu ada di profilmu. Kamu bisa menyembunyikannya di <settings>pengaturanmu</settings>.",
+		"cta": "Buka Fluxer Labs",
+		"delivered_label": "Dikirim",
+		"delivered_value": "{deliveredAt, date, long}",
+		"footer_reason": "Kamu menerima email ini karena Operator Pass ditambahkan ke akun {product_name} kamu.",
+		"intro": "Operator Pass-mu sudah aktif. Terima kasih telah mendukung {product_name}.",
+		"labs_line": "Di Fluxer Labs, kamu mendapatkan peran Operator dan #operators. Bonus ini berlaku selama kami menjalankan Fluxer Labs.",
+		"order_number_label": "Nomor pesanan",
+		"pass_count_label": "Operator Pass",
+		"signoff": "{founderName} dan tim {product_name}",
+		"subject": "Operator Pass {product_name} kamu aktif",
+		"terms_link": "Ketentuan Operator Pass",
+		"wall_line": "{wallOptOut, select, yes {Kamu memilih untuk tidak dicantumkan di dinding Operators. Kamu bisa menambahkan namamu kapan saja di <settings>pengaturanmu</settings>.} other {Kamu dicantumkan di dinding Operators sebagai {wallName}, dan nama serta avatarmu tampil setelah kami memeriksanya. Kamu bisa mengubahnya atau keluar dari dinding di <settings>pengaturanmu</settings>.}}"
+	},
+	"operator_pass_withdrawal_receipt": {
+		"cta": "Kelola donasimu",
+		"currency_label": "Mata uang",
+		"donation": "Donasi bulanan yang kamu tambahkan saat pembayaran terpisah dan tetap berjalan. Kamu bisa membatalkannya kapan saja.",
+		"footer_reason": "{cancellation, select, yes {Kamu menerima email ini karena kamu membatalkan pembelian Operator Pass di {product_name}.} other {Kamu menerima email ini karena kamu menarik diri dari pembelian Operator Pass di {product_name}.}}",
+		"intro": "{cancellation, select, yes {Kami menerima pembatalanmu pada {receivedAt, date, long} pukul {receivedAt, time, short}.} other {Kami menerima penarikan dirimu pada {receivedAt, date, long} pukul {receivedAt, time, short}.}}",
+		"name_label": "Nama",
+		"note": "Simpan email ini sebagai tanda terimamu.",
+		"order_date_label": "Tanggal pesanan",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Nomor pesanan",
+		"refund": "{refundViaDispute, select, yes {Bankmu lebih dulu membuka sengketa pembayaran untuk pembelian ini, jadi kami menerima sengketa tersebut dan bankmu mengembalikan {amountFormatted} secara penuh kepadamu.} other {Kami sudah memulai pengembalian dana penuh sebesar {amountFormatted} ke metode pembayaranmu, dan kamu akan menerimanya dalam 14 hari.}} {lastPass, select, yes {Pass ini sudah berakhir, begitu juga lencana, pencantuman di dinding, dan bonusmu.} other {Pass ini sudah berakhir. Pass-mu yang lain tetap ada.}}",
+		"refund_label": "Pengembalian dana",
+		"signoff": "Tim {product_name}",
+		"subject": "{cancellation, select, yes {Operator Pass {product_name} kamu telah dibatalkan} other {Kami telah menerima penarikan dirimu dari pembelian Operator Pass {product_name}}}"
 	},
 	"password_change_verification": {
-		"subject": "Konfirmasi perubahan kata sandi {product_name} kamu",
-		"body": "Halo {username},\n\nKami menerima permintaan untuk mengubah kata sandi di akun {product_name} kamu.\n\nUntuk mengonfirmasi perubahan ini, masukkan kode ini di aplikasi:\n\n{code}\n\nKode ini kedaluwarsa pada {expiresAt, date, full} pukul {expiresAt, time, short}.\n\nJika kamu tidak meminta ini, seseorang mungkin punya akses ke akunmu. Ubah kata sandimu segera dan aktifkan autentikasi dua faktor.\n\n– Tim {product_name}"
+		"expiry": "Kode ini kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena seseorang meminta untuk mengubah kata sandi di akun {product_name} kamu.",
+		"intro": "Untuk mengubah kata sandi {product_name} kamu, masukkan kode ini di aplikasi.",
+		"note": "Jika kamu tidak memintanya, mungkin ada orang lain yang bisa mengakses akunmu. Segera ubah kata sandimu dan aktifkan autentikasi dua faktor.",
+		"signoff": "Tim {product_name}",
+		"subject": "Konfirmasi perubahan kata sandi {product_name} kamu"
 	},
 	"password_reset": {
-		"subject": "Atur ulang kata sandi {product_name} kamu",
-		"body": "Halo {username},\n\nKamu meminta pengaturan ulang kata sandi {product_name}. Gunakan tautan di bawah ini untuk mengatur kata sandi baru:\n\n{resetUrl}\n\nJika kamu tidak meminta ini, kamu bisa mengabaikan email ini dengan aman.\n\nTautan ini berlaku selama 1 jam.\n\n– Tim {product_name}"
+		"cta": "Atur kata sandi baru",
+		"expiry": "Tautan ini kedaluwarsa dalam 1 jam.",
+		"footer_reason": "Kamu menerima email ini karena ada permintaan pengaturan ulang kata sandi untuk akun {product_name} kamu.",
+		"intro": "Kamu meminta untuk mengatur ulang kata sandi {product_name} kamu.",
+		"note": "Jika kamu tidak memintanya, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Atur ulang kata sandi {product_name} kamu"
+	},
+	"payment_dispute_warning": {
+		"amount_label": "Jumlah yang disengketakan",
+		"appeal_body": "{reply, select, yes {Balas email ini dan jelaskan alasannya.} other {{appeals_email, select, null {Hubungi admin instance ini dan jelaskan alasannya.} other {Tulis ke <mail>{appeals_email}</mail> dan jelaskan alasannya.}}}} Orang yang tidak mengambil keputusan ini akan memeriksanya kembali, dan jika sengketa itu beralasan, kami tidak akan mengambil tindakan terhadap akunmu.",
+		"appeal_title": "Jika menurutmu kami keliru",
+		"currency_label": "Mata uang",
+		"deadline_body": "Jika sengketa tidak dicabut sebelum {warningDate, date, long} dan berakhir dengan uang dikembalikan kepadamu, kami akan menghapus akun {product_name} kamu secara permanen. Akun yang sudah dihapus tidak bisa dipulihkan. Jika kami menutup akunmu, kamu juga tidak boleh membuat atau menggunakan akun {product_name} lain.",
+		"deadline_label": "Cabut sengketa sebelum",
+		"deadline_value": "{warningDate, date, long}",
+		"footer_reason": "Kamu menerima email ini karena adanya sengketa pembayaran terkait akun {product_name} kamu.",
+		"ground": "{product, select, plutonium {Bagian 4.4 ketentuan layanan} other {Bagian 9 ketentuan Operator Pass}}",
+		"ground_label": "Dasar",
+		"intro": "Kamu menyengketakan {product, select, plutonium {pembayaran Plutonium-mu} other {pembayaran Operator Pass-mu}} melalui bank atau penerbit kartumu. Seseorang di tim kami memeriksa sengketa tersebut berdasarkan ketentuan kami dan menilainya tidak beralasan.",
+		"next_body": "Jika kamu yang melakukan pembayaran ini, kamu bisa meminta bank atau penerbit kartumu untuk mencabut sengketa. Jika sengketa dicabut atau berakhir tanpa uang dikembalikan kepadamu, tidak ada yang terjadi pada akunmu. Sampai sengketa selesai, kamu tidak bisa membeli apa pun di {product_name}.{privacy_email, select, null {} other { Kamu bisa meminta salinan datamu kapan saja dengan menulis ke <mail>{privacy_email}</mail>.}}",
+		"next_title": "Apa yang terjadi sekarang",
+		"order_date_label": "Tanggal pesanan",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Nomor pesanan",
+		"signoff": "Tim {product_name}",
+		"subject": "Tentang sengketa pembayaranmu di {product_name}",
+		"why_body": "Pembayaran dilakukan olehmu atau orang yang kamu izinkan, kami menagih jumlah yang benar, {product, select, plutonium {Plutonium diberikan sesuai deskripsi} other {Operator Pass dikirimkan sesuai deskripsi}}, kami belum mengembalikan dana pembayaran tersebut, dan masa penarikan diri sudah berakhir saat kamu menyengketakannya.",
+		"why_title": "Mengapa kami menilainya tidak beralasan"
+	},
+	"reauth_code": {
+		"expiry": "Kode ini akan kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena ada perubahan pada akun {product_name} kamu yang memerlukan kode konfirmasi.",
+		"intro": "Masukkan kode ini di aplikasi untuk memastikan bahwa ini memang kamu sebelum kamu mengubah akun.",
+		"note": "Jangan bagikan kode ini kepada siapa pun. Staf {product_name} tidak akan pernah memintanya. Jika kamu tidak memintanya, mungkin ada orang lain yang menggunakan akunmu. Keluar dari semua sesi dan periksa keamanan akunmu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kode konfirmasi {product_name} kamu"
+	},
+	"registration_approved": {
+		"cta": "Masuk ke {product_name}",
+		"footer_reason": "Kamu menerima email ini karena alamat ini digunakan untuk akun {product_name}.",
+		"intro": "Pendaftaranmu di {product_name} sudah disetujui. Kamu bisa masuk sekarang.",
+		"signoff": "Tim {product_name}",
+		"subject": "Akun {product_name} kamu sudah disetujui"
+	},
+	"registration_pending": {
+		"cta": "Tinjau pendaftaran yang tertunda",
+		"footer_reason": "Kamu menerima email ini karena kamu bisa menyetujui akun baru di {product_name}.",
+		"intro": "Akun baru di {product_name} menunggu persetujuan.",
+		"signoff": "Tim {product_name}",
+		"subject": "Pendaftaran baru menunggu persetujuan di {product_name}"
 	},
 	"report_received": {
-		"subject": "Kami telah menerima laporanmu di {product_name}",
-		"body": "Halo,\n\nKami telah menerima laporan Digital Services Act kamu tentang {targetKind, select, message {sebuah pesan} user {sebuah akun} guild {sebuah komunitas} other {konten}} di {product_name}.\n\nID laporan: {reportId}\n\nTim Keamanan kami akan meninjau laporanmu dan kami akan mengirim email ke alamat ini setelah mengambil keputusan. Simpan email ini sebagai arsip.\n\n– Tim Keamanan {product_name}"
+		"footer_reason": "Kamu menerima email ini karena kamu mengirimkan laporan Digital Services Act di {product_name}.",
+		"intro": "Kami telah menerima laporan Digital Services Act kamu tentang {targetKind, select, message {sebuah pesan} user {sebuah akun} guild {sebuah komunitas} other {konten}} di {product_name}.",
+		"next": "Kami akan mengirim email ke alamat ini setelah kami memutuskan.",
+		"report_label": "ID laporan",
+		"signoff": "Tim keamanan {product_name}",
+		"subject": "Kami telah menerima laporanmu di {product_name}"
 	},
 	"report_resolved": {
-		"subject": "Laporanmu di {product_name} telah ditinjau",
-		"body": "Halo {username},\n\nKami telah meninjau laporanmu (ID: {reportId}).\n\n{outcome, select, removed {Kami menghapus konten yang kamu laporkan karena melanggar aturan kami.} restricted {Kami menemukan bahwa akun yang kamu laporkan melanggar aturan kami, dan kami telah membatasinya. Kami tidak membagikan tindakan apa yang kami ambil terhadap akun lain, karena itu adalah data pribadi pemiliknya.} action_taken {Kami menemukan bahwa yang kamu laporkan melanggar aturan kami, dan kami telah mengambil tindakan. Kami tidak membagikan tindakan apa yang kami ambil terhadap akun lain, karena itu adalah data pribadi pemiliknya.} no_violation {Kami menemukan bahwa konten atau akun yang kamu laporkan tidak melanggar aturan kami, jadi kami membiarkannya apa adanya.} other {Kami menutup laporanmu.}}{hasComment, select, yes {\n\nCatatan dari tim kami: {publicComment}} other {}}{appeals_email, select, null {} other {\n\nJika kamu tidak setuju, kirim email ke {appeals_email} dalam 60 hari dan sertakan ID laporan. Jika kamu berada di UE, kamu juga bisa membawa hal ini ke badan penyelesaian sengketa di luar pengadilan yang tersertifikasi atau mengajukan pengaduan ke Koordinator Layanan Digital di negaramu.}}\n\nTim {product_name}"
+		"comment_label": "Catatan dari tim kami",
+		"footer_reason": "Kamu menerima email ini karena kamu mengirimkan laporan di {product_name}.",
+		"intro": "{outcome, select, removed {Kami menghapus konten yang kamu laporkan karena melanggar aturan kami.} restricted {Akun yang kamu laporkan melanggar aturan kami, dan kami membatasinya. Kami tidak memberi tahu tindakan apa yang kami ambil terhadap akun orang lain.} action_taken {Hal yang kamu laporkan melanggar aturan kami, dan kami sudah mengambil tindakan. Kami tidak memberi tahu tindakan apa yang kami ambil terhadap akun orang lain.} no_violation {Hal yang kamu laporkan tidak melanggar aturan kami, jadi kami membiarkannya seperti apa adanya.} other {Kami telah menutup laporanmu.}}",
+		"note": "{reply, select, yes {Jika kamu tidak setuju, balas email ini dalam 60 hari.} other {{appeals_email, select, null {} other {Jika kamu tidak setuju, kirim email ke <mail>{appeals_email}</mail> dalam 60 hari dan sertakan ID laporan.}}}}{appeals_email, select, null {} other { Jika kamu berada di UE, kamu juga bisa membawanya ke <dsa>badan penyelesaian sengketa di luar pengadilan</dsa> yang tersertifikasi atau mengadu ke Koordinator Layanan Digital di negaramu.}}",
+		"report_label": "ID laporan",
+		"signoff": "Tim {product_name}",
+		"subject": "Laporanmu di {product_name} telah ditinjau"
 	},
 	"self_deletion_scheduled": {
-		"subject": "Penghapusan akun {product_name} kamu telah dijadwalkan",
-		"body": "Halo {username},\n\nKamu meminta agar akun {product_name} kamu dihapus. Akunmu dijadwalkan untuk dihapus permanen pada:\n\n{deletionDate, date, full} pukul {deletionDate, time, short}\n\nJika kamu tidak meminta ini, masuk ke akunmu untuk membatalkan penghapusan. Kami juga menyarankan kamu mengubah kata sandi agar akunmu tetap aman.\n\n– Tim {product_name}"
+		"footer_reason": "Kamu menerima email ini karena kamu meminta untuk menghapus akun {product_name} kamu.",
+		"intro": "Sesuai permintaanmu, kami akan menghapus akun {product_name} kamu pada {deletionDate, date, long}.",
+		"note": "Jika kamu tidak memintanya, masuk sebelum tanggal itu untuk membatalkannya, lalu ubah kata sandimu.",
+		"signoff": "Tim {product_name}",
+		"subject": "Akun {product_name} kamu akan dihapus pada {deletionDate, date, long}"
+	},
+	"sign_in_code": {
+		"device_label": "Perangkat",
+		"expiry": "Kode ini akan kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena seseorang meminta untuk masuk ke {product_name} dengan alamat ini.",
+		"intro": "Gunakan kode ini untuk masuk ke {product_name}.",
+		"location_label": "Diminta dari",
+		"note": "Jangan bagikan kode ini kepada siapa pun. Staf {product_name} tidak akan pernah memintanya. Jika kamu tidak mencoba masuk, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kode masuk {product_name} kamu"
+	},
+	"sign_up_code": {
+		"device_label": "Perangkat",
+		"expiry": "Kode ini akan kedaluwarsa dalam {minutes, plural, other {# menit}}.",
+		"footer_reason": "Kamu menerima email ini karena seseorang meminta untuk membuat akun {product_name} dengan alamat ini.",
+		"intro": "Gunakan kode ini untuk menyelesaikan pembuatan akun {product_name} kamu.",
+		"location_label": "Diminta dari",
+		"note": "Jangan bagikan kode ini kepada siapa pun. Staf {product_name} tidak akan pernah memintanya. Jika kamu tidak mencoba membuat akun, kamu bisa mengabaikan email ini.",
+		"signoff": "Tim {product_name}",
+		"subject": "Kode pendaftaran {product_name} kamu"
 	}
 }
