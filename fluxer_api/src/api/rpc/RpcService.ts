@@ -36,6 +36,8 @@ import {
 	mapGuildToGuildResponse,
 } from '@app/api/guild/GuildModel';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
+import {enqueueEndGuildVisitsForCode} from '@app/api/guild/visits/GuildVisitLifecycle';
+import {resolveSessionGuildVisits} from '@app/api/guild/visits/GuildVisitSession';
 import {stripAnimationPrefix} from '@app/api/infrastructure/AssetEntitlementUtils';
 import type {AvatarService} from '@app/api/infrastructure/AvatarService';
 import type {DiscriminatorService} from '@app/api/infrastructure/DiscriminatorService';
@@ -50,6 +52,7 @@ import type {LimitConfigService} from '@app/api/limits/LimitConfigService';
 import {resolveLimitSafe} from '@app/api/limits/LimitConfigUtils';
 import {createLimitMatchContext} from '@app/api/limits/LimitMatchContextBuilder';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
+import {getOperatorPassEntitlementService} from '@app/api/middleware/ServiceSingletons';
 import type {AuthSession as AuthSessionModel} from '@app/api/models/AuthSession';
 import type {Channel} from '@app/api/models/Channel';
 import type {FavoriteMeme} from '@app/api/models/FavoriteMeme';
@@ -63,6 +66,7 @@ import type {UserGuildSettings} from '@app/api/models/UserGuildSettings';
 import {UserSettings} from '@app/api/models/UserSettings';
 import type {WebAuthnCredential} from '@app/api/models/WebAuthnCredential';
 import type {BotAuthService} from '@app/api/oauth/BotAuthService';
+import {operatorPassPrivateFields} from '@app/api/operator_pass/OperatorPassEntitlementService';
 import {mapReadStateResponse} from '@app/api/read_state/ReadStateResponseMapper';
 import type {ReadStateService} from '@app/api/read_state/ReadStateService';
 import {visibleReadStates} from '@app/api/read_state/ReadStateVisibility';
@@ -75,6 +79,8 @@ import {
 	timeRpcStep,
 	timeRpcStepSync,
 } from '@app/api/rpc/RpcTimings';
+import {getAccountTier} from '@app/api/user/AccountTier';
+import {isDateOfBirthEnforced} from '@app/api/user/DateOfBirth';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {CustomStatusValidator} from '@app/api/user/services/CustomStatusValidator';
 import {
@@ -113,6 +119,7 @@ import {RateLimitError} from '@fluxer/errors/src/domains/core/RateLimitError';
 import {UnauthorizedError} from '@fluxer/errors/src/domains/core/UnauthorizedError';
 import {UnknownGuildError} from '@fluxer/errors/src/domains/guild/UnknownGuildError';
 import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
+import {getSameIpDecisionKey} from '@fluxer/ip_utils/src/IpAddress';
 import type {ChannelResponse} from '@fluxer/schema/src/domains/channel/ChannelSchemas';
 import type {VoiceStateResponse} from '@fluxer/schema/src/domains/gateway/GatewaySchemas';
 import type {GuildMemberResponse} from '@fluxer/schema/src/domains/guild/GuildMemberSchemas';
@@ -144,6 +151,7 @@ interface HandleSessionRequestParams {
 	latitude?: string;
 	longitude?: string;
 	threadChannelsCapable?: boolean;
+	guildVisitsCapable?: boolean;
 }
 
 interface HandleGuildCollectionRequestParams {
@@ -234,6 +242,18 @@ export class RpcService {
 		});
 	}
 
+	private async loadOperatorPassFields(user: User): Promise<ReturnType<typeof operatorPassPrivateFields> | null> {
+		if (Config.instance.selfHosted || user.isBot) {
+			return null;
+		}
+		try {
+			return operatorPassPrivateFields(user, await getOperatorPassEntitlementService().getHolder(user));
+		} catch (error) {
+			Logger.warn({userId: user.id, error}, 'Failed to load Operator Pass holder for session start');
+			return null;
+		}
+	}
+
 	private async ensurePersonalNotesChannel(user: User): Promise<void> {
 		const personalNotesChannelId = userIdToChannelId(user.id);
 		const existingChannel = await this.channelRepository.channelData.findUnique(personalNotesChannelId);
@@ -295,6 +315,7 @@ export class RpcService {
 						latitude: request.latitude,
 						longitude: request.longitude,
 						threadChannelsCapable: request.thread_channels_capable === true,
+						guildVisitsCapable: request.guild_visits_capable === true,
 					}),
 				};
 			case 'guild_collection':
@@ -820,6 +841,7 @@ export class RpcService {
 		latitude,
 		longitude,
 		threadChannelsCapable = false,
+		guildVisitsCapable = false,
 	}: HandleSessionRequestParams): Promise<RpcResponseSessionData> {
 		const timings = new RpcTimingRecorder();
 		const normalizedToken = timings.timeSync('normalize_session_token', () => this.normalizeSessionToken(token));
@@ -1025,7 +1047,7 @@ export class RpcService {
 			preloadUserPartialsStartedAtNs,
 			preloadUserPartialsSteps,
 		);
-		const [privateChannels, relationships, guilds] = await Promise.all([
+		const [privateChannels, relationships, guilds, operatorPassFields] = await Promise.all([
 			timeRpcStep(readyPayloadSteps, 'map_private_channels', async () =>
 				this.mapRpcSessionPrivateChannels({
 					channels: userData.privateChannels,
@@ -1043,6 +1065,7 @@ export class RpcService {
 			timeRpcStepSync(readyPayloadSteps, 'map_guild_ids', () =>
 				userData.guildIds.map((guildId) => ({id: guildId.toString()})),
 			),
+			timeRpcStep(readyPayloadSteps, 'load_operator_pass', async () => this.loadOperatorPassFields(user)),
 		]);
 		timings.record('map_ready_payloads', readyPayloadStartedAtNs, readyPayloadSteps);
 		const rtcRegions = timings.timeSync('build_rtc_regions', () => {
@@ -1101,13 +1124,22 @@ export class RpcService {
 		const userGuildSettings = await timings.time('map_user_guild_settings', () =>
 			Promise.all(userData.guildSettings.map((settings) => mapUserGuildSettingsForViewer(settings, sessionViewer))),
 		);
+		const visitGuildIds =
+			guildVisitsCapable && !isDateOfBirthEnforced(user)
+				? await timings.time('resolve_guild_visits', async () =>
+						resolveSessionGuildVisits({user, ip: ip ?? null, memberGuildIds: userData.guildIds}),
+					)
+				: [];
 		const responseBuildSteps: RpcTimingSteps = {};
 		const responseBuildStartedAtNs = startRpcTiming();
 		const responsePayload = {
 			auth_session_id_hash: timeRpcStepSync(responseBuildSteps, 'map_auth_session_id_hash', () =>
 				authSession ? uint8ArrayToBase64(authSession.sessionIdHash, {urlSafe: true}) : undefined,
 			),
-			user: timeRpcStepSync(responseBuildSteps, 'map_user', () => mapUserToPrivateResponse(user)),
+			user: timeRpcStepSync(responseBuildSteps, 'map_user', () => ({
+				...mapUserToPrivateResponse(user),
+				...operatorPassFields,
+			})),
 			user_settings: timeRpcStepSync(responseBuildSteps, 'map_user_settings', () =>
 				userData.settings
 					? mapUserSettingsToResponse({
@@ -1140,6 +1172,13 @@ export class RpcService {
 				),
 			),
 			version,
+			visit_guild_ids: visitGuildIds.map((visit) => visit.guildId.toString()),
+			operator_visit_guild_ids: visitGuildIds
+				.filter((visit) => visit.operator)
+				.map((visit) => visit.guildId.toString()),
+			adult_content_allowed: canUserAccessNsfwContent(user),
+			account_tier: getAccountTier(user),
+			ip_key: ip ? (getSameIpDecisionKey(ip) ?? ip) : null,
 		};
 		timings.record('build_session_response_payload', responseBuildStartedAtNs, responseBuildSteps);
 		if ((user.flags & UserFlags.STAFF) === 0n) {
@@ -1605,7 +1644,7 @@ export class RpcService {
 			guildSettings,
 			notes,
 			readStates,
-			guildIds,
+			guildIds: isDateOfBirthEnforced(user) ? [] : guildIds,
 			privateChannels,
 			relationships,
 			favoriteMemes,
@@ -1874,7 +1913,12 @@ export class RpcService {
 				},
 				'Repairing orphaned invites',
 			);
-			await Promise.all(orphanedInvites.map((invite) => this.inviteRepository.delete(invite.code)));
+			await Promise.all(
+				orphanedInvites.map(async (invite) => {
+					await this.inviteRepository.delete(invite.code);
+					await enqueueEndGuildVisitsForCode(guild.id, invite.code);
+				}),
+			);
 		}
 		if (orphanedWebhooks.length > 0) {
 			Logger.info(
