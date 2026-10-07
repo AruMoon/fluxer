@@ -5,7 +5,9 @@ import {AuditLogMiddleware} from '@app/api/middleware/AuditLogMiddleware';
 import {ClientFeaturesMiddleware} from '@app/api/middleware/ClientFeaturesMiddleware';
 import {ConcurrencyLimitMiddleware} from '@app/api/middleware/ConcurrencyLimitMiddleware';
 import ContentFilterMiddleware from '@app/api/middleware/ContentFilterMiddleware';
+import {DateOfBirthGateMiddleware} from '@app/api/middleware/DateOfBirthGateMiddleware';
 import {GuildAvailabilityMiddleware} from '@app/api/middleware/GuildAvailabilityMiddleware';
+import {GuildVisitorRequestContextMiddleware} from '@app/api/middleware/GuildVisitorRequestContextMiddleware';
 import {IpBanMiddleware} from '@app/api/middleware/IpBanMiddleware';
 import {LocaleMiddleware} from '@app/api/middleware/LocaleMiddleware';
 import {RequestCacheMiddleware} from '@app/api/middleware/RequestCacheMiddleware';
@@ -67,6 +69,7 @@ export function configureMiddleware(routes: HonoApp, options: MiddlewarePipeline
 				HttpHeaders.X_AUDIT_LOG_REASON,
 				HttpHeaders.X_CAPTCHA_ID,
 				HttpHeaders.X_CAPTCHA_TOKEN,
+				HttpHeaders.X_FLUXER_CAPABILITIES,
 				HttpHeaders.X_FLUXER_CLIENT_INSTALLATION_ID,
 				HttpHeaders.X_FLUXER_FEATURES,
 				HttpHeaders.X_FLUXER_PLATFORM,
@@ -114,6 +117,8 @@ export function configureMiddleware(routes: HonoApp, options: MiddlewarePipeline
 	routes.use(ActivityContextMiddleware);
 	routes.use(ServiceMiddleware);
 	routes.use(UserMiddleware);
+	routes.use(DateOfBirthGateMiddleware);
+	routes.use(GuildVisitorRequestContextMiddleware);
 	routes.use(ContentFilterMiddleware);
 	routes.use(GuildAvailabilityMiddleware);
 	routes.use(LocaleMiddleware);

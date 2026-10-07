@@ -25,6 +25,7 @@ import {DonationMagicLinkService} from '@app/api/donation/services/DonationMagic
 import {FavoriteMemeRequestService} from '@app/api/favorite_meme/FavoriteMemeRequestService';
 import {FavoriteMemeService} from '@app/api/favorite_meme/FavoriteMemeService';
 import {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
+import {GuildVisitService} from '@app/api/guild/visits/GuildVisitService';
 import {DisabledLiveKitService} from '@app/api/infrastructure/DisabledLiveKitService';
 import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
 import type {ILiveKitService} from '@app/api/infrastructure/ILiveKitService';
@@ -39,6 +40,7 @@ import {InviteRequestService} from '@app/api/invite/InviteRequestService';
 import {JobLedgerRepository} from '@app/api/jobs/JobLedgerRepository';
 import {createGuildStackServices, type GuildStackServices} from '@app/api/middleware/GuildStackServiceFactory';
 import {installLazyServices, type RequestScopedServices} from '@app/api/middleware/LazyServiceProvider';
+import {createOperatorPassServices, type OperatorPassServices} from '@app/api/middleware/OperatorPassServiceFactory';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import {
 	ensureVoiceResourcesInitialized,
@@ -92,6 +94,9 @@ import {
 	getKVThreadAutoArchiveQueue,
 	getLimitConfigService,
 	getOAuth2TokenRepository,
+	getOperatorPassEntitlementService,
+	getOperatorPassRepository,
+	getOperatorPassWaitlistService,
 	getPasswordChangeRepository,
 	getPremiumStateReconciliationQueueService,
 	getPurgeQueue,
@@ -117,6 +122,9 @@ import {ApplicationService} from '@app/api/oauth/ApplicationService';
 import {OAuth2ApplicationsRequestService} from '@app/api/oauth/OAuth2ApplicationsRequestService';
 import {OAuth2RequestService} from '@app/api/oauth/OAuth2RequestService';
 import {OAuth2Service} from '@app/api/oauth/OAuth2Service';
+import {OperatorPassCheckoutService} from '@app/api/operator_pass/OperatorPassCheckoutService';
+import type {OperatorPassEntitlementService} from '@app/api/operator_pass/OperatorPassEntitlementService';
+import type {OperatorPassWaitlistService} from '@app/api/operator_pass/OperatorPassWaitlistService';
 import {ReportRequestService} from '@app/api/report/ReportRequestService';
 import {ReportService} from '@app/api/report/ReportService';
 import {RpcService} from '@app/api/rpc/RpcService';
@@ -125,7 +133,6 @@ import {SearchService} from '@app/api/search/SearchService';
 import type {StoreEntitlementService} from '@app/api/store_billing/StoreEntitlementService';
 import {createStoreEntitlementService} from '@app/api/store_billing/StoreEntitlementServiceFactory';
 import {StripeService} from '@app/api/stripe/StripeService';
-import {AgeVerificationService} from '@app/api/stripe/services/AgeVerificationService';
 import type {HonoEnv} from '@app/api/types/HonoEnv';
 import {EmailChangeService} from '@app/api/user/services/EmailChangeService';
 import {MfaBackupCodesChallengeService} from '@app/api/user/services/MfaBackupCodesChallengeService';
@@ -202,6 +209,8 @@ function getLiveKitWebhookService(): LiveKitWebhookService | null {
 }
 
 class RequestServices implements RequestScopedServices {
+	private cachedOperatorPassServices: OperatorPassServices | undefined;
+	private cachedGuildVisitService: GuildVisitService | undefined;
 	private cachedGateway: IGatewayService | undefined;
 	private cachedMedia: IMediaService | undefined;
 	private cachedLiveKit: ILiveKitService | undefined;
@@ -236,8 +245,8 @@ class RequestServices implements RequestScopedServices {
 	private cachedSearchService: SearchService | undefined;
 	private cachedStripeService: StripeService | undefined;
 	private cachedStoreEntitlementService: StoreEntitlementService | undefined;
-	private cachedAgeVerificationService: AgeVerificationService | undefined;
 	private cachedDonationService: DonationService | undefined;
+	private cachedOperatorPassCheckoutService: OperatorPassCheckoutService | undefined;
 	private cachedUserService: UserService | undefined;
 	private cachedUserAccountRequestService: UserAccountRequestService | undefined;
 	private cachedUserAuthRequestService: UserAuthRequestService | undefined;
@@ -343,6 +352,18 @@ class RequestServices implements RequestScopedServices {
 
 	get inviteService() {
 		return this.guildStack.inviteService;
+	}
+
+	get guildVisitService(): GuildVisitService {
+		this.cachedGuildVisitService ??= new GuildVisitService(
+			this.gatewayService,
+			this.guildService,
+			this.inviteService,
+			this.singleCommunityService,
+			getLimitConfigService(),
+			getUserCacheService(),
+		);
+		return this.cachedGuildVisitService;
 	}
 
 	get blueskyOAuthService(): IBlueskyOAuthService | null {
@@ -523,6 +544,7 @@ class RequestServices implements RequestScopedServices {
 			getKVActivityTracker(),
 			this.singleCommunityService,
 			this.inviteService,
+			this.guildService.members,
 		);
 		return this.cachedSsoService;
 	}
@@ -542,6 +564,7 @@ class RequestServices implements RequestScopedServices {
 					inviteService: this.inviteService,
 					instanceConfigRepository: getInstanceConfigRepository(),
 					singleCommunityService: this.singleCommunityService,
+					guildVisitService: this.guildVisitService,
 					discriminatorService: getDiscriminatorService(),
 					kvActivityTracker: getKVActivityTracker(),
 				},
@@ -711,7 +734,10 @@ class RequestServices implements RequestScopedServices {
 	}
 
 	get reportRequestService(): ReportRequestService {
-		this.cachedReportRequestService ??= new ReportRequestService(getReportServiceInstance());
+		this.cachedReportRequestService ??= new ReportRequestService(getReportServiceInstance(), {
+			kv: getKVClient(),
+			rateLimit: getRateLimitService(),
+		});
 		return this.cachedReportRequestService;
 	}
 
@@ -755,6 +781,20 @@ class RequestServices implements RequestScopedServices {
 		return this.cachedSearchService;
 	}
 
+	private get operatorPassServices(): OperatorPassServices {
+		this.cachedOperatorPassServices ??= createOperatorPassServices({
+			operatorPassRepository: getOperatorPassRepository(),
+			userRepository: getUserRepository(),
+			guildRepository: getGuildRepository(),
+			guildService: this.guildService,
+			get emailService() {
+				return getEmailService();
+			},
+			gatewayService: this.gatewayService,
+		});
+		return this.cachedOperatorPassServices;
+	}
+
 	get stripeService(): StripeService {
 		this.cachedStripeService ??= new StripeService(
 			getUserRepository(),
@@ -765,6 +805,7 @@ class RequestServices implements RequestScopedServices {
 			getBillingRepository(),
 			getStoreBillingRepository(),
 			this.storeEntitlementService,
+			this.operatorPassServices,
 		);
 		return this.cachedStripeService;
 	}
@@ -781,19 +822,6 @@ class RequestServices implements RequestScopedServices {
 		return this.cachedStoreEntitlementService;
 	}
 
-	get ageVerificationService(): AgeVerificationService | undefined {
-		if (Config.instance.selfHosted) {
-			return undefined;
-		}
-		this.cachedAgeVerificationService ??= new AgeVerificationService(
-			this.stripeService.getStripe(),
-			getUserRepository(),
-			this.gatewayService,
-			getCacheService(),
-		);
-		return this.cachedAgeVerificationService;
-	}
-
 	get donationService(): DonationService | undefined {
 		if (Config.instance.selfHosted) {
 			return undefined;
@@ -807,6 +835,33 @@ class RequestServices implements RequestScopedServices {
 			),
 		);
 		return this.cachedDonationService;
+	}
+
+	get operatorPassEntitlementService(): OperatorPassEntitlementService | undefined {
+		if (Config.instance.selfHosted) {
+			return undefined;
+		}
+		return getOperatorPassEntitlementService();
+	}
+
+	get operatorPassWaitlistService(): OperatorPassWaitlistService | undefined {
+		if (Config.instance.selfHosted) {
+			return undefined;
+		}
+		return getOperatorPassWaitlistService();
+	}
+
+	get operatorPassCheckoutService(): OperatorPassCheckoutService | undefined {
+		if (Config.instance.selfHosted) {
+			return undefined;
+		}
+		this.cachedOperatorPassCheckoutService ??= new OperatorPassCheckoutService(
+			this.stripeService.getStripe(),
+			getOperatorPassRepository(),
+			getOperatorPassEntitlementService(),
+			getDonationRepository(),
+		);
+		return this.cachedOperatorPassCheckoutService;
 	}
 
 	get userService(): UserService {
@@ -825,6 +880,7 @@ class RequestServices implements RequestScopedServices {
 			getContactChangeLogService(),
 			getConnectionRepository(),
 			getLimitConfigService(),
+			Config.instance.selfHosted ? null : this.operatorPassServices,
 		);
 		return this.cachedUserService;
 	}
@@ -837,6 +893,8 @@ class RequestServices implements RequestScopedServices {
 				this.userService.channelService,
 				getUserRepository(),
 				getUserCacheService(),
+				getGatewayService(),
+				Config.instance.selfHosted ? null : getOperatorPassEntitlementService(),
 			);
 		}
 		return this.cachedUserAccountRequestService;
@@ -856,10 +914,7 @@ class RequestServices implements RequestScopedServices {
 	}
 
 	get userContentRequestService(): UserContentRequestService {
-		this.cachedUserContentRequestService ??= new UserContentRequestService(
-			this.userService.contentService,
-			getUserCacheService(),
-		);
+		this.cachedUserContentRequestService ??= new UserContentRequestService(this.userService.contentService);
 		return this.cachedUserContentRequestService;
 	}
 
