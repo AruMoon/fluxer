@@ -83,6 +83,17 @@ export const UserUpdateRequest = z
 		premium_badge_masked: z.boolean().describe('Whether to mask the premium badge'),
 		premium_badge_timestamp_hidden: z.boolean().describe('Whether to hide premium badge timestamp'),
 		premium_badge_sequence_hidden: z.boolean().describe('Whether to hide premium badge sequence'),
+		operator_pass_badge_hidden: z
+			.boolean()
+			.describe('Whether to hide the Operator Pass badge from other people. Either value replaces the default'),
+		operator_pass_badge_timestamp_hidden: z
+			.boolean()
+			.describe('Whether to hide from other people the month and year the Operator Pass was first held'),
+		operator_pass_badge_count_hidden: z
+			.boolean()
+			.describe(
+				"Whether to hide from other people how many Operator Passes are held, on the badge and the Operators' wall",
+			),
 		premium_enabled_override: z.boolean().describe('Override premium enabled state'),
 		has_dismissed_premium_onboarding: z.boolean().describe('Whether user dismissed premium onboarding'),
 		has_unread_gift_inventory: z.boolean().describe('Whether user has unread gifts'),
@@ -174,7 +185,7 @@ export type PasswordChangeVerifyRequest = z.infer<typeof PasswordChangeVerifyReq
 export const PasswordChangeCompleteRequest = PasswordChangeTicketRequest.extend({
 	verification_proof: createStringType().describe('Proof token obtained from verifying the email code'),
 	new_password: PasswordType.describe('The new password to set'),
-});
+}).extend(SudoVerificationSchema.shape);
 
 export type PasswordChangeCompleteRequest = z.infer<typeof PasswordChangeCompleteRequest>;
 
@@ -188,7 +199,9 @@ export type UserPasswordUpdateRequest = z.infer<typeof UserPasswordUpdateRequest
 
 export const FriendRequestByTagRequest = z.object({
 	username: UsernameType.describe('Username of the user to send friend request'),
-	discriminator: DiscriminatorType.describe('Discriminator tag of the user'),
+	discriminator: DiscriminatorType.optional().describe(
+		'Discriminator tag of the user, optional on an instance without tags',
+	),
 });
 
 export type FriendRequestByTagRequest = z.infer<typeof FriendRequestByTagRequest>;
