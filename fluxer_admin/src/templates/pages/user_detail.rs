@@ -10,7 +10,7 @@ use crate::{
             detail_tabs::{build_detail_tabs, detail_tabs},
             empty_state::not_found_state,
             media::{user_avatar_url, user_banner_url},
-            user_profile_badges::user_profile_badges,
+            user_profile_badges::{BadgeSize, user_profile_badges},
         },
         layout::admin_layout,
         pages::user_detail_tabs,
@@ -41,13 +41,10 @@ pub fn user_detail_with_tab(
     user_id: &str,
     active_tab: &str,
     tab_body: Option<Markup>,
-    premium_badge_name: Option<&str>,
     is_htmx: bool,
 ) -> Markup {
     let content = match user {
-        Some(user) => {
-            render_user_detail(config, auth, user, active_tab, tab_body, premium_badge_name)
-        }
+        Some(user) => render_user_detail(config, auth, user, active_tab, tab_body),
         None => not_found_state("User", user_id, None, None),
     };
     let title = user
@@ -73,7 +70,6 @@ fn render_user_detail(
     user: &AdminUser,
     active_tab: &str,
     tab_body: Option<Markup>,
-    premium_badge_name: Option<&str>,
 ) -> Markup {
     let display_name = user
         .global_name
@@ -134,12 +130,8 @@ fn render_user_detail(
                     }
                     (user_profile_badges(
                         &config.static_cdn_endpoint,
-                        user.flags,
-                        user.premium_type,
-                        user.premium_since.as_deref(),
-                        config.self_hosted,
-                        premium_badge_name,
-                        false,
+                        &user.profile_badges,
+                        BadgeSize::Detail,
                     ))
                 }
                 p class="break-words text-sm text-neutral-500" {
