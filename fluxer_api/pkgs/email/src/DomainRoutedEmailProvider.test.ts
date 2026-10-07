@@ -49,15 +49,21 @@ describe('DomainRoutedEmailProvider', () => {
 				fromEmail: 'noreply@example.com',
 				fromName: 'Example',
 				appBaseUrl: 'https://example.com',
+				apiBaseUrl: 'https://api.example.com',
 				appealsEmail: null,
+				privacyEmail: null,
 				safetyEmail: null,
 				supportEmail: null,
 				productName: 'Example',
+				marketingBaseUrl: 'https://example.com',
+				staticCdnBaseUrl: 'https://static.example.com',
+				legalAddress: null,
+				brandLogo: false,
 			},
 			new DomainRoutedEmailProvider(primary, fallback, ['gmail.com']),
 			{isEmailBounced: async () => true},
 		);
-		expect(await service.sendPasswordResetEmail('user@gmail.com', 'user', 'token')).toBe(false);
+		expect(await service.send('password_reset', 'user@gmail.com', {resetToken: 'token'})).toBe(false);
 		expect(primary.sendEmail).not.toHaveBeenCalled();
 		expect(fallback.sendEmail).not.toHaveBeenCalled();
 	});
