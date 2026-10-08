@@ -13,10 +13,6 @@ import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
 import {Hono} from 'hono';
 import {afterEach, describe, expect, it} from 'vitest';
 
-interface DiscoveryCaptcha {
-	provider: string;
-}
-
 describe('InstanceController discovery captcha', () => {
 	const repositories: Array<InstanceConfigRepository> = [];
 
@@ -46,6 +42,7 @@ describe('InstanceController discovery captcha', () => {
 					enabled: false,
 					enforced: false,
 					display_name: null,
+					button_label: null,
 					redirect_uri: '',
 				}),
 			} as unknown as SsoService);
@@ -66,7 +63,6 @@ describe('InstanceController discovery captcha', () => {
 	});
 
 	it('advertises no provider once an admin turns the captcha off', async () => {
-		const repository = createRepository();
 		await repository.updateCaptchaConfig({enabled: false});
 
 		await expect(readCaptcha(repository)).resolves.toEqual({provider: 'none'});
