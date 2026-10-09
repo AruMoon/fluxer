@@ -717,7 +717,7 @@ const MediaViewerModalComponent: FC = observer(() => {
 				providerName={currentItem.providerName}
 				videoSrc={currentItem.type === 'video' ? currentItem.src : undefined}
 				initialTime={currentItem.initialTime}
-				mediaType={currentItem.type === 'audio' ? 'audio' : currentItem.type === 'video' ? 'video' : 'image'}
+				mediaType={currentItem.type === 'audio' || currentItem.type === 'video' ? currentItem.type : 'image'}
 				onMenuOpen={handleMenuOpen}
 				data-flx="messaging.media-viewer-modal.media-viewer-modal-component.media-modal"
 			>

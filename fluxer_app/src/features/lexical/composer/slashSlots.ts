@@ -25,6 +25,7 @@ import {
 	$createSlashSlotNode,
 	$isSlashSlotNode,
 	SlashSlotNode,
+	type SlashSlotValidity,
 } from '@app/features/lexical/composer/nodes/SlashSlotNode';
 import {
 	$createSlashSlotPlaceholderNode,
@@ -126,17 +127,6 @@ function $collectSlots(): Array<SlashSlotNode> {
 		}
 	}
 	return slots;
-}
-
-function $enclosingSlot(node: LexicalNode): SlashSlotNode | null {
-	let current: LexicalNode | null = node;
-	while (current != null) {
-		if ($isSlashSlotNode(current)) {
-			return current;
-		}
-		current = current.getParent();
-	}
-	return null;
 }
 
 function $isPointAtSlotBoundary(slot: SlashSlotNode, point: PointType, boundary: 'start' | 'end'): boolean {
@@ -508,11 +498,10 @@ function $handleSlashStructuralDelete(event: KeyboardEvent, isBackward: boolean)
 	if (adjacent == null) {
 		return false;
 	}
-	const adjacentSlot = $isSlashSeparatorNode(adjacent)
-		? isBackward
-			? adjacent.getPreviousSibling()
-			: adjacent.getNextSibling()
-		: adjacent;
+	let adjacentSlot: LexicalNode | null = adjacent;
+	if ($isSlashSeparatorNode(adjacent)) {
+		adjacentSlot = isBackward ? adjacent.getPreviousSibling() : adjacent.getNextSibling();
+	}
 	if ($isSlashSlotNode(adjacentSlot)) {
 		event.preventDefault();
 		if (adjacentSlot.isRequired()) {
@@ -573,14 +562,12 @@ export function registerSlashSlotPlugin(
 			const text = node.getTextContent();
 			const resolvedDisplay = node.getResolvedDisplay();
 			const nextTouched = node.isTouched() || text.length > 0 || (resolvedDisplay != null && resolvedDisplay !== text);
-			const nextValidity =
-				text.length === 0
-					? node.isSubmitRequired() && nextTouched
-						? 'invalid'
-						: 'neutral'
-					: result.valid
-						? 'valid'
-						: 'invalid';
+			let nextValidity: SlashSlotValidity;
+			if (text.length > 0) {
+				nextValidity = result.valid ? 'valid' : 'invalid';
+			} else {
+				nextValidity = node.isSubmitRequired() && nextTouched ? 'invalid' : 'neutral';
+			}
 			const nextWire = result.resolvedWire == null ? null : result.resolvedWire;
 			if (node.isTouched() !== nextTouched) {
 				node.setTouched(nextTouched);

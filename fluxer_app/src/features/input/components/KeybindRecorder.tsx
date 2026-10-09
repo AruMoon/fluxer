@@ -344,11 +344,12 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 		};
 		rafId = requestAnimationFrame(pollGamepads);
 		const globalShortcutsApi = getGlobalShortcutsApi();
-		const cancelGlobalCapture = globalShortcutsApi
-			? canCaptureFromHook(globalShortcutsApi)
-				? beginShortcutCapture(globalShortcutsApi, handleCaptureEvent)
-				: null
-			: beginGlobalKeyCapture(getElectronAPI(), handleGlobalKeyEvent);
+		let cancelGlobalCapture: (() => void) | null = null;
+		if (!globalShortcutsApi) {
+			cancelGlobalCapture = beginGlobalKeyCapture(getElectronAPI(), handleGlobalKeyEvent);
+		} else if (canCaptureFromHook(globalShortcutsApi)) {
+			cancelGlobalCapture = beginShortcutCapture(globalShortcutsApi, handleCaptureEvent);
+		}
 		window.addEventListener('keydown', handleKeyDown, true);
 		window.addEventListener('keyup', handleKeyUp, true);
 		window.addEventListener('mousedown', handleMouseDown, true);
@@ -370,6 +371,14 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 		setPreviewCombo(null);
 		onReset?.();
 	};
+	let recorderText: React.ReactNode;
+	if (recording) {
+		recorderText = <Trans>Press a shortcut…</Trans>;
+	} else if (currentHasValue) {
+		recorderText = displayValue;
+	} else {
+		recorderText = <Trans>Click to record</Trans>;
+	}
 	return (
 		<div className={styles.popout} data-flx="input.keybind-recorder.keybind-editor-popout.popout">
 			<div className={styles.popoutHeader} data-flx="input.keybind-recorder.keybind-editor-popout.popout-header">
@@ -402,13 +411,7 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 						data-flx="input.keybind-recorder.keybind-editor-popout.recorder-icon"
 					/>
 					<span className={styles.recorderText} data-flx="input.keybind-recorder.keybind-editor-popout.recorder-text">
-						{recording ? (
-							<Trans>Press a shortcut…</Trans>
-						) : currentHasValue ? (
-							displayValue
-						) : (
-							<Trans>Click to record</Trans>
-						)}
+						{recorderText}
 					</span>
 				</div>
 			</FocusRing>
