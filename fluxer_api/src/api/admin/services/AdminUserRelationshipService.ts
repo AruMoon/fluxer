@@ -5,6 +5,7 @@ import {resolveAdminUsers} from '@app/api/admin/models/UserTypes';
 import type {AdminAuditService} from '@app/api/admin/services/AdminAuditService';
 import {createUserID, type UserID} from '@app/api/BrandedTypes';
 import type {Relationship} from '@app/api/models/Relationship';
+import type {UserRelationshipService} from '@app/api/user/services/UserRelationshipService';
 import {RelationshipTypes} from '@fluxer/constants/src/UserConstants';
 import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {
@@ -20,6 +21,7 @@ import type {
 interface AdminUserRelationshipServiceDeps {
 	apiContext: ApiContext;
 	auditService: AdminAuditService;
+	userRelationshipService: Pick<UserRelationshipService, 'endFriendship'>;
 }
 
 const CATEGORY_TO_TYPE: Record<RelationshipCategory, number> = {
@@ -164,8 +166,7 @@ export class AdminUserRelationshipService {
 		const {users: userRepository, gateway: gatewayService} = this.deps.apiContext.services;
 		switch (category) {
 			case 'friend': {
-				await userRepository.deleteRelationship(userId, targetUserId, RelationshipTypes.FRIEND);
-				await userRepository.deleteRelationship(targetUserId, userId, RelationshipTypes.FRIEND);
+				await this.deps.userRelationshipService.endFriendship(userId, targetUserId);
 				await gatewayService.dispatchPresence({
 					userId,
 					event: 'RELATIONSHIP_REMOVE',
