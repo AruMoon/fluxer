@@ -18,8 +18,6 @@ Submitted names and other text must pass the instance's content policy. Blocked 
 
 ## Guild object
 
-A guild object contains the guild's configuration. The operation that returns it decides which embedded collections and caller-specific fields it has.
-
 ### Structure
 
 | Field | Type | Description |
@@ -65,6 +63,7 @@ A guild object contains the guild's configuration. The operation that returns it
 | approximate_member_count?<sup>15</sup> | integer | Approximate member count |
 | approximate_presence_count?<sup>15</sup> | integer | Approximate online presence count |
 | threads_active?<sup>16</sup> | boolean | Whether the caller can use threads, forum channels, and media channels in the guild, always `true` when present |
+| visiting?<sup>17</sup> | boolean | Present and `true` when the caller is [visiting](#visiting-guilds) the guild without being a member |
 
 <sup>1</sup> An animated icon hash has the `a_` prefix, and that prefix is removed from the returned value while the guild lacks `ANIMATED_ICON`
 
@@ -97,6 +96,8 @@ A guild object contains the guild's configuration. The operation that returns it
 <sup>15</sup> Only [List current user guilds](#list-current-user-guilds) populates these fields, and only when `with_counts` is true. A guild for which the Gateway holds no cached counts reports 0 for both
 
 <sup>16</sup> Only [List current user guilds](#list-current-user-guilds) populates this field, and only for a bot or a user session that declares the [`channel_threads` client capability](/http-api/threads/#client-capability)
+
+<sup>17</sup> Only [Get guild](#get-guild) populates this field, for a caller with a visit. That response has no `permissions`, and `channels` holds the channels a visitor can read with only the @everyone overwrite kept
 
 A caller other than a bot or a user session that declares `channel_threads` receives `permissions` and each role `permissions` with the [thread permission bits](/http-api/threads/#thread-permissions) removed. The `permission_overwrites` of `channels` keep the thread bits.
 
@@ -155,6 +156,7 @@ A partial guild object is the smaller shape that appears inside invite payloads.
 | embed_splash_width<sup>3</sup> | ?integer | Embedded invite splash width in pixels |
 | embed_splash_height<sup>3</sup> | ?integer | Embedded invite splash height in pixels |
 | features<sup>5</sup> | array[string] | [Guild features](#guild-features) |
+| visits_enabled?<sup>6</sup> | boolean | Whether the caller can [visit](#visiting-guilds) the guild from this invite |
 
 <sup>1</sup> An animated icon hash has the `a_` prefix, and that prefix is removed from the returned value while the guild lacks `ANIMATED_ICON`
 
@@ -165,6 +167,8 @@ A partial guild object is the smaller shape that appears inside invite payloads.
 <sup>4</sup> The field is null whenever the guild lacks `INVITE_SPLASH`
 
 <sup>5</sup> The set has each feature at most once, and `vanity_url_code` is never part of this representation
+
+<sup>6</sup> Present only on [Get invite](/http-api/invites/#get-invite) for a caller with the `guild_visits` assignment. True when the guild holds `VISITS_ENABLED` and invites are not disabled
 
 ### Example
 
@@ -391,8 +395,6 @@ A guild explicit content filter level is the guild-wide filter a moderator selec
 | 0 | SAFE | Guild is not age restricted |
 | 3 | AGE_RESTRICTED | Guild is age restricted |
 
-The registry has no other value. Fluxer derives the level from the guild's `nsfw` field and never writes it directly.
-
 ## Guild content warning levels
 
 The guild is the last position in the resolution chain described by [channel content warning levels](/http-api/channels/#content-warning-levels).
@@ -407,8 +409,6 @@ The guild is the last position in the resolution chain described by [channel con
 | Value | Name | Description |
 | --- | --- | --- |
 | 1 &lt;&lt; 0 | SUPPRESS_JOIN_NOTIFICATIONS | Suppress member join system messages |
-
-Every bit outside this registry is discarded when the field is written.
 
 ## Disabled guild operations
 
@@ -426,12 +426,8 @@ A set bit disables the named behaviour across the guild. Only the [Admin API](/a
 
 ## Guild features
 
-Each value in the guild's `features` array is a capability or availability flag.
-
 | Value | Description |
 | --- | --- |
-| ANIMATED_ICON | Guild can use an animated icon |
-| ANNOUNCEMENT_CHANNELS_DISABLED<sup>8</sup> | Publishing from and following the guild's announcement channels is disabled |
 | ANIMATED_BANNER | Guild can use an animated banner |
 | AUDIO_BITRATE_128_KBPS<sup>6</sup> | Voice channel bitrate ceiling is raised to 128000 |
 | AUDIO_BITRATE_256_KBPS<sup>6</sup> | Voice channel bitrate ceiling is raised to 256000 |
@@ -458,12 +454,6 @@ Each value in the guild's `features` array is a capability or availability flag.
 | VERIFIED | Guild has verified status |
 | VIP_VOICE | Guild can use voice regions that are restricted to VIP guilds |
 | VOICE_E2EE | Guild voice channels support end-to-end encryption |
-| UNAVAILABLE_FOR_EVERYONE<sup>4</sup> | Guild is unavailable to every account |
-| UNAVAILABLE_FOR_EVERYONE_BUT_STAFF<sup>4</sup> | Guild is unavailable to every account without the instance staff flag |
-| UNAVAILABLE_HIDDEN | While the guild is unavailable, the Gateway sends its unavailable guild entry with `unavailable_hidden: true` |
-| VISIONARY | Guild has visionary status |
-| LARGE_GUILD_OVERRIDE<sup>2</sup> | Guild is marked as a large guild |
-| VERY_LARGE_GUILD<sup>5</sup> | Guild member capacity is raised |
 
 <sup>1</sup> The feature is added or removed through [Modify guild](#modify-guild), as part of the complete array. Send every feature without this marker back to `features` exactly as the guild holds it
 
@@ -484,6 +474,53 @@ Each value in the guild's `features` array is a capability or availability flag.
 :::caution[Expression cloning is opt-in]
 Cloning requires `CLONE_EMOJI_ENABLED` or `CLONE_STICKER_ENABLED`. A member with `MANAGE_GUILD` can enable them through [Modify guild](#modify-guild). The deprecated `CLONE_EMOJI_DISABLED` and `CLONE_STICKER_DISABLED` features have no effect.
 :::
+
+## Visiting guilds
+
+A visit lets someone read a guild before joining it. The visitor reads the channels the @everyone role can see, and cannot post, react, type, join voice, or see the member list. Members see no member add, presence, or count change. Visits need the `guild_visits` [experiment assignment](/http-api/experiments/#guild-visits-assignment-object). Without it every route here behaves as if the guild or invite did not exist, and no session receives a visited guild. A session receives its visited guilds only when it identifies with the `GUILD_VISITS` [session flag](/gateway/commands/#session-flags).
+
+A guild accepts visitors while it holds `VISITS_ENABLED`. New guilds get it at creation, an approved [discovery](/http-api/discovery/) listing turns it back on, and a member with `MANAGE_GUILD` can turn it off through [Modify guild](#modify-guild). A visit starts from an invite ([Visit invite guild](/http-api/invites/#visit-invite-guild)), from a discovery listing ([Visit discovery guild](/http-api/discovery/#visit-discovery-guild)), or from the instance community after sign up. The instance community does not need `VISITS_ENABLED`.
+
+What a visitor can read:
+
+- The visitor's permissions in a channel are the @everyone role permissions without `ADMINISTRATOR`, with only the @everyone channel overwrite applied, limited to `VIEW_CHANNEL` and `READ_MESSAGE_HISTORY`. Role and member overwrites are ignored.
+- Adult channels are hidden from a visitor who may not see adult content, and an adult guild cannot be visited by them at all.
+- Private threads are never visible. Public threads follow their parent channel.
+- An account without a confirmed email reads only the last `guild_visit_history_days_unverified` days of history, 30 by default.
+- Channel search accepts content, `has`, and date filters. Filtering by author or mention returns 400 `SEARCH_FILTER_NEEDS_MEMBERSHIP`.
+- Every channel object a visitor receives has only the @everyone permission overwrite.
+
+A person can visit at most `max_guild_visits` guilds at once, 10 by default and half that without a confirmed email. Starting another visit ends the one opened longest ago. A visit ends after 14 days without being opened, when the invite that started it is deleted or expires, when the person is banned, when the guild drops `VISITS_ENABLED`, and when the person joins. Each ending sends [Guild Delete](/gateway/events/#guild-delete) to every session of that person, except a join, which sends a member [Guild Create](/gateway/events/#guild-create) in place.
+
+Visiting does not use up a limited invite. Joining from the visit uses one, so a visitor cannot join once every use is taken.
+
+### Guild visit object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| guild_id | snowflake | The ID of the guild being visited |
+| source | integer | [Guild visit source](#guild-visit-sources) |
+| started_at | ISO8601 timestamp | When the visit started |
+| opened_at<sup>1</sup> | ISO8601 timestamp | When the visit was last opened |
+
+<sup>1</sup> Updated at most once a day
+
+### Guild visit sources
+
+| Value | Name | Description |
+| --- | --- | --- |
+| 1 | INVITE | The visit started from an invite |
+| 2 | VANITY_URL | The visit started from a custom invite URL |
+| 3 | DISCOVERY | The visit started from a discovery listing |
+| 4 | OPERATOR | The visit started from the instance community after sign up |
+
+### Guild visit start object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| guild_id | snowflake | The ID of the guild |
+| member | boolean | Whether the caller is already a member, in which case no visit starts |
+| visit | ?[guild visit](#guild-visit-object) object | The visit, or null when `member` is true |
 
 ## Custom invite URL object
 
@@ -526,10 +563,12 @@ These fields prove [sudo mode](/http-api/users/mfa/#sudo-mode) when an operation
 | Field | Type | Description |
 | --- | --- | --- |
 | password?<sup>1</sup> | string | Current account password |
-| mfa_method?<sup>2</sup> | string | MFA method, either `totp` or `webauthn` |
+| mfa_method?<sup>2</sup> | string | MFA method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | Authenticator code or unconsumed backup code when the method is `totp` (1-32 characters) |
 | webauthn_response? | [WebAuthn assertion](/http-api/authentication/#webauthn-assertion) object | Assertion when the method is `webauthn` |
 | webauthn_challenge? | string | Challenge bound to the WebAuthn assertion |
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 <sup>1</sup> The password is accepted only while the account holds neither a TOTP secret nor a registered WebAuthn credential, and it returns the field code `INVALID_PASSWORD` when it does not match
 
@@ -689,8 +728,6 @@ Changing `mfa_level` to a different value also requires the guild owner, an owne
 
 ### JSON body
 
-Every field is optional. An omitted field preserves its current value, and a field explicitly set to null clears it where the type allows null.
-
 | Field | Type | Description |
 | --- | --- | --- |
 | name?<sup>1</sup> | string | Guild name (1-100 characters) |
@@ -714,10 +751,12 @@ Every field is optional. An omitted field preserves its current value, and a fie
 | features?<sup>14</sup> | array[string] | Complete desired [guild feature](#guild-features) set (max 100 entries) |
 | message_history_cutoff?<sup>15</sup> | ?ISO8601 timestamp | Earliest history visible without [READ_MESSAGE_HISTORY](/http-api/permissions/), or null to deny historical access |
 | password? | string | [Sudo verification](#sudo-verification-fields) password |
-| mfa_method? | string | [Sudo verification](#sudo-verification-fields) method, either `totp` or `webauthn` |
+| mfa_method? | string | [Sudo verification](#sudo-verification-fields) method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | [Sudo verification](#sudo-verification-fields) authenticator code |
 | webauthn_response? | [WebAuthn assertion](/http-api/authentication/#webauthn-assertion) object | [Sudo verification](#sudo-verification-fields) assertion |
 | webauthn_challenge? | string | Challenge bound to the WebAuthn assertion |
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 <sup>1</sup> Normalised and trimmed before its length is measured. A blocked name returns 403 `CONTENT_BLOCKED`
 

@@ -70,10 +70,6 @@ Such a session receives exactly this set:
 - [Channel Create](/gateway/events/#channel-create), [Channel Update](/gateway/events/#channel-update), [Channel Update Bulk](/gateway/events/#channel-update-bulk), and [Channel Delete](/gateway/events/#channel-delete)
 - [Guild Audit Log Entry Create](/gateway/events/#guild-audit-log-entry-create)
 - [Passive Updates](/gateway/events/#passive-updates)
-- [Message Create](/gateway/events/#message-create) when the message mentions the session's user or that user wrote it
-- [Message Update](/gateway/events/#message-update) when the message has a mention that overrides the passive filter for [Message Create](/gateway/events/#message-create)
-- [Guild Member Update](/gateway/events/#guild-member-update) and [Guild Member Remove](/gateway/events/#guild-member-remove) when the subject is the session's own user
-- The thread events [Gateway threads](/gateway/threads/#dispatch-events) states for a passive session
 
 Every other Dispatch the guild produces is suppressed:
 
@@ -108,6 +104,18 @@ A message, reaction, typing, or pin event in a thread follows the rules on this 
 
 [Guild Member List Update](/gateway/events/#guild-member-list-update) has its own subscription. A session receives it only for a channel it named in `member_list_channels`, and only while it can view that channel and holds `VIEW_CHANNEL_MEMBERS` on it. One session holds at most one member list subscription per guild. [Thread Member List Update](/gateway/threads/#thread-member-list-update) has a separate subscription, as [Lazy Request thread options](/gateway/threads/#lazy-request-thread-options) describes.
 
+## Visited guilds
+
+A session [visiting](/http-api/guilds/#visiting-guilds) a guild receives only these events for it, and every other event is withheld, including any event added later:
+
+- [Guild Update](/gateway/events/#guild-update), and the role, emoji, and sticker events.
+- [Channel Create](/gateway/events/#channel-create), [Channel Update](/gateway/events/#channel-update), [Channel Update Bulk](/gateway/events/#channel-update-bulk), and [Channel Delete](/gateway/events/#channel-delete) for channels a visitor can read, with only the @everyone permission overwrite. A channel a visitor can no longer read arrives as Channel Delete, and one that becomes readable arrives as Channel Create.
+- [Channel Pins Update](/gateway/events/#channel-pins-update) for channels a visitor can read.
+- Message and reaction events for the channel the session has focused with `focused_channel_id` in [Lazy Request](/gateway/commands/#lazy-request). Reaction events have no `user_id` and no `member`.
+- Thread Create, Thread Update, and Thread Delete for public threads in channels a visitor can read.
+
+Visitors never appear in member lists, presences, typing, voice states, or member counts, and members receive nothing when a visitor connects or leaves. Member list ranges, [Request Guild Members](/gateway/commands/#request-guild-members), acknowledgements, and typing are ignored for a visited guild.
+
 ## Presence subscriptions
 
 [Presence Update](/gateway/events/#presence-update) skips gates 1 through 3 and is subject only to gate 4. A guild dispatches it only to a session that named the subject in the `members` array of a [Lazy Request](/gateway/commands/#lazy-request), that can view at least one channel the subject can view, and that does not belong to the subject.
@@ -130,12 +138,6 @@ Identify accepts `ignored_events`, an array of up to 256 Dispatch event names. F
   }
 }
 ```
-
-[Message Create](/gateway/events/#message-create) is the one exception. Fluxer delivers it even when `MESSAGE_CREATE` is ignored, if the message names the session's user in `mentions`, sets `mention_here`, or sets `mention_everyone`. A role mention does not defeat the list.
-
-A suppressed Dispatch consumes no sequence number, so a client MUST NOT expect a gap in the sequence where the list dropped one.
-
-The list is fixed for the lifetime of the session. Changing it requires a new Identify.
 
 ## The shard filter
 

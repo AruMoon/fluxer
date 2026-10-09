@@ -127,8 +127,9 @@ A token the backend rejects closes with `4004` and reason `Invalid token`. A non
 | --- | --- | --- |
 | 1 &lt;&lt; 1 | DEBOUNCE_MESSAGE_REACTIONS | Merge runs of reaction additions into [Message Reaction Add Many](/gateway/events/#message-reaction-add-many) |
 | 1 &lt;&lt; 2 | [CHANNEL_THREADS](/gateway/threads/#session-flag) | The client can parse thread, forum, and media channels |
+| 1 &lt;&lt; 3 | GUILD_VISITS | The session receives the guilds the account is [visiting](/http-api/guilds/#visiting-guilds) |
 
-Bit `0` and every bit above `2` are undefined. An undefined bit is accepted and ignored without closing the connection.
+Bit `0` and every bit above `3` are undefined. An undefined bit is accepted and ignored without closing the connection.
 
 `DEBOUNCE_MESSAGE_REACTIONS` applies to a reaction in a direct message or group direct message. A reaction in a guild channel is never merged and arrives as its own [Message Reaction Add](/gateway/events/#message-reaction-add).
 
@@ -429,8 +430,6 @@ Opcode `14` sets the per-guild subscriptions that decide member list, typing, sy
 }
 ```
 
-`subscriptions` is an object whose keys are canonical decimal Snowflake strings. A key that does not parse, a value that is not an object, and a guild the session is not connected to are all skipped without affecting the rest of the command. The command never closes the connection.
-
 ### Guild subscription object
 
 #### Structure
@@ -442,10 +441,13 @@ Opcode `14` sets the per-guild subscriptions that decide member list, typing, sy
 | typing? | boolean | Whether the guild delivers [Typing Start](/gateway/events/#typing-start), overriding the active flag |
 | member_list_channels?<sup>2</sup> | map[snowflake, array[array[integer]]] | The member list windows to subscribe to, keyed by channel ID |
 | members? | array[snowflake] | The explicit member IDs to subscribe to, at most 1,000 |
+| focused_channel_id?<sup>3</sup> | ?snowflake | The channel or public thread a visiting session has open |
 
 <sup>1</sup> Both are Booleans when present. Any other value stops Fluxer from applying the remaining options for that guild and every guild it has not yet processed, without a close and without a result
 
 <sup>2</sup> Subscriptions may be combined over a 100 ms window. Ranges sent during that window are merged for the same channel, and an empty range list clears its pending ranges
+
+<sup>3</sup> Read only for a guild the session is visiting, where it is the only option applied. A channel the visitor cannot read, or null, clears the focus. Messages and reactions reach a visiting session only for its focused channel
 
 Fluxer applies each option only when its key is present, in the order `active`, `sync`, `member_list_channels`, `members`, `typing`. The [thread options](/gateway/threads/#lazy-request-thread-options) `threads` and `thread_member_lists` follow `typing`.
 

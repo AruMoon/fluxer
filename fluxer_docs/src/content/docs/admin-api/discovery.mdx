@@ -6,7 +6,7 @@ description: Discovery application review, listing reads, category moves, and re
 
 import RouteHeader from '@/components/RouteHeader.astro';
 
-Admin discovery is the review side of the public guild directory. An Admin decides the application a guild manager submits, reads and edits the approved listing, moves it between categories, and removes the guild from the directory. A guild has at most one application, and the public [Discovery](/http-api/discovery/) resource drives the same lifecycle from the guild's side.
+Admin discovery is the review side of the public guild directory. An Admin decides the application a guild manager submits, reads and edits the approved listing, moves it between categories, and removes the guild from the directory. A guild has at most one application, and the public [Discovery](/http-api/discovery/) resource drives the same lifecycle from the guild's side. People see this feature as "Explore" in the Fluxer apps. The API calls it discovery.
 
 Every operation except [Remove discovery listing](#remove-discovery-listing) requires `discovery:review`, which covers the reads, [Review discovery application](#review-discovery-application), [Move discovery listings to a category](#move-discovery-listings-to-a-category), and [Update discovery listing](#update-discovery-listing). [Remove discovery listing](#remove-discovery-listing) requires `discovery:remove` instead. Neither implies the other.
 
@@ -180,8 +180,6 @@ Approves or rejects a pending application and returns the updated [discovery app
 | guild_id | snowflake | Guild that applied to discovery |
 
 ### JSON body
-
-`status` is the decision, and the constraint on `reason` depends on which one it is.
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -363,8 +361,6 @@ Updates the stored listing of one guild and returns the updated [discovery appli
 
 ### JSON body
 
-Every member is optional. An omitted member preserves the stored value, and an empty object is accepted and changes nothing.
-
 | Field | Type | Description |
 | --- | --- | --- |
 | description?<sup>1</sup> | string | Listing description of 10 through 300 characters |
@@ -414,8 +410,6 @@ Removes an approved listing from discovery, strips the guild's discoverable feat
 | guild_id | snowflake | The guild whose listing is removed |
 
 ### JSON body
-
-The body is required even though this is a DELETE, so a request without one fails body validation.
 
 | Field | Type | Description |
 | --- | --- | --- |

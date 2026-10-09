@@ -12,8 +12,6 @@ An invite is a code that admits an account into a guild or a group direct messag
 
 ## Invite object
 
-An invite object describes one code and the target it admits into. The `type` selects the representation.
-
 ### Structure
 
 | Field | Type | Description |
@@ -127,14 +125,6 @@ A partial recipient has only the username.
 | --- | --- | --- |
 | username | string | The username of the recipient |
 
-### Example
-
-```json
-{
-  "username": "example"
-}
-```
-
 ## Custom invite URLs
 
 [Modify guild custom invite URL](/http-api/guilds/#modify-guild-custom-invite-url) creates or replaces a custom invite code. It has type `0`, null `inviter` and `expires_at`, and `max_uses` and `max_age` of `0`. Its channel is the first guild text channel in channel order that the default role can view.
@@ -242,6 +232,44 @@ No admission path records a guild audit entry.
 
 10 requests per 10 seconds for each authenticated user, on the `invite:accept` bucket, which is not partitioned by invite code.
 
+## Visit invite guild
+
+<RouteHeader method="POST" path="/v1/invites/{invite_code}/visit" />
+
+Starts a [visit](/http-api/guilds/#visiting-guilds) to the guild of an invite and returns the [guild visit start object](/http-api/guilds/#guild-visit-start-object). The caller reads the guild without joining it. A caller who is already a member receives `member: true` and no visit. Opening the same visit again returns it unchanged.
+
+Visiting does not use up a limited invite. Joining later from the visit uses one. Deleting the invite, or its expiry, ends every visit it started. The caller's sessions with the `GUILD_VISITS` [session flag](/gateway/commands/#session-flags) receive [Guild Create](/gateway/events/#guild-create) with `visiting: true`.
+
+### Limitations
+
+- User-only, so a bot token is rejected with 403 `ACCESS_DENIED`.
+- Needs the `guild_visits` [experiment assignment](/http-api/experiments/#guild-visits-assignment-object), otherwise the route returns 404 `UNKNOWN_INVITE`.
+
+### Path parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| invite_code | string | The invite code (1 through 256 characters) |
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 200 | [guild visit start](/http-api/guilds/#guild-visit-start-object) object | Visit started, was already open, or the caller is a member |
+| 403 | [error response](/http-api/#error-response) | The guild does not accept visitors and the request returns `GUILD_VISITS_DISABLED` |
+| 403 | [error response](/http-api/#error-response) | The guild is for adults and the caller may not see adult content, returning `GUILD_VISIT_AGE_RESTRICTED` |
+| 403 | [error response](/http-api/#error-response) | Invites are disabled for the guild and the request returns `INVITES_DISABLED` |
+| 403 | [error response](/http-api/#error-response) | The caller is banned from the guild and the request returns `USER_BANNED_FROM_GUILD` or `USER_IP_BANNED_FROM_GUILD` |
+| 403 | [error response](/http-api/#error-response) | The account is [limited](/http-api/users/#account-limitation) and the request returns `ACCOUNT_LIMITED` |
+| 403 | [error response](/http-api/#error-response) | The caller has not given a date of birth and the request returns `DATE_OF_BIRTH_REQUIRED` |
+| 403 | [error response](/http-api/#error-response) | The caller is below the minimum age and the request returns `ACCOUNT_BELOW_MINIMUM_AGE` |
+| 404 | [error response](/http-api/#error-response) | The code resolves to no guild invite, the invite is used up, or visits are off for the caller, returning `UNKNOWN_INVITE` |
+| 404 | [error response](/http-api/#error-response) | The guild is unavailable and the request returns `UNKNOWN_GUILD` |
+
+### Rate limit
+
+10 requests per 60 seconds for each authenticated user, on the `guild:visit:start` bucket. Each address can also start 30 visits per 60 seconds.
+
 ## Delete invite
 
 <RouteHeader method="DELETE" path="/v1/invites/{invite_code}" bot auditReason mfa />
@@ -317,8 +345,6 @@ A channel that belongs to a guild creates a guild invite. Any other channel the 
 | channel_id | snowflake | The ID of the guild channel or private channel |
 
 ### JSON body
-
-Every field is optional and nullable, and an omitted or null value takes the stated default.
 
 | Field | Type | Description |
 | --- | --- | --- |

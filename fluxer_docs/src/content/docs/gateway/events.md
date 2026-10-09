@@ -228,8 +228,6 @@ The first entry always has `session_id: "all"` and the account's combined status
 | last_used_at | ?ISO8601 timestamp | When the credential was last used |
 | rp_id | string | The domain the passkey was created for, as in the [WebAuthn credential object](/http-api/users/mfa/#webauthn-credential-object) |
 
-[Replaced passkeys](/http-api/users/mfa/#replaced-passkeys) never appear in this list.
-
 #### RTC region object
 
 | Field | Type | Description |
@@ -402,6 +400,8 @@ A guild became available to the session. The payload is a [guild ready object](#
 
 Every session receives Guild Create when a guild becomes available after Ready, for example after joining one or after an unavailable guild recovers. A bot session also receives one for each available guild in the burst that follows Ready.
 
+A guild the account is [visiting](/http-api/guilds/#visiting-guilds) arrives with `visiting: true`, `joined_at: null`, and empty `members`, `presences`, and `voice_states`. Its `channels` hold only the channels a visitor can read, each with only the @everyone overwrite. Ready lists visited guilds the same way for a session with the `GUILD_VISITS` [session flag](/gateway/commands/#session-flags). A later Guild Create without `visiting` for a visited guild means the account joined it, and a client replaces the guild in place without clearing its messages.
+
 A bot session's Guild Create has `unavailable: false` unless it is the first Guild Create for a guild the bot joined during the session and [Ready](#ready) did not list. That Dispatch has no `unavailable` field, even when a [Guild Delete](#guild-delete) with `unavailable: true` for the guild came before it. A user session never receives the field on Guild Create.
 
 ### <span id="guild-sync"></span>GUILD_SYNC
@@ -429,7 +429,7 @@ A guild left the session's visibility, or became unavailable.
 
 <sup>1</sup> Present only when the guild itself is deleted. The payload has `id` alone when the account leaves a guild or is removed from one, and `id` with `unavailable` in the unavailable form
 
-Without `unavailable`, the account is no longer a member, and a client deletes everything it stores for that guild. With `unavailable: true`, the guild is temporarily unreachable. A client keeps the guild as an unavailable entry until a later [Guild Create](#guild-create) sends its full state again.
+Without `unavailable`, the account is no longer a member or no longer visiting, and a client deletes everything it stores for that guild. With `unavailable: true`, the guild is temporarily unreachable. A client keeps the guild as an unavailable entry until a later [Guild Create](#guild-create) sends its full state again.
 
 ### <span id="guild-role-create"></span>GUILD_ROLE_CREATE
 
@@ -476,8 +476,6 @@ A guild's emojis changed.
 | guild_id | snowflake | Guild the emojis belong to |
 | emojis | array[[guild emoji](/http-api/guild-emojis/#guild-emoji-object) object] | Every emoji in the guild |
 
-A client that stores the guild's emojis replaces them with this array. Fluxer does not send per-emoji create, update, or delete events.
-
 ### <span id="guild-stickers-update"></span>GUILD_STICKERS_UPDATE
 
 A guild's stickers changed.
@@ -486,8 +484,6 @@ A guild's stickers changed.
 | --- | --- | --- |
 | guild_id | snowflake | Guild the stickers belong to |
 | stickers | array[[guild sticker](/http-api/guild-stickers/#guild-sticker-object) object] | Every sticker in the guild |
-
-A client that stores the guild's stickers replaces them with this array. Fluxer does not send per-sticker create, update, or delete events.
 
 ### <span id="channel-create"></span>CHANNEL_CREATE
 
@@ -643,8 +639,6 @@ A group whose count is `0` is omitted. The `offline` group is also omitted once 
 | op | string | Operation kind, which is always `SYNC` |
 | range | array[integer] | Inclusive `[start, end]` range this operation replaces |
 | items | array[[member list item object](#member-list-item-object)] | Replacement items for the range |
-
-`SYNC` is the only operation Fluxer sends. A client MUST ignore an operation whose `op` it does not recognise or whose range fails the bounds in [Lazy Request](/gateway/commands/#lazy-request).
 
 #### Member list item object
 
@@ -1111,8 +1105,6 @@ Another connection of a [peer-to-peer](#peer-to-peer-voice) voice channel or cal
 }
 ```
 
-Fluxer authorises every signal against the current voice states, so `from` always names a connection with `p2p: true` in `channel_id`. A client discards a signal whose `from` it no longer has in its roster.
-
 ### <span id="entrance-sound-play"></span>ENTRANCE_SOUND_PLAY
 
 A participant asked for their entrance sound to play in a voice channel they are already connected to.
@@ -1127,8 +1119,6 @@ A participant asked for their entrance sound to play in a voice channel they are
 | url | string | URL to fetch the sound from |
 | duration_ms | integer | Sound duration in milliseconds |
 | content_type | string | MIME type of the sound file |
-
-Recipients are every other account with a voice state in that channel, one Dispatch each and at most one per account. The requesting account never receives its own sound.
 
 ### <span id="call-create"></span>CALL_CREATE
 
