@@ -38,7 +38,7 @@ import {useLingui} from '@lingui/react/macro';
 import {ChatsIcon, LockSimpleIcon, MagnifyingGlassIcon, PlusIcon, XIcon} from '@phosphor-icons/react';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
-import {useCallback, useEffect, useState} from 'react';
+import {type ReactNode, useCallback, useEffect, useState} from 'react';
 
 type BrowserTab = 'active' | 'archived' | 'archivedPrivate';
 type ThreadOpenHandler = (thread: Channel, event: ThreadOpenEvent) => void;
@@ -250,7 +250,10 @@ const ArchivedThreads = observer(
 		const [threadIds, setThreadIds] = useState<ReadonlyArray<string>>([]);
 		const [hasMore, setHasMore] = useState(false);
 		const [loading, setLoading] = useState(false);
-		const kind: ThreadCommands.ArchivedThreadListKind = !privateOnly ? 'public' : moderator ? 'private' : 'joined';
+		let kind: ThreadCommands.ArchivedThreadListKind = 'public';
+		if (privateOnly) {
+			kind = moderator ? 'private' : 'joined';
+		}
 		const parentId = parent.id;
 		const load = useCallback(
 			(before?: string) => {
@@ -366,6 +369,34 @@ export const ThreadBrowser = observer(
 		if (current.type === ChannelTypes.GUILD_TEXT) {
 			tabs.push({id: 'archivedPrivate', label: i18n._(D.ARCHIVED_PRIVATE_THREADS_DESCRIPTOR)});
 		}
+		let threadList: ReactNode;
+		if (searching) {
+			threadList = (
+				<SearchResults
+					parent={current}
+					query={query}
+					tab={tab}
+					onOpen={handleOpen}
+					data-flx="threads.thread-browser.search-results"
+				/>
+			);
+		} else if (tab === 'active') {
+			threadList = (
+				<div className={styles.list} data-flx="threads.thread-browser.list.active">
+					<ActiveThreads parent={current} onOpen={handleOpen} data-flx="threads.thread-browser.active-threads" />
+				</div>
+			);
+		} else {
+			threadList = (
+				<ArchivedThreads
+					key={tab}
+					parent={current}
+					privateOnly={tab === 'archivedPrivate'}
+					onOpen={handleOpen}
+					data-flx="threads.thread-browser.archived-threads"
+				/>
+			);
+		}
 		return (
 			<div
 				className={clsx(styles.container, sheet && styles.containerSheet)}
@@ -393,27 +424,7 @@ export const ThreadBrowser = observer(
 					className={styles.tabs}
 					data-flx="threads.thread-browser.segmented-tabs"
 				/>
-				{searching ? (
-					<SearchResults
-						parent={current}
-						query={query}
-						tab={tab}
-						onOpen={handleOpen}
-						data-flx="threads.thread-browser.search-results"
-					/>
-				) : tab === 'active' ? (
-					<div className={styles.list} data-flx="threads.thread-browser.list.active">
-						<ActiveThreads parent={current} onOpen={handleOpen} data-flx="threads.thread-browser.active-threads" />
-					</div>
-				) : (
-					<ArchivedThreads
-						key={tab}
-						parent={current}
-						privateOnly={tab === 'archivedPrivate'}
-						onOpen={handleOpen}
-						data-flx="threads.thread-browser.archived-threads"
-					/>
-				)}
+				{threadList}
 			</div>
 		);
 	},
