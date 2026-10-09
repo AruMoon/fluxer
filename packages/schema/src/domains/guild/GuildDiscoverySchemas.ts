@@ -14,6 +14,7 @@ import {
 } from '@fluxer/constants/src/DiscoveryConstants';
 import {NSFWLevelSchema} from '@fluxer/schema/src/primitives/GuildValidators';
 import {SnowflakeStringType, SnowflakeType, withOpenApiType} from '@fluxer/schema/src/primitives/SchemaPrimitives';
+import {withSchemaMetadata} from '@fluxer/schema/src/SchemaMetadata';
 import {z} from 'zod';
 
 const DISCOVERY_CATEGORY_MAX = Math.max(...Object.values(DiscoveryCategories));
@@ -83,6 +84,14 @@ const DiscoveryGuildResponse = z.object({
 	online_count: z.number().describe('Approximate online member count'),
 	features: z.array(z.string()).describe('Guild feature flags'),
 	verification_level: z.number().describe('Verification level'),
+	visits_enabled: withSchemaMetadata(
+		z
+			.boolean()
+			.describe(
+				'Whether opening this listing starts a visit instead of a join for the requesting user. Omitted for a caller outside the guild visits experiment',
+			),
+		{experiment: 'guild_visits'},
+	).optional(),
 });
 
 const DiscoveryCategoryCountResponse = z.object({
