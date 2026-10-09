@@ -19,6 +19,7 @@ export interface DiscoveryGuild {
 	online_count: number;
 	features: Array<string>;
 	verification_level: number;
+	visits_enabled?: boolean;
 }
 
 type DiscoveryGuildPayload = Omit<DiscoveryGuild, 'banner'> & {banner?: string | null};

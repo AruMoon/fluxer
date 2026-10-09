@@ -63,6 +63,7 @@ export class Guild {
 	private readonly _disabledOperations: number;
 	readonly joinedAt: string | null;
 	readonly unavailable: boolean;
+	readonly visiting: boolean;
 	readonly messageHistoryCutoff: string | null;
 	readonly memberCount: number;
 
@@ -103,6 +104,7 @@ export class Guild {
 		this.joinedAt = this.normalizeJoinedAt(guild);
 		this.messageHistoryCutoff = this.normalizeMessageHistoryCutoff(guild);
 		this.unavailable = guild.unavailable ?? false;
+		this.visiting = guild.visiting === true;
 		this.memberCount = this.normalizeMemberCount(guild);
 	}
 
@@ -284,8 +286,9 @@ export class Guild {
 			{
 				...guildData.properties,
 				roles,
-				joined_at: guildData.joined_at,
+				joined_at: guildData.joined_at ?? undefined,
 				unavailable: guildData.unavailable,
+				visiting: guildData.visiting === true ? true : undefined,
 			},
 			{instanceId},
 		);
@@ -326,6 +329,7 @@ export class Guild {
 			message_history_cutoff: this.messageHistoryCutoff,
 			joined_at: this.joinedAt ?? undefined,
 			unavailable: this.unavailable,
+			visiting: this.visiting ? true : undefined,
 			member_count: this.memberCount,
 			roles: Object.values(this.roles).map((role) => role.toJSON()),
 		};
