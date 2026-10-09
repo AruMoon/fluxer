@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {ChannelID, GuildID, MessageID, RoleID, UserID} from '@app/api/BrandedTypes';
-import {createChannelID, createRoleID, createUserID} from '@app/api/BrandedTypes';
+import {createChannelID, createUserID} from '@app/api/BrandedTypes';
 import {SYSTEM_USER_ID} from '@app/api/constants/Core';
 import type {GatewayDispatchEvent} from '@app/api/constants/Gateway';
 import {GatewayRpcClient} from '@app/api/infrastructure/GatewayRpcClient';
@@ -87,22 +87,6 @@ interface GuildAuthContextParams {
 	channelId?: ChannelID;
 }
 
-interface GuildMemberParams {
-	guildId: GuildID;
-	userId: UserID;
-}
-
-interface HasMemberParams {
-	guildId: GuildID;
-	userId: UserID;
-}
-
-interface UserPermissionsParams {
-	guildId: GuildID;
-	userId: UserID;
-	channelId?: ChannelID;
-}
-
 interface CheckPermissionParams {
 	guildId: GuildID;
 	userId: UserID;
@@ -117,16 +101,6 @@ interface CanManageRolesParams {
 	roleId: RoleID;
 }
 
-interface AssignableRolesParams {
-	guildId: GuildID;
-	userId: UserID;
-}
-
-interface MaxRolePositionParams {
-	guildId: GuildID;
-	userId: UserID;
-}
-
 interface MembersWithRoleParams {
 	guildId: GuildID;
 	roleId: RoleID;
@@ -136,11 +110,6 @@ interface CheckTargetMemberParams {
 	guildId: GuildID;
 	userId: UserID;
 	targetUserId: UserID;
-}
-
-interface ViewableChannelsParams {
-	guildId: GuildID;
-	userId: UserID;
 }
 
 interface CategoryChannelCountParams {
@@ -170,16 +139,6 @@ interface ResolveMentionSourcesPageParams extends ResolveAllMentionsParams {
 interface ResolveChannelMentionsParams {
 	guildId: GuildID;
 	channelIds: Array<ChannelID>;
-}
-
-interface JoinGuildParams {
-	userId: UserID;
-	guildId: GuildID;
-}
-
-interface LeaveGuildParams {
-	userId: UserID;
-	guildId: GuildID;
 }
 
 interface TerminateSessionParams {
@@ -238,14 +197,6 @@ export class GatewayService {
 	private pendingPermissionRequests = new Map<string, Array<PendingRequest<boolean>>>();
 	private pendingAuthContextRequests = new Map<string, Array<PendingRequest<GuildChannelAuthContext>>>();
 	private pendingBatchRequestCount = 0;
-	private guildDataBatchTimeout: NodeJS.Timeout | null = null;
-	private guildMemberBatchTimeout: NodeJS.Timeout | null = null;
-	private permissionBatchTimeout: NodeJS.Timeout | null = null;
-	private authContextBatchTimeout: NodeJS.Timeout | null = null;
-	private activeGuildDataRequests = 0;
-	private activeGuildMemberRequests = 0;
-	private activePermissionRequests = 0;
-	private activeAuthContextRequests = 0;
 	private authContextUnsupportedUntil = 0;
 	private readonly BATCH_DELAY_MS = ms('5 milliseconds');
 	private readonly MAX_PENDING_BATCH_REQUESTS = 2000;
@@ -270,21 +221,6 @@ export class GatewayService {
 			const createError = GATEWAY_ERROR_TO_DOMAIN_ERROR[error.code];
 			if (createError) {
 				return createError();
-			}
-			if (error.code === GatewayRpcMethodErrorCodes.TIMEOUT) {
-				return new GatewayTimeoutError();
-			}
-			if (error.code === GatewayRpcMethodErrorCodes.GUILD_OVERLOADED) {
-				return new ServiceUnavailableError({headers: {'Retry-After': '1'}});
-			}
-			if (error.code === GatewayRpcMethodErrorCodes.OVERLOADED) {
-				return new ServiceUnavailableError();
-			}
-			if (error.code === GatewayRpcMethodErrorCodes.NO_RESPONDERS) {
-				return new ServiceUnavailableError();
-			}
-			if (error.code === GatewayRpcMethodErrorCodes.INTERNAL_ERROR) {
-				return new BadGatewayError();
 			}
 			return new BadGatewayError();
 		}
@@ -478,19 +414,6 @@ export class GatewayService {
 		for (const pendingRequests of this.pendingGuildDataRequests.values()) {
 			this.rejectPendingRequests(pendingRequests, error);
 		}
-		for (const pendingRequests of this.pendingGuildMemberRequests.values()) {
-			this.rejectPendingRequests(pendingRequests, error);
-		}
-		for (const pendingRequests of this.pendingPermissionRequests.values()) {
-			this.rejectPendingRequests(pendingRequests, error);
-		}
-		for (const pendingRequests of this.pendingAuthContextRequests.values()) {
-			this.rejectPendingRequests(pendingRequests, error);
-		}
-		this.pendingGuildDataRequests.clear();
-		this.pendingGuildMemberRequests.clear();
-		this.pendingPermissionRequests.clear();
-		this.pendingAuthContextRequests.clear();
 		this.pendingBatchRequestCount = 0;
 	}
 
@@ -1028,10 +951,6 @@ export class GatewayService {
 		if (guildIds.length === 0) {
 			return permissionsMap;
 		}
-		const batches: Array<Array<GuildID>> = [];
-		for (let index = 0; index < guildIds.length; index += USER_PERMISSIONS_BATCH_SIZE) {
-			batches.push(guildIds.slice(index, index + USER_PERMISSIONS_BATCH_SIZE));
-		}
 		const results = await Promise.all(
 			batches.map((batch) =>
 				this.call<{
@@ -1118,26 +1037,6 @@ export class GatewayService {
 			role_id: roleId.toString(),
 		});
 		return result.can_manage;
-	}
-
-	async getAssignableRoles({guildId, userId}: AssignableRolesParams): Promise<Array<RoleID>> {
-		const result = await this.call<{
-			role_ids: Array<string>;
-		}>('guild.get_assignable_roles', {
-			guild_id: guildId.toString(),
-			user_id: userId.toString(),
-		});
-		return result.role_ids.map((id: string) => createRoleID(BigInt(id)));
-	}
-
-	async getUserMaxRolePosition({guildId, userId}: MaxRolePositionParams): Promise<number> {
-		const result = await this.call<{
-			position: number;
-		}>('guild.get_user_max_role_position', {
-			guild_id: guildId.toString(),
-			user_id: userId.toString(),
-		});
-		return result.position;
 	}
 
 	async getMembersWithRole({guildId, roleId}: MembersWithRoleParams): Promise<Array<UserID>> {
@@ -1357,6 +1256,29 @@ export class GatewayService {
 			user_id: userId.toString(),
 			guild_id: guildId.toString(),
 		});
+	}
+
+	async startVisit({userId, guildId, operator}: {userId: UserID; guildId: GuildID; operator?: boolean}): Promise<void> {
+		await this.call('presence.start_visit', {
+			user_id: userId.toString(),
+			guild_id: guildId.toString(),
+			...(operator ? {operator: true} : {}),
+		});
+	}
+
+	async endVisit({userId, guildId}: {userId: UserID; guildId: GuildID}): Promise<void> {
+		await this.call('presence.end_visit', {
+			user_id: userId.toString(),
+			guild_id: guildId.toString(),
+		});
+	}
+
+	async evictVisitors({guildId, ipKeys}: {guildId: GuildID; ipKeys: Array<string>}): Promise<Array<UserID>> {
+		const result = await this.call<{user_ids: Array<string>}>('guild.evict_visitors', {
+			guild_id: guildId.toString(),
+			ip_keys: ipKeys,
+		});
+		return result.user_ids.map((userId) => createUserID(BigInt(userId)));
 	}
 
 	async removeTemporaryGuild({userId, guildId}: {userId: UserID; guildId: GuildID}): Promise<void> {
