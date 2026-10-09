@@ -9,9 +9,12 @@ import {
 	loginUser,
 	type TestAccount,
 } from '@app/api/auth/tests/AuthTestUtils';
+import {createUserID} from '@app/api/BrandedTypes';
+import {getUserRepository} from '@app/api/middleware/ServiceSingletons';
 import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {NoopWorkerService} from '@app/api/test/NoopWorkerService';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
+import {UserTraits} from '@app/api/user/UserTraits';
 import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 interface EmailChangeStartResponse {
@@ -48,6 +51,7 @@ interface UserPrivateResponse {
 	mfa_enabled: boolean;
 	authenticator_types: Array<number>;
 	password_last_changed_at?: string;
+	traits?: Array<string>;
 }
 
 interface EmailRevertResponse {
@@ -170,9 +174,6 @@ describe('Email revert flow', () => {
 		await harness.reset();
 		await clearTestEmails(harness);
 	});
-	afterEach(() => {
-		vi.restoreAllMocks();
-	});
 	afterAll(async () => {
 		await harness?.shutdown();
 	});
@@ -230,6 +231,24 @@ describe('Email revert flow', () => {
 				email: account.email,
 				password: account.password,
 			})
+			.expect(400)
+			.execute();
+	});
+	it('drops the passkey trait when a claimed revert clears the passkeys', async () => {
+		const account = await createTestAccount(harness);
+		const userId = createUserID(BigInt(account.userId));
+		const stored = await getUserRepository().findUniqueAssert(userId);
+		await getUserRepository().patchUpsert(userId, {traits: new Set([UserTraits.PASSKEY])}, stored.toRow());
+		const revertToken = await changeEmailAndGetRevertToken(harness, account);
+		const revertResp = await createBuilderWithoutAuth<EmailRevertResponse>(harness)
+			.post('/auth/email-revert')
+			.body({token: revertToken, password: uniquePassword()})
+			.execute();
+		const user = await createBuilder<UserPrivateResponse>(harness, revertResp.token).get('/users/@me').execute();
+		expect(user.traits ?? []).not.toContain(UserTraits.PASSKEY);
+		await createBuilderWithoutAuth(harness)
+			.post('/auth/email-revert')
+			.body({token: revertToken, password: uniquePassword()})
 			.expect(400)
 			.execute();
 	});
