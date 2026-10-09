@@ -609,21 +609,25 @@ const CachedMessages = observer(function CachedMessages({channel, allowAutoAck =
 		onMessageEdit,
 		onReveal,
 	]);
-	const bottomBar =
-		windowBar === 'retry' ? (
+	let bottomBar: React.ReactNode = null;
+	if (windowBar === 'retry') {
+		bottomBar = (
 			<LoadErrorBar
 				loading={safeMessages.loadingMore}
 				onRetry={onRetryLoadMessages}
 				data-flx="channel.messages.load-error-bar"
 			/>
-		) : windowBar === 'present' ? (
+		);
+	} else if (windowBar === 'present') {
+		bottomBar = (
 			<JumpToPresentBar
 				loadingMore={safeMessages.loadingMore}
 				landedAtLiveEdge={safeMessages.landedAtLiveEdge}
 				onJumpToPresent={onScrollToPresent}
 				data-flx="channel.messages.jump-to-present-bar"
 			/>
-		) : null;
+		);
+	}
 	const showNewMessagesBar = Boolean(windowStatus.phase === 'stream' && state.unreadCount > 0);
 	const unreadTimestampMessageId = state.oldestUnreadMessageId ?? state.ackMessageId;
 	const topBar = showNewMessagesBar ? (
