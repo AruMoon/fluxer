@@ -209,6 +209,7 @@ export class ThreadForumService {
 			userId,
 			channelId,
 			viewer,
+			access: 'visitor_read',
 		});
 		const allowed = threadOnly
 			? THREAD_ONLY_CHANNEL_TYPES.has(auth.channel.type)

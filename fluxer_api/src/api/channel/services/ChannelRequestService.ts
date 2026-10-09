@@ -14,18 +14,12 @@ import type {UserCacheService} from '@app/api/infrastructure/UserCacheService';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import type {Channel} from '@app/api/models/Channel';
 import type {User} from '@app/api/models/User';
-import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {InvalidChannelTypeError} from '@fluxer/errors/src/domains/channel/InvalidChannelTypeError';
 import {UnknownChannelError} from '@fluxer/errors/src/domains/channel/UnknownChannelError';
-import {ThrottledError} from '@fluxer/errors/src/domains/core/ThrottledError';
 import type {ChannelUpdateGatedRequest} from '@fluxer/schema/src/domains/channel/ChannelRequestSchemas';
 import type {ChannelResponse, ChannelSlowmodeStateResponse} from '@fluxer/schema/src/domains/channel/ChannelSchemas';
 import type {ICacheService} from '@pkgs/cache/src/ICacheService';
-
-const FORUM_TAGS_LOCK_TTL_SECONDS = 5;
-const FORUM_TAGS_LOCK_ACQUIRE_ATTEMPTS = 6;
-const FORUM_TAGS_LOCK_RETRY_DELAY_MS = 50;
 
 export class ChannelRequestService {
 	constructor(
@@ -44,6 +38,7 @@ export class ChannelRequestService {
 			userId: params.userId,
 			viewer: params.viewer,
 			channelId: params.channelId,
+			access: 'visitor_read',
 		});
 		return this.maskedChannelResponse(channel, params);
 	}
