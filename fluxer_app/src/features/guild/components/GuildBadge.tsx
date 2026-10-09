@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import styles from '@app/features/guild/components/GuildBadge.module.css';
 import {DISCOVERABLE_COMMUNITY_DESCRIPTOR} from '@app/features/i18n/utils/CommonMessageDescriptors';
 import {DiscoverableBadgeIcon} from '@app/features/ui/components/icons/DiscoverableBadgeIcon';
@@ -9,6 +10,7 @@ import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
 import {GuildFeatures} from '@fluxer/constants/src/GuildConstants';
 import {msg} from '@lingui/core/macro';
 import {useLingui} from '@lingui/react/macro';
+import {observer} from 'mobx-react-lite';
 
 const VERIFIED_PARTNERED_COMMUNITY_DESCRIPTOR = msg({
 	message: 'Verified & partnered community',
@@ -39,7 +41,7 @@ function hasFeature(features: ReadonlySet<string> | ReadonlyArray<string>, featu
 	return (features as ReadonlySet<string>).has(feature);
 }
 
-export function GuildBadge({
+export const GuildBadge = observer(function GuildBadge({
 	features,
 	variant = 'default',
 	tooltipPosition = 'top',
@@ -50,19 +52,17 @@ export function GuildBadge({
 	const {i18n} = useLingui();
 	const isVerified = hasFeature(features, GuildFeatures.VERIFIED);
 	const isPartnered = hasFeature(features, GuildFeatures.PARTNERED);
-	const isDiscoverable = hasFeature(features, GuildFeatures.DISCOVERABLE);
+	const isDiscoverable = hasFeature(features, GuildFeatures.DISCOVERABLE) && RuntimeConfig.discoveryAvailable;
 	if (!isVerified && !isPartnered && !isDiscoverable) {
 		return null;
 	}
 	const badgeSize = variant === 'large' ? 24 : 20;
-	const badgeClassName =
-		variant === 'banner'
-			? forceDarkTheme
-				? styles.badgeBannerDark
-				: styles.badgeBanner
-			: onLightSurface
-				? styles.badgeOnLightSurface
-				: styles.badge;
+	let badgeClassName: string;
+	if (variant === 'banner') {
+		badgeClassName = forceDarkTheme ? styles.badgeBannerDark : styles.badgeBanner;
+	} else {
+		badgeClassName = onLightSurface ? styles.badgeOnLightSurface : styles.badge;
+	}
 	let tooltipText: string;
 	let icon: React.JSX.Element;
 	if (isPartnered) {
@@ -99,4 +99,4 @@ export function GuildBadge({
 			</span>
 		</Tooltip>
 	);
-}
+});
