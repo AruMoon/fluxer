@@ -12,6 +12,7 @@ import type {
 	InstanceDomainMigration,
 	InstanceFeatures,
 	InstanceGif,
+	InstanceNotice,
 	InstancePush,
 	InstanceRegistration,
 	InstanceServices,
@@ -52,6 +53,7 @@ export interface ClientRuntimeDiscovery {
 	readonly appPublic: InstanceAppPublic;
 	readonly agePolicy: InstanceAgePolicy | null;
 	readonly domainMigration: InstanceDomainMigration | null;
+	readonly notice?: InstanceNotice | null;
 }
 
 export function projectClientRuntimeDiscovery(document: InstanceDiscoveryDocument): ClientRuntimeDiscovery {
@@ -70,6 +72,7 @@ export function projectClientRuntimeDiscovery(document: InstanceDiscoveryDocumen
 		appPublic: projectAppPublic(document.appPublic),
 		agePolicy: document.agePolicy,
 		domainMigration: document.domainMigration,
+		notice: document.notice ?? null,
 	};
 }
 
@@ -126,11 +129,15 @@ function projectAppPublic(appPublic: InstanceDiscoveryDocument['appPublic']): In
 			logo_url: requireDefined(value.branding.logo_url, 'app_public.branding.logo_url'),
 			wordmark_url: requireDefined(value.branding.wordmark_url, 'app_public.branding.wordmark_url'),
 			favicon_url: requireDefined(value.branding.favicon_url, 'app_public.branding.favicon_url'),
+			favicon_dark_url: value.branding.favicon_dark_url ?? null,
 			theme_color: requireDefined(value.branding.theme_color, 'app_public.branding.theme_color'),
 			status_page_url: value.branding.status_page_url ?? null,
 			status_page_incident_history_url: value.branding.status_page_incident_history_url ?? null,
 			premium_product_name: value.branding.premium_product_name ?? DEFAULT_PREMIUM_PRODUCT_NAME,
 			premium_info_url: value.branding.premium_info_url ?? null,
+			sign_in_backdrop_url: value.branding.sign_in_backdrop_url ?? null,
+			custom_css: value.branding.custom_css ?? null,
+			upload_limit_message: value.branding.upload_limit_message ?? null,
 		},
 		setup: {
 			...value.setup,

@@ -25,6 +25,7 @@ export type {
 	InstanceEndpoints,
 	InstanceFeatures,
 	InstanceGif,
+	InstanceNotice,
 	InstancePush,
 	InstanceRegistration,
 	InstanceServices,
