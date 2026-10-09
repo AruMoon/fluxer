@@ -21,7 +21,6 @@ import {searchExistingMessages} from '@app/api/search/MessageSearchResultReconci
 import {channelRequiresAgeVerification} from '@app/api/search/SearchNsfwUtils';
 import {accessibleRequestedThreadIds, accessibleThreadIds} from '@app/api/search/ThreadSearchScope';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
-import {canUserAccessNsfwContent} from '@app/api/utils/AgeUtils';
 import {mapWithConcurrency} from '@app/api/utils/ConcurrencyUtils';
 import type {WorkerTaskName} from '@app/api/worker/WorkerLaneConfig';
 import {ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
@@ -32,14 +31,12 @@ import {FeatureTemporarilyDisabledError} from '@fluxer/errors/src/domains/core/F
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {MissingPermissionsError} from '@fluxer/errors/src/domains/core/MissingPermissionsError';
 import {NsfwContentRequiresAgeVerificationError} from '@fluxer/errors/src/domains/moderation/NsfwContentRequiresAgeVerificationError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {MessageSearchRequest} from '@fluxer/schema/src/domains/message/MessageRequestSchemas';
 import type {MessageSearchResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
 import type {IWorkerService} from '@pkgs/worker/src/contracts/IWorkerService';
 
 const GUILD_FANOUT_CONCURRENCY = 16;
 const PERMISSION_CHECK_CONCURRENCY = 64;
-const CHANNEL_INDEX_JOB_ENQUEUE_CONCURRENCY = 16;
 
 export class GuildSearchService {
 	private readonly responseMapper: MessageSearchResponseMapper;
@@ -174,15 +171,18 @@ export class GuildSearchService {
 			);
 			return {indexing: true};
 		}
-		const searchChannelIds = threadsVisible
-			? await this.threadSearchChannelIds({
-					userId,
-					guildId,
-					validChannelIds,
-					channelMap,
-					requestedIds: explicitChannelIds ? new Set(params.channelIds.map((id) => id.toString())) : null,
-				})
-			: validChannelIds.map((id) => id.toString());
+		let searchChannelIds: Array<string>;
+		if (threadsVisible) {
+			searchChannelIds = await this.threadSearchChannelIds({
+				userId,
+				guildId,
+				validChannelIds,
+				channelMap,
+				requestedIds: explicitChannelIds ? new Set(params.channelIds.map((id) => id.toString())) : null,
+			});
+		} else {
+			searchChannelIds = validChannelIds.map((id) => id.toString());
+		}
 		const filters = buildMessageSearchFilters(searchParams, searchChannelIds);
 		const hitsPerPage = searchParams.hits_per_page ?? 25;
 		const page = searchParams.page ?? 1;
@@ -362,27 +362,6 @@ export class GuildSearchService {
 			}
 		}
 		return lookup;
-	}
-
-	private async getCanUserAccessNsfw(userId: UserID): Promise<boolean> {
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
-		return canUserAccessNsfwContent(user);
-	}
-
-	private async queueIndexingChannels(channelIds: Iterable<string>): Promise<void> {
-		await mapWithConcurrency(Array.from(channelIds), CHANNEL_INDEX_JOB_ENQUEUE_CONCURRENCY, (channelId) =>
-			this.workerService.addJob(
-				'indexChannelMessages',
-				{channelId},
-				{
-					jobKey: `indexChannelMessages-${channelId}`,
-					maxAttempts: 3,
-				},
-			),
-		);
 	}
 
 	private async addRequestedThreads(

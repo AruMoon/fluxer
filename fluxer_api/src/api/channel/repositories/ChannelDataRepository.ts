@@ -196,10 +196,7 @@ export class ChannelDataRepository {
 				channelId: channelId.toString(),
 				kind,
 				failureCount: failures.length,
-				error:
-					failures[0].status === 'rejected' && failures[0].reason instanceof Error
-						? failures[0].reason.message
-						: String(failures[0].status === 'rejected' ? failures[0].reason : ''),
+				error: failures[0].reason instanceof Error ? failures[0].reason.message : String(failures[0].reason),
 			},
 			'Failed to write through private channel snapshot fan-out',
 		);

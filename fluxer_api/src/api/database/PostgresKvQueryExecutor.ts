@@ -12,7 +12,6 @@ import type {
 import {isConditionalQuery, validateTtlSeconds} from '@app/api/database/CassandraTypes';
 import {Logger} from '@app/api/Logger';
 import {type IPostgresClient, type PostgresQueryable, quoteIdentifier} from '@pkgs/postgres/src/Client';
-import cassandra from 'cassandra-driver';
 
 type Row = Record<string, unknown>;
 type EqWhereExpr = Extract<WhereExpr<Row>, {kind: 'eq'}>;
@@ -59,7 +58,6 @@ export type CandidatePlan =
 	| {kind: 'range'; lowerBound: string; upperBound: string}
 	| {kind: 'ranges'; lowerBounds: Array<string>; upperBounds: Array<string>}
 	| {kind: 'rangeGroups'; groups: Array<RangeGroup>}
-	| {kind: 'partitionKeys'; partitionKeys: Array<string>}
 	| {kind: 'scan'};
 
 interface QueryPlan {
@@ -69,7 +67,6 @@ interface QueryPlan {
 
 interface QueryShape {
 	leadingClauses: ReadonlyArray<PinnedWhereExpr>;
-	partitionClauses: ReadonlyArray<PinnedWhereExpr> | null;
 	inClauses: ReadonlyArray<InWhereExpr>;
 	whereColumns: ReadonlyArray<string>;
 	requiredColumns: ReadonlyArray<string> | null;
@@ -110,11 +107,6 @@ const NON_NUMERIC_ROW_KEY_RANGES = [
 	`kv.row_key COLLATE "C" >= '${BIGINT_ROW_KEY_PREFIX}:'`,
 ];
 
-export async function postgresKvPassIsFresh(
-	client: IPostgresClient,
-	marker: string,
-	maxAgeMs: number,
-): Promise<boolean> {
 	const result = await client.query(
 		`SELECT 1 FROM ${quoteIdentifier(client.kvTable())} WHERE table_name = $1 AND row_key = $2 AND (row_data ->> 'applied_at')::timestamptz > now() - make_interval(secs => $3::double precision)`,
 		[POSTGRES_KV_MIGRATION_TABLE, marker, maxAgeMs / 1000],
@@ -287,6 +279,13 @@ function rowKeyFromParams(meta: KvQueryMeta, params: CassandraParams): string {
 	return rowKey(meta, paramsRow(params, (meta.pkColumns ?? meta.table.primaryKey) as ReadonlyArray<string>));
 }
 
+function comparisonValue(value: unknown): unknown {
+	if (value instanceof Date) {
+		return value.getTime();
+	}
+	return value?.constructor?.name === 'LocalDate' ? value.toString() : value;
+}
+
 function compareValues(left: unknown, right: unknown): number {
 	if (typeof left === 'bigint' || typeof right === 'bigint') {
 		const l = typeof left === 'bigint' ? left : BigInt(left as number | string);
@@ -294,9 +293,8 @@ function compareValues(left: unknown, right: unknown): number {
 		if (l === r) return 0;
 		return l < r ? -1 : 1;
 	}
-	const l = left instanceof Date ? left.getTime() : left?.constructor?.name === 'LocalDate' ? left.toString() : left;
-	const r =
-		right instanceof Date ? right.getTime() : right?.constructor?.name === 'LocalDate' ? right.toString() : right;
+	const l = comparisonValue(left);
+	const r = comparisonValue(right);
 	if (Buffer.isBuffer(l) && Buffer.isBuffer(r)) return Buffer.compare(l, r);
 	if (l === r) return 0;
 	return (l as number | string) < (r as number | string) ? -1 : 1;
@@ -452,21 +450,9 @@ function queryShape(meta: KvQueryMeta): QueryShape {
 		if (!clause) break;
 		leadingClauses.push(clause);
 	}
-	const partitionColumns = meta.table.partitionKey as ReadonlyArray<string>;
-	const partitionClauses: Array<PinnedWhereExpr> = [];
-	for (const column of partitionColumns) {
-		const clause = pinnedClause(where, column);
-		if (!clause) {
-			partitionClauses.length = 0;
-			break;
-		}
-		partitionClauses.push(clause);
-	}
 	const whereColumns = [...new Set(where.flatMap(clauseColumns))];
 	const shape: QueryShape = {
 		leadingClauses,
-		partitionClauses:
-			partitionColumns.length > 0 && partitionClauses.length === partitionColumns.length ? partitionClauses : null,
 		inClauses: where.filter((clause): clause is InWhereExpr => clause.kind === 'in'),
 		whereColumns,
 		requiredColumns: requiredColumnsFor(meta, whereColumns),
@@ -632,18 +618,6 @@ export function buildCandidatePlan(meta: KvQueryMeta, params: CassandraParams): 
 			exact,
 		};
 	}
-	if (shape.partitionClauses) {
-		const partition = pinnedColumns(shape.partitionClauses, params);
-		if (
-			partition.length === shape.partitionClauses.length &&
-			combinationCount(partition.map((column) => column.segments)) <= MAX_ROW_KEY_COMBINATIONS
-		) {
-			return {
-				candidates: {kind: 'partitionKeys', partitionKeys: keyPrefixes(partition.map((column) => column.segments))},
-				exact: planIsExact(meta, shape, partition),
-			};
-		}
-	}
 	return {candidates: {kind: 'scan'}, exact: planIsExact(meta, shape, [])};
 }
 
@@ -667,10 +641,6 @@ function planFragments(plan: Exclude<CandidatePlan, {kind: 'rangeGroups'}>): Pla
 			};
 		case 'ranges':
 			return rangeFragments(plan);
-		case 'partitionKeys':
-			return plan.partitionKeys.length === 1
-				? {predicate: ' AND kv.partition_key = $2', params: [plan.partitionKeys[0]]}
-				: {predicate: ' AND kv.partition_key = ANY($2::text[])', params: [plan.partitionKeys]};
 		default:
 			return {predicate: '', params: []};
 	}
@@ -920,12 +890,6 @@ CREATE TABLE IF NOT EXISTS ${table} (
 		await db.query(
 			`CREATE INDEX IF NOT EXISTS ${quoteIdentifier(`${kvTable}_expires_idx`)} ON ${table} (expires_at) WHERE expires_at IS NOT NULL`,
 		);
-		await db.query(
-			`CREATE INDEX IF NOT EXISTS ${quoteIdentifier(`${kvTable}_messages_message_idx`)} ON ${table} (partition_key, ((CASE WHEN row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN (row_data -> 'message_id' ->> 'value')::bigint END))) WHERE table_name = 'messages'`,
-		);
-		await db.query(
-			`CREATE INDEX IF NOT EXISTS ${quoteIdentifier(`${kvTable}_message_reactions_message_idx`)} ON ${table} (partition_key, ((CASE WHEN row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN (row_data -> 'message_id' ->> 'value')::bigint END))) WHERE table_name = 'message_reactions'`,
-		);
 		await repairInvalidPostgresKvIndexes(db, kvTable);
 		const migrated = await db.query(`SELECT 1 FROM ${table} WHERE table_name = $1 AND row_key = $2 LIMIT 1`, [
 			POSTGRES_KV_MIGRATION_TABLE,
@@ -1100,14 +1064,14 @@ export class PostgresKvQueryExecutor {
 		const page = await this.walkScan(meta, params, walk, pageSize, this.client);
 		if (!page.more || page.after === null) return {rows: this.projected(meta, page.entries), pageState: null};
 		const position = {offset: offset + page.entries.length, after: page.after};
-		return {
-			rows: this.projected(meta, page.entries),
-			pageState: encodePageState(
-				walk.numeric
-					? {...position, keyed: true}
-					: {...position, byRowKey: true, ...(walk.since === null ? {} : {since: walk.since})},
-			),
-		};
+		const rows = this.projected(meta, page.entries);
+		let state: PageState;
+		if (walk.numeric) {
+			state = {...position, keyed: true};
+		} else {
+			state = {...position, byRowKey: true, ...(walk.since === null ? {} : {since: walk.since})};
+		}
+		return {rows, pageState: encodePageState(state)};
 	}
 
 	private async walkScan(
@@ -1342,17 +1306,6 @@ export class PostgresKvQueryExecutor {
 
 	private async upsert(meta: KvQueryMeta, params: CassandraParams, db: PostgresQueryable): Promise<Array<Row>> {
 		const incoming = rowFromParams(meta, params);
-		const key = rowKey(meta, incoming);
-		if (meta.ifNotExists) {
-			if (await this.getRow(meta, key, db)) {
-				return [{'[applied]': false}];
-			}
-			await db.query(
-				`DELETE FROM ${this.table} WHERE table_name = $1 AND row_key = $2 AND expires_at IS NOT NULL AND expires_at <= now()`,
-				[meta.table.name, key],
-				'kv_del_expired',
-			);
-		}
 		const explicit = ttlExpiresAt(meta, params);
 		const expiresAt = explicit === undefined ? (defaultExpiresAt(meta) ?? null) : explicit;
 		const result = await db.query(
@@ -1515,12 +1468,15 @@ WHERE NOT $6`,
 		}
 		const explicit = ttlExpiresAt(meta, params);
 		const fallback = explicit === undefined ? defaultExpiresAt(meta) : undefined;
-		const [expiresAtExpr, statementName] =
-			explicit !== undefined
-				? ['EXCLUDED.expires_at', 'kv_patch_set_ttl']
-				: fallback !== undefined
-					? ['GREATEST(kv.expires_at, EXCLUDED.expires_at)', 'kv_patch_default_ttl']
-					: [KEPT_EXPIRES_AT, 'kv_patch_keep_ttl'];
+		let patchExpiration: [string, string];
+		if (explicit !== undefined) {
+			patchExpiration = ['EXCLUDED.expires_at', 'kv_patch_set_ttl'];
+		} else if (fallback !== undefined) {
+			patchExpiration = ['GREATEST(kv.expires_at, EXCLUDED.expires_at)', 'kv_patch_default_ttl'];
+		} else {
+			patchExpiration = [KEPT_EXPIRES_AT, 'kv_patch_keep_ttl'];
+		}
+		const [expiresAtExpr, statementName] = patchExpiration;
 		await db.query(
 			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
 VALUES ($1, $2, $3, $4::jsonb, $5, now())
@@ -1568,15 +1524,5 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DA
 			[meta.table.name, matchingKeys],
 			'kv_del_keys',
 		);
-	}
-
-	private async getRow(meta: KvQueryMeta, key: string, db: PostgresQueryable): Promise<Row | null> {
-		const result = await db.query<{row_data: unknown}>(
-			`SELECT row_data FROM ${this.table} WHERE table_name = $1 AND row_key = $2 AND (expires_at IS NULL OR expires_at > now()) LIMIT 1`,
-			[meta.table.name, key],
-			'kv_get_row',
-		);
-		const row = result.rows[0];
-		return row ? decodeRow(row.row_data) : null;
 	}
 }

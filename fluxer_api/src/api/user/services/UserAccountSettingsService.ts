@@ -348,11 +348,10 @@ export class UserAccountSettingsService {
 			const channelOverrides = new Map<ChannelID, ChannelOverride>();
 			for (const [channelIdStr, override] of Object.entries(data.channel_overrides ?? {})) {
 				const channelId = createChannelID(BigInt(channelIdStr));
-				const flags = flagsWritable
-					? override.flags !== undefined
+				const flags =
+					flagsWritable && override.flags !== undefined
 						? override.flags & CHANNEL_OVERRIDE_FLAG_MASK
-						: previousOverrides.get(channelId)?.flags
-					: previousOverrides.get(channelId)?.flags;
+						: previousOverrides.get(channelId)?.flags;
 				channelOverrides.set(channelId, {
 					collapsed: override.collapsed,
 					message_notifications: override.message_notifications,
