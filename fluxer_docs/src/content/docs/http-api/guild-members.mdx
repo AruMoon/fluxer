@@ -18,8 +18,6 @@ A request whose target is not a member returns 404 `UNKNOWN_MEMBER` whether or n
 
 ## Guild member object
 
-Every field except `user` describes state that belongs to the membership.
-
 ### Structure
 
 | Field | Type | Description |
@@ -69,10 +67,6 @@ A client compares `communication_disabled_until` against the current time, becau
   "communication_disabled_until": null
 }
 ```
-
-:::note[List and direct reads can briefly differ]
-[Get current guild member](#get-current-guild-member), [Get guild member](#get-guild-member), and both modify operations recompute `mute` against the current time. In [List guild members](#list-guild-members) an expired timeout can leave `mute` true until that membership next changes.
-:::
 
 ## Guild member profile flags
 
@@ -163,8 +157,6 @@ This route checks no permission bit, including [VIEW_CHANNEL_MEMBERS](/http-api/
 | Status | Body | Condition |
 | --- | --- | --- |
 | 200 | array[[guild member](#guild-member-object) object] | Members were returned |
-| 403 | [error response](/http-api/#error-response) | Guild is unavailable, or the caller is not a member |
-| 404 | [error response](/http-api/#error-response) | Guild does not exist and the request returns `UNKNOWN_GUILD` |
 
 ### Rate limit
 
@@ -433,10 +425,12 @@ The operation requires the [sudo verification fields](/http-api/guilds/#sudo-ver
 | --- | --- | --- |
 | new_owner_id | snowflake | The ID of the member to make the new owner |
 | password? | string | The current owner password, as defined by the [sudo verification fields](/http-api/guilds/#sudo-verification-fields) |
-| mfa_method? | string | The second factor to verify, either `totp` or `webauthn` |
+| mfa_method? | string | The second factor to verify, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | The authenticator code, required when the method is `totp` (1-32 characters) |
 | webauthn_response? | [WebAuthn assertion](/http-api/authentication/#webauthn-assertion) object | The assertion produced when the method is `webauthn` |
 | webauthn_challenge? | string | The challenge bound to the WebAuthn assertion |
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 ### Response
 

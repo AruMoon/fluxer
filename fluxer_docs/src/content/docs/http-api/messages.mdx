@@ -22,8 +22,6 @@ The message read, create, modify, and delete routes, [Bulk delete messages](#bul
 
 ## Message object
 
-A message object is the full stored form of one post in a channel.
-
 ### Structure
 
 | Field | Type | Description |
@@ -161,8 +159,6 @@ A caller other than a bot or a user session that declares the [`channel_threads`
 
 ## Message attachment object
 
-An attachment is one file stored against a message and served from media delivery.
-
 ### Structure
 
 | Field | Type | Description |
@@ -259,8 +255,6 @@ A client treats a data package URL as never expiring and does not refresh it bef
 
 ## Emoji object
 
-An emoji is either a custom guild emoji identified by ID or a standard Unicode emoji.
-
 ### Structure
 
 | Field | Type | Description |
@@ -272,8 +266,6 @@ An emoji is either a custom guild emoji identified by ID or a standard Unicode e
 <sup>1</sup> Holds the guild emoji name for a custom emoji and the literal Unicode sequence for a standard emoji
 
 ## Reaction object
-
-A reaction object summarises one emoji group on a message. Fluxer has ordinary reactions only.
 
 ### Structure
 
@@ -305,8 +297,6 @@ Each message has at most the resolved `max_reactions_per_message` distinct group
 
 ## Message reference object
 
-A message reference names the message that a reply points at, that a forward was taken from, or that a copy was published from. A `THREAD_CREATED` message references its thread, and a `THREAD_STARTER_MESSAGE` references the message its thread started from, as [Thread messages](/http-api/threads/#thread-messages) describes.
-
 ### Structure
 
 | Field | Type | Description |
@@ -315,8 +305,6 @@ A message reference names the message that a reply points at, that a forward was
 | message_id?<sup>1</sup> | snowflake | The ID of the referenced message |
 | guild_id? | snowflake | The ID of the referenced guild, present only for a guild message |
 | type | integer | [Message reference type](#message-reference-types) |
-
-<sup>1</sup> Absent on a `CHANNEL_FOLLOW_ADD` and on a `THREAD_CREATED` [system message](#message-types). Each of those references names a channel and no message
 
 ## Message reference types
 
@@ -332,8 +320,6 @@ A message reference names the message that a reply points at, that a forward was
 <sup>3</sup> On a message with the `IS_CROSSPOST` [flag](#message-flags), the reference names the published message in the announcement channel. The copy is not a reply and never has `referenced_message`
 
 ## Message reference input object
-
-A message reference input names the source message a create request replies to or forwards.
 
 ### Structure
 
@@ -378,8 +364,6 @@ Every optional field above is omitted entirely.
 
 ## Message call object
 
-A message call has the participants and end time of the call that a `CALL` message records.
-
 ### Structure
 
 | Field | Type | Description |
@@ -388,8 +372,6 @@ A message call has the participants and end time of the call that a `CALL` messa
 | ended_timestamp | ?ISO8601 timestamp | Call end time, or null while the call is still active |
 
 ## Channel mention object
-
-A channel mention names one channel that the message content links by ID.
 
 ### Structure
 
@@ -400,8 +382,6 @@ A channel mention names one channel that the message content links by ID.
 | type | integer | [Channel type](/http-api/channels/#channel-types) |
 
 ## Sticker item object
-
-Each sticker item is the trimmed sticker record on a message.
 
 ### Structure
 
@@ -449,7 +429,6 @@ Every optional field above is omitted entirely.
 {
   "type": "rich",
   "title": "Release 2.4.0",
-  "description": "Voice reconnects are now instant.",
   "url": "https://example.com/releases/2.4.0",
   "color": 5793266,
   "footer": {"text": "example.com"},
@@ -526,8 +505,6 @@ Fluxer signs every other embed field that can hold an attachment URL of this ins
 
 ## Embed provider object
 
-Only an embed the unfurler builds from a link has a provider. A rich embed input cannot set one.
-
 ### Structure
 
 | Field | Type | Description |
@@ -557,8 +534,6 @@ An allowed mentions object selects which mentions written in the message text be
 :::caution[An empty object suppresses every mention]
 Sending `allowed_mentions` as `{}` resolves to an empty parse set, so no user mention, role mention, `@everyone`, or `@here` becomes active. Omitting the object does the opposite.
 :::
-
-`mention_everyone` is forced to false whenever the caller lacks `MENTION_EVERYONE`, without failing the request.
 
 ## Allowed mention parse values
 
@@ -711,8 +686,6 @@ An upload key can be referenced only by a message that the same identity creates
 
 ### Attachment upload request item object
 
-One declared upload inside a [Request attachment upload URLs](#request-attachment-upload-urls) body.
-
 #### Structure
 
 | Field | Type | Description |
@@ -768,8 +741,6 @@ Returned when the declared `file_size` exceeds 10 MiB.
 
 ### Attachment upload part object
 
-One presigned part of a multipart upload plan.
-
 #### Structure
 
 | Field | Type | Description |
@@ -781,8 +752,6 @@ One presigned part of a multipart upload plan.
 
 ### Multipart upload completion item object
 
-One planned upload named in a [Complete attachment upload](#complete-attachment-upload) body.
-
 #### Structure
 
 | Field | Type | Description |
@@ -791,8 +760,6 @@ One planned upload named in a [Complete attachment upload](#complete-attachment-
 | upload_id | string | Multipart upload identifier returned when the upload was planned |
 
 ## Refreshed attachment URL object
-
-One result of [Refresh attachment URLs](#refresh-attachment-urls).
 
 ### Structure
 
@@ -813,8 +780,6 @@ A URL is an attachment URL of this instance when all of these hold:
 To sign a URL, Fluxer removes every `ex`, `is`, `hm`, and `uc` parameter and every empty pair, then places the fresh `ex`, `is`, and `hm` first. Every other parameter follows in its original order and bytes, and a fragment is kept. A [data package URL](#data-package-attachment-urls) loses its `uc` this way, so the result is an ordinary URL valid for 24 hours.
 
 ## Channel pin object
-
-A channel pin pairs one pinned message with the time it was pinned.
 
 ### Structure
 
@@ -1668,8 +1633,6 @@ Deletes from 1 through 100 messages in one guild channel. Returns 204 with an em
 
 ### JSON body
 
-At least one of the fields below must be present. Supplying neither fails with 400 `INVALID_FORM_BODY` on the path `message_ids`, and supplying both uses `message_ids` and ignores `messages`.
-
 | Field | Type | Description |
 | --- | --- | --- |
 | message_ids?<sup>1</sup> | array[snowflake] | Message IDs to delete, at most 100 entries |
@@ -1786,10 +1749,12 @@ The deletion runs inside the request despite the 202 status, so every matching m
 | Field | Type | Description |
 | --- | --- | --- |
 | password?<sup>1</sup> | string | Account password proof |
-| mfa_method?<sup>2</sup> | string | MFA method, one of `totp` or `webauthn` |
+| mfa_method?<sup>2</sup> | string | MFA method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | Authenticator code (1-32 characters), supplied with the `totp` method |
 | webauthn_response? | [WebAuthn assertion](/http-api/authentication/#webauthn-assertion) object | WebAuthn assertion for sudo verification |
 | webauthn_challenge? | string | Challenge bound to the sudo mode assertion |
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 <sup>1</sup> Accepted only when the account has no enrolled authenticator, and an incorrect password fails with the field code `INVALID_PASSWORD`. An account with neither a stored password nor an enrolled authenticator never reaches this check
 
@@ -2404,8 +2369,6 @@ Advances the authenticated user's read state through one message. Returns 204 wi
 <sup>1</sup> Neither identifier needs to name something that exists, because both are stored as read-state keys and watermarks
 
 ### JSON body
-
-An empty body is read as `{}`, and `{}` is the minimal valid form.
 
 | Field | Type | Description |
 | --- | --- | --- |

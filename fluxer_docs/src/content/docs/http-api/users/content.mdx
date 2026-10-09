@@ -233,14 +233,6 @@ The caller needs access to the channel and to the message.
 | channel_id<sup>1</sup> | snowflake | The channel containing the message |
 | message_id | snowflake | The ID of the message to save |
 
-<sup>1</sup> The saved entry retains this channel ID verbatim
-
-### Collection limit
-
-An account holds at most the instance-configured `max_bookmarks` [limit](/http-api/instance/#limit-keys) entries. Fluxer resolves the account's effective value on every save, and the default is 50. Reaching the ceiling fails with 400 `MAX_BOOKMARKS`, whose body has `max_bookmarks` reporting the ceiling.
-
-The check runs before Fluxer touches the channel or the message, so re-saving an already stored message is refused at the ceiling too.
-
 ### Response
 
 | Status | Body | Condition |
@@ -316,26 +308,12 @@ The caller proves sudo mode either with the sudo fields below or with an existin
 | start_date?<sup>4</sup> | ?ISO8601 timestamp | The inclusive lower bound on message time, or null for no lower bound |
 | end_date?<sup>4</sup> | ?ISO8601 timestamp | The exclusive upper bound on message time, or null for no upper bound |
 | password?<sup>5</sup> | string | The account password (8-256 characters) |
-| mfa_method?<sup>5</sup> | string | The sudo MFA method, either `totp` or `webauthn` |
+| mfa_method?<sup>5</sup> | string | The sudo MFA method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code?<sup>5</sup> | string | The sudo authenticator code, or an unconsumed backup code (1-32 characters) |
 | webauthn_response?<sup>5</sup> | [WebAuthn assertion](/http-api/users/mfa/#webauthn-assertion-object) object | The sudo WebAuthn assertion |
 | webauthn_challenge?<sup>5</sup> | string | The sudo WebAuthn challenge (1-256 characters) |
-
-<sup>1</sup> Independent of `include_dms`, so setting `include_dms` false and `include_dms_closed` true targets closed direct messages only
-
-<sup>2</sup> Under the `selected` scope a group DM is eligible only while the caller is still a recipient, and a guild channel only while the caller is still a member
-
-<sup>3</sup> Evaluated only while `include_guilds` is true and `scope` is `selected`
-
-<sup>4</sup> Supplying both bounds requires `start_date` strictly earlier than `end_date`, and an equal pair fails validation on `end_date`
-
-<sup>5</sup> These fields are the [sudo verification object](/http-api/users/mfa/#sudo-verification-object). Which combination is accepted depends on whether the account holds a TOTP secret or a registered WebAuthn credential
-
-The `selected` scope requires at least one of the context toggles to be true, and a request that disables them all fails validation on `include_dms`. The `inaccessible_only` scope ignores the toggles and the guild filter.
-
-Neither scope includes the caller's personal notes channel, so this operation cannot delete a personal note.
-
-[Request filtered data harvest](/http-api/users/data-harvest/#request-filtered-data-harvest) accepts the same filter shape and applies it to the messages an archive contains. That operation requires no sudo mode.
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 ### Response
 
@@ -420,7 +398,6 @@ No sudo verification applies. An account with no pending deletion still returns 
 | Status | Body | Condition |
 | --- | --- | --- |
 | 200 | response body | The pending deletion, if any, was cancelled |
-| 500 | [error response](/http-api/#error-response) | The cancellation could not be applied |
 
 ### Side effects
 

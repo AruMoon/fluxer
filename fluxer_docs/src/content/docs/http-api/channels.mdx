@@ -425,14 +425,6 @@ Modifies a guild channel or a group direct message and returns the updated [chan
 The submitted array becomes the complete overwrite collection of the channel.
 :::
 
-[Set channel permission overwrite](#set-channel-permission-overwrite) and [Delete channel permission overwrite](#delete-channel-permission-overwrite) each change one overwrite and leave the rest untouched.
-
-### Path parameters
-
-| Field | Type | Description |
-| --- | --- | --- |
-| channel_id | snowflake | The ID of the channel to modify |
-
 ### Request headers
 
 | Field | Type | Description |
@@ -607,12 +599,6 @@ Deletes a guild channel, closes a direct message, or removes the caller from a g
 Deleting a guild channel destroys the channel record, every message in it, every stored attachment of those messages, its invites, its webhooks, and every thread in it. There is no pending state, no grace period, and no restore.
 :::
 
-### Path parameters
-
-| Field | Type | Description |
-| --- | --- | --- |
-| channel_id | snowflake | The ID of the channel to delete, close, or leave |
-
 ### Query parameters
 
 | Field | Type | Description |
@@ -639,16 +625,12 @@ The body is optional. Fluxer reads it only when `delete_messages` is set and no 
 | Field | Type | Description |
 | --- | --- | --- |
 | password?<sup>1</sup> | string | The account password, offered as the sudo proof |
-| mfa_method?<sup>2</sup> | string | The verification method, either `totp` or `webauthn` |
+| mfa_method?<sup>2</sup> | string | The verification method, one of `totp`, `webauthn` or `email_code` |
 | mfa_code? | string | The authenticator code or an unconsumed backup code (1-32 characters), supplied with the `totp` method |
 | webauthn_response? | [WebAuthn assertion](/http-api/authentication/#webauthn-assertion) object | The WebAuthn assertion for sudo verification |
 | webauthn_challenge? | string | The challenge (1-256 characters) bound to the sudo mode assertion |
-
-<sup>1</sup> Accepted only for an account holding no TOTP secret and no registered WebAuthn credential. A rejected password returns 400 `INVALID_FORM_BODY` with the code `INVALID_PASSWORD` on the path `password`
-
-<sup>2</sup> Accepted only for an account holding a TOTP secret or a registered WebAuthn credential. The `totp` method reads `mfa_code` as a backup code alone while the account holds no TOTP secret. A rejected code or assertion returns 400 `INVALID_FORM_BODY` with the code `INVALID_MFA_CODE` on the path `mfa_code`
-
-An account that stores no password, no TOTP secret, and no registered WebAuthn credential is verified without any proof.
+| email_code_ticket? | string | The ticket from [send a sudo email code](/http-api/users/mfa/#send-a-sudo-email-code) (1-128 characters) |
+| email_code? | string | The 6-digit code from that email |
 
 ### Response
 
