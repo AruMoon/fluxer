@@ -14,7 +14,7 @@ use axum::{
 };
 use serde::Deserialize;
 
-use super::system_actions;
+use super::{limit_config_actions, system_actions};
 
 #[derive(Deserialize)]
 struct GatewayQuery {
@@ -62,7 +62,7 @@ pub fn router() -> Router<AppState> {
         )
         .route(
             "/limit-config",
-            get(limit_config_page).post(system_actions::limit_config_post),
+            get(limit_config_page).post(limit_config_actions::limit_config_post),
         )
 }
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use crate::templates::pages::instance_config::ConfigForm;
 use crate::{
     api::types::{
         AppBrandingConfigResponse, BillingCatalogMode, BillingPriceSet, InstanceBillingResponse,
@@ -8,8 +9,8 @@ use crate::{
     templates::components::{
         badge::{BadgeVariant, badge},
         form::{
-            FORM_INPUT_CLASS, FORM_SELECT_CLASS, checkbox, csrf_input, form_actions,
-            form_field_group, select_chevron, submit_button, text_input, textarea_input,
+            Checkbox, FORM_INPUT_CLASS, FORM_SELECT_CLASS, form_actions, form_field_group,
+            select_chevron, submit_button, text_input, textarea_input,
         },
         section_card::section_card_with_description,
     },
@@ -137,7 +138,13 @@ fn secret_field(
                 },
             ))
             @if is_stored {
-                (checkbox(clear_name, "true", "Clear the stored value", false, true))
+                (Checkbox {
+                    name: clear_name,
+                    value: "true",
+                    label: "Clear the stored value",
+                    checked: false,
+                    enabled: true,
+                }.render())
             }
         }
     }
@@ -321,9 +328,9 @@ fn legacy_prices_text(billing: &InstanceBillingResponse) -> String {
         .join("\n")
 }
 
-pub fn premium_billing_section(
+pub(crate) fn premium_billing_section(
     base: &str,
-    csrf_token: &str,
+    config_form: ConfigForm<'_>,
     branding: &AppBrandingConfigResponse,
     billing: &InstanceBillingResponse,
     premium_mode: PremiumMode,
@@ -339,7 +346,7 @@ pub fn premium_billing_section(
         html! {
             form method="post" action={(base) "/instance-config?action=update_billing"}
                 data-admin-result-form="true" {
-                (csrf_input(csrf_token))
+                (config_form.fields())
                 div class="space-y-8" {
                     div class="space-y-4" {
                         h3 class="text-sm font-semibold text-neutral-900" { "Premium tier" }
