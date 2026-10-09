@@ -15,8 +15,6 @@ interface UseMediaKeyboardOptions {
 	onToggleMute?: () => void;
 	onToggleFullscreen?: () => void;
 	onSeekPercentage?: (percentage: number) => void;
-	seekAmount?: number;
-	volumeStep?: number;
 	captureDocumentKeys?: boolean;
 }
 
@@ -118,14 +116,14 @@ function trapFocusInContainer(event: KeyboardEvent, container: HTMLElement): voi
 	}
 	const activeElement = document.activeElement;
 	const activeIndex = activeElement instanceof HTMLElement ? focusableElements.indexOf(activeElement) : -1;
-	const nextIndex =
-		activeIndex === -1
-			? event.shiftKey
-				? focusableElements.length - 1
-				: 0
-			: event.shiftKey
-				? (activeIndex - 1 + focusableElements.length) % focusableElements.length
-				: (activeIndex + 1) % focusableElements.length;
+	let nextIndex: number;
+	if (activeIndex === -1) {
+		nextIndex = event.shiftKey ? focusableElements.length - 1 : 0;
+	} else if (event.shiftKey) {
+		nextIndex = (activeIndex - 1 + focusableElements.length) % focusableElements.length;
+	} else {
+		nextIndex = (activeIndex + 1) % focusableElements.length;
+	}
 	focusElement(focusableElements[nextIndex]);
 }
 
@@ -141,8 +139,6 @@ export function useMediaKeyboard(options: UseMediaKeyboardOptions): UseMediaKeyb
 		onToggleMute,
 		onToggleFullscreen,
 		onSeekPercentage,
-		seekAmount = SEEK_STEP,
-		volumeStep = VOLUME_STEP,
 		captureDocumentKeys = false,
 	} = options;
 	const handleMediaKeyDown = useCallback(
@@ -223,8 +219,6 @@ export function useMediaKeyboard(options: UseMediaKeyboardOptions): UseMediaKeyb
 			onToggleMute,
 			onToggleFullscreen,
 			onSeekPercentage,
-			seekAmount,
-			volumeStep,
 		],
 	);
 	const handleKeyDown = useCallback(

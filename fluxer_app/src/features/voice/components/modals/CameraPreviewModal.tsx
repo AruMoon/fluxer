@@ -79,7 +79,6 @@ const BLUR_STRENGTH_DESCRIPTOR = msg({
 const logger = new Logger('CameraPreviewModal');
 
 interface CameraPreviewModalProps {
-	onEnabled?: () => void;
 	onEnableCamera?: () => void | Promise<void>;
 	showEnableCameraButton?: boolean;
 	localParticipant?: LocalParticipant;
@@ -577,7 +576,6 @@ const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 		try {
 			if (!localParticipant) {
 				await onEnableCamera?.();
-				onEnabled?.();
 				ModalCommands.pop();
 				return;
 			}
@@ -591,7 +589,6 @@ const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 							effectiveVideoDeviceId && effectiveVideoDeviceId !== 'default' ? effectiveVideoDeviceId : undefined,
 					}));
 			await enableCamera();
-			onEnabled?.();
 			ModalCommands.pop();
 		} catch (_err) {
 			showGenericErrorModal({
@@ -683,6 +680,14 @@ const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 							: device.label || formatFallbackCameraLabel(i18n),
 				}))
 			: [{value: 'default', label: i18n._(DEFAULT_CAMERA_DESCRIPTOR)}];
+	let overlayStatusText: React.ReactNode;
+	if (status === 'fixing') {
+		overlayStatusText = <Trans>Optimizing camera...</Trans>;
+	} else if (status === 'fix-switching-back') {
+		overlayStatusText = <Trans>Finalizing camera...</Trans>;
+	} else {
+		overlayStatusText = <Trans>Initializing camera...</Trans>;
+	}
 	return (
 		<Modal.Root size="medium" data-flx="voice.camera-preview-modal.camera-preview-modal-content.modal-root">
 			<Modal.Header
@@ -763,13 +768,7 @@ const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 										className={styles.overlayTextMedium}
 										data-flx="voice.camera-preview-modal.camera-preview-modal-content.overlay-text-medium"
 									>
-										{status === 'fixing' ? (
-											<Trans>Optimizing camera...</Trans>
-										) : status === 'fix-switching-back' ? (
-											<Trans>Finalizing camera...</Trans>
-										) : (
-											<Trans>Initializing camera...</Trans>
-										)}
+										{overlayStatusText}
 									</div>
 								</div>
 							</div>
