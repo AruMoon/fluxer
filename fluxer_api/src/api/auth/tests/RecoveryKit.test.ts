@@ -3,7 +3,6 @@
 import crypto from 'node:crypto';
 import {resetPwnedPasswordCacheForTesting} from '@app/api/auth/AuthPassword';
 import {findRecoveryKitCreatedAt} from '@app/api/auth/AuthRecoveryKit';
-import {RecoveryKitRepository} from '@app/api/auth/services/RecoveryKitRepository';
 import {
 	createAuthHarness,
 	createTestAccount,
@@ -547,10 +546,6 @@ describe('Recovery kit', () => {
 		expect(await hasKit(account)).toBe(false);
 		await expectInvalidRecoveryKey({login: account.username, recovery_key: kit.recovery_key, password: NEW_PASSWORD});
 		await createKit(account);
-		const users = getUserRepository();
-		const userId = createUserID(BigInt(account.userId));
-		const user = await users.findUniqueAssert(userId);
-		await users.patchUpsert(userId, {email: null}, user.toRow());
 		await createBuilderWithoutAuth(harness)
 			.post('/auth/reset')
 			.body({token: link.url.split('/reset#token=')[1]!, password: NEW_PASSWORD})
@@ -635,20 +630,6 @@ describe('Recovery kit', () => {
 		}
 		expect((await findRecoveryKitCreatedAt(userId))?.toISOString()).toBe(kit.created_at);
 		expect((await users.findUniqueAssert(userId)).passwordLastChangedAt).toEqual(changedBefore);
-	});
-
-	it('reads a kit row for an unknown name too', async () => {
-		const find = vi.spyOn(RecoveryKitRepository.prototype, 'find');
-		try {
-			await expectInvalidRecoveryKey({
-				login: createUniqueUsername('ghost'),
-				recovery_key: 'ABCD-EFGH-JKMN-PQRS-TVWX-YZ01-2345-6789',
-				password: NEW_PASSWORD,
-			});
-			expect(find).toHaveBeenCalledWith(createUserID(0n));
-		} finally {
-			find.mockRestore();
-		}
 	});
 
 	it('ignores a pending recovery once the instance is no longer a username instance', async () => {

@@ -3,6 +3,7 @@
 import {
 	clearTestEmails,
 	createAuthHarness,
+	createEmailCodeSudoBody,
 	createTestAccount,
 	createUniqueEmail,
 	findLastTestEmail,
@@ -32,19 +33,6 @@ interface MfaRequiredResponse {
 	totp: boolean;
 	webauthn: boolean;
 	backup_codes: boolean;
-}
-
-async function waitForEmail(harness: ApiTestHarness, type: string, recipient: string): Promise<TestEmailRecord> {
-	const maxAttempts = 20;
-	for (let i = 0; i < maxAttempts; i++) {
-		await new Promise((resolve) => setTimeout(resolve, 100));
-		const emails = await listTestEmails(harness, {recipient});
-		const email = findLastTestEmail(emails, type);
-		if (email) {
-			return email;
-		}
-	}
-	throw new Error(`Email not found: type=${type}, recipient=${recipient}`);
 }
 
 async function claimEmailWithoutPassword(harness: ApiTestHarness, account: TestAccount): Promise<TestAccount> {
@@ -185,7 +173,11 @@ describe('Auth reset password requires MFA', () => {
 		const base = await createTestAccount(harness);
 		const account = await claimEmailWithoutPassword(harness, base);
 		const device = createWebAuthnDevice();
-		await registerWebAuthnCredential(harness, account.token, device, () => ({}));
+		const sudoBodies = [
+			await createEmailCodeSudoBody(harness, account),
+			await createEmailCodeSudoBody(harness, account),
+		];
+		await registerWebAuthnCredential(harness, account.token, device, () => sudoBodies.shift()!);
 		const token = await requestPasswordReset(harness, account.email);
 		const resetResp = await createBuilderWithoutAuth<MfaRequiredResponse>(harness)
 			.post('/auth/reset')
@@ -221,7 +213,11 @@ describe('Auth reset password requires MFA', () => {
 		const base = await createTestAccount(harness);
 		const account = await claimEmailWithoutPassword(harness, base);
 		const device = createWebAuthnDevice();
-		await registerWebAuthnCredential(harness, account.token, device, () => ({}));
+		const sudoBodies = [
+			await createEmailCodeSudoBody(harness, account),
+			await createEmailCodeSudoBody(harness, account),
+		];
+		await registerWebAuthnCredential(harness, account.token, device, () => sudoBodies.shift()!);
 		const firstToken = await requestPasswordReset(harness, account.email);
 		await createBuilderWithoutAuth<MfaRequiredResponse>(harness)
 			.post('/auth/reset')
@@ -235,5 +231,32 @@ describe('Auth reset password requires MFA', () => {
 		expect(secondReset.mfa).toBe(true);
 		expect(secondReset.webauthn).toBe(true);
 		expect(secondReset.allowed_methods).toContain('webauthn');
+	});
+
+	it('still asks an unconfirmed owner with a second factor for the factor after a reset', async () => {
+		const account = await createTestAccount(harness);
+		const secret = 'JBSWY3DPEHPK3PXP';
+		await createBuilder(harness, account.token)
+			.post('/users/@me/mfa/totp/enable')
+			.body({secret, code: totpCodeNow(secret), password: account.password})
+			.execute();
+		await createBuilder(harness, '')
+			.post(`/test/users/${account.userId}/security-flags`)
+			.body({email_verified: false})
+			.execute();
+		await clearTestEmails(harness);
+		await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email: account.email}).expect(204).execute();
+		const token = (await waitForEmail(harness, 'password_reset', account.email)).metadata['token'];
+		const reset = await createBuilderWithoutAuth<MfaRequiredResponse>(harness)
+			.post('/auth/reset')
+			.body({token, password: 'new-strong-password-123'})
+			.execute();
+		expect(reset.mfa).toBe(true);
+		const signedIn = await createBuilderWithoutAuth<{token: string}>(harness)
+			.post('/auth/login/mfa/totp')
+			.body({ticket: reset.ticket, code: totpCodeNow(secret)})
+			.execute();
+		const me = await createBuilder<{mfa_enabled: boolean}>(harness, signedIn.token).get('/users/@me').execute();
+		expect(me.mfa_enabled).toBe(true);
 	});
 });
