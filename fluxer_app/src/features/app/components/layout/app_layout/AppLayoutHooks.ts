@@ -12,7 +12,6 @@ import DomainMovedNotice from '@app/features/app/domain_migration/DomainMovedNot
 import {isClientReconnecting} from '@app/features/app/state/ClientReadiness';
 import Initialization from '@app/features/app/state/Initialization';
 import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
-import Updater from '@app/features/app/state/Updater';
 import Accounts from '@app/features/auth/state/Accounts';
 import Authentication from '@app/features/auth/state/Authentication';
 import Channels from '@app/features/channel/state/Channels';
@@ -52,7 +51,7 @@ function sortNagbarsByPriority(a: NagbarState, b: NagbarState): number {
 	return a.priority - b.priority;
 }
 
-export function selectVisibleNagbars(nagbars: Array<NagbarState>): Array<NagbarState> {
+function selectVisibleNagbars(nagbars: Array<NagbarState>): Array<NagbarState> {
 	const visibleNagbars = nagbars.filter((nagbar) => nagbar.visible).sort(sortNagbarsByPriority);
 	const pinned = visibleNagbars.filter((nagbar) => nagbar.type === NagbarType.BUILD_ENVIRONMENT);
 	const selectable = visibleNagbars.filter((nagbar) => nagbar.type !== NagbarType.BUILD_ENVIRONMENT);
@@ -259,7 +258,6 @@ export const useNagbarConditions = (): NagbarConditions => {
 	})();
 	const canShowSoftwareEncoder = SoftwareEncoderWarning.showWarning;
 	const canShowStreamerMode = StreamerMode.shouldShowNagbar;
-	const canShowDesktopUpdateReady = Updater.shouldShowUpdateReadyNagbar;
 	const canShowDomainMoved = nagbarState.forceHideDomainMoved
 		? false
 		: nagbarState.forceDomainMoved
@@ -329,7 +327,6 @@ export const useNagbarConditions = (): NagbarConditions => {
 		needsTermsAcceptance,
 		canShowSoftwareEncoder,
 		canShowStreamerMode,
-		canShowDesktopUpdateReady,
 		canShowDomainMoved,
 	};
 };
@@ -460,12 +457,6 @@ export const useActiveNagbars = (conditions: NagbarConditions): Array<NagbarStat
 				type: NagbarType.STREAMER_MODE,
 				priority: -2.5,
 				visible: conditions.canShowStreamerMode,
-				dismissible: true,
-			},
-			{
-				type: NagbarType.DESKTOP_UPDATE_READY,
-				priority: -1.5,
-				visible: conditions.canShowDesktopUpdateReady,
 				dismissible: true,
 			},
 			{
