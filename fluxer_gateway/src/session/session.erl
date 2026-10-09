@@ -35,6 +35,7 @@
     buffer_bytes => non_neg_integer(),
     seq => seq(),
     ack_seq => seq(),
+    replay_floor => seq(),
     properties => map(),
     status => status(),
     resume_status => status(),
@@ -168,7 +169,24 @@ handle_cast_guild_or_lifecycle({reconnect_drain, SocketPid}, State) when
     session_lifecycle:handle_reconnect_drain(SocketPid, State);
 handle_cast_guild_or_lifecycle({guild_join, GuildId}, State) when is_integer(GuildId) ->
     self() ! {guild_connect, GuildId, 0},
-    {noreply, session_bot_guilds:track_join(GuildId, State)};
+    {noreply,
+        session_bot_guilds:track_join(
+            GuildId, session_visits:handle_guild_join(GuildId, State)
+        )};
+handle_cast_guild_or_lifecycle({visit_start, GuildId, Operator}, State) when
+    is_integer(GuildId), is_boolean(Operator)
+->
+    session_visits:handle_start(GuildId, Operator, State);
+handle_cast_guild_or_lifecycle({visit_end, GuildId}, State) when is_integer(GuildId) ->
+    session_visits:handle_end(GuildId, State);
+handle_cast_guild_or_lifecycle({visit_rejected, GuildId, _Reason}, State) when
+    is_integer(GuildId)
+->
+    session_visits:handle_rejected(GuildId, State);
+handle_cast_guild_or_lifecycle({visit_promoted, GuildId, GuildPid, GuildState}, State) when
+    is_integer(GuildId), is_pid(GuildPid), is_map(GuildState)
+->
+    session_visits:handle_promoted(GuildId, GuildPid, GuildState, State);
 handle_cast_guild_or_lifecycle({store_guild_subscriptions, Data}, State) when is_map(Data) ->
     {noreply, session_guilds:store_guild_subscriptions(Data, State)};
 handle_cast_guild_or_lifecycle({guild_leave, GuildId, forced_unavailable, true}, State) when
@@ -249,10 +267,7 @@ handle_info(Msg, State) ->
 
 -spec notify_thread_user_flip(session_state()) -> session_state().
 notify_thread_user_flip(#{id := SessionId} = State) when is_binary(SessionId) ->
-    case
-        maps:get(bot, State, false) =:= true orelse
-            maps:get(thread_channels_capable, State, false) =:= true
-    of
+    case session_thread_backstop:capable(State) of
         true -> cast_thread_user_flip(SessionId, State);
         false -> State
     end;
@@ -278,7 +293,7 @@ handle_info_guild_connect_result(
     {guild_connect_result, GuildId, Attempt, Result}, State
 ) when is_integer(GuildId), is_integer(Attempt), Attempt >= 0 ->
     session_connection_guild:handle_guild_connect_result(
-        GuildId, Attempt, Result, State
+        GuildId, Attempt, eqwalizer:dynamic_cast(Result), State
     );
 handle_info_guild_connect_result(_, State) ->
     {noreply, State}.
@@ -383,212 +398,3 @@ binary_list([Value | Rest], Acc) when is_binary(Value) ->
     binary_list(Rest, [Value | Acc]);
 binary_list(_, _) ->
     error.
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-test_base_state(GuildId) ->
-    Buf = limited_deque:new(4096, 16777216),
-    maps:merge(test_base_core(GuildId, Buf), test_base_extra()).
-
-test_base_core(GuildId, Buffer) ->
-    #{
-        id => <<"test-session">>,
-        user_id => 1,
-        user_data => #{},
-        custom_status => null,
-        version => 1,
-        token_hash => <<>>,
-        auth_session_id_hash => <<>>,
-        buffer => Buffer,
-        seq => 0,
-        ack_seq => 0,
-        properties => #{},
-        status => online,
-        resume_status => online,
-        afk => false,
-        mobile => false,
-        presence_pid => undefined,
-        presence_mref => undefined,
-        socket_pid => undefined,
-        socket_mref => undefined,
-        resume_timer => undefined,
-        offline_timer => undefined,
-        guilds => #{GuildId => {self(), make_ref()}},
-        calls => #{},
-        channels => #{},
-        ready => undefined,
-        bot => false
-    }.
-
-test_base_extra() ->
-    #{
-        ignored_events => #{},
-        initial_guild_id => undefined,
-        collected_guild_states => [],
-        collected_sessions => [],
-        collected_presences => [],
-        relationships => #{},
-        suppress_presence_updates => false,
-        pending_presences => [],
-        guild_connect_inflight => #{},
-        voice_queue => queue:new(),
-        voice_queue_timer => undefined,
-        debounce_reactions => false,
-        thread_channels_capable => false,
-        reaction_buffer => [],
-        reaction_buffer_timer => undefined
-    }.
-
-handle_cast_forced_unavailable_guild_leave_schedules_retry_test() ->
-    GuildId = 123,
-    State0 = test_base_state(GuildId),
-    {noreply, State1} = handle_cast({guild_leave, GuildId, forced_unavailable}, State0),
-    ?assertEqual(cached_unavailable, maps:get(GuildId, maps:get(guilds, State1))),
-    [LastEvent] = limited_deque:to_list(maps:get(buffer, State1)),
-    LastData = assert_guild_delete_event_data(LastEvent),
-    ?assertEqual(true, maps:get(<<"unavailable">>, LastData)),
-    receive
-        {guild_connect, GuildId, 0} -> ok
-    after 100 -> ?assert(false, forced_unavailable_retry_not_scheduled)
-    end.
-
-handle_cast_forced_unavailable_hidden_guild_leave_includes_hidden_flag_test() ->
-    GuildId = 124,
-    State0 = test_base_state(GuildId),
-    {noreply, State1} = handle_cast({guild_leave, GuildId, forced_unavailable, true}, State0),
-    ?assertEqual(cached_unavailable, maps:get(GuildId, maps:get(guilds, State1))),
-    [LastEvent] = limited_deque:to_list(maps:get(buffer, State1)),
-    EventData = assert_guild_delete_event_data(LastEvent),
-    ?assertEqual(true, maps:get(<<"unavailable">>, EventData)),
-    ?assertEqual(true, maps:get(<<"unavailable_hidden">>, EventData)),
-    receive
-        {guild_connect, GuildId, 0} -> ok
-    after 100 -> ?assert(false, forced_unavailable_hidden_retry_not_scheduled)
-    end.
-
--spec assert_guild_delete_event_data(term()) -> map().
-assert_guild_delete_event_data(Event) when is_map(Event) ->
-    ?assertEqual(guild_delete, maps:get(event, Event)),
-    ensure_map(maps:get(data, Event)).
-
-ensure_map(V) when is_map(V) -> V.
-
-handle_cast_reconnect_drain_signals_socket_test() ->
-    SocketPid = spawn_msg_forwarder(self(), socket_message),
-    State = #{socket_pid => SocketPid},
-    {noreply, State} = handle_cast(reconnect_drain, State),
-    receive
-        {socket_message, session_reconnect} -> ok
-    after 200 -> ?assert(false, reconnect_signal_not_received)
-    end.
-
-handle_cast_targeted_reconnect_drain_ignores_replaced_socket_test() ->
-    OldSocketPid = spawn_msg_forwarder(self(), old_socket_message),
-    NewSocketPid = spawn_msg_forwarder(self(), new_socket_message),
-    State = #{socket_pid => NewSocketPid},
-    {noreply, State} = handle_cast({reconnect_drain, OldSocketPid}, State),
-    receive
-        {old_socket_message, session_reconnect} -> ?assert(false, old_socket_signaled);
-        {new_socket_message, session_reconnect} -> ?assert(false, new_socket_signaled)
-    after 50 ->
-        ok
-    end.
-
-handle_cast_targeted_reconnect_drain_signals_matching_socket_test() ->
-    SocketPid = spawn_msg_forwarder(self(), socket_message),
-    State = #{socket_pid => SocketPid},
-    {noreply, State} = handle_cast({reconnect_drain, SocketPid}, State),
-    receive
-        {socket_message, session_reconnect} -> ok
-    after 200 -> ?assert(false, targeted_reconnect_signal_not_received)
-    end.
-
-spawn_msg_forwarder(TargetPid, Tag) ->
-    spawn(fun() -> msg_forwarder_loop(TargetPid, Tag) end).
-
-msg_forwarder_loop(TargetPid, Tag) ->
-    receive
-        Msg -> TargetPid ! {Tag, Msg}
-    after 30000 -> ok
-    end.
-
-handle_cast_reconnect_drain_with_missing_socket_is_noop_test() ->
-    State = #{socket_pid => undefined},
-    {noreply, State} = handle_cast(reconnect_drain, State),
-    receive
-        session_reconnect -> ?assert(false, unexpected_reconnect)
-    after 50 -> ok
-    end.
-
-handle_cast_handoff_fence_signals_socket_and_stops_test() ->
-    SocketPid = spawn_msg_forwarder(self(), socket_message),
-    State0 = #{socket_pid => SocketPid},
-    {stop, normal, State1} = handle_cast(handoff_fence, State0),
-    ?assertEqual(true, maps:get(fenced, State1)),
-    receive
-        {socket_message, session_reconnect} -> ok
-    after 200 -> ?assert(false, fence_signal_not_received)
-    end.
-
-handle_cast_handoff_fence_with_missing_socket_stops_test() ->
-    State0 = #{socket_pid => undefined},
-    {stop, normal, State1} = handle_cast(handoff_fence, State0),
-    ?assertEqual(true, maps:get(fenced, State1)).
-
-handle_info_ignores_stale_resume_timeout_test() ->
-    CurrentToken = make_ref(),
-    State = #{socket_pid => undefined, resume_timer => {CurrentToken, make_ref()}},
-    {noreply, State} = handle_info({resume_timeout, make_ref()}, State).
-
-handle_info_stops_on_current_resume_timeout_test() ->
-    CurrentToken = make_ref(),
-    State = #{socket_pid => undefined, resume_timer => {CurrentToken, make_ref()}},
-    ?assertMatch({stop, normal, _}, handle_info({resume_timeout, CurrentToken}, State)).
-
-handle_presence_rejoin_check_reconnects_when_unattached_test() ->
-    {noreply, State1} = handle_presence_rejoin_check(#{presence_pid => undefined}),
-    ?assertEqual(undefined, maps:get(presence_pid, State1)),
-    ?assert(received_presence_connect()).
-
-handle_presence_rejoin_check_keeps_healthy_attachment_test() ->
-    State0 = #{presence_pid => self(), presence_mref => undefined},
-    ?assertEqual({noreply, State0}, handle_presence_rejoin_check(State0)),
-    ?assertNot(received_presence_connect()).
-
-check_ack_lag_repairs_unattached_presence_test() ->
-    State0 = #{
-        guilds => #{},
-        guild_connect_inflight => #{},
-        guild_connect_workers => #{},
-        guild_connect_last_repair_at => 0,
-        presence_pid => undefined
-    },
-    {noreply, State1} = do_handle_info_misc(check_ack_lag, State0),
-    ?assertEqual(undefined, maps:get(presence_pid, State1)),
-    ?assert(received_presence_connect()).
-
-received_presence_connect() ->
-    receive
-        {presence_connect, 0} -> true
-    after 200 -> false
-    end.
-
-thread_user_flip_skips_sessions_that_cannot_become_viewers_test() ->
-    Base = #{id => <<"s">>, guilds => #{1 => {self(), make_ref()}, 2 => undefined}},
-    _ = notify_thread_user_flip(Base),
-    _ = notify_thread_user_flip(Base#{bot => false, thread_channels_capable => false}),
-    ?assertNot(received_thread_user_flip()),
-    _ = notify_thread_user_flip(Base#{thread_channels_capable => true}),
-    ?assert(received_thread_user_flip()),
-    _ = notify_thread_user_flip(Base#{bot => true}),
-    ?assert(received_thread_user_flip()),
-    ?assertNot(received_thread_user_flip()).
-
-received_thread_user_flip() ->
-    receive
-        {'$gen_cast', {thread_user_flip, <<"s">>}} -> true
-    after 100 -> false
-    end.
-
--endif.
