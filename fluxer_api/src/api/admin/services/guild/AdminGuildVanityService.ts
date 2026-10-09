@@ -11,8 +11,8 @@ import {
 	vanityCodeToInviteCode,
 } from '@app/api/BrandedTypes';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
+import {enqueueEndGuildVisitsForCode} from '@app/api/guild/visits/GuildVisitLifecycle';
 import type {InviteRepository} from '@app/api/invite/InviteRepository';
-import {InviteTypes} from '@fluxer/constants/src/ChannelConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {UnknownGuildError} from '@fluxer/errors/src/domains/guild/UnknownGuildError';
@@ -44,20 +44,11 @@ export class AdminGuildVanityService {
 			}
 			if (oldVanity) {
 				await inviteRepository.delete(vanityCodeToInviteCode(oldVanity));
+				await enqueueEndGuildVisitsForCode(guildId, vanityCodeToInviteCode(oldVanity));
 			}
-			await inviteRepository.create({
-				code: inviteCode,
-				type: InviteTypes.GUILD,
-				guild_id: guildId,
-				channel_id: null,
-				inviter_id: null,
-				uses: 0,
-				max_uses: 0,
-				max_age: 0,
-				temporary: false,
-			});
 		} else if (oldVanity) {
 			await inviteRepository.delete(vanityCodeToInviteCode(oldVanity));
+			await enqueueEndGuildVisitsForCode(guildId, vanityCodeToInviteCode(oldVanity));
 		}
 		const updatedGuild = await guildRepository.upsertPartial(
 			guildId,

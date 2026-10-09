@@ -9,6 +9,7 @@ import {
 } from '@app/api/BrandedTypes';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import type {GuildDataHelpers} from '@app/api/guild/services/data/GuildDataHelpers';
+import {enqueueEndGuildVisitsForCode} from '@app/api/guild/visits/GuildVisitLifecycle';
 import type {InviteRepository} from '@app/api/invite/InviteRepository';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import {serializeGuildForAudit} from '@app/api/utils/AuditSerializationUtils';
@@ -77,6 +78,7 @@ export class GuildVanityService {
 				const oldInvite = await this.inviteRepository.findUnique(vanityCodeToInviteCode(guild.vanityUrlCode));
 				if (oldInvite) {
 					await this.inviteRepository.delete(oldInvite.code);
+					await enqueueEndGuildVisitsForCode(guildId, oldInvite.code);
 				}
 				const updatedGuild = await this.guildRepository.upsertPartial(guildId, {vanity_url_code: null}, guild.toRow());
 				await this.helpers.dispatchGuildUpdate(updatedGuild);
@@ -100,18 +102,9 @@ export class GuildVanityService {
 			const oldInvite = await this.inviteRepository.findUnique(vanityCodeToInviteCode(guild.vanityUrlCode));
 			if (oldInvite) {
 				await this.inviteRepository.delete(oldInvite.code);
+				await enqueueEndGuildVisitsForCode(guildId, oldInvite.code);
 			}
 		}
-		await this.inviteRepository.create({
-			code: createInviteCode(code),
-			type: InviteTypes.GUILD,
-			guild_id: guildId,
-			channel_id: null,
-			inviter_id: null,
-			uses: 0,
-			max_uses: 0,
-			max_age: 0,
-		});
 		const updatedGuild = await this.guildRepository.upsertPartial(
 			guildId,
 			{vanity_url_code: createVanityURLCode(code)},
