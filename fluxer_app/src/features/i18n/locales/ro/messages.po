@@ -5981,7 +5981,7 @@ msgid "Block"
 msgstr "Blochează"
 
 #. Sensitive media filter option meaning the media is hidden entirely. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:31
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:32
 msgctxt "sensitive-media-filter-level"
 msgid "Block"
 msgstr "Blocare"
@@ -6098,7 +6098,7 @@ msgid "Blur"
 msgstr "Estompare"
 
 #. Sensitive media filter option meaning the media is blurred until the viewer reveals it. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:25
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:26
 msgctxt "sensitive-media-filter-level"
 msgid "Blur"
 msgstr "Estompare"
@@ -8050,6 +8050,11 @@ msgstr "Alege ce poate face {clientLabel} în comunitatea ta. Debifează permisi
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:287
 msgid "Choose what friends see in their active now panel"
 msgstr "Alege ce văd prietenii în panoul lor „Activ acum”"
+
+#. Introduction at the top of the sensitive content settings. Show, Blur and Block are the option names used below and must match their translations.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:50
+msgid "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+msgstr "Alege ce se întâmplă cu imaginile și videoclipurile marcate ca fiind sensibile. Afișare le arată ca de obicei, Estompare le ascunde până dai clic, iar Blocare le ascunde complet."
 
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:311
 msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
@@ -12735,12 +12740,12 @@ msgid "Direct messages (open and closed)"
 msgstr "Mesaje directe (deschise și închise)"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:37
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:38
 msgid "Direct messages from friends"
 msgstr "Mesaje directe de la prieteni"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:41
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:42
 msgid "Direct messages from others"
 msgstr "Mesaje directe de la alții"
 
@@ -16533,6 +16538,11 @@ msgstr "Doar prietenii"
 #: src/features/channel/components/direct_message/DMFriendsView.tsx:37
 msgid "Friends sections"
 msgstr "Secțiuni pentru prieteni"
+
+#. Privacy > Active now: helper text under the switch controlling whether friends see voice activity.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
+msgid "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+msgstr "Prietenii văd în ce canal vocal sunteți în lista lor „Acum activ”. Puteți schimba acest lucru o dată la 24 de ore."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:86
@@ -21203,6 +21213,16 @@ msgstr "Afișare media"
 msgid "Media filter"
 msgstr "Filtru media"
 
+#. Helper text under "Messages in community channels" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:64
+msgid "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+msgstr "Media din canalele care nu sunt marcate 18+. Canalele marcate 18+ o vor afișa întotdeauna."
+
+#. Helper text under "Direct messages from others" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:60
+msgid "Media in group chats and in direct messages from people who aren't your friends."
+msgstr "Media din conversațiile de grup și din mesajele directe de la persoane care nu sunt prietenii tăi."
+
 #. Plutonium page comparison row label for the saved media limit.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:215
 msgid "Media items you can save for later"
@@ -21254,6 +21274,11 @@ msgstr "Dimensiune media"
 msgctxt "keyboard-key-name"
 msgid "Media stop"
 msgstr "Oprește redarea"
+
+#. Helper text under "Direct messages from friends" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:56
+msgid "Media your friends send you in direct messages."
+msgstr "Media pe care ți-o trimit prietenii în mesaje directe."
 
 #. Activity log value naming the medium member verification level of a community.
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
@@ -21809,7 +21834,7 @@ msgid "Messages failed to load"
 msgstr "Mesajele nu s-au putut încărca"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:45
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:46
 msgid "Messages in community channels"
 msgstr "Mesaje în canalele comunității"
 
@@ -31227,7 +31252,7 @@ msgid "Shorten your about me and try again."
 msgstr "Scurtează secțiunea „Despre mine” și încearcă din nou."
 
 #. Sensitive media filter option meaning the media is shown as-is. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:19
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:20
 msgctxt "sensitive-media-filter-level"
 msgid "Show"
 msgstr "Afișare"
@@ -39219,11 +39244,6 @@ msgstr "activitate vocală"
 msgid "Voice activity"
 msgstr "Activitate vocală"
 
-#. Privacy > Active now: settings subsection title for voice activity sharing.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
-msgid "Voice activity on active now"
-msgstr "Activitate vocală în „Activ acum”"
-
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:318
 msgid "Voice activity priority"
@@ -41875,3 +41895,51 @@ msgstr "În acest moment"
 #: src/features/user/components/modals/PrivacySetupModal.tsx:27
 msgid "Take a moment to check who can message you. Nothing changes unless you choose to."
 msgstr "Acordă-ți un moment să verifici cine te poate contacta. Nimic nu se schimbă decât dacă alegi tu."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:236
+msgid "Anyone who finds you can send a request. Turn this off to pick groups below."
+msgstr "Oricine te găsește îți poate trimite o cerere. Dezactivează această opțiune pentru a alege grupuri mai jos."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:272
+msgid "Applies to bots in communities you join from now on. You can also change it for each community."
+msgstr "Se aplică roboților din comunitățile la care te alături de acum înainte. Poți, de asemenea, să o modifici pentru fiecare comunitate."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:265
+msgid "Applies to communities you join from now on. You can also change it for each community."
+msgstr "Se aplică comunităților pe care le vei alătura de acum înainte. Poți să o schimbi și pentru fiecare comunitate în parte."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:231
+msgid "Choose who can send you a friend request."
+msgstr "Alege cine îți poate trimite o cerere de prietenie."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:260
+msgid "Friends can always message you. These settings cover people and bots you only share a community with."
+msgstr "Prietenii îți pot trimite oricând mesaje. Aceste setări acoperă persoanele și boții cu care împarți doar o comunitate."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:251
+msgid "People who share a community with you."
+msgstr "Persoane care au o comunitate în comun cu tine."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:243
+msgid "People who share at least one friend with you."
+msgstr "Persoane care au cel puțin un prieten comun cu tine."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:219
+msgid "Calls you allow still come through, but they don't ring."
+msgstr "Apelurile pe care le permiți în continuare vor intra, dar nu vor suna."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:230
+msgid "Choose who can add you to a group chat without asking first."
+msgstr "Alege cine te poate adăuga într-un chat de grup fără să te întrebe mai întâi."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:183
+msgid "Choose who can start a call with you."
+msgstr "Alege cine poate iniția un apel cu tine."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:229
+msgid "Group chats"
+msgstr "Conversații de grup"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:218
+msgid "Receive calls silently"
+msgstr "Primește apeluri silențios"

@@ -5981,7 +5981,7 @@ msgid "Block"
 msgstr "Blokker"
 
 #. Sensitive media filter option meaning the media is hidden entirely. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:31
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:32
 msgctxt "sensitive-media-filter-level"
 msgid "Block"
 msgstr "Blokker"
@@ -6098,7 +6098,7 @@ msgid "Blur"
 msgstr "Gjør uskarp"
 
 #. Sensitive media filter option meaning the media is blurred until the viewer reveals it. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:25
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:26
 msgctxt "sensitive-media-filter-level"
 msgid "Blur"
 msgstr "Gjør uskarp"
@@ -8050,6 +8050,11 @@ msgstr "Velg hva {clientLabel} kan gjøre i fellesskapet ditt. Fjern avmerkingen
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:287
 msgid "Choose what friends see in their active now panel"
 msgstr "Velg hva venner ser i panelet «Aktiv nå»"
+
+#. Introduction at the top of the sensitive content settings. Show, Blur and Block are the option names used below and must match their translations.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:50
+msgid "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+msgstr "Velg hva som skjer med bilder og videoer som er merket som sensitive. Vis viser dem som vanlig, Uskarp skjuler dem til du klikker, og Blokker skjuler dem helt."
 
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:311
 msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
@@ -12735,12 +12740,12 @@ msgid "Direct messages (open and closed)"
 msgstr "Direktemeldingssamtaler (åpne og lukkede)"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:37
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:38
 msgid "Direct messages from friends"
 msgstr "Direktemeldinger fra venner"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:41
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:42
 msgid "Direct messages from others"
 msgstr "Direktemeldinger fra andre"
 
@@ -16533,6 +16538,11 @@ msgstr "Kun venner"
 #: src/features/channel/components/direct_message/DMFriendsView.tsx:37
 msgid "Friends sections"
 msgstr "Seksjoner i vennelisten"
+
+#. Privacy > Active now: helper text under the switch controlling whether friends see voice activity.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
+msgid "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+msgstr "Venner ser hvilken stemmekanal du er i på listen deres under «Aktiv nå». Du kan endre dette én gang hver 24. time."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:86
@@ -21203,6 +21213,16 @@ msgstr "Medievisning"
 msgid "Media filter"
 msgstr "Mediefilter"
 
+#. Helper text under "Messages in community channels" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:64
+msgid "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+msgstr "Medier i kanaler som ikke er merket 18+. Kanaler merket 18+ viser det alltid."
+
+#. Helper text under "Direct messages from others" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:60
+msgid "Media in group chats and in direct messages from people who aren't your friends."
+msgstr "Medier i gruppechatter og i direkte meldinger fra personer som ikke er vennene dine."
+
 #. Plutonium page comparison row label for the saved media limit.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:215
 msgid "Media items you can save for later"
@@ -21254,6 +21274,11 @@ msgstr "Mediestørrelse"
 msgctxt "keyboard-key-name"
 msgid "Media stop"
 msgstr "Stopp avspilling"
+
+#. Helper text under "Direct messages from friends" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:56
+msgid "Media your friends send you in direct messages."
+msgstr "Medier vennene dine sender deg i direktemeldinger."
 
 #. Activity log value naming the medium member verification level of a community.
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
@@ -21809,7 +21834,7 @@ msgid "Messages failed to load"
 msgstr "Meldinger kunne ikke lastes inn"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:45
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:46
 msgid "Messages in community channels"
 msgstr "Meldinger i fellesskapskanaler"
 
@@ -31227,7 +31252,7 @@ msgid "Shorten your about me and try again."
 msgstr "Kort ned «Om meg»-teksten og prøv igjen."
 
 #. Sensitive media filter option meaning the media is shown as-is. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:19
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:20
 msgctxt "sensitive-media-filter-level"
 msgid "Show"
 msgstr "Vis"
@@ -39219,11 +39244,6 @@ msgstr "taleaktivitet"
 msgid "Voice activity"
 msgstr "Taleaktivitet"
 
-#. Privacy > Active now: settings subsection title for voice activity sharing.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
-msgid "Voice activity on active now"
-msgstr "Taleaktivitet i «Aktiv nå»"
-
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:318
 msgid "Voice activity priority"
@@ -41875,3 +41895,51 @@ msgstr "Akkurat nå"
 #: src/features/user/components/modals/PrivacySetupModal.tsx:27
 msgid "Take a moment to check who can message you. Nothing changes unless you choose to."
 msgstr "Ta deg tid til å sjekke hvem som kan sende deg meldinger. Ingenting endres med mindre du velger det."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:236
+msgid "Anyone who finds you can send a request. Turn this off to pick groups below."
+msgstr "Alle som finner deg kan sende en forespørsel. Skru av dette for å velge grupper nedenfor."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:272
+msgid "Applies to bots in communities you join from now on. You can also change it for each community."
+msgstr "Gjelder for boter i fellesskap du blir med i fra nå av. Du kan også endre det for hvert fellesskap."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:265
+msgid "Applies to communities you join from now on. You can also change it for each community."
+msgstr "Gjelder for communities du blir med i heretter. Du kan også endre det for hver community."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:231
+msgid "Choose who can send you a friend request."
+msgstr "Velg hvem som kan sende deg en venneforespørsel."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:260
+msgid "Friends can always message you. These settings cover people and bots you only share a community with."
+msgstr "Venner kan alltid sende deg meldinger. Disse innstillingene gjelder personer og roboter du bare deler et fellesskap med."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:251
+msgid "People who share a community with you."
+msgstr "Folk som deler et fellesskap med deg."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:243
+msgid "People who share at least one friend with you."
+msgstr "Folk som deler minst én venn med deg."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:219
+msgid "Calls you allow still come through, but they don't ring."
+msgstr "Samtaler du tillater, kommer fortsatt gjennom, men de ringer ikke."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:230
+msgid "Choose who can add you to a group chat without asking first."
+msgstr "Velg hvem som kan legge deg til i en gruppechat uten å spørre først."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:183
+msgid "Choose who can start a call with you."
+msgstr "Velg hvem som kan starte en samtale med deg."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:229
+msgid "Group chats"
+msgstr "Gruppechatter"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:218
+msgid "Receive calls silently"
+msgstr "Motta anrop stille"

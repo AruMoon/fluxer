@@ -5981,7 +5981,7 @@ msgid "Block"
 msgstr "Bloquer"
 
 #. Sensitive media filter option meaning the media is hidden entirely. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:31
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:32
 msgctxt "sensitive-media-filter-level"
 msgid "Block"
 msgstr "Bloquer"
@@ -6098,7 +6098,7 @@ msgid "Blur"
 msgstr "Flouter"
 
 #. Sensitive media filter option meaning the media is blurred until the viewer reveals it. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:25
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:26
 msgctxt "sensitive-media-filter-level"
 msgid "Blur"
 msgstr "Flouter"
@@ -8050,6 +8050,11 @@ msgstr "Choisissez ce que {clientLabel} peut faire dans votre communauté. Déco
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:287
 msgid "Choose what friends see in their active now panel"
 msgstr "Choisissez ce que vos amis voient dans leur panneau « Actif en ce moment »"
+
+#. Introduction at the top of the sensitive content settings. Show, Blur and Block are the option names used below and must match their translations.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:50
+msgid "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+msgstr "Choisissez ce qui arrive aux images et vidéos signalées comme sensibles. Afficher les affiche normalement, Flouter les masque jusqu'à ce que vous cliquiez, et Bloquer les masque complètement."
 
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:311
 msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
@@ -12735,12 +12740,12 @@ msgid "Direct messages (open and closed)"
 msgstr "Messages privés (ouverts et fermés)"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:37
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:38
 msgid "Direct messages from friends"
 msgstr "Messages privés d’amis"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:41
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:42
 msgid "Direct messages from others"
 msgstr "Messages privés d’autres personnes"
 
@@ -16533,6 +16538,11 @@ msgstr "Amis seulement"
 #: src/features/channel/components/direct_message/DMFriendsView.tsx:37
 msgid "Friends sections"
 msgstr "Sections des amis"
+
+#. Privacy > Active now: helper text under the switch controlling whether friends see voice activity.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
+msgid "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+msgstr "Vos amis voient dans quel salon vocal vous vous trouvez dans leur liste « En ligne ». Vous pouvez modifier ce réglage une fois toutes les 24 heures."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:86
@@ -21203,6 +21213,16 @@ msgstr "Affichage des médias"
 msgid "Media filter"
 msgstr "Filtre des médias"
 
+#. Helper text under "Messages in community channels" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:64
+msgid "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+msgstr "Médias dans les canaux non marqués 18+. Les canaux marqués 18+ les affichent toujours."
+
+#. Helper text under "Direct messages from others" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:60
+msgid "Media in group chats and in direct messages from people who aren't your friends."
+msgstr "Médias dans les discussions de groupe et les messages directs de personnes qui ne sont pas vos amis."
+
 #. Plutonium page comparison row label for the saved media limit.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:215
 msgid "Media items you can save for later"
@@ -21254,6 +21274,11 @@ msgstr "Taille des médias"
 msgctxt "keyboard-key-name"
 msgid "Media stop"
 msgstr "Arrêter la lecture"
+
+#. Helper text under "Direct messages from friends" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:56
+msgid "Media your friends send you in direct messages."
+msgstr "Médias que vos amis vous envoient dans les messages directs."
 
 #. Activity log value naming the medium member verification level of a community.
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
@@ -21809,7 +21834,7 @@ msgid "Messages failed to load"
 msgstr "Échec du chargement des messages"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:45
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:46
 msgid "Messages in community channels"
 msgstr "Messages dans les salons de communauté"
 
@@ -31227,7 +31252,7 @@ msgid "Shorten your about me and try again."
 msgstr "Raccourcissez votre « À propos de moi » et réessayez."
 
 #. Sensitive media filter option meaning the media is shown as-is. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:19
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:20
 msgctxt "sensitive-media-filter-level"
 msgid "Show"
 msgstr "Afficher"
@@ -39219,11 +39244,6 @@ msgstr "activité vocale"
 msgid "Voice activity"
 msgstr "Activité vocale"
 
-#. Privacy > Active now: settings subsection title for voice activity sharing.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
-msgid "Voice activity on active now"
-msgstr "Activité vocale dans « Actif en ce moment »"
-
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:318
 msgid "Voice activity priority"
@@ -41875,3 +41895,51 @@ msgstr "Pour l'instant"
 #: src/features/user/components/modals/PrivacySetupModal.tsx:27
 msgid "Take a moment to check who can message you. Nothing changes unless you choose to."
 msgstr "Prenez un moment pour vérifier qui peut vous envoyer des messages. Rien ne changera tant que vous ne le déciderez pas."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:236
+msgid "Anyone who finds you can send a request. Turn this off to pick groups below."
+msgstr "Toute personne qui vous trouve peut envoyer une demande. Désactivez cette option pour choisir les groupes ci-dessous."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:272
+msgid "Applies to bots in communities you join from now on. You can also change it for each community."
+msgstr "S'applique aux bots dans les communautés que vous rejoignez à partir de maintenant. Vous pouvez également la modifier pour chaque communauté."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:265
+msgid "Applies to communities you join from now on. You can also change it for each community."
+msgstr "S'applique aux communautés que vous rejoignez à partir de maintenant. Vous pouvez également la modifier pour chaque communauté."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:231
+msgid "Choose who can send you a friend request."
+msgstr "Choisissez qui peut vous envoyer une demande d'ami."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:260
+msgid "Friends can always message you. These settings cover people and bots you only share a community with."
+msgstr "Les amis peuvent toujours vous envoyer des messages. Ces paramètres concernent les personnes et les bots avec lesquels vous partagez uniquement une communauté."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:251
+msgid "People who share a community with you."
+msgstr "Personnes qui partagent une communauté avec vous."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:243
+msgid "People who share at least one friend with you."
+msgstr "Les personnes qui partagent au moins un ami avec vous."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:219
+msgid "Calls you allow still come through, but they don't ring."
+msgstr "Les appels que vous autorisez continuent d'arriver, mais ils ne sonnent pas."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:230
+msgid "Choose who can add you to a group chat without asking first."
+msgstr "Choisissez qui peut vous ajouter à une discussion de groupe sans demander d'abord."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:183
+msgid "Choose who can start a call with you."
+msgstr "Choisissez qui peut vous appeler."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:229
+msgid "Group chats"
+msgstr "Discussions de groupe"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:218
+msgid "Receive calls silently"
+msgstr "Recevoir les appels en silence"

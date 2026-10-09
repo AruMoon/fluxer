@@ -5981,7 +5981,7 @@ msgid "Block"
 msgstr "ब्लॉक करें"
 
 #. Sensitive media filter option meaning the media is hidden entirely. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:31
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:32
 msgctxt "sensitive-media-filter-level"
 msgid "Block"
 msgstr "ब्लॉक करें"
@@ -6098,7 +6098,7 @@ msgid "Blur"
 msgstr "धुंधला करें"
 
 #. Sensitive media filter option meaning the media is blurred until the viewer reveals it. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:25
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:26
 msgctxt "sensitive-media-filter-level"
 msgid "Blur"
 msgstr "धुंधला करें"
@@ -8050,6 +8050,11 @@ msgstr "चुनें कि {clientLabel} आपकी कम्युनि�
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:287
 msgid "Choose what friends see in their active now panel"
 msgstr "चुनें कि दोस्त अपने अभी सक्रिय पैनल में क्या देखें"
+
+#. Introduction at the top of the sensitive content settings. Show, Blur and Block are the option names used below and must match their translations.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:50
+msgid "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+msgstr "चुनें कि संवेदनशील के रूप में फ़्लैग की गई छवियों और वीडियो के साथ क्या होता है। दिखाएँ उन्हें सामान्य रूप से प्रदर्शित करता है, धुंधला करें क्लिक करने तक उन्हें छिपा देता है, और ब्लॉक करें उन्हें पूरी तरह से छिपा देता है।"
 
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:311
 msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
@@ -12735,12 +12740,12 @@ msgid "Direct messages (open and closed)"
 msgstr "डायरेक्ट मैसेज (खुले और बंद)"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:37
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:38
 msgid "Direct messages from friends"
 msgstr "दोस्तों के डायरेक्ट मैसेज"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:41
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:42
 msgid "Direct messages from others"
 msgstr "दूसरों के डायरेक्ट मैसेज"
 
@@ -16533,6 +16538,11 @@ msgstr "सिर्फ़ दोस्त"
 #: src/features/channel/components/direct_message/DMFriendsView.tsx:37
 msgid "Friends sections"
 msgstr "दोस्तों के सेक्शन"
+
+#. Privacy > Active now: helper text under the switch controlling whether friends see voice activity.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
+msgid "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+msgstr "आपके दोस्त आपको आपकी एक्टिव नाउ लिस्ट में देख पाएंगे कि आप किस वॉयस चैनल में हैं। आप इसे हर 24 घंटे में एक बार बदल सकते हैं।"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:86
@@ -21203,6 +21213,16 @@ msgstr "मीडिया डिस्प्ले"
 msgid "Media filter"
 msgstr "मीडिया फ़िल्टर"
 
+#. Helper text under "Messages in community channels" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:64
+msgid "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+msgstr "18+ के रूप में चिह्नित नहीं किए गए चैनलों में मीडिया। 18+ के रूप में चिह्नित चैनल हमेशा इसे दिखाते हैं।"
+
+#. Helper text under "Direct messages from others" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:60
+msgid "Media in group chats and in direct messages from people who aren't your friends."
+msgstr "समूह चैट में और उन लोगों से सीधे संदेशों में जो आपके मित्र नहीं हैं, मीडिया।"
+
 #. Plutonium page comparison row label for the saved media limit.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:215
 msgid "Media items you can save for later"
@@ -21254,6 +21274,11 @@ msgstr "मीडिया का आकार"
 msgctxt "keyboard-key-name"
 msgid "Media stop"
 msgstr "प्लेबैक रोकें"
+
+#. Helper text under "Direct messages from friends" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:56
+msgid "Media your friends send you in direct messages."
+msgstr "आपके दोस्तों द्वारा आपको डायरेक्ट मैसेज में भेजा गया मीडिया।"
 
 #. Activity log value naming the medium member verification level of a community.
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
@@ -21809,7 +21834,7 @@ msgid "Messages failed to load"
 msgstr "मैसेज लोड नहीं हो पाए"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:45
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:46
 msgid "Messages in community channels"
 msgstr "कम्युनिटी चैनलों में मैसेज"
 
@@ -31227,7 +31252,7 @@ msgid "Shorten your about me and try again."
 msgstr "अपने “मेरे बारे में” को छोटा करें और फिर से कोशिश करें।"
 
 #. Sensitive media filter option meaning the media is shown as-is. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:19
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:20
 msgctxt "sensitive-media-filter-level"
 msgid "Show"
 msgstr "दिखाएँ"
@@ -39219,11 +39244,6 @@ msgstr "वॉइस गतिविधि"
 msgid "Voice activity"
 msgstr "वॉइस गतिविधि"
 
-#. Privacy > Active now: settings subsection title for voice activity sharing.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
-msgid "Voice activity on active now"
-msgstr "'अभी सक्रिय' में वॉइस गतिविधि"
-
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:318
 msgid "Voice activity priority"
@@ -41875,3 +41895,51 @@ msgstr "अभी"
 #: src/features/user/components/modals/PrivacySetupModal.tsx:27
 msgid "Take a moment to check who can message you. Nothing changes unless you choose to."
 msgstr "एक पल लें और जांचें कि आपको कौन संदेश भेज सकता है। जब तक आप चुनते नहीं हैं, तब तक कुछ भी नहीं बदलता है।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:236
+msgid "Anyone who finds you can send a request. Turn this off to pick groups below."
+msgstr "जो कोई भी आपको ढूंढता है, वह अनुरोध भेज सकता है। नीचे दिए गए समूहों को चुनने के लिए इसे बंद कर दें।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:272
+msgid "Applies to bots in communities you join from now on. You can also change it for each community."
+msgstr "अब से आपके द्वारा शामिल किए जाने वाले समुदायों में बॉट्स पर लागू होता है। आप इसे प्रत्येक समुदाय के लिए भी बदल सकते हैं।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:265
+msgid "Applies to communities you join from now on. You can also change it for each community."
+msgstr "अब से आपके द्वारा शामिल किए जाने वाले समुदायों पर लागू होता है। आप इसे प्रत्येक समुदाय के लिए भी बदल सकते हैं।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:231
+msgid "Choose who can send you a friend request."
+msgstr "चुनें कि कौन आपको फ्रेंड रिक्वेस्ट भेज सकता है।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:260
+msgid "Friends can always message you. These settings cover people and bots you only share a community with."
+msgstr "आपके दोस्त आपको हमेशा मैसेज कर सकते हैं। ये सेटिंग्स उन लोगों और बॉट्स के लिए हैं जिनके साथ आप केवल एक कम्युनिटी शेयर करते हैं।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:251
+msgid "People who share a community with you."
+msgstr "जो लोग आपके साथ एक समुदाय साझा करते हैं।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:243
+msgid "People who share at least one friend with you."
+msgstr "ऐसे लोग जिनके कम से कम एक दोस्त आपके साथ साझा हो।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:219
+msgid "Calls you allow still come through, but they don't ring."
+msgstr "आपके द्वारा अनुमति दी गई कॉलें अभी भी आती हैं, लेकिन वे बजेंगी नहीं।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:230
+msgid "Choose who can add you to a group chat without asking first."
+msgstr "चुनें कि कौन आपको पहले पूछे बिना ग्रुप चैट में जोड़ सकता है।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:183
+msgid "Choose who can start a call with you."
+msgstr "आपसे कौन कॉल शुरू कर सकता है, यह चुनें।"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:229
+msgid "Group chats"
+msgstr "ग्रुप चैट"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:218
+msgid "Receive calls silently"
+msgstr "कॉल चुपचाप प्राप्त करें"

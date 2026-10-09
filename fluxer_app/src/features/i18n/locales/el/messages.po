@@ -5981,7 +5981,7 @@ msgid "Block"
 msgstr "Μπλοκάρισμα"
 
 #. Sensitive media filter option meaning the media is hidden entirely. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:31
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:32
 msgctxt "sensitive-media-filter-level"
 msgid "Block"
 msgstr "Αποκλεισμός"
@@ -6098,7 +6098,7 @@ msgid "Blur"
 msgstr "Θάμπωμα"
 
 #. Sensitive media filter option meaning the media is blurred until the viewer reveals it. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:25
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:26
 msgctxt "sensitive-media-filter-level"
 msgid "Blur"
 msgstr "Θάμπωμα"
@@ -8050,6 +8050,11 @@ msgstr "Επίλεξε τι μπορεί να κάνει το {clientLabel} στ
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:287
 msgid "Choose what friends see in their active now panel"
 msgstr "Επιλέξτε τι βλέπουν οι φίλοι στην ενότητα «Ενεργοί τώρα»"
+
+#. Introduction at the top of the sensitive content settings. Show, Blur and Block are the option names used below and must match their translations.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:50
+msgid "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+msgstr "Επιλέξτε τι συμβαίνει με τις εικόνες και τα βίντεο που επισημαίνονται ως ευαίσθητα. Η Εμφάνιση τα προβάλλει κανονικά, η Θόλωση τα κρύβει μέχρι να κάνετε κλικ και το Μπλοκάρισμα τα κρύβει εντελώς."
 
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx:311
 msgid "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
@@ -12735,12 +12740,12 @@ msgid "Direct messages (open and closed)"
 msgstr "Απευθείας μηνύματα (ανοιχτά και κλειστά)"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:37
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:38
 msgid "Direct messages from friends"
 msgstr "Απευθείας μηνύματα από φίλους"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:41
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:42
 msgid "Direct messages from others"
 msgstr "Απευθείας μηνύματα από άλλους"
 
@@ -16533,6 +16538,11 @@ msgstr "Μόνο φίλοι"
 #: src/features/channel/components/direct_message/DMFriendsView.tsx:37
 msgid "Friends sections"
 msgstr "Ενότητες φίλων"
+
+#. Privacy > Active now: helper text under the switch controlling whether friends see voice activity.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
+msgid "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+msgstr "Οι φίλοι σας βλέπουν σε ποιο κανάλι φωνής βρίσκεστε στη λίστα \"Τώρα ενεργοί\". Μπορείτε να αλλάξετε αυτήν τη ρύθμιση μία φορά κάθε 24 ώρες."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts:86
@@ -21203,6 +21213,16 @@ msgstr "Εμφάνιση πολυμέσων"
 msgid "Media filter"
 msgstr "Φίλτρο πολυμέσων"
 
+#. Helper text under "Messages in community channels" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:64
+msgid "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+msgstr "Μέσα σε κανάλια που δεν είναι χαρακτηρισμένα ως 18+. Τα κανάλια που είναι χαρακτηρισμένα ως 18+ τα εμφανίζουν πάντα."
+
+#. Helper text under "Direct messages from others" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:60
+msgid "Media in group chats and in direct messages from people who aren't your friends."
+msgstr "Μέσα σε ομαδικές συνομιλίες και σε απευθείας μηνύματα από άτομα που δεν είναι φίλοι σας."
+
 #. Plutonium page comparison row label for the saved media limit.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts:215
 msgid "Media items you can save for later"
@@ -21254,6 +21274,11 @@ msgstr "Μέγεθος πολυμέσων"
 msgctxt "keyboard-key-name"
 msgid "Media stop"
 msgstr "Διακοπή αναπαραγωγής"
+
+#. Helper text under "Direct messages from friends" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:56
+msgid "Media your friends send you in direct messages."
+msgstr "Μέσα που σου στέλνουν οι φίλοι σου σε απευθείας μηνύματα."
 
 #. Activity log value naming the medium member verification level of a community.
 #. Member verification level option in the community moderation settings tab. Short standalone severity label.
@@ -21809,7 +21834,7 @@ msgid "Messages failed to load"
 msgstr "Τα μηνύματα δεν φορτώθηκαν"
 
 #. Label in the sensitive content tab.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:45
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:46
 msgid "Messages in community channels"
 msgstr "Μηνύματα σε κανάλια κοινότητας"
 
@@ -31227,7 +31252,7 @@ msgid "Shorten your about me and try again."
 msgstr "Συντομεύστε το \"Σχετικά με εμένα\" και δοκιμάστε ξανά."
 
 #. Sensitive media filter option meaning the media is shown as-is. One of three mutually exclusive values (Show, Blur, Block); keep all three in the same grammatical form.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:19
+#: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx:20
 msgctxt "sensitive-media-filter-level"
 msgid "Show"
 msgstr "Εμφάνιση"
@@ -39219,11 +39244,6 @@ msgstr "φωνητική δραστηριότητα"
 msgid "Voice activity"
 msgstr "Φωνητική δραστηριότητα"
 
-#. Privacy > Active now: settings subsection title for voice activity sharing.
-#: src/features/user/components/modals/tabs/privacy_safety_tab/ActiveNowTab.tsx:72
-msgid "Voice activity on active now"
-msgstr "Φωνητική δραστηριότητα στο «Ενεργός τώρα»"
-
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts:318
 msgid "Voice activity priority"
@@ -41875,3 +41895,51 @@ msgstr "Αυτή τη στιγμή"
 #: src/features/user/components/modals/PrivacySetupModal.tsx:27
 msgid "Take a moment to check who can message you. Nothing changes unless you choose to."
 msgstr "Αφιερώστε λίγο χρόνο για να ελέγξετε ποιος μπορεί να σας στείλει μήνυμα. Τίποτα δεν αλλάζει εκτός αν το επιλέξετε εσείς."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:236
+msgid "Anyone who finds you can send a request. Turn this off to pick groups below."
+msgstr "Όποιος σε βρει μπορεί να στείλει αίτημα. Απενεργοποίησε αυτήν την επιλογή για να επιλέξεις ομάδες παρακάτω."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:272
+msgid "Applies to bots in communities you join from now on. You can also change it for each community."
+msgstr "Ισχύει για bots σε κοινότητες που θα ενταχθείς από τώρα και στο εξής. Μπορείς επίσης να το αλλάξεις για κάθε κοινότητα."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:265
+msgid "Applies to communities you join from now on. You can also change it for each community."
+msgstr "Ισχύει για κοινότητες που θα συμμετάσχεις από τώρα και στο εξής. Μπορείς επίσης να το αλλάξεις για κάθε κοινότητα."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:231
+msgid "Choose who can send you a friend request."
+msgstr "Επιλέξτε ποιος μπορεί να σας στείλει αίτημα φιλίας."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:260
+msgid "Friends can always message you. These settings cover people and bots you only share a community with."
+msgstr "Οι φίλοι μπορούν πάντα να σου στείλουν μήνυμα. Αυτές οι ρυθμίσεις αφορούν άτομα και bots με τα οποία μοιράζεσαι μόνο μια κοινότητα."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:251
+msgid "People who share a community with you."
+msgstr "Άτομα που μοιράζονται μια κοινότητα μαζί σας."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx:243
+msgid "People who share at least one friend with you."
+msgstr "Άτομα που μοιράζονται τουλάχιστον έναν φίλο μαζί σου."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:219
+msgid "Calls you allow still come through, but they don't ring."
+msgstr "Οι κλήσεις που επιτρέπεις εξακολουθούν να έρχονται, αλλά δεν χτυπούν."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:230
+msgid "Choose who can add you to a group chat without asking first."
+msgstr "Επίλεξε ποιος μπορεί να σε προσθέσει σε ομαδική συνομιλία χωρίς να ρωτήσει πρώτα."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:183
+msgid "Choose who can start a call with you."
+msgstr "Επίλεξε ποιος μπορεί να ξεκινήσει μια κλήση μαζί σου."
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:229
+msgid "Group chats"
+msgstr "Ομαδικές συνομιλίες"
+
+#: src/features/user/components/modals/tabs/privacy_safety_tab/CommunicationTab.tsx:218
+msgid "Receive calls silently"
+msgstr "Λήψη κλήσεων σε σίγαση"

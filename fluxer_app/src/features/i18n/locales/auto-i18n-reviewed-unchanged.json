@@ -2375,6 +2375,9 @@
         "msgid": "Choose the reason again"
       },
       {
+        "msgid": "Choose what happens to images and videos flagged as sensitive. Show displays them as usual, Blur hides them until you click, and Block hides them completely."
+      },
+      {
         "msgid": "Choose what members must have before they can post or DM community members. Members with roles can bypass these checks. For public spaces, we recommend enabling verification."
       },
       {
@@ -2972,6 +2975,9 @@
         "msgid": "Friends can always send you direct messages. Choose whether people who share a community with you can message you without sending a friend request first."
       },
       {
+        "msgid": "Friends see which voice channel you're in on their Active now list. You can change this once every 24 hours."
+      },
+      {
         "msgid": "From {sourceGuildName}"
       },
       {
@@ -3332,7 +3338,16 @@
         "msgid": "May cause compatibility issues for viewers. We’re working on improving this."
       },
       {
+        "msgid": "Media in channels that are not marked 18+. Channels marked 18+ always show it."
+      },
+      {
+        "msgid": "Media in group chats and in direct messages from people who aren't your friends."
+      },
+      {
         "msgid": "Media items you can save for later"
+      },
+      {
+        "msgid": "Media your friends send you in direct messages."
       },
       {
         "msgid": "Members who can manage posts can add or remove it."
@@ -5373,6 +5388,42 @@
       },
       {
         "msgid": "{count, plural, one {# community has its own setting} other {# communities have their own setting}}"
+      },
+      {
+        "msgid": "Anyone who finds you can send a request. Turn this off to pick groups below."
+      },
+      {
+        "msgid": "Applies to bots in communities you join from now on. You can also change it for each community."
+      },
+      {
+        "msgid": "Applies to communities you join from now on. You can also change it for each community."
+      },
+      {
+        "msgid": "Choose who can send you a friend request."
+      },
+      {
+        "msgid": "Friends can always message you. These settings cover people and bots you only share a community with."
+      },
+      {
+        "msgid": "People who share a community with you."
+      },
+      {
+        "msgid": "People who share at least one friend with you."
+      },
+      {
+        "msgid": "Calls you allow still come through, but they don't ring."
+      },
+      {
+        "msgid": "Choose who can add you to a group chat without asking first."
+      },
+      {
+        "msgid": "Choose who can start a call with you."
+      },
+      {
+        "msgid": "Group chats"
+      },
+      {
+        "msgid": "Receive calls silently"
       }
     ],
     "es-419": [
