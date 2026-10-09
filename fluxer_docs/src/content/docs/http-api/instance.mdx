@@ -16,7 +16,7 @@ Each `GET` route answers with `Access-Control-Allow-Origin: *`, replaced by the 
 
 ## Instance discovery object
 
-The discovery document is the complete public description of one deployment. Every field without a `?` is always present. This server never sends `codename` or `age_policy`, and `domain_migration` and `endpoints.upload_relay` are absent only from a server older than this version.
+The discovery document is the complete public description of one deployment. Every field without a `?` is always present. This server never sends `codename` or `age_policy`, and `endpoints.upload_relay` is absent only from a server older than this version.
 
 ### Structure
 
@@ -36,9 +36,27 @@ The discovery document is the complete public description of one deployment. Eve
 | push | [push configuration](#push-configuration-object) object | Public Web Push identity |
 | app_public | [public application configuration](#public-application-configuration-object) object | Public client configuration |
 | age_policy? | [age policy](#age-policy-object) object | Regional age policy for the deployment |
-| domain_migration? | [domain migration](#domain-migration-object) object | Web domain migration switch and logged-out rollout |
+| notice?<sup>2</sup> | ?[instance notice](#instance-notice-object) object | Notice from the deployment's admins, or null when there is none |
 
 <sup>1</sup> The value is a plain integer that increases when the API introduces a change a client is expected to notice, and the current value is `1`
+
+<sup>2</sup> Absent only from a server older than this version. A notice whose `ends_at` has passed is reported as null
+
+## Instance notice object
+
+A short message an admin writes for everyone on the deployment, such as planned maintenance. Clients show it from `starts_at` until `ends_at` and let people dismiss it.
+
+### Structure
+
+| Field | Type | Description |
+| --- | --- | --- |
+| id<sup>1</sup> | string | Identifier of this version of the notice |
+| message | string | Notice text written by an admin (1-1000 characters) |
+| url | ?string | Absolute `http` or `https` link shown with the notice, or null |
+| starts_at | ?ISO8601 timestamp | When clients start showing the notice, or null to show it at once |
+| ends_at | ?ISO8601 timestamp | When clients stop showing the notice, or null for no end |
+
+<sup>1</sup> A new identifier is issued whenever the text, link or either time changes, so a client can remember which notice a person dismissed
 
 ## Instance endpoints object
 
@@ -110,8 +128,6 @@ A client MUST NOT upgrade a published `http` value to `https`, downgrade a publi
 
 ## CAPTCHA configuration object
 
-Whether this deployment asks for a CAPTCHA on gated operations.
-
 ### Structure
 
 | Field | Type | Description |
@@ -143,28 +159,59 @@ Deployment-wide switches a client reads before it offers a feature, plus whether
 | presigned_attachment_uploads | boolean | Whether a client can request presigned attachment upload URLs |
 | emails_enabled<sup>1</sup> | boolean | Whether the deployment sends email |
 | phone_verification_enabled | boolean | Deprecated. Always false |
+| discovery_enabled? | boolean | Whether the Explore community directory is available, true when missing |
 | account_identity<sup>5</sup> | string | How members sign in, one of the [account identity modes](#account-identity-modes) |
 | tag_style<sup>6</sup> | string | How usernames are tagged, one of the [tag styles](#tag-styles) |
 | desktop_modules_enabled? | boolean | Whether desktop clients may load downloadable modules |
-| discovery_enabled?<sup>7</sup> | boolean | Whether community discovery is enabled |
 | account_deletion_grace_period_hours? | integer | Hours between a deletion request and the permanent deletion of the account (1-8,760) |
-| max_background_gateway_connections? | integer | Maximum Gateway connections a client may keep open for background accounts (0-64) |
+| identifier_first? | boolean | Whether clients start sign-in with [identify an account](/http-api/authentication/#identify-an-account), false when missing |
+| instant_accounts?<sup>7</sup> | boolean | Whether [register an account](/http-api/authentication/#register-an-account) accepts an instant account, created from only a display name, false when missing |
+| email_codes? | boolean | Whether [send an email code](/http-api/authentication/#send-an-email-code) works, false when missing |
+| date_of_birth_step? | boolean | Whether accounts [set their date of birth](/http-api/users/current-user/#set-date-of-birth) after they are created, so sign-up forms never ask for it, false when missing |
+| instant_account_availability?<sup>7</sup> | string | Whether public sign-up can create an instant account, and why not, one of the [instant account availability](#instant-account-availability) values |
+| interaction_tier?<sup>8</sup> | string | How the [account tiers](/http-api/users/#account-tiers) apply, `legacy` or `enforced` |
+| guild_join_gate?<sup>8</sup> | string | When joining a community needs a verified account under `enforced`, `off`, `visits_capable` or `always` |
+| email_delivery_state? | string | Whether the deployment sends email, and why not, one of the [email delivery states](#email-delivery-states) |
+| verification_basis?<sup>9</sup> | string | What an account needs to be verified right now, `confirmed_email` or `local_credential` |
 
 <sup>1</sup> The value is true only when email is switched on and the transport is completely configured. It is always false on a `username` deployment
 
 <sup>2</sup> True only when billing is switched on, a Stripe secret key is set, at least one currency has both a monthly and a yearly price, and `premium_enabled` is true. It is computed on each request
 
-<sup>3</sup> Always true on a hosted deployment. A self-hosted deployment reports true only while its [premium mode](/admin-api/instance/#premium-modes) is `mirror`
+<sup>3</sup> True only while its [premium mode](/admin-api/instance/#premium-modes) is `mirror`
 
-<sup>4</sup> On a hosted deployment, true while billing is switched on and a Stripe secret key is set. A self-hosted deployment reports true while a Stripe secret key is set and `premium_enabled` is true, even after billing is switched off
+<sup>4</sup> True while a Stripe secret key is set and `premium_enabled` is true, even after billing is switched off
 
-<sup>5</sup> Always `email` on a hosted deployment. A client treats a missing value as `email`, which is what a deployment from before the field existed means
+<sup>5</sup> A client treats a missing value as `email`, which is what a deployment from before the field existed means
 
-<sup>6</sup> Always `none` on a `username` deployment. Always `random` on a hosted deployment and on an instance that existed before the field. A client treats a missing value as `random`
+<sup>6</sup> Always `none` on a `username` deployment. Always `random` on an instance that existed before the field. A client treats a missing value as `random`
 
-<sup>7</sup> A client treats a missing value as true
+<sup>7</sup> `instant_accounts` is true only while `instant_account_availability` is `available`. A registration URL code that skips approval still allows an instant account while public sign-up is closed or needs approval. A client treats a missing `instant_account_availability` as `available` when `instant_accounts` is true and `disabled` otherwise
+
+<sup>8</sup> A client treats a missing `interaction_tier` as `legacy` and a missing `guild_join_gate` as `always`. The admin [accounts configuration](/admin-api/instance/#accounts-configuration-object) explains both
+
+<sup>9</sup> The value in effect after `auto` is resolved, so it is never `auto`. A `username` deployment, and any instance that cannot send email right now, reports `local_credential`. A client treats a missing value as `confirmed_email` while `emails_enabled` is true and `local_credential` otherwise
 
 A deployment that reports `emails_enabled` as false sends no verification, password recovery, or IP authorisation message, and the flows that depend on one are unusable there. [Deployment availability](/http-api/deployment-availability/) states which routes a self-hosted deployment does not serve at all.
+
+### Instant account availability
+
+| Value | Description |
+| --- | --- |
+| available | Public sign-up can create an instant account |
+| disabled | An admin has turned instant accounts off |
+| captcha_off | Instant accounts are on, but the CAPTCHA they need is off |
+| registration_closed | Public registration is closed |
+| approval_required | New accounts wait for admin approval, which needs a password to sign in afterwards |
+
+### Email delivery states
+
+| Value | Description |
+| --- | --- |
+| on | The deployment sends email |
+| off_username_mode | The deployment uses usernames and never sends email |
+| off_disabled | An admin or the deployment configuration has turned email off |
+| off_incomplete | Email is turned on, but the SMTP settings or the sender address are incomplete |
 
 ### Account identity modes
 
@@ -184,8 +231,6 @@ A `username` deployment answers its email routes with 400 `EMAIL_UNAVAILABLE_ON_
 
 ## GIF provider object
 
-The GIF provider this deployment has bound, and whether a client shows its attribution mark.
-
 ### Structure
 
 | Field | Type | Description |
@@ -199,8 +244,6 @@ The GIF provider this deployment has bound, and whether a client shows its attri
 The fields describe the provider a deployment has bound even when [service availability](#service-availability-object) reports `gif_enabled` as false. A client reads `gif_enabled` to decide whether to offer the picker at all. A deployment that has bound no GIF provider still publishes the stock values `klipy`, `Klipy`, and false.
 
 ## Registration policy object
-
-Who can register an account on this deployment.
 
 ### Structure
 
@@ -221,22 +264,21 @@ Who can register an account on this deployment.
 
 ## Community policy object
 
-Whether this deployment runs as one community, and whether direct messages exist on it at all.
-
 ### Structure
 
 | Field | Type | Description |
 | --- | --- | --- |
 | single_community | boolean | Whether this deployment runs as one community that every account joins |
 | single_community_guild_id<sup>1</sup> | ?snowflake | The ID of the guild every account joins in single-community mode, or null |
-| direct_messages_disabled | boolean | Whether direct messages and friend requests are disabled for the whole deployment |
+| direct_messages_disabled | boolean | Whether direct messages are disabled for the whole deployment |
+| friends_disabled?<sup>2</sup> | boolean | Whether friend requests are disabled for the whole deployment |
 | guild_create_access | boolean | Whether every account can create communities, or only admins and holders of the `feature_guild_create` limit |
 
 <sup>1</sup> The identifier is published only while `single_community` is true and the deployment has designated a community guild
 
-## Service availability object
+<sup>2</sup> Absent only from a server older than this version, where `direct_messages_disabled` covers friend requests too
 
-Each field reports whether one optional integration is available on this deployment.
+## Service availability object
 
 ### Structure
 
@@ -248,8 +290,6 @@ Each field reports whether one optional integration is available on this deploym
 
 ## Push configuration object
 
-This deployment's public Web Push identity.
-
 ### Structure
 
 | Field | Type | Description |
@@ -259,8 +299,6 @@ This deployment's public Web Push identity.
 | event_resolution_path? | string | API path a client calls to resolve the payload of a push event |
 | external_relay_url? | ?string | URL of the external push relay, or null when there is none |
 | relay_signing_key_hashes? | ?array[string] | Hashes of the keys the external push relay signs with, or null |
-
-<sup>1</sup> Null when the deployment has configured no Web Push identity
 
 ## Limit configuration object
 
@@ -304,8 +342,6 @@ The document publishes neither the requesting account's traits nor any guild fea
 Nothing validates a rule's `traits` filter against `traitDefinitions`, so a rule can filter on a name that collection omits. A self-hosted deployment whose [premium mode](/admin-api/instance/#premium-modes) is `everyone` publishes an empty collection and has no rule that filters on `premium`.
 
 ## Limit rule object
-
-One rule of the limit configuration, with the filters that select it and the values it sets.
 
 ### Structure
 
@@ -361,6 +397,7 @@ Each key names one limit. A key whose name begins with `feature_` is a feature g
 | feature_higher_video_quality | Access to higher video streaming quality, in user scope |
 | feature_per_guild_profiles | Different profile per guild, in user scope |
 | feature_voice_entrance_sounds | Play a sound when joining voice, in user scope |
+| guild_visit_history_days_unverified | Days of message history an account without a confirmed email can read while [visiting](/http-api/guilds/#visiting-guilds) a guild, in user scope |
 | max_attachment_file_size | Maximum size of each attachment file in bytes, in user and guild scope |
 | max_attachments_per_message | Maximum number of file attachments per message, in user and guild scope |
 | max_bio_length | Maximum characters in a user biography, in user scope. At most 320 |
@@ -383,6 +420,7 @@ Each key names one limit. A key whose name begins with `feature_` is a feature g
 | max_guild_roles | Maximum roles per guild, in guild scope |
 | max_guild_stickers | Maximum stickers per guild, in guild scope |
 | max_guild_stickers_more<sup>2</sup> | Compatibility alias for older clients, in guild scope |
+| max_guild_visits | Maximum guilds a user can [visit](/http-api/guilds/#visiting-guilds) at once. Accounts without a confirmed email get half, in user scope |
 | max_guilds | Maximum number of guilds a user can join, in user scope |
 | max_message_length | Maximum number of characters per message, in user and guild scope |
 | max_private_channels_per_user | Maximum direct message channels per user, in user scope |
@@ -418,8 +456,6 @@ Branding, setup state, legal documents, and registration fields a client reads b
 
 ## Public branding object
 
-The instance identity a client renders: its name, its images, its theme colour, its status page links, and the name of its premium tier. The image URLs customise browser metadata, install metadata, and link previews.
-
 ### Structure
 
 | Field | Type | Description |
@@ -430,15 +466,25 @@ The instance identity a client renders: its name, its images, its theme colour, 
 | logo_url | ?string | Application logo URL, or null |
 | wordmark_url | ?string | Application wordmark URL, or null |
 | favicon_url | ?string | Browser favicon URL, or null |
+| favicon_dark_url<sup>3</sup> | ?string | Browser favicon URL for a dark colour scheme, or null |
 | theme_color | ?string | Brand and browser theme colour as lowercase `#rrggbb`, or null |
 | status_page_url | ?string | Public status page URL, or null |
 | status_page_incident_history_url | ?string | Status page incident history URL, or null |
 | premium_product_name | string | Name of the premium tier a client displays. A self-hosted deployment reports `Premium` until the operator sets a name |
 | premium_info_url | ?string | Absolute URL of a page describing the premium tier, or null |
+| sign_in_backdrop_url<sup>1</sup> | ?string | Image URL drawn behind the sign-in screens under a dark scrim, or null |
+| custom_css<sup>2</sup> | ?string | Stylesheet the web and desktop app apply on every page, or null |
+| upload_limit_message<sup>4</sup> | ?string | Markdown shown when a file is over the upload limit, or null |
+
+<sup>1</sup> Null means the default space background
+
+<sup>2</sup> Applied before the person's own theme and custom CSS, so those win
+
+<sup>3</sup> Shown in place of `favicon_url` while the browser uses a dark colour scheme. Null means one favicon for every colour scheme
+
+<sup>4</sup> Shown in place of the default sentence about the instance setting the limit
 
 ## Public setup state object
-
-Whether the deployment has finished its initial configuration, and where an operator goes to continue it.
 
 ### Structure
 
@@ -447,17 +493,27 @@ Whether the deployment has finished its initial configuration, and where an oper
 | configured | boolean | Whether initial deployment configuration is complete |
 | admin_url<sup>1</sup> | ?string | The admin application URL used to continue setup, or null |
 | account_identity_locked? | boolean | Whether the sign-in method can no longer change, sent only while a self-hosted deployment is not configured |
+| account_identity_lock_reason? | ?string | One of the [account identity lock reasons](#account-identity-lock-reasons), or null while the method can still change |
 | setup_token_required? | boolean | Whether registration needs the setup token, sent only while a self-hosted deployment is not configured |
 
 <sup>1</sup> The value is the deployment's configured admin endpoint, and it is null when no admin endpoint is configured
 
-`account_identity_locked` is true once the first account exists, and on a deployment stored as already in use. [Set the setup sign-in method](#set-the-setup-sign-in-method) returns 409 there.
+`account_identity_locked` is true once the first account exists, and on a deployment stored as already in use. [Set the setup sign-in method](#set-the-setup-sign-in-method) returns 409 there. `account_identity_lock_reason` says why, and is sent only while a self-hosted deployment is not configured, like the lock itself.
+
+### Account identity lock reasons
+
+| Value | Description |
+| --- | --- |
+| setup_configured | The deployment configuration marks setup as finished |
+| existing_instance | The deployment was in use before username sign-in existed, so it stays on `email` |
+| admin_exists | The deployment already has an admin account |
+| accounts_exist | The deployment already has accounts, none of them an admin |
+
+When more than one applies, the value is the first one in this table.
 
 `setup_token_required` is true while [Register an account](/http-api/authentication/#register-an-account) refuses a body without `setup_token`. It is false once the first admin account exists, and on a deployment that does not enforce the token.
 
 ## Public legal configuration object
-
-The public document URLs a client links from its registration form and its report flows.
 
 ### Structure
 
@@ -467,40 +523,19 @@ The public document URLs a client links from its registration form and its repor
 | privacy_url | ?string | Public privacy policy URL, or null |
 | guidelines_url<sup>1</sup> | ?string | Public community guidelines URL, or null |
 
-<sup>1</sup> The URL the operator set. A [report flow](/http-api/reports/#report-flows) and the account enforcement emails link it. When it is null, a hosted instance links its own guidelines page, and a self-hosted instance hides every guidelines link
+<sup>1</sup> The URL the operator set. A [report flow](/http-api/reports/#report-flows) and the account enforcement emails link it. When it is null, every guidelines link is hidden
 
 ## Public registration fields object
 
-Which extra fields public registration collects.
-
 ### Structure
 
 | Field | Type | Description |
 | --- | --- | --- |
-| collect_date_of_birth | boolean | Whether public registration collects and validates a date of birth |
+| collect_date_of_birth<sup>1</sup> | boolean | Whether the deployment asks accounts for a date of birth |
 
-## Domain migration object
-
-The public part of the instance [domain migration configuration](/admin-api/instance/#domain-migration-configuration-object). The official web client reads it before sign-in to decide whether its legacy origin forwards to the new one. Every instance publishes it, and only the official web client acts on it.
-
-### Structure
-
-| Field | Type | Description |
-| --- | --- | --- |
-| enabled | boolean | Whether the migration runs at all |
-| anonymous_rollout_basis_points | integer | Share of logged-out devices moved to the new origin, in basis points (0-10000) |
-| rollout_salt | string | Salt of the sampling hash, shared by accounts and devices |
-| standalone_forwarding | boolean | Whether installed desktop web apps forward to the new origin once their data has moved |
-
-`enabled` is the instance-wide switch. While it is false, no client starts a migration and a client that already migrated stops forwarding from the legacy origin. No [passkey update](/http-api/users/mfa/#passkey-updates) opens, and the [passkey bridge](/http-api/authentication/#passkey-bridge) keeps working for people already on a new origin.
-
-A logged-out device draws its own random ID once and keeps it. The device moves when its bucket over that ID and `rollout_salt` falls below `anonymous_rollout_basis_points`. Signed-in accounts use the [domain migration assignment](/http-api/experiments/#domain-migration-assignment-object) instead.
-
-While `standalone_forwarding` is false, an installed desktop web app moves its data and stays on the legacy origin. Browser tabs forward either way.
+<sup>1</sup> Derived from the admin [`date_of_birth`](/admin-api/instance/#accounts-configuration-object) setting, and false only while it is `off`
 
 ## Age policy object
-
-The regions where the deployment gates access behind an age check or blocks it.
 
 ### Structure
 
@@ -517,7 +552,6 @@ The regions where the deployment gates access behind an age check or blocks it.
 | country_code | string | The ISO 3166-1 alpha-2 country code |
 | region_code | ?string | The ISO 3166-2 subdivision code, or null when the entry covers the whole country |
 | action | string | `restrict` to require an age check, or `block` to refuse access |
-| card_verification_available | boolean | Whether card age verification is available in the region |
 
 ## Geolocation object
 
@@ -557,8 +591,6 @@ The geo collections are fixed by the release, so they are identical in every res
 
 ## Geo entry object
 
-A geo entry names a whole country when its `regionCode` is null and names one subdivision otherwise.
-
 ### Structure
 
 | Field | Type | Description |
@@ -567,8 +599,6 @@ A geo entry names a whole country when its `regionCode` is null and names one su
 | regionCode | ?string | The ISO 3166-2 subdivision code within the country, or null when the entry covers the whole country |
 
 ## Account identity object
-
-The sign-in method a new deployment uses after [set the setup sign-in method](#set-the-setup-sign-in-method).
 
 ### Structure
 
@@ -612,6 +642,38 @@ A lookup that resolves nothing still returns 200 with `countryCode`, `regionCode
 ### Rate limit
 
 30 requests per minute for each authenticated user, or for each client IP address when the request has no credential, on the `ip:geo_lookup` bucket.
+
+## Check the setup token
+
+<RouteHeader method="POST" path="/v1/instance/setup/token-checks" unauthenticated />
+
+Checks a setup token without using it up. The setup wizard calls this first, so a wrong token is caught before any other question.
+
+The route returns 204 when the token is correct, and also when the deployment no longer needs one, which is the case once the first admin account exists and on a deployment that does not enforce the token.
+
+### JSON body
+
+| Field | Type | Description |
+| --- | --- | --- |
+| setup_token<sup>1</sup> | string | The setup token of the deployment (1-256 characters) |
+
+<sup>1</sup> Checked the way [Register an account](/http-api/authentication/#register-an-account) checks it, with the same field codes and the same allowance for wrong tokens
+
+### Response
+
+| Status | Body | Condition |
+| --- | --- | --- |
+| 204 | None | The token is correct, or the deployment needs no setup token |
+| 400 | [error response](/http-api/#error-response) | The body is invalid, or the setup token is missing or wrong |
+| 429 | [rate limit response](/topics/rate-limits/#rate-limit-response-object) | Route or global bucket denies the request, or the address has used its wrong setup token allowance |
+
+### Side effects
+
+None. The token stays valid, and a wrong token counts toward the allowance of the address.
+
+### Rate limit
+
+10 requests per minute for each authenticated user, or for each client IP address when the request has no credential, on the `instance:setup:token_check` bucket.
 
 ## Set the setup sign-in method
 
