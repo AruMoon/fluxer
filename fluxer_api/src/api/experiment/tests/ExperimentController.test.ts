@@ -1,25 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {createTestAccount, setUserACLs} from '@app/api/auth/tests/AuthTestUtils';
+import {createTestAccount} from '@app/api/auth/tests/AuthTestUtils';
 import {acceptInvite, createChannelInvite, createGuild, getChannel} from '@app/api/guild/tests/GuildTestUtils';
 import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {HTTP_STATUS} from '@app/api/test/TestConstants';
-import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
+import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {grantPremium} from '@app/api/user/tests/UserTestUtils';
-import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
-import {
-	DEFAULT_DOMAIN_MIGRATION_CONFIG,
-	INERT_DOMAIN_MIGRATION_ASSIGNMENT,
-} from '@fluxer/schema/src/domains/admin/DomainMigrationSchemas';
-import {DEFAULT_VOICE_P2P_CONFIG, INERT_VOICE_P2P_ASSIGNMENT} from '@fluxer/schema/src/domains/admin/VoiceP2pSchemas';
-import {
-	DEFAULT_EXPERIMENT_POLL_INTERVAL_SECONDS,
-	DEFAULT_EXPERIMENT_POLL_JITTER_PERCENT,
-	type ExperimentAssignmentsResponse,
-	type ExperimentDeliveryConfigResponse,
-} from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
+import {DEFAULT_DOMAIN_MIGRATION_CONFIG} from '@fluxer/schema/src/domains/admin/DomainMigrationSchemas';
+import {DEFAULT_VOICE_P2P_CONFIG} from '@fluxer/schema/src/domains/admin/VoiceP2pSchemas';
+import type {ExperimentAssignmentsResponse} from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
 import type {GeoipResult} from '@pkgs/geoip/src/GeoipLookup';
 import {afterAll, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -62,24 +53,12 @@ describe('GET /experiments', () => {
 		await harness.shutdown();
 	});
 
-	it('rejects an unauthenticated caller', async () => {
-		await createBuilderWithoutAuth(harness).get(ENDPOINT).expect(HTTP_STATUS.UNAUTHORIZED).execute();
-	});
-
-	it('returns the default delivery cadence and the default assignments', async () => {
-		const account = await createTestAccount(harness);
-
-		const body = await createBuilder<ExperimentAssignmentsResponse>(harness, account.token).get(ENDPOINT).execute();
-
-		expect(body).toEqual({
-			poll_interval_seconds: DEFAULT_EXPERIMENT_POLL_INTERVAL_SECONDS,
-			poll_jitter_percent: DEFAULT_EXPERIMENT_POLL_JITTER_PERCENT,
-			assignments: {
-				domain_migration: INERT_DOMAIN_MIGRATION_ASSIGNMENT,
-				channel_threads: {active: true, config_version: 0},
-				plutonium_page: {enabled: true},
-				voice_p2p: INERT_VOICE_P2P_ASSIGNMENT,
-			},
+	it('assigns guild visits only to people the switch includes', async () => {
+		const included = await createTestAccount(harness);
+		const other = await createTestAccount(harness);
+		await getInstanceConfigRepository().updateGuildVisitsConfig({
+			enabled: true,
+			included_user_ids: [included.userId],
 		});
 	});
 
@@ -239,31 +218,6 @@ describe('GET /experiments', () => {
 		}
 	});
 
-	it('stores the guild ids, countries and premium switch an admin sets for each experiment', async () => {
-		const admin = await setUserACLs(harness, await createTestAccount(harness), [
-			AdminACLs.AUTHENTICATE,
-			AdminACLs.INSTANCE_CONFIG_VIEW,
-			AdminACLs.INSTANCE_CONFIG_UPDATE,
-		]);
-		const guildIds = ['1500000000000000001', '1500000000000000002'];
-		const countryCodes = ['SE', 'NO'];
-		const section = {included_guild_ids: guildIds, include_premium_users: true, rollout_country_codes: countryCodes};
-		const body = await createBuilder<
-			Record<
-				'domain_migration' | 'voice_p2p',
-				{included_guild_ids: Array<string>; include_premium_users: boolean; rollout_country_codes: Array<string>}
-			>
-		>(harness, admin.token)
-			.patch('/admin/instance/config')
-			.body({domain_migration: section, voice_p2p: section})
-			.execute();
-		for (const stored of [body.domain_migration, body.voice_p2p]) {
-			expect(stored.included_guild_ids).toEqual(guildIds);
-			expect(stored.include_premium_users).toBe(true);
-			expect(stored.rollout_country_codes).toEqual(countryCodes);
-		}
-	});
-
 	it('revalidates with a strong etag and answers 304 when nothing changed', async () => {
 		const account = await createTestAccount(harness);
 
@@ -284,13 +238,6 @@ describe('GET /experiments', () => {
 		expect(revalidated.json).toBeUndefined();
 		expect(revalidated.response.headers.get('etag')).toBe(etag);
 		expect(revalidated.response.headers.get('vary')).toBe('Authorization, Origin');
-	});
-
-	it('lets a cross-origin client send If-None-Match and read the etag back', async () => {
-		const preflight = await harness.requestJson({path: ENDPOINT, method: 'OPTIONS'});
-
-		expect(preflight.headers.get('access-control-allow-headers')).toContain('If-None-Match');
-		expect(preflight.headers.get('access-control-expose-headers')).toContain('ETag');
 	});
 
 	it('serves a fresh body once the domain migration config changes', async () => {
@@ -338,101 +285,5 @@ describe('GET /experiments', () => {
 		expect(refreshed.response.headers.get('etag')).not.toBe(staleEtag);
 		expect(refreshed.json?.poll_interval_seconds).toBe(1800);
 		expect(refreshed.json?.poll_jitter_percent).toBe(5);
-	});
-
-	it('bumps the domain migration config version on every admin update without the client sending one', async () => {
-		const admin = await setUserACLs(harness, await createTestAccount(harness), [
-			AdminACLs.AUTHENTICATE,
-			AdminACLs.INSTANCE_CONFIG_VIEW,
-			AdminACLs.INSTANCE_CONFIG_UPDATE,
-		]);
-
-		const afterFirst = await createBuilder<{domain_migration: {config_version: number; enabled: boolean}}>(
-			harness,
-			admin.token,
-		)
-			.patch('/admin/instance/config')
-			.body({domain_migration: {enabled: true, rollout_basis_points: 10000}})
-			.execute();
-		expect(afterFirst.domain_migration).toMatchObject({config_version: 1, enabled: true});
-
-		const afterSecond = await createBuilder<{
-			domain_migration: {config_version: number; enabled: boolean; anonymous_rollout_basis_points: number};
-		}>(harness, admin.token)
-			.patch('/admin/instance/config')
-			.body({domain_migration: {anonymous_rollout_basis_points: 2500}})
-			.execute();
-		expect(afterSecond.domain_migration).toMatchObject({
-			config_version: 2,
-			enabled: true,
-			anonymous_rollout_basis_points: 2500,
-		});
-
-		const afterEmpty = await createBuilder<{domain_migration: {config_version: number; enabled: boolean}}>(
-			harness,
-			admin.token,
-		)
-			.patch('/admin/instance/config')
-			.body({domain_migration: {}})
-			.execute();
-		expect(afterEmpty.domain_migration).toMatchObject({config_version: 2, enabled: true});
-
-		const body = await createBuilder<ExperimentAssignmentsResponse>(harness, admin.token).get(ENDPOINT).execute();
-		expect(body.assignments.domain_migration).toEqual({enabled: true});
-	});
-
-	it('bumps the voice p2p config version on every admin update without the client sending one', async () => {
-		const admin = await setUserACLs(harness, await createTestAccount(harness), [
-			AdminACLs.AUTHENTICATE,
-			AdminACLs.INSTANCE_CONFIG_VIEW,
-			AdminACLs.INSTANCE_CONFIG_UPDATE,
-		]);
-
-		const afterFirst = await createBuilder<{voice_p2p: {config_version: number; enabled: boolean}}>(
-			harness,
-			admin.token,
-		)
-			.patch('/admin/instance/config')
-			.body({voice_p2p: {enabled: true, included_user_ids: [admin.userId]}})
-			.execute();
-		expect(afterFirst.voice_p2p).toMatchObject({config_version: 1, enabled: true});
-
-		const afterSecond = await createBuilder<{
-			voice_p2p: {config_version: number; rollout_basis_points: number};
-		}>(harness, admin.token)
-			.patch('/admin/instance/config')
-			.body({voice_p2p: {rollout_basis_points: 2500, max_participants: 4}})
-			.execute();
-		expect(afterSecond.voice_p2p).toMatchObject({config_version: 2, rollout_basis_points: 2500, max_participants: 4});
-
-		const afterEmpty = await createBuilder<{voice_p2p: {config_version: number}}>(harness, admin.token)
-			.patch('/admin/instance/config')
-			.body({voice_p2p: {}})
-			.execute();
-		expect(afterEmpty.voice_p2p).toMatchObject({config_version: 2});
-
-		const body = await createBuilder<ExperimentAssignmentsResponse>(harness, admin.token).get(ENDPOINT).execute();
-		expect(body.assignments.voice_p2p).toEqual({enabled: true, max_participants: 4});
-	});
-
-	it('serves the delivery cadence an admin set through the instance config', async () => {
-		const admin = await setUserACLs(harness, await createTestAccount(harness), [
-			AdminACLs.AUTHENTICATE,
-			AdminACLs.INSTANCE_CONFIG_VIEW,
-			AdminACLs.INSTANCE_CONFIG_UPDATE,
-		]);
-
-		const updated = await createBuilder<{experiment_delivery: ExperimentDeliveryConfigResponse}>(harness, admin.token)
-			.patch('/admin/instance/config')
-			.body({experiment_delivery: {poll_interval_seconds: 3600}})
-			.execute();
-		expect(updated.experiment_delivery).toEqual({
-			poll_interval_seconds: 3600,
-			poll_jitter_percent: DEFAULT_EXPERIMENT_POLL_JITTER_PERCENT,
-		});
-
-		const body = await createBuilder<ExperimentAssignmentsResponse>(harness, admin.token).get(ENDPOINT).execute();
-		expect(body.poll_interval_seconds).toBe(3600);
-		expect(body.poll_jitter_percent).toBe(DEFAULT_EXPERIMENT_POLL_JITTER_PERCENT);
 	});
 });

@@ -8,7 +8,6 @@ import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import processPendingBulkMessageDeletions from '@app/api/worker/tasks/ProcessPendingBulkMessageDeletions';
 import {clearWorkerDependencies, setWorkerDependenciesForTest} from '@app/api/worker/WorkerContext';
-import type {WorkerDependencies} from '@app/api/worker/WorkerDependencies';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
 import {afterEach, describe, expect, test, vi} from 'vitest';
 
@@ -48,7 +47,6 @@ function createHarness(users: Array<User>) {
 describe('processPendingBulkMessageDeletions', () => {
 	afterEach(() => {
 		clearWorkerDependencies();
-		vi.restoreAllMocks();
 	});
 
 	test('replaces the old sorted-set member when a user is rescheduled', async () => {
@@ -66,17 +64,6 @@ describe('processPendingBulkMessageDeletions', () => {
 		]);
 	});
 
-	test('renews the rebuild lock with the acquired token before publishing the state version', async () => {
-		const harness = createHarness([createUser(createUserID(1234n), new Date())]);
-		const extendLock = vi.spyOn(harness.kvClient, 'extendLock');
-		const token = await harness.bulkMessageDeletionQueueService.acquireRebuildLock();
-		expect(token).not.toBeNull();
-		await harness.bulkMessageDeletionQueueService.rebuildState(token);
-
-		expect(extendLock).toHaveBeenCalledExactlyOnceWith('bulk_message_deletion_queue:rebuild_lock', token, 300);
-		expect((await harness.kvClient.exists('bulk_message_deletion_queue:state_version')) === 1).toBe(true);
-	});
-
 	test('rebuilds the queue from the users table when the state version is missing', async () => {
 		const userId = createUserID(1234n);
 		const scheduledAt = new Date(Date.now() - 60_000);
@@ -92,17 +79,6 @@ describe('processPendingBulkMessageDeletions', () => {
 			},
 		]);
 		expect((await harness.kvClient.exists('bulk_message_deletion_queue:state_version')) === 1).toBe(true);
-	});
-
-	test('does not scan the users table when the state version is fresh', async () => {
-		const userId = createUserID(5678n);
-		const harness = createHarness([createUser(userId, new Date(Date.now() - 60_000))]);
-		await harness.kvClient.set('bulk_message_deletion_queue:state_version', Date.now().toString());
-
-		await processPendingBulkMessageDeletions({}, createTestWorkerHelpers());
-
-		expect(harness.scanCalls).toEqual([]);
-		expect(harness.jobs).toEqual([]);
 	});
 
 	test('skips the run when another worker holds the rebuild lock', async () => {

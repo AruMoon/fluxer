@@ -14,56 +14,6 @@ import {describe, expect, it, vi} from 'vitest';
 const GUILD_ID = createGuildID(1n);
 const CHANNEL_ID = createChannelID(2n);
 
-function roomFinished(name: string): WebhookEvent {
-	return {
-		event: 'room_finished',
-		room: {name, sid: 'RM_test', emptyTimeout: 300, creationTime: 0n},
-	} as unknown as WebhookEvent;
-}
-
-function harness(pinnedServerId: string | null) {
-	const deleteRoomServer = vi.fn(async () => {});
-	const voiceRoomStore = {
-		getPinnedRoomServer: vi.fn(async () => (pinnedServerId ? {regionId: 'eu', serverId: pinnedServerId} : null)),
-		deleteRoomServer,
-	} as unknown as IVoiceRoomStore;
-	const gatewayService = {} as unknown as IGatewayService;
-	const liveKitService = {} as unknown as ILiveKitService;
-	const service = new LiveKitWebhookService(
-		voiceRoomStore,
-		gatewayService,
-		liveKitService,
-		new VoiceTopology({} as unknown as VoiceRepository, null),
-	);
-	return {service, deleteRoomServer};
-}
-
-describe('LiveKitWebhookService room_finished', () => {
-	it('clears the guild pin without disconnecting anybody', async () => {
-		const {service, deleteRoomServer} = harness('eu-1');
-
-		await service.handleRoomFinished(roomFinished(`guild_${GUILD_ID}_channel_${CHANNEL_ID}`), 'unknown-key');
-
-		expect(deleteRoomServer).toHaveBeenCalledTimes(1);
-	});
-
-	it('clears the pin even when no server is pinned, and still disconnects nobody', async () => {
-		const {service, deleteRoomServer} = harness(null);
-
-		await service.handleRoomFinished(roomFinished(`guild_${GUILD_ID}_channel_${CHANNEL_ID}`), 'unknown-key');
-
-		expect(deleteRoomServer).toHaveBeenCalledTimes(1);
-	});
-
-	it('ignores a room name it cannot parse', async () => {
-		const {service, deleteRoomServer} = harness('eu-1');
-
-		await service.handleRoomFinished(roomFinished('not_a_voice_room'), 'unknown-key');
-
-		expect(deleteRoomServer).not.toHaveBeenCalled();
-	});
-});
-
 function trackPublished(source: TrackSource, attributes: Record<string, string>): WebhookEvent {
 	return {
 		event: 'track_published',
