@@ -6,7 +6,7 @@ use crate::{
     api::types::VoiceServer,
     config::AdminConfig,
     templates::components::{
-        form::{checkbox, csrf_input},
+        form::{Checkbox, csrf_input},
         page_container::card,
         voice::voice_restriction_fields,
     },
@@ -90,7 +90,13 @@ pub fn edit_server_form(
                     "LiveKit API secret (leave blank to keep unchanged)",
                 ))
                 div class="space-y-2" {
-                    (checkbox("is_active", "true", "Server is active", is_active, true))
+                    (Checkbox {
+                        name: "is_active",
+                        value: "true",
+                        label: "Server is active",
+                        checked: is_active,
+                        enabled: true,
+                    }.render())
                 }
                 (voice_restriction_fields(&id_prefix, vip_only, &features_csv, &guild_ids_csv))
                 button type="submit"
@@ -130,7 +136,13 @@ pub fn create_server_form(config: &AdminConfig, region_id: &str, csrf_token: &st
                 ))
             }
             div class="space-y-3" {
-                (checkbox("is_active", "true", "Server is active", true, true))
+                (Checkbox {
+                    name: "is_active",
+                    value: "true",
+                    label: "Server is active",
+                    checked: true,
+                    enabled: true,
+                }.render())
             }
             (voice_restriction_fields("create", false, "", ""))
             button type="submit"
