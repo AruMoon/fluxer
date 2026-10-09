@@ -336,7 +336,7 @@ export class AdminUserSecurityService {
 			user_id: userId,
 			email: user.email,
 		});
-		await emailService.sendPasswordResetEmail(user.email, user.username, token, user.locale);
+		await emailService.send('password_reset', user.email, {resetToken: token}, user.locale);
 		await auditService.createAuditLog({
 			adminUserId,
 			targetType: 'user',
@@ -369,7 +369,7 @@ export class AdminUserSecurityService {
 		await userRepository.createPasswordResetToken({
 			token_: token,
 			user_id: userId,
-			email: null,
+			email: user.email ?? null,
 		});
 		await auditService.createAuditLog({
 			adminUserId,

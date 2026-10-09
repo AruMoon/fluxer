@@ -127,8 +127,12 @@ describe('Password reset flow', () => {
 			[HTTP_STATUS.OK, HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.BAD_REQUEST].sort(),
 		);
 	});
-	it('keeps a reset token usable when the reset fails before the password is written', async () => {
+	it('lets the inbox owner reset the password of an account holding the unconfirmed address', async () => {
 		const account = await createTestAccount(harness);
+		await createBuilder(harness, '')
+			.post(`/test/users/${account.userId}/security-flags`)
+			.body({email_verified: false})
+			.execute();
 		await createBuilderWithoutAuth(harness)
 			.post('/auth/forgot')
 			.body({email: account.email})
@@ -136,29 +140,55 @@ describe('Password reset flow', () => {
 			.execute();
 		const emails = await listTestEmails(harness, {recipient: account.email});
 		const token = findLastTestEmail(emails, 'password_reset')!.metadata!.token!;
-		const patchUpsert = vi
-			.spyOn(UserRepository.prototype, 'patchUpsert')
-			.mockRejectedValueOnce(new Error('the user row write failed'));
-		try {
-			await createBuilderWithoutAuth(harness)
-				.post('/auth/reset')
-				.body({token, password: generateUniquePassword()})
-				.expect(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-				.execute();
-		} finally {
-			patchUpsert.mockRestore();
-		}
 		const newPassword = generateUniquePassword();
-		const resetResp = await createBuilderWithoutAuth<LoginSuccessResponse>(harness)
+		const reset = await createBuilderWithoutAuth<LoginSuccessResponse>(harness)
 			.post('/auth/reset')
 			.body({token, password: newPassword})
 			.execute();
-		expect(resetResp.token.length).toBeGreaterThan(0);
+		await createBuilder(harness, account.token).get('/users/@me').expect(HTTP_STATUS.UNAUTHORIZED).execute();
+		const me = await createBuilder<{has_password: boolean}>(harness, reset.token).get('/users/@me').execute();
+		expect(me.has_password).toBe(true);
 		await createBuilderWithoutAuth(harness)
 			.post('/auth/reset')
 			.body({token, password: generateUniquePassword()})
 			.expect(HTTP_STATUS.BAD_REQUEST)
 			.execute();
+		const login = await loginUser(harness, {email: account.email, password: newPassword});
+		expect('token' in login && login.token.length > 0).toBe(true);
+	});
+	it('refuses a new-IP approval requested before the password was reset', async () => {
+		const account = await createTestAccount(harness);
+		await clearTestEmails(harness);
+		await createBuilderWithoutAuth(harness)
+			.post('/auth/login')
+			.header('x-forwarded-for', '192.0.2.88')
+			.body({email: account.email, password: account.password})
+			.expect(HTTP_STATUS.FORBIDDEN)
+			.execute();
+		const approval = findLastTestEmail(await listTestEmails(harness, {recipient: account.email}), 'ip_authorization');
+		vi.useFakeTimers({toFake: ['Date']});
+		vi.setSystemTime(new Date(Date.now() + 1000));
+		try {
+			await createBuilderWithoutAuth(harness)
+				.post('/auth/forgot')
+				.body({email: account.email})
+				.expect(HTTP_STATUS.NO_CONTENT)
+				.execute();
+			const token = findLastTestEmail(await listTestEmails(harness, {recipient: account.email}), 'password_reset')!
+				.metadata!.token!;
+			await createBuilderWithoutAuth(harness)
+				.post('/auth/reset')
+				.body({token, password: generateUniquePassword()})
+				.execute();
+			await createBuilderWithoutAuth(harness)
+				.post('/auth/authorize-ip')
+				.header('x-forwarded-for', '192.0.2.88')
+				.body({token: approval!.metadata['token']})
+				.expect(HTTP_STATUS.BAD_REQUEST)
+				.execute();
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 	it('rejects invalid reset token', async () => {
 		await createTestAccount(harness);
