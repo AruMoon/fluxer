@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {MAX_GIFT_CODES_PER_REQUEST, MAX_GIFT_DURATION_QUANTITY} from '@fluxer/constants/src/GiftCodeConstants';
+import {
+	GIFT_CODE_DURATION_TYPE_DEFINITIONS,
+	MAX_GIFT_CODES_PER_REQUEST,
+	MAX_GIFT_DURATION_QUANTITY,
+} from '@fluxer/constants/src/GiftCodeConstants';
 import {
 	CONTENT_WARNING_TEXT_MAX_LENGTH,
 	SystemChannelFlags,
@@ -9,6 +13,17 @@ import {
 import {LIMIT_KEY_METADATA, LIMIT_KEYS} from '@fluxer/constants/src/LimitConfigMetadata';
 import {SmtpTlsModes} from '@fluxer/constants/src/SmtpConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
+import {
+	EmailDeliveryModeSchema,
+	EmailDeliveryStateSchema,
+	InstantAccountAvailabilitySchema,
+} from '@fluxer/schema/src/domains/account/AccountTierSchemas';
+import {
+	AccountsConfigSchema,
+	AccountsConfigUpdateRequest,
+	AuthConfigSchema,
+	AuthConfigUpdateRequest,
+} from '@fluxer/schema/src/domains/admin/AccountsConfigSchemas';
 import {ADMIN_ACL_COUNT, AdminAclType} from '@fluxer/schema/src/domains/admin/AdminAclType';
 import {AdminArchiveResponseSchema} from '@fluxer/schema/src/domains/admin/AdminArchiveSchemas';
 import {GuildAdminResponse} from '@fluxer/schema/src/domains/admin/AdminGuildSchemas';
@@ -24,6 +39,10 @@ import {
 	GatewayRolloutConfigUpdateRequest,
 } from '@fluxer/schema/src/domains/admin/GatewayRolloutSchemas';
 import {
+	GuildVisitsConfigResponse,
+	GuildVisitsConfigUpdateRequest,
+} from '@fluxer/schema/src/domains/admin/GuildVisitsSchemas';
+import {
 	InstanceBillingResponse,
 	InstanceBillingUpdateRequest,
 } from '@fluxer/schema/src/domains/admin/InstanceBillingSchemas';
@@ -35,12 +54,13 @@ import {
 } from '@fluxer/schema/src/domains/experiment/ExperimentSchemas';
 import {GuildMemberResponse} from '@fluxer/schema/src/domains/guild/GuildMemberSchemas';
 import {
+	AccountIdentityLockReasonSchema,
 	AccountIdentityModeSchema,
+	InstanceNoticeSchema,
 	InstanceRegistrationModeSchema,
 	TagStyleSchema,
 } from '@fluxer/schema/src/domains/instance/InstanceSchemas';
 import {MessageResponseSchema} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
-import {GiftCodeDurationTypeSchema} from '@fluxer/schema/src/domains/premium/GiftCodeSchemas';
 import {ChannelTypeSchema} from '@fluxer/schema/src/primitives/ChannelValidators';
 import {
 	ContentWarningLevelSchema,
@@ -64,7 +84,7 @@ import {
 	SnowflakeType,
 	withOpenApiType,
 } from '@fluxer/schema/src/primitives/SchemaPrimitives';
-import {EmailBlocklistEntryType} from '@fluxer/schema/src/primitives/UserValidators';
+import {EmailBlocklistEntryType, EmailType} from '@fluxer/schema/src/primitives/UserValidators';
 import {WebhookTypeSchema} from '@fluxer/schema/src/primitives/WebhookValidators';
 import {schemaMetadata} from '@fluxer/schema/src/SchemaMetadata';
 import {z} from 'zod';
@@ -480,25 +500,63 @@ export const BanProfileSubstringRequest = z.object({
 
 export type BanProfileSubstringRequest = z.infer<typeof BanProfileSubstringRequest>;
 
+const GenerateGiftCodeDurationTypeSchema = createNamedStringLiteralUnion(
+	[
+		...GIFT_CODE_DURATION_TYPE_DEFINITIONS,
+		['lifetime', 'lifetime', 'Lifetime premium that never ends. duration_quantity is ignored'],
+	],
+	'Gift code duration unit, or lifetime',
+);
+
 export const GenerateGiftCodesRequest = z.object({
 	count: z.number().int().min(1).max(MAX_GIFT_CODES_PER_REQUEST).describe('Number of gift codes to generate'),
-	duration_type: GiftCodeDurationTypeSchema.describe('Duration unit for the generated gift codes'),
+	duration_type: GenerateGiftCodeDurationTypeSchema.describe('Duration unit for the generated gift codes'),
 	duration_quantity: z
 		.number()
 		.int()
 		.min(1)
 		.max(MAX_GIFT_DURATION_QUANTITY)
-		.describe('Duration quantity for the selected unit. Lifetime gifts are not supported.'),
+		.describe('Duration quantity for the selected unit. Ignored for lifetime gifts.'),
 });
 
 export type GenerateGiftCodesRequest = z.infer<typeof GenerateGiftCodesRequest>;
 
 const SsoAllowedDomainsSchema = z.array(z.string()).max(100);
 
+const SSO_BUTTON_LABEL_MAX_LENGTH = 64;
+
+const SSO_GROUP_ROLE_MAPPINGS_MAX = 100;
+
+const SsoGroupRoleMappingSchema = z.object({
+	group: z
+		.string()
+		.trim()
+		.min(1)
+		.max(256)
+		.describe(
+			'A group name exactly as the provider sends it in the groups claim, such as `staff` or `/engineering/devs`',
+		),
+	role_id: SnowflakeStringType.describe('The role in the single community that members of the group get'),
+});
+
+const SsoGroupRoleMappingsSchema = z
+	.array(SsoGroupRoleMappingSchema)
+	.max(SSO_GROUP_ROLE_MAPPINGS_MAX)
+	.describe(
+		'Groups whose members get a role in the single community. Every listed role is managed by single sign-on, and is added or removed to match the groups at each sign-in',
+	);
+
+const SsoGroupsClaimSchema = z
+	.string()
+	.trim()
+	.max(128)
+	.describe('The claim that lists the groups of a member. Empty or null uses `groups`');
+
 const SsoConfigResponse = z.object({
 	enabled: z.boolean(),
 	enforced: z.boolean(),
 	display_name: z.string().nullable(),
+	button_label: z.string().nullable(),
 	issuer: z.string().nullable(),
 	authorization_url: z.string().nullable(),
 	token_url: z.string().nullable(),
@@ -510,11 +568,16 @@ const SsoConfigResponse = z.object({
 	allowed_domains: SsoAllowedDomainsSchema,
 	auto_provision: z.boolean(),
 	redirect_uri: z.string().nullable(),
+	groups_claim: SsoGroupsClaimSchema.nullable(),
+	group_role_mappings: SsoGroupRoleMappingsSchema,
 });
 
 const InstanceRegistrationConfigResponse = z.object({
 	mode: InstanceRegistrationModeSchema,
 	admin_registration_urls_enabled: z.boolean(),
+	allowed_email_domains: SsoAllowedDomainsSchema.describe(
+		'Email domains that public sign-ups and email changes must use. Empty allows any domain',
+	),
 });
 
 const RegistrationUrlResponse = z.object({
@@ -529,6 +592,7 @@ const RegistrationUrlResponse = z.object({
 	approval_required: z.boolean(),
 	last_used_at: z.iso.datetime().nullable(),
 	last_used_by_user_id: SnowflakeStringType.nullable(),
+	invite_code: z.string().max(64).nullable().describe('Invite that people who sign up through the link accept'),
 });
 export type RegistrationUrlResponse = z.infer<typeof RegistrationUrlResponse>;
 
@@ -562,11 +626,15 @@ const AppPublicConfigResponse = z.object({
 		logo_url: z.string().nullable(),
 		wordmark_url: z.string().nullable(),
 		favicon_url: z.string().nullable(),
+		favicon_dark_url: z.string().nullable(),
 		theme_color: z.string().nullable(),
 		status_page_url: z.string().nullable(),
 		status_page_incident_history_url: z.string().nullable(),
 		premium_product_name: z.string(),
 		premium_info_url: z.string().nullable(),
+		sign_in_backdrop_url: z.string().nullable(),
+		custom_css: z.string().nullable(),
+		upload_limit_message: z.string().nullable(),
 	}),
 	setup: z.object({
 		configured: z.boolean(),
@@ -577,7 +645,7 @@ const AppPublicConfigResponse = z.object({
 		guidelines_url: z.string().nullable(),
 	}),
 	registration: z.object({
-		collect_date_of_birth: z.boolean(),
+		collect_date_of_birth: z.boolean().describe('Deprecated, derived from accounts.date_of_birth not being off'),
 	}),
 });
 
@@ -590,6 +658,8 @@ function isAbsoluteHttpUrl(value: string): boolean {
 	}
 }
 
+export const UPLOAD_LIMIT_MESSAGE_MAX_LENGTH = 500;
+
 const HEX_THEME_COLOR_PATTERN = /^(?:#?(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$/;
 
 const AppPublicConfigUpdateRequest = z.object({
@@ -601,11 +671,15 @@ const AppPublicConfigUpdateRequest = z.object({
 			logo_url: z.string().trim().max(2048).nullish(),
 			wordmark_url: z.string().trim().max(2048).nullish(),
 			favicon_url: z.string().trim().max(2048).nullish(),
+			favicon_dark_url: z.string().trim().max(2048).nullish(),
 			theme_color: z.string().trim().regex(HEX_THEME_COLOR_PATTERN).nullish(),
 			status_page_url: z.string().trim().max(2048).nullish(),
 			status_page_incident_history_url: z.string().trim().max(2048).nullish(),
 			premium_product_name: z.string().trim().min(1).max(40).nullable().optional(),
 			premium_info_url: z.string().trim().max(2048).refine(isAbsoluteHttpUrl).nullish(),
+			sign_in_backdrop_url: z.string().trim().max(2048).nullish(),
+			custom_css: z.string().trim().max(32_768).nullish(),
+			upload_limit_message: z.string().trim().max(UPLOAD_LIMIT_MESSAGE_MAX_LENGTH).nullish(),
 		})
 		.register(schemaMetadata, {preserveNullFields: true})
 		.nullish(),
@@ -624,7 +698,10 @@ const AppPublicConfigUpdateRequest = z.object({
 		.nullish(),
 	registration: z
 		.object({
-			collect_date_of_birth: z.boolean().optional(),
+			collect_date_of_birth: z
+				.boolean()
+				.optional()
+				.describe('Deprecated, use accounts.date_of_birth. false sets it to off'),
 		})
 		.nullish(),
 });
@@ -634,6 +711,7 @@ const InstancePolicyResponse = z.object({
 	single_community_guild_id: z.string().nullable(),
 	direct_messages_disabled: z.boolean(),
 	direct_messages_locked: z.boolean(),
+	friends_disabled: z.boolean().describe('Whether friend requests are disabled instance-wide'),
 	guild_create_access: z.boolean(),
 	premium_mode: z.enum(['mirror', 'everyone']),
 	services: z.object({
@@ -653,7 +731,7 @@ const InstancePolicyResponse = z.object({
 	}),
 });
 
-const EmailProviderSchema = z.enum(['smtp', 'none']);
+const EmailProviderSchema = z.enum(['smtp', 'none']).describe('Deprecated, use delivery');
 
 const SmtpTlsModeSchema = createNamedStringLiteralUnion(
 	[
@@ -702,8 +780,11 @@ const InstanceIntegrationsResponse = z.object({
 		effective_available: z.boolean(),
 	}),
 	email: z.object({
-		enabled: z.boolean().nullable(),
-		effective_enabled: z.boolean(),
+		delivery: EmailDeliveryModeSchema.nullable().describe('Saved delivery mode, or null to use the environment'),
+		effective_delivery: EmailDeliveryModeSchema,
+		delivery_state: EmailDeliveryStateSchema,
+		enabled: z.boolean().nullable().describe('Deprecated, use delivery'),
+		effective_enabled: z.boolean().describe('Whether the instance sends email, same as delivery_state being on'),
 		provider: EmailProviderSchema.nullable(),
 		effective_provider: EmailProviderSchema,
 		from_email: z.string().nullable(),
@@ -735,6 +816,9 @@ const InstanceAccountIdentityConfigResponse = z.object({
 	mode: AccountIdentityModeSchema.describe('Sign-in method in effect on this instance'),
 	locked: z.boolean().describe('Whether the sign-in method can no longer change'),
 	tag_style: TagStyleSchema.describe('How usernames are tagged'),
+	lock_reason: AccountIdentityLockReasonSchema.nullable().describe(
+		'Why the sign-in method can no longer change, or null while it still can',
+	),
 });
 
 export const InstanceConfigResponse = z.object({
@@ -744,6 +828,13 @@ export const InstanceConfigResponse = z.object({
 	domain_migration: DomainMigrationConfigResponse,
 	voice_p2p: VoiceP2pConfigResponse,
 	captcha: CaptchaConfigResponse,
+	auth: AuthConfigSchema.extend({
+		instant_account_availability: InstantAccountAvailabilitySchema.describe(
+			'Whether accounts can be created from just a display name through public sign-up right now, and why not',
+		),
+	}),
+	accounts: AccountsConfigSchema,
+	guild_visits: GuildVisitsConfigResponse,
 	experiment_delivery: ExperimentDeliveryConfigResponse,
 	registration: InstanceRegistrationResponse,
 	self_hosted: z.boolean(),
@@ -753,6 +844,7 @@ export const InstanceConfigResponse = z.object({
 	integrations: InstanceIntegrationsResponse,
 	media: InstanceMediaResponse,
 	billing: InstanceBillingResponse,
+	notice: InstanceNoticeSchema.nullable().describe('Notice shown to everyone on the instance, or null'),
 });
 
 export type InstanceConfigResponse = z.infer<typeof InstanceConfigResponse>;
@@ -760,8 +852,21 @@ export type InstanceConfigResponse = z.infer<typeof InstanceConfigResponse>;
 const InstancePolicyUpdateSchema = z.object({
 	single_community_enabled: z.boolean().optional(),
 	single_community_name: z.string().trim().min(1).max(100).optional(),
+	single_community_guild_id: SnowflakeStringType.optional().describe(
+		'ID of an existing community to use as the single community. Turns the mode on with that community, or moves it there while the mode is on',
+	),
+	single_community_add_members: z
+		.boolean()
+		.optional()
+		.describe('Also add every existing account to the single community in the background'),
 	direct_messages_disabled: z.boolean().optional(),
 	direct_messages_locked: z.literal(false).optional(),
+	friends_disabled: z
+		.boolean()
+		.optional()
+		.describe(
+			'Whether friend requests are disabled instance-wide. Left out while direct_messages_disabled changes, it takes the same value',
+		),
 	premium_mode: z.enum(['mirror', 'everyone']).optional(),
 	guild_create_access: z.boolean().optional(),
 	services: z
@@ -779,11 +884,15 @@ export const InstanceConfigUpdateRequest = z.object({
 	domain_migration: DomainMigrationConfigUpdateRequest.nullish(),
 	voice_p2p: VoiceP2pConfigUpdateRequest.nullish(),
 	captcha: CaptchaConfigUpdateRequest.nullish(),
+	auth: AuthConfigUpdateRequest.nullish(),
+	accounts: AccountsConfigUpdateRequest.nullish(),
+	guild_visits: GuildVisitsConfigUpdateRequest.nullish(),
 	experiment_delivery: ExperimentDeliveryConfigUpdateRequest.nullish(),
 	registration: z
 		.object({
 			mode: InstanceRegistrationModeSchema.optional(),
 			admin_registration_urls_enabled: z.boolean().optional(),
+			allowed_email_domains: SsoAllowedDomainsSchema.optional(),
 		})
 		.nullish(),
 	sso: z
@@ -791,6 +900,14 @@ export const InstanceConfigUpdateRequest = z.object({
 			enabled: z.boolean().optional(),
 			enforced: z.boolean().optional(),
 			display_name: z.string().nullish(),
+			button_label: z
+				.string()
+				.trim()
+				.max(SSO_BUTTON_LABEL_MAX_LENGTH)
+				.nullish()
+				.describe(
+					`Text for the sign-in button. Trimmed, then up to ${SSO_BUTTON_LABEL_MAX_LENGTH} UTF-16 code units with at least one visible character and no control characters, line breaks or bidirectional formatting characters. Empty or null uses the default label`,
+				),
 			issuer: z.string().nullish(),
 			authorization_url: z.string().nullish(),
 			token_url: z.string().nullish(),
@@ -801,6 +918,8 @@ export const InstanceConfigUpdateRequest = z.object({
 			scope: z.string().nullish(),
 			allowed_domains: SsoAllowedDomainsSchema.optional(),
 			auto_provision: z.boolean().optional(),
+			groups_claim: SsoGroupsClaimSchema.nullish(),
+			group_role_mappings: SsoGroupRoleMappingsSchema.optional(),
 		})
 		.nullish(),
 	app_public: AppPublicConfigUpdateRequest.nullish(),
@@ -818,7 +937,10 @@ export const InstanceConfigUpdateRequest = z.object({
 				.nullish(),
 			email: z
 				.object({
-					enabled: z.boolean().nullish(),
+					delivery: EmailDeliveryModeSchema.nullish().describe(
+						'How the instance sends email, or null to use the environment',
+					),
+					enabled: z.boolean().nullish().describe('Deprecated, use delivery'),
 					provider: EmailProviderSchema.nullish(),
 					from_email: z.string().trim().max(320).nullish(),
 					from_name: z.string().trim().max(120).nullish(),
@@ -854,6 +976,7 @@ export const InstanceConfigUpdateRequest = z.object({
 						.max(8)
 						.optional(),
 				})
+				.register(schemaMetadata, {preserveNullFields: true})
 				.nullish(),
 		})
 		.nullish(),
@@ -871,17 +994,44 @@ export const InstanceConfigUpdateRequest = z.object({
 					renew_threshold_days: z.number().int().positive().nullish(),
 					renew_window_days: z.number().int().positive().nullish(),
 				})
+				.register(schemaMetadata, {preserveNullFields: true})
 				.nullish(),
 		})
 		.nullish(),
 	policy: InstancePolicyUpdateSchema.nullish(),
 	billing: InstanceBillingUpdateRequest.nullish(),
+	notice: z
+		.object({
+			message: z
+				.string()
+				.trim()
+				.max(1000)
+				.nullable()
+				.describe('Notice text. Empty or null removes the notice and ignores the other fields'),
+			url: z
+				.url({protocol: /^https?$/})
+				.max(2048)
+				.nullish()
+				.describe('Optional http or https link'),
+			starts_at: z.iso.datetime().nullish().describe('When clients start showing the notice'),
+			ends_at: z.iso.datetime().nullish().describe('When clients stop showing the notice'),
+		})
+		.refine(
+			(notice) => !notice.starts_at || !notice.ends_at || Date.parse(notice.ends_at) > Date.parse(notice.starts_at),
+			{
+				path: ['ends_at'],
+				message: 'The end time must be after the start time',
+			},
+		)
+		.register(schemaMetadata, {preserveNullFields: true})
+		.nullish()
+		.describe('Notice shown to everyone on the instance, such as planned maintenance'),
 });
 
 export type InstanceConfigUpdateRequest = z.infer<typeof InstanceConfigUpdateRequest>;
 
 export const BrandingAssetUploadRequest = z.object({
-	kind: z.enum(['icon', 'symbol', 'logo', 'wordmark', 'favicon']),
+	kind: z.enum(['icon', 'symbol', 'logo', 'wordmark', 'favicon', 'favicon_dark', 'sign_in_backdrop']),
 	image: z.string().max(16_000_000).nullish(),
 });
 
@@ -893,6 +1043,17 @@ export const InstanceEmailSmtpTestRequest = z.object({
 	username: z.string().trim().min(1).max(320).nullish(),
 	password: z.string().trim().min(1).max(4096).nullish(),
 	tls_mode: SmtpTlsModeSchema.nullish(),
+	from_email: EmailType.nullish().describe('The from address for the test message, in place of the saved one'),
+	from_name: z
+		.string()
+		.trim()
+		.min(1)
+		.max(120)
+		.nullish()
+		.describe('The from name for the test message, in place of the saved one'),
+	send_to: EmailType.nullish().describe(
+		'When set, the test also sends a short message to this address and reports what the server answered',
+	),
 });
 
 export type InstanceEmailSmtpTestRequest = z.infer<typeof InstanceEmailSmtpTestRequest>;
@@ -900,6 +1061,11 @@ export type InstanceEmailSmtpTestRequest = z.infer<typeof InstanceEmailSmtpTestR
 export const InstanceEmailSmtpTestResponse = z.object({
 	ok: z.boolean(),
 	error: z.string().nullable(),
+	server_response: z
+		.string()
+		.nullable()
+		.optional()
+		.describe('What the server answered when it accepted the test message, present only when send_to was set'),
 });
 
 export type InstanceEmailSmtpTestResponse = z.infer<typeof InstanceEmailSmtpTestResponse>;
@@ -909,6 +1075,14 @@ export const CreateRegistrationUrlRequest = z.object({
 	expires_at: z.iso.datetime().nullish(),
 	max_uses: z.number().int().min(1).max(1000000).nullish(),
 	approval_required: z.boolean().default(false),
+	invite_code: z
+		.string()
+		.trim()
+		.min(1)
+		.max(64)
+		.regex(/^[A-Za-z0-9-]+$/)
+		.nullish()
+		.describe('Code of an invite that people who sign up through the link accept once their account exists'),
 });
 
 export type CreateRegistrationUrlRequest = z.infer<typeof CreateRegistrationUrlRequest>;
@@ -920,6 +1094,20 @@ export const CreateRegistrationUrlResponse = z.object({
 });
 
 export type CreateRegistrationUrlResponse = z.infer<typeof CreateRegistrationUrlResponse>;
+
+export const UpdateRegistrationUrlRequest = z.object({
+	label: z.string().trim().max(120).nullable().describe('New label, or null or empty to clear it'),
+});
+
+export type UpdateRegistrationUrlRequest = z.infer<typeof UpdateRegistrationUrlRequest>;
+
+export const AdminSignedDownloadParam = z.object({
+	filename: createStringType(1, 512).describe('File name to save the download as'),
+});
+
+export type AdminSignedDownloadParam = z.infer<typeof AdminSignedDownloadParam>;
+
+export const AdminSignedDownloadResponse = z.file().describe('The archive or report evidence file');
 
 export const RegistrationUrlIdParam = z.object({
 	registration_url_id: createStringType(1, 128).describe('The ID of the registration URL'),
