@@ -12,6 +12,7 @@ import {DomainMovedNagbar} from '@app/features/app/components/layout/app_layout/
 import {EmailVerificationNagbar} from '@app/features/app/components/layout/app_layout/nagbars/EmailVerificationNagbar';
 import {GiftInventoryNagbar} from '@app/features/app/components/layout/app_layout/nagbars/GiftInventoryNagbar';
 import {GuildMembershipCtaNagbar} from '@app/features/app/components/layout/app_layout/nagbars/GuildMembershipCtaNagbar';
+import {InstanceNoticeNagbar} from '@app/features/app/components/layout/app_layout/nagbars/InstanceNoticeNagbar';
 import {LegacyPriceOptInNagbar} from '@app/features/app/components/layout/app_layout/nagbars/LegacyPriceOptInNagbar';
 import {PremiumOnboardingNagbar} from '@app/features/app/components/layout/app_layout/nagbars/PremiumOnboardingNagbar';
 import {PremiumStatusNagbar} from '@app/features/app/components/layout/app_layout/nagbars/PremiumStatusNagbar';
@@ -86,6 +87,14 @@ export const NagbarContainer: React.FC<NagbarContainerProps> = observer(({nagbar
 								key={nagbar.type}
 								isMobile={mobileLayout.enabled}
 								data-flx="app.app-layout.nagbar-container.scheduled-maintenance-nagbar"
+							/>
+						);
+					case NagbarType.INSTANCE_NOTICE:
+						return (
+							<InstanceNoticeNagbar
+								key={nagbar.type}
+								isMobile={mobileLayout.enabled}
+								data-flx="app.app-layout.nagbar-container.instance-notice-nagbar"
 							/>
 						);
 					case NagbarType.UNCLAIMED_ACCOUNT:
