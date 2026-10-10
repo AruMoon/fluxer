@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import {ResettableStates} from '@app/features/app/state/ResettableStates';
 import Guilds from '@app/features/guild/state/Guilds';
 import type {GuildMember} from '@app/features/member/models/GuildMember';
 import GuildMembers from '@app/features/member/state/GuildMembers';
@@ -418,9 +419,8 @@ class MemberSearch {
 		if (!guildIds || guildIds.length === 0) {
 			return;
 		}
-		const sortedGuildIds = priorityGuildId
-			? [...guildIds].sort((a, b) => (a === priorityGuildId ? -1 : b === priorityGuildId ? 1 : 0))
-			: guildIds;
+		const priorityRank = (guildId: string) => (guildId === priorityGuildId ? 0 : 1);
+		const sortedGuildIds = priorityGuildId ? [...guildIds].sort((a, b) => priorityRank(a) - priorityRank(b)) : guildIds;
 		const eligibleGuildIds = sortedGuildIds.filter((guildId) => {
 			if (!guildId) {
 				return false;
@@ -457,4 +457,8 @@ class MemberSearch {
 	}
 }
 
-export default new MemberSearch();
+const memberSearch = new MemberSearch();
+
+ResettableStates.register(memberSearch, () => memberSearch.handleLogout());
+
+export default memberSearch;
