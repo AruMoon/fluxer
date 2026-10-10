@@ -60,7 +60,7 @@ describe('RpcService voice GeoIP', () => {
 
 		const voiceRequest = voiceService.getVoiceToken.mock.calls[0]![0];
 
-		expect(voiceRequest.countryCode).toBe('SE');
+		expect(voiceRequest.regionCountryCode).toBe('SE');
 		expect(voiceRequest.latitude).toBe('55.7558');
 		expect(voiceRequest.longitude).toBe('37.6173');
 	});
@@ -88,7 +88,7 @@ describe('RpcService voice GeoIP', () => {
 
 		const voiceRequest = voiceService.getVoiceToken.mock.calls[0]![0];
 
-		expect(voiceRequest.countryCode).toBe('SE');
-		expect(voiceRequest.countryCode).not.toBe('US');
+		expect(voiceRequest.regionCountryCode).toBe('SE');
+		expect(voiceRequest.regionCountryCode).not.toBe('US');
 	});
 });
