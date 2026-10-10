@@ -6,6 +6,7 @@ import {FeatureTemporarilyDisabledModal} from '@app/features/app/components/aler
 import {showGenericErrorModal} from '@app/features/app/components/alerts/GenericErrorModalCommands';
 import {Endpoints} from '@app/features/app/constants/Endpoints';
 import Authentication from '@app/features/auth/state/Authentication';
+import {promptForAccountTier} from '@app/features/auth/utils/AccountTierPrompt';
 import ForumPosts from '@app/features/forum/state/ForumPosts';
 import GatewaySessions from '@app/features/gateway/transport/GatewaySessionPool';
 import MessageReactions from '@app/features/messaging/state/MessageReactions';
@@ -58,6 +59,9 @@ type ReactionOptimisticType =
 
 const checkReactionResponse = (i18n: I18n, error: HttpError): boolean => {
 	const errorCode = failureCode(error);
+	if (promptForAccountTier(error)) {
+		return true;
+	}
 	if (error.status === 403) {
 		if (errorCode === APIErrorCodes.FEATURE_TEMPORARILY_DISABLED) {
 			logger.debug('Feature temporarily disabled, not retrying');
