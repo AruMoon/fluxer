@@ -201,6 +201,18 @@ export class AuthSessionManager {
 		return selectAuthSessionAccountKey(this._snapshot);
 	}
 
+	get restoringAccountKey(): string | null {
+		return this.currentCredentialMirror().storageKey;
+	}
+
+	async restoreAccountOnNextStart(accountKey: string): Promise<void> {
+		const resolved = this.accountCatalog.resolve(this.accounts, accountKey);
+		if (resolved === null) {
+			throw new Error(`No stored account found for ${accountKey}`);
+		}
+		await this.deps.credentialMirror.persist(this.accountPersistence.pointer(resolved.account));
+	}
+
 	get currentAccount(): Account | null {
 		const accountKey = this.currentAccountKey;
 		if (accountKey === null) return null;
@@ -455,6 +467,32 @@ export class AuthSessionManager {
 		});
 	}
 
+	async addStoredAccount({
+		userId,
+		token,
+		userData,
+		instance,
+	}: {
+		userId: string;
+		token: string;
+		userData?: UserData;
+		instance: RuntimeConfigSnapshot;
+	}): Promise<void> {
+		await this.initialize();
+		const account = {
+			storageKey: getAccountKey({userId, instance}),
+			userId,
+			token,
+			userData,
+			presenceIntent: null,
+			lastActive: this.deps.now(),
+			instance,
+			isValid: true,
+		} satisfies PersistableSessionAccount;
+		await this.accountPersistence.stash(account);
+		this.send({type: 'account.upsert', account});
+	}
+
 	async validateToken(
 		token: string,
 		userId: string,
@@ -517,6 +555,30 @@ export class AuthSessionManager {
 		return prepared;
 	}
 
+	async reloadStoredAccount(accountKey: string): Promise<void> {
+		await this.initialize();
+		const resolved = this.accountCatalog.resolve(this.accounts, accountKey);
+		if (resolved === null || resolved.accountKey === this.currentAccountKey) {
+			return;
+		}
+		await this.adoptStoredAccountToken(resolved.account);
+	}
+
+	async adoptRotatedAccountToken(accountKey: string, expectedToken: string, token: string): Promise<void> {
+		await this.initialize();
+		const resolved = this.accountCatalog.resolve(this.accounts, accountKey);
+		if (
+			resolved === null ||
+			resolved.accountKey === this.currentAccountKey ||
+			resolved.account.token !== expectedToken ||
+			token.length === 0
+		) {
+			return;
+		}
+		await this.deps.accountStorage.updateAccountToken(resolved.accountKey, expectedToken, token);
+		await this.adoptStoredAccountToken(resolved.account);
+	}
+
 	private async adoptStoredAccountToken(account: Account): Promise<Account> {
 		if (account.storageKey === this.currentAccountKey) {
 			return account;
@@ -552,9 +614,9 @@ export class AuthSessionManager {
 		await this.lifecycle.switchAccountWithinAccountActivation(accountKey, options, suspension);
 	}
 
-	async logout(): Promise<void> {
+	async logout(options: {notifyServer?: boolean} = {}): Promise<void> {
 		await this.initialize();
-		await this.lifecycle.logout();
+		await this.lifecycle.logout(options);
 	}
 
 	async removeAccount(accountKey: string): Promise<void> {
@@ -641,6 +703,21 @@ export class AuthSessionManager {
 			return;
 		}
 		this.send({type: 'account.userDataUpdated', accountKey: resolved.accountKey, userData});
+	}
+
+	async reorderAccounts(orderedAccountKeys: ReadonlyArray<string>): Promise<void> {
+		const positions = new Map<string, number>();
+		for (const accountKey of orderedAccountKeys) {
+			const resolved = this.accountCatalog.resolve(this.accounts, accountKey);
+			if (resolved !== null && !positions.has(resolved.accountKey)) {
+				positions.set(resolved.accountKey, positions.size);
+			}
+		}
+		if (positions.size === 0) {
+			return;
+		}
+		this.send({type: 'accounts.reordered', positions});
+		await this.deps.accountStorage.updateAccountSwitcherPositions(positions);
 	}
 
 	async reset(): Promise<void> {
