@@ -997,6 +997,9 @@ class MemberSidebar {
 		ranges: Array<[number, number]>,
 		forceResend = false,
 	): boolean {
+		if (Guilds.getGuild(guildId)?.visiting === true) {
+			return false;
+		}
 		const normalizedRanges = normalizeMemberListRanges(ranges);
 		const storageKey = this.resolveStorageKey(guildId, channelId);
 		const socket = GatewaySessions.foregroundConnection.socket;

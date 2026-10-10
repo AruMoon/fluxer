@@ -152,6 +152,7 @@ const GroupDMMemberListGroup = observer(({group, channelId, ownerId, onHeadingRe
 			name={group.displayName}
 			count={group.count}
 			className={styles.groupHeader}
+			data-flx="channel.channel-members.group-dm-member-list-group.group-header"
 		/>
 		<div className={styles.membersList} data-flx="channel.channel-members.group-dm-member-list-group.members-list">
 			{group.users.map((user) => {
@@ -442,6 +443,7 @@ const LazyMemberList = observer(function LazyMemberList({guild, channel}: LazyMe
 							count={group.count}
 							className={clsx(styles.virtualRow, styles.virtualGroupRow)}
 							style={rowStyle}
+							data-flx="channel.channel-members.lazy-member-list.virtual-row"
 						/>,
 					);
 
@@ -578,7 +580,11 @@ export const ChannelMembers = observer(function ChannelMembers({guild = null, ch
 	const frameSides = guild ? {left: false} : undefined;
 	return (
 		<OutlineFrame hideTopBorder sides={frameSides} data-flx="channel.channel-members.outline-frame--2">
-			<LazyMemberList guild={guild} channel={channel} data-flx="channel.channel-members.lazy-member-list" />
+			{guild.visiting ? (
+				<MemberListUnavailableFallback variant="visiting" data-flx="channel.channel-members.visiting-fallback" />
+			) : (
+				<LazyMemberList guild={guild} channel={channel} data-flx="channel.channel-members.lazy-member-list" />
+			)}
 		</OutlineFrame>
 	);
 });
