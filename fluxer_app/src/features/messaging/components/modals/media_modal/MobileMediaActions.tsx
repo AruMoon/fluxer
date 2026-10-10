@@ -23,6 +23,7 @@ import {
 	ROTATE_CLOCKWISE_DESCRIPTOR,
 } from '@app/features/messaging/components/modals/media_modal/shared';
 import {remFromPx} from '@app/features/theme/layout/RemFromPx';
+import {ArrowBendUpLeftIcon, ArrowBendUpRightIcon} from '@app/features/ui/icons/DirectionalIcons';
 import {
 	MenuBottomSheet,
 	type MenuGroupType,
@@ -30,8 +31,6 @@ import {
 } from '@app/features/ui/menu_bottom_sheet/MenuBottomSheet';
 import {useLingui} from '@lingui/react/macro';
 import {
-	ArrowBendUpLeftIcon,
-	ArrowBendUpRightIcon,
 	ArrowClockwiseIcon,
 	ArrowCounterClockwiseIcon,
 	ArrowSquareOutIcon,
@@ -47,30 +46,6 @@ import {
 } from '@phosphor-icons/react';
 import {observer} from 'mobx-react-lite';
 import {type FC, type ReactNode, type Ref, useCallback, useMemo, useState} from 'react';
-
-interface MobileMediaActionsProps {
-	isFavorited?: boolean;
-	onFavorite?: () => void;
-	onDownload?: () => void;
-	onOpenInBrowser?: () => void;
-	onCopyLink?: () => void;
-	onCopyMedia?: () => void;
-	onReset?: () => void;
-	onZoomIn?: () => void;
-	onZoomOut?: () => void;
-	onRotateCW?: () => void;
-	onRotateCCW?: () => void;
-	onReply?: () => void;
-	onForward?: () => void;
-	onClose: () => void;
-	canReset?: boolean;
-	canZoomIn?: boolean;
-	canZoomOut?: boolean;
-	enableZoomControls?: boolean;
-	onPointerEnter?: () => void;
-	onPointerLeave?: () => void;
-	rootRef?: Ref<HTMLDivElement>;
-}
 
 const iconSize = remFromPx(20);
 
