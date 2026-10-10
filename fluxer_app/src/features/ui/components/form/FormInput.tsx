@@ -58,7 +58,7 @@ const FieldSet = React.forwardRef<HTMLFieldSetElement, FieldSetProps>(
 			<div className={styles.inputGroup} data-flx="ui.form.input.field-set.input-group">
 				{children}
 				{error && (
-					<span id={errorId} className={styles.errorText} data-flx="ui.form.input.field-set.error-text">
+					<span id={errorId} className={styles.errorText} role="alert" data-flx="ui.form.input.field-set.error-text">
 						{error}
 					</span>
 				)}
@@ -249,6 +249,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						<button
 							type="button"
 							className={styles.passwordToggle}
+							tabIndex={-1}
+							onMouseDown={(event) => event.preventDefault()}
 							onClick={handlePasswordToggle}
 							aria-label={passwordToggleLabel}
 							data-flx="ui.form.input.input-content.password-toggle.button"
@@ -304,7 +306,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				<div className={styles.inputContainer} data-flx="ui.form.input.input-container">
 					{focusDecoratedInput}
 					{error && (
-						<span id={errorId} className={styles.errorText} data-flx="ui.form.input.error-text">
+						<span id={errorId} className={styles.errorText} role="alert" data-flx="ui.form.input.error-text">
 							{error}
 						</span>
 					)}
@@ -351,8 +353,6 @@ type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
 	maxRows?: number;
 	showCharacterCount?: boolean;
 	actionButton?: React.ReactNode;
-	innerActionButton?: React.ReactNode;
-	characterCountTooltip?: (remaining: number, total: number, current: number) => React.ReactNode;
 };
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -367,8 +367,6 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 			maxLength,
 			value,
 			actionButton,
-			innerActionButton,
-			characterCountTooltip,
 			disabled,
 			id,
 			...props
@@ -381,7 +379,6 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 		const currentValue = useMemo(() => value || '', [value]);
 		const currentLength = useMemo(() => String(currentValue).length, [currentValue]);
 		const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-		const textareaWrapperRef = useRef<HTMLDivElement | null>(null);
 		const generatedTextareaId = useId();
 		const textareaId = id ?? generatedTextareaId;
 		const errorId = error ? `${textareaId}-error` : undefined;
@@ -528,35 +525,6 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 						className={clsx(error ? styles.error : styles.focusable)}
 						ref={setTextareaRefs}
 					/>
-				) : null,
-			[innerActionButton, textareaProps, error, setTextareaRefs],
-		);
-		const ringTarget = useMemo(
-			() => (innerActionButton ? textareaWrapperRef : textareaRef),
-			[innerActionButton, textareaWrapperRef, textareaRef],
-		);
-		const control = useMemo(
-			() => (innerActionButton ? textareaWithActions : simpleTextarea)!,
-			[innerActionButton, textareaWithActions, simpleTextarea],
-		);
-		return (
-			<FieldSet
-				error={error}
-				errorId={errorId}
-				footer={footer}
-				label={label}
-				labelRight={labelRight}
-				htmlFor={textareaId}
-				data-flx="ui.form.input.textarea.field-set"
-			>
-				<FocusRing
-					focusTarget={textareaRef}
-					ringTarget={ringTarget}
-					offset={-2}
-					enabled={!disabled}
-					data-flx="ui.form.input.textarea.focus-ring"
-				>
-					{control}
 				</FocusRing>
 			</FieldSet>
 		);

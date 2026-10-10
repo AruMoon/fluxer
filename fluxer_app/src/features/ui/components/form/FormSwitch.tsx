@@ -67,13 +67,14 @@ export const Switch = observer(
 							<span
 								id={labelId}
 								className={clsx(styles.label, disabled && styles.disabled)}
+								dir="auto"
 								data-flx="ui.form.switch.label"
 							>
 								{label}
 							</span>
 						)}
 						{hasDescription && (
-							<span id={descriptionId} className={styles.description} data-flx="ui.form.switch.description">
+							<span id={descriptionId} className={styles.description} dir="auto" data-flx="ui.form.switch.description">
 								{description}
 							</span>
 						)}
