@@ -32,6 +32,7 @@ import {Button, ButtonVariant} from '@app/features/ui/button/Button';
 import {VerifiedConnectionIcon} from '@app/features/ui/components/icons/VerifiedConnectionIcon';
 import {Spinner, SpinnerSize} from '@app/features/ui/components/Spinner';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
+import {ArrowLeftIcon} from '@app/features/ui/icons/DirectionalIcons';
 import {SteppedCarousel, SteppedCarouselActions} from '@app/features/ui/stepped_carousel/SteppedCarousel';
 import {isDesktop} from '@app/features/ui/utils/NativeUtils';
 import {flxElementClassName} from '@app/lib/react';
@@ -41,7 +42,6 @@ import {msg} from '@lingui/core/macro';
 import {Trans, useLingui} from '@lingui/react/macro';
 import {
 	ArrowClockwiseIcon,
-	ArrowLeftIcon,
 	ArrowSquareOutIcon,
 	CheckCircleIcon,
 	ClipboardIcon,
@@ -163,44 +163,56 @@ interface WaitingContentProps {
 function WaitingContent({handoff, instanceName, onOtherDevice}: WaitingContentProps): ReactElement {
 	const {i18n} = useLingui();
 	const showCode = handoff.returnMethod === DesktopHandoffReturnMethod.CODE && handoff.hasCode;
+	const panelClassName = flxElementClassName(styles.browserStatusPanel);
+	const statusIcon = handoff.hasStoppedWaiting ? (
+		<WarningCircleIcon
+			size={remFromPx(28)}
+			weight="regular"
+			data-flx="auth.flow.auth-login-core.auth-login-browser-step.stopped-waiting-icon"
+		/>
+	) : (
+		<Spinner size={SpinnerSize.MEDIUM} data-flx="auth.flow.auth-login-core.auth-login-browser-step.spinner" />
+	);
+	const title = (
+		<flx-auth-login-browser-step-status-title
+			className={flxElementClassName(styles.browserStatusTitle)}
+			data-flx="auth.flow.auth-login-core.auth-login-browser-step.waiting-title"
+		>
+			<Trans comment="Title in the desktop app while it waits for the user to sign in on the browser page it opened.">
+				Continue in your browser
+			</Trans>
+		</flx-auth-login-browser-step-status-title>
+	);
+	const textClassName = flxElementClassName(styles.browserStatusText);
+	let statusText: ReactNode;
+	if (handoff.hasStoppedWaiting) {
+		statusText = i18n._(BROWSER_WAIT_STOPPED_DESCRIPTOR);
+	} else if (showCode) {
+		statusText = (
+			<Trans comment="Shown in the desktop app above the code when the browser cannot return the sign-in automatically. instanceName is the server name, such as Fluxer.">
+				Sign in to {instanceName} in your browser, and check that it shows this code:
+			</Trans>
+		);
+	} else {
+		statusText = (
+			<Trans comment="Shown in the desktop app while it waits for the browser. instanceName is the server name, such as Fluxer.">
+				Sign in to {instanceName} in your browser and confirm. This app finishes signing in on its own.
+			</Trans>
+		);
+	}
 	return (
 		<flx-auth-login-browser-step-status-panel
-			className={flxElementClassName(styles.browserStatusPanel)}
+			className={panelClassName}
 			data-flx="auth.flow.auth-login-core.auth-login-browser-step.waiting-panel"
 		>
-			{handoff.hasStoppedWaiting ? (
-				<WarningCircleIcon
-					size={remFromPx(28)}
-					weight="regular"
-					data-flx="auth.flow.auth-login-core.auth-login-browser-step.stopped-waiting-icon"
-				/>
-			) : (
-				<Spinner size={SpinnerSize.MEDIUM} data-flx="auth.flow.auth-login-core.auth-login-browser-step.spinner" />
-			)}
-			<flx-auth-login-browser-step-status-title
-				className={flxElementClassName(styles.browserStatusTitle)}
-				data-flx="auth.flow.auth-login-core.auth-login-browser-step.waiting-title"
-			>
-				<Trans comment="Title in the desktop app while it waits for the user to sign in on the browser page it opened.">
-					Continue in your browser
-				</Trans>
-			</flx-auth-login-browser-step-status-title>
+			{statusIcon}
+			{title}
 			<flx-auth-login-browser-step-status-text
-				className={flxElementClassName(styles.browserStatusText)}
+				className={textClassName}
 				role="status"
 				data-flx="auth.flow.auth-login-core.auth-login-browser-step.waiting-text"
 			>
-				{handoff.hasStoppedWaiting ? (
-					i18n._(BROWSER_WAIT_STOPPED_DESCRIPTOR)
-				) : showCode ? (
-					<Trans comment="Shown in the desktop app above the code when the browser cannot return the sign-in automatically. instanceName is the server name, such as Fluxer.">
-						Sign in to {instanceName} in your browser, and check that it shows this code:
-					</Trans>
-				) : (
-					<Trans comment="Shown in the desktop app while it waits for the browser. instanceName is the server name, such as Fluxer.">
-						Sign in to {instanceName} in your browser and confirm. This app finishes signing in on its own.
-					</Trans>
-				)}
+				{statusText}
 			</flx-auth-login-browser-step-status-text>
 			{showCode && !handoff.hasStoppedWaiting ? (
 				<HandoffCode
@@ -326,6 +338,7 @@ interface AuthLoginBrowserStepProps {
 	readonly onChangeInstance: (() => void) | null;
 	readonly onSuccess: (payload: LoginSuccessPayload) => Promise<void> | void;
 	readonly showBackButton?: boolean;
+	readonly startSso?: boolean;
 }
 
 export const AuthLoginBrowserStep = observer(function AuthLoginBrowserStep({
@@ -339,6 +352,7 @@ export const AuthLoginBrowserStep = observer(function AuthLoginBrowserStep({
 	onChangeInstance,
 	onSuccess,
 	showBackButton = true,
+	startSso = false,
 }: AuthLoginBrowserStepProps) {
 	const {i18n} = useLingui();
 	const [step, setStep] = useState<BrowserHandoffStep>(BrowserHandoffStep.WAITING);
@@ -351,6 +365,7 @@ export const AuthLoginBrowserStep = observer(function AuthLoginBrowserStep({
 	const handoff = useBrowserLoginHandoff({
 		runtimeSnapshot,
 		prefillIdentifier,
+		startSso,
 		onEnded: handleEnded,
 		onSuccess,
 	});
@@ -623,12 +638,14 @@ export const AuthLoginBrowserStep = observer(function AuthLoginBrowserStep({
 									</span>
 								) : null}
 							</span>
-							<span
-								className={styles.browserInstanceDomain}
-								data-flx="auth.flow.auth-login-core.auth-login-browser-step.browser-instance-domain"
-							>
-								{instanceIdentity.domain}
-							</span>
+							{instanceIdentity.name === instanceDomainHost(instanceIdentity.domain) ? null : (
+								<span
+									className={styles.browserInstanceDomain}
+									data-flx="auth.flow.auth-login-core.auth-login-browser-step.browser-instance-domain"
+								>
+									{instanceIdentity.domain}
+								</span>
+							)}
 						</span>
 					</flx-auth-login-browser-step-instance-identity>
 					{onChangeInstance == null ? null : (
