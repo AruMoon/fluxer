@@ -20,6 +20,7 @@
     normalize_session_id/1,
     normalize_optional_binary/1,
     maybe_error_reply/5,
+    p2p_agreed/1,
     clear_virtual_access_flags/2
 ]).
 
@@ -65,8 +66,14 @@ build_context(Request0) ->
         client_ip =>
             guild_voice_connection_normalize:normalize_optional_binary(
                 maps:get(client_ip, Request, undefined)
-            )
+            ),
+        p2p => maps:get(p2p, Request, undefined),
+        country_code => maps:get(country_code, Request, undefined)
     }.
+
+-spec p2p_agreed(context()) -> boolean().
+p2p_agreed(Context) ->
+    voice_p2p:agreed(maps:get(p2p, Context, undefined), maps:get(bot, Context, false)).
 
 -spec voice_flags_for_permissions(context(), voice_utils:voice_permissions()) -> voice_flags().
 voice_flags_for_permissions(Context, VoicePermissions) ->

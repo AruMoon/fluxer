@@ -47,6 +47,7 @@ handle_voice_state_update(Data, State) ->
         user_id => UserId,
         e2ee_capable => E2EECapable,
         bot => Bot,
+        country_code => maps:get(geoip_country_code, State, undefined),
         guilds => Guilds
     },
     dispatch_validated(GuildIdResult, ChannelIdResult, Ctx, State).
@@ -65,7 +66,8 @@ extract_voice_params(Data) ->
         is_mobile => maps:get(<<"is_mobile">>, Data, false),
         latitude => maps:get(<<"latitude">>, Data, null),
         longitude => maps:get(<<"longitude">>, Data, null),
-        client_ip => maps:get(<<"client_ip">>, Data, undefined)
+        client_ip => maps:get(<<"client_ip">>, Data, undefined),
+        p2p => maps:get(<<"p2p">>, Data, undefined)
     }.
 
 -spec dispatch_validated(
@@ -149,13 +151,14 @@ handle_dm_channel(ChId, Ctx, State) ->
         user_id := UserId,
         params := Params,
         e2ee_capable := E2EE,
-        bot := Bot
+        bot := Bot,
+        country_code := CountryCode
     } = Ctx,
     ConnId = maps:get(connection_id, Params),
     case is_binary(ConnId) orelse ConnId =:= null of
         true ->
             handle_dm_connect(
-                ChId, Params, SId, UserId, E2EE, Bot, State
+                ChId, Params, SId, UserId, E2EE, Bot, CountryCode, State
             );
         false ->
             invalid_params_reply(UserId, SId, State)
@@ -258,9 +261,10 @@ log_dm_disconnect_err(UserId, SId, ConnId, Cat, Err) ->
     user_id(),
     boolean(),
     boolean(),
+    binary() | undefined,
     session_state()
 ) -> voice_state_reply().
-handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, State) ->
+handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, CountryCode, State) ->
     ConnId = maps:get(connection_id, Params),
     Request = #{
         user_id => UserId,
@@ -277,7 +281,9 @@ handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, State) ->
         longitude => maps:get(longitude, Params),
         client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
-        bot => Bot
+        bot => Bot,
+        p2p => maps:get(p2p, Params),
+        country_code => CountryCode
     },
     StWithPid = State#{session_pid => self()},
     Result = dm_voice:voice_state_update(Request, StWithPid),
@@ -406,11 +412,12 @@ guild_voice_queue(GuildPid, GId, ChId, Ctx, State) ->
         user_id := UserId,
         params := Params,
         e2ee_capable := E2EE,
-        bot := Bot
+        bot := Bot,
+        country_code := CountryCode
     } = Ctx,
     ConnId = maps:get(connection_id, Params),
     log_guild_info("guild_queue", UserId, SId, GId, ChId, ConnId),
-    Req = build_guild_request(ChId, Params, UserId, SId, E2EE, Bot),
+    Req = build_guild_request(ChId, Params, UserId, SId, E2EE, Bot, CountryCode),
     VoiceCtx = #{
         guild_pid => GuildPid,
         guild_id => GId,
@@ -488,9 +495,10 @@ log_guild_warning(Tag, UserId, SId, GId, ChId, ConnId) ->
     user_id(),
     binary(),
     boolean(),
-    boolean()
+    boolean(),
+    binary() | undefined
 ) -> map().
-build_guild_request(ChId, Params, UserId, SId, E2EE, Bot) ->
+build_guild_request(ChId, Params, UserId, SId, E2EE, Bot, CountryCode) ->
     #{
         user_id => UserId,
         session_id => SId,
@@ -506,5 +514,7 @@ build_guild_request(ChId, Params, UserId, SId, E2EE, Bot) ->
         longitude => maps:get(longitude, Params),
         client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
-        bot => Bot
+        bot => Bot,
+        p2p => maps:get(p2p, Params),
+        country_code => CountryCode
     }.

@@ -6,6 +6,8 @@
 
 -export([request_voice_token/8]).
 -export([request_voice_token/9]).
+-export([request_voice_token/10]).
+-export([request_voice_token/11]).
 
 -spec request_voice_token(
     integer(),
@@ -27,15 +29,62 @@ request_voice_token(
     Latitude,
     Longitude
 ) ->
-    Req = voice_utils:build_voice_token_rpc_request(
-        GuildId,
-        ChannelId,
-        UserId,
-        ConnectionId,
-        Latitude,
-        Longitude,
-        VoicePermissions,
-        TokenNonce
+    case
+        request_voice_token(
+            GuildId,
+            ChannelId,
+            UserId,
+            ConnectionId,
+            VoicePermissions,
+            TokenNonce,
+            Latitude,
+            Longitude,
+            sfu,
+            undefined
+        )
+    of
+        {ok, TokenData} when is_map(TokenData) -> {ok, TokenData};
+        {ok, _Grant} -> {error, voice_token_failed};
+        {error, Reason} -> {error, Reason}
+    end.
+
+-spec request_voice_token(
+    integer(),
+    integer(),
+    integer(),
+    binary() | null,
+    map(),
+    binary() | null,
+    binary() | undefined | null,
+    binary() | undefined | null,
+    voice_p2p:join_decision(),
+    binary() | undefined
+) -> {ok, map() | voice_p2p:token_grant()} | {error, term()}.
+request_voice_token(
+    GuildId,
+    ChannelId,
+    UserId,
+    ConnectionId,
+    VoicePermissions,
+    TokenNonce,
+    Latitude,
+    Longitude,
+    Decision,
+    CountryCode
+) ->
+    Req = voice_p2p:add_to_token_request(
+        voice_utils:build_voice_token_rpc_request(
+            GuildId,
+            ChannelId,
+            UserId,
+            ConnectionId,
+            Latitude,
+            Longitude,
+            VoicePermissions,
+            TokenNonce
+        ),
+        Decision,
+        CountryCode
     ),
     log_token_start(GuildId, ChannelId, UserId, ConnectionId, TokenNonce),
     case rpc_client:call(Req) of
@@ -90,6 +139,63 @@ request_voice_token(
             handle_token_error(GuildId, ChannelId, UserId, ConnectionId, Reason)
     end.
 
+-spec request_voice_token(
+    integer(),
+    integer(),
+    integer(),
+    binary() | null,
+    map(),
+    binary() | null,
+    binary() | undefined | null,
+    binary() | undefined | null,
+    voice_p2p:join_decision(),
+    binary() | undefined | null,
+    binary() | undefined | null
+) -> {ok, map() | voice_p2p:token_grant()} | {error, term()}.
+
+request_voice_token(
+    GuildId,
+    ChannelId,
+    UserId,
+    ConnectionId,
+    VoicePermissions,
+    TokenNonce,
+    Latitude,
+    Longitude,
+    Decision,
+    CountryCode,
+    ClientIP
+) ->
+    Req0 = voice_utils:build_voice_token_rpc_request(
+        GuildId,
+        ChannelId,
+        UserId,
+        ConnectionId,
+        Latitude,
+        Longitude,
+        ClientIP,
+        VoicePermissions,
+        TokenNonce
+    ),
+    Req = voice_p2p:add_to_token_request(
+        Req0,
+        Decision,
+        CountryCode
+    ),
+    log_token_start(GuildId, ChannelId, UserId, ConnectionId, TokenNonce),
+    case rpc_client:call(Req) of
+        {ok, Data} ->
+            handle_token_success(GuildId, ChannelId, UserId, Data);
+        {error, {rpc_error, Status, Body}} ->
+            handle_token_rpc_error(
+                GuildId, ChannelId, UserId, ConnectionId, Status, Body
+            );
+        {error, Reason} ->
+            handle_token_error(
+                GuildId, ChannelId, UserId, ConnectionId, Reason
+            )
+    end.
+
 -spec log_token_start(integer(), integer(), integer(), binary() | null, binary() | null) -> ok.
 log_token_start(GuildId, ChannelId, UserId, ConnectionId, TokenNonce) ->
     logger:debug(
@@ -102,8 +208,16 @@ token_start_log_message() ->
     "guild_voice_request_token_start: guild_id=~p channel_id=~p "
     "user_id=~p connection_id=~p token_nonce=~p".
 
--spec handle_token_success(integer(), integer(), integer(), map()) -> {ok, map()}.
+-spec handle_token_success(integer(), integer(), integer(), map()) ->
+    {ok, map() | voice_p2p:token_grant()}.
 handle_token_success(GuildId, ChannelId, UserId, Data) ->
+    case voice_p2p:grant(Data) of
+        sfu -> handle_sfu_token_success(GuildId, ChannelId, UserId, Data);
+        Grant -> {ok, Grant}
+    end.
+
+-spec handle_sfu_token_success(integer(), integer(), integer(), map()) -> {ok, map()}.
+handle_sfu_token_success(GuildId, ChannelId, UserId, Data) ->
     logger:debug(
         token_success_log_message(),
         [
