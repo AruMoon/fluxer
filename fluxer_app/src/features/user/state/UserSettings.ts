@@ -11,6 +11,8 @@ import {
 	selectEffectiveGifAutoPlay,
 } from '@app/features/accessibility/state/MotionPreferencesMachine';
 import {Endpoints} from '@app/features/app/constants/Endpoints';
+import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
+import {isDateOfBirthStepOpen, whenDateOfBirthStepClosed} from '@app/features/auth/state/DateOfBirthStep';
 import {resolveRetryAfterMs} from '@app/features/messaging/utils/RetryAfterUtils';
 import {AccountScopedWork} from '@app/features/platform/state/AccountScopedWork';
 import AppStorage, {flushAppStorageWrites} from '@app/features/platform/state/PersistentStorage';
@@ -20,7 +22,7 @@ import {Logger} from '@app/features/platform/utils/AppLogger';
 import {isAbortError} from '@app/features/platform/utils/PlatformHelpers';
 import {failureCode} from '@app/features/platform/utils/ResponseInspection';
 import LocalPresence, {setLocalPresenceUserSettings} from '@app/features/presence/state/LocalPresence';
-import Theme from '@app/features/theme/state/Theme';
+import AccountTheme from '@app/features/theme/state/AccountTheme';
 import MobileLayout from '@app/features/ui/state/MobileLayout';
 import {PRIVACY_SETUP_VERSION} from '@app/features/user/constants/PrivacySetupConstants';
 import {
@@ -333,9 +335,11 @@ class UserSettingsState {
 	staffDmAccessUserIds: Array<string> = [];
 	syncedPreferences: SyncedPreferences = readPersistedSyncedPreferences(SYNCED_PREFERENCES_LOCAL_KEY);
 	private hydrated = false;
+	private awaitingAccountSettings = false;
 	private wireSyncedPreferences: SyncedPreferences = readPersistedSyncedPreferences(SYNCED_PREFERENCES_WIRE_KEY);
 	private wireSyncedPreferencesBase: string | null = null;
 	private syncFlushTimer: NodeJS.Timeout | 'microtask' | null = null;
+	private syncWaitingForDateOfBirth = false;
 	private syncFlushInFlight = false;
 	private syncFlushPendingPromise: Promise<void> | null = null;
 	private syncFlushPendingResolvers: Array<{
@@ -469,7 +473,12 @@ class UserSettingsState {
 	}
 
 	isPrivacySetupPending(): boolean {
-		return this.hydrated && this.privacySetupVersion !== null && this.privacySetupVersion < PRIVACY_SETUP_VERSION;
+		return (
+			this.hydrated &&
+			this.privacySetupVersion !== null &&
+			this.privacySetupVersion < PRIVACY_SETUP_VERSION &&
+			!RuntimeConfig.directMessagesDisabled
+		);
 	}
 
 	getCustomStatus(): CustomStatus | null {
@@ -523,6 +532,7 @@ class UserSettingsState {
 		runInAction(() => {
 			this.accountEpoch = Math.max(this.accountEpoch, checkpoint.accountEpoch);
 			this.hydrated = checkpoint.hydrated;
+			this.awaitingAccountSettings = false;
 			this.syncedPreferences = cloneSyncedPreferences(checkpoint.syncedPreferences);
 			this.wireSyncedPreferences = cloneSyncedPreferences(checkpoint.wireSyncedPreferences);
 			this.wireSyncedPreferencesBase = checkpoint.wireSyncedPreferencesBase;
@@ -567,6 +577,7 @@ class UserSettingsState {
 		this.accountEpoch += 1;
 		this.syncFlushGeneration += 1;
 		this.hydrated = false;
+		this.awaitingAccountSettings = true;
 		this.syncedPreferences = createEmptySyncedPreferences();
 		this.wireSyncedPreferences = createEmptySyncedPreferences();
 		this.wireSyncedPreferencesBase = null;
@@ -619,6 +630,7 @@ class UserSettingsState {
 		const camelCaseSettings = convertKeysToCamelCase<UserSettings>(userSettings);
 		if (hydrate) {
 			this.hydrated = true;
+			this.awaitingAccountSettings = false;
 		}
 		this.flags = camelCaseSettings.flags;
 		const normalizedStatus = normalizeStatus(camelCaseSettings.status);
@@ -627,7 +639,7 @@ class UserSettingsState {
 		this.statusResetsTo = camelCaseSettings.statusResetsTo ?? null;
 		if (camelCaseSettings.theme) {
 			this.theme = camelCaseSettings.theme;
-			Theme.updateServerTheme(camelCaseSettings.theme);
+			AccountTheme.updateServerTheme(camelCaseSettings.theme);
 		}
 		this.timeFormat = camelCaseSettings.timeFormat;
 		const localeToLoad = camelCaseSettings.locale ?? this.locale;
@@ -795,6 +807,9 @@ class UserSettingsState {
 		field: F,
 		value: NonNullable<SyncedPreferences[F]>,
 	): Promise<void> {
+		if (this.awaitingAccountSettings) {
+			return;
+		}
 		runInAction(() => {
 			this.markSyncedPreferenceFieldDirty(field);
 			(this.syncedPreferences as SyncedPreferences)[field] = value;
@@ -930,6 +945,16 @@ class UserSettingsState {
 
 	private async runSyncedPreferencesFlush(): Promise<void> {
 		if (this.syncFlushInFlight || AccountScopedWork.isSuspended) return;
+		if (isDateOfBirthStepOpen()) {
+			if (!this.syncWaitingForDateOfBirth) {
+				this.syncWaitingForDateOfBirth = true;
+				void whenDateOfBirthStepClosed().then(() => {
+					this.syncWaitingForDateOfBirth = false;
+					void this.scheduleSyncedPreferencesFlush();
+				});
+			}
+			return;
+		}
 		const resolvers = this.syncFlushPendingResolvers;
 		this.syncFlushPendingResolvers = [];
 		const pendingPromise = this.syncFlushPendingPromise;
