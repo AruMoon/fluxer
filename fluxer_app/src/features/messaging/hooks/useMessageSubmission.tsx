@@ -88,16 +88,15 @@ export const useMessageSubmission = ({
 		) => {
 			const isTtsCall = typeof stickersOrTts === 'boolean';
 			const tts = isTtsCall ? stickersOrTts : undefined;
-			const stickers = isTtsCall
-				? Array.isArray(favoriteMemeIdOrStickers)
-					? favoriteMemeIdOrStickers
-					: []
-				: stickersOrTts;
-			const favoriteMemeId = isTtsCall
-				? maybeFavoriteMemeId
-				: typeof favoriteMemeIdOrStickers === 'string'
-					? favoriteMemeIdOrStickers
-					: undefined;
+			let stickers: Array<MessageStickerItem>;
+			let favoriteMemeId: string | undefined;
+			if (isTtsCall) {
+				stickers = Array.isArray(favoriteMemeIdOrStickers) ? favoriteMemeIdOrStickers : [];
+				favoriteMemeId = maybeFavoriteMemeId;
+			} else {
+				stickers = stickersOrTts;
+				favoriteMemeId = typeof favoriteMemeIdOrStickers === 'string' ? favoriteMemeIdOrStickers : undefined;
+			}
 			const currentUser = Users.getCurrentUser();
 			if (!channel || !currentUser || !accountOwnsActiveView(accountKey)) return false;
 			const hasNonTextContent =

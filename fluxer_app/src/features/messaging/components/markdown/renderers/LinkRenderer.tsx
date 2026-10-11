@@ -17,11 +17,7 @@ import DiscoveryChannelPreviews from '@app/features/discovery/state/DiscoveryCha
 import {GuildAcronym} from '@app/features/guild/components/GuildAcronym';
 import type {Guild} from '@app/features/guild/models/Guild';
 import Guilds from '@app/features/guild/state/Guilds';
-import {
-	COPY_LINK_DESCRIPTOR,
-	OKAY_DESCRIPTOR,
-	OPEN_LINK_DESCRIPTOR,
-} from '@app/features/i18n/utils/CommonMessageDescriptors';
+import {COPY_LINK_DESCRIPTOR, OPEN_LINK_DESCRIPTOR} from '@app/features/i18n/utils/CommonMessageDescriptors';
 import * as InviteCommands from '@app/features/invite/commands/InviteCommands';
 import * as InviteUtils from '@app/features/invite/utils/InviteUtils';
 import {LinkDestinationTooltip} from '@app/features/messaging/components/LinkDestinationTooltip';
@@ -70,6 +66,7 @@ import * as ModalCommands from '@app/features/ui/commands/ModalCommands';
 import {modal} from '@app/features/ui/commands/ModalCommands';
 import * as TextCopyCommands from '@app/features/ui/commands/TextCopyCommands';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
+import {CaretRightIcon} from '@app/features/ui/icons/DirectionalIcons';
 import {APP_PROTOCOL_PREFIX, APP_PROTOCOL_SCHEME, isAppProtocolUrl} from '@app/features/ui/utils/AppProtocol';
 import {openExternalUrl} from '@app/features/ui/utils/NativeUtils';
 import {
@@ -84,7 +81,7 @@ import {isProbablyAValidSnowflake} from '@fluxer/snowflake/src/SnowflakeUtils';
 import type {I18n} from '@lingui/core';
 import {msg} from '@lingui/core/macro';
 import {useLingui} from '@lingui/react';
-import {CaretRightIcon, ChatTeardropIcon, LockIcon} from '@phosphor-icons/react';
+import {ChatTeardropIcon, LockIcon} from '@phosphor-icons/react';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
 import type React from 'react';
@@ -127,7 +124,7 @@ const OPEN_SETTINGS_SECTION_DESCRIPTOR = msg({
 const OPEN_APP_PAGE_DESCRIPTOR = msg({
 	message: 'Open {labelText}',
 	comment:
-		'Accessible label for an inline chat link pill that opens an app page such as Discovery. labelText is the page name.',
+		'Accessible label for an inline chat link pill that opens an app page such as Explore. labelText is the page name.',
 });
 const PAGE_LINK_DESCRIPTOR = msg({
 	message: 'page link',
@@ -177,11 +174,6 @@ function showChannelAccessDeniedModal(i18n: I18n): void {
 			<ConfirmModal
 				title={i18n._(CHANNEL_ACCESS_DENIED_DESCRIPTOR)}
 				description={i18n._(YOU_DO_NOT_HAVE_ACCESS_TO_THE_CHANNEL_DESCRIPTOR)}
-				primaryText={i18n._(OKAY_DESCRIPTOR)}
-				primaryVariant="primary"
-				secondaryText={false}
-				onPrimary={() => {}}
-				hideCloseButton
 				data-flx="messaging.markdown.renderers.link-renderer.show-channel-access-denied-modal.confirm-modal"
 			/>
 		)),
@@ -355,19 +347,69 @@ const JumpLinkMention = observer(function JumpLinkMention({
 	const shouldShowDMIconLabel = isDMChannel && !messageId;
 	const hasDetailChunk = Boolean(messageId) || shouldShowChannelInfo;
 	const roleDescription = messageId ? i18n._(MESSAGE_LINK_DESCRIPTOR) : i18n._(CHANNEL_LINK_DESCRIPTOR);
-	const ariaLabel = messageId
-		? labelText
-			? i18n._(JUMP_TO_THE_MESSAGE_IN_DESCRIPTOR, {labelText})
-			: i18n._(JUMP_TO_THE_LINKED_MESSAGE_DESCRIPTOR)
-		: labelText
-			? i18n._(JUMP_TO_DESCRIPTOR, {labelText})
-			: i18n._(JUMP_TO_THE_LINKED_CHANNEL_DESCRIPTOR);
+	let ariaLabel: string;
+	if (messageId) {
+		if (labelText) {
+			ariaLabel = i18n._(JUMP_TO_THE_MESSAGE_IN_DESCRIPTOR, {labelText});
+		} else {
+			ariaLabel = i18n._(JUMP_TO_THE_LINKED_MESSAGE_DESCRIPTOR);
+		}
+	} else if (labelText) {
+		ariaLabel = i18n._(JUMP_TO_DESCRIPTOR, {labelText});
+	} else {
+		ariaLabel = i18n._(JUMP_TO_THE_LINKED_CHANNEL_DESCRIPTOR);
+	}
 	const Component = interactive ? 'button' : 'span';
+	const className = clsx(markupStyles.mention, interactive && markupStyles.interactive, jumpLinkStyles.jumpLinkButton);
+	let leadingChunk: React.ReactNode;
+	if (guild) {
+		leadingChunk = (
+			<span
+				className={jumpLinkStyles.part}
+				data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.part--guild"
+			>
+				<CompactGuildMentionIcon
+					guild={guild}
+					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.compact-guild-mention-icon"
+				/>
+				<span
+					className={jumpLinkStyles.name}
+					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.guild-name"
+				>
+					{guild.name}
+				</span>
+			</span>
+		);
+	} else if (shouldShowDMIconLabel) {
+		leadingChunk = (
+			<span
+				className={jumpLinkStyles.part}
+				data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.part--dm"
+			>
+				{getIcon(channel, {className: jumpLinkStyles.icon})}
+				<span
+					className={jumpLinkStyles.name}
+					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.dm-name"
+				>
+					{displayName}
+				</span>
+			</span>
+		);
+	} else {
+		leadingChunk = (
+			<span
+				className={jumpLinkStyles.name}
+				data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.label"
+			>
+				{displayName}
+			</span>
+		);
+	}
 	return (
 		<Component
 			data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.component.click"
 			{...(interactive ? {type: 'button'} : {})}
-			className={clsx(markupStyles.mention, interactive && markupStyles.interactive, jumpLinkStyles.jumpLinkButton)}
+			className={className}
 			onClick={handleClick}
 			onAuxClick={handleAuxClick}
 			onContextMenu={handleContextMenu}
@@ -375,43 +417,7 @@ const JumpLinkMention = observer(function JumpLinkMention({
 			{...(interactive ? {'aria-roledescription': roleDescription} : {})}
 			tabIndex={interactive ? 0 : -1}
 		>
-			{guild ? (
-				<span
-					className={jumpLinkStyles.part}
-					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.part--guild"
-				>
-					<CompactGuildMentionIcon
-						guild={guild}
-						data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.compact-guild-mention-icon"
-					/>
-					<span
-						className={jumpLinkStyles.name}
-						data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.guild-name"
-					>
-						{guild.name}
-					</span>
-				</span>
-			) : shouldShowDMIconLabel ? (
-				<span
-					className={jumpLinkStyles.part}
-					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.part--dm"
-				>
-					{getIcon(channel, {className: jumpLinkStyles.icon})}
-					<span
-						className={jumpLinkStyles.name}
-						data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.dm-name"
-					>
-						{displayName}
-					</span>
-				</span>
-			) : (
-				<span
-					className={jumpLinkStyles.name}
-					data-flx="messaging.markdown.renderers.link-renderer.jump-link-mention.label"
-				>
-					{displayName}
-				</span>
-			)}
+			{leadingChunk}
 			{hasDetailChunk && (
 				<>
 					<span
@@ -988,11 +994,6 @@ export const LinkRenderer = observer(function LinkRenderer({
 						<ConfirmModal
 							title={i18n._(DEVELOPER_TOOLS_DESCRIPTOR)}
 							description={i18n._(DEVELOPER_TOOLS_ARE_AVAILABLE_FROM_THE_STAFF_BADGE_DESCRIPTOR)}
-							primaryText={i18n._(OKAY_DESCRIPTOR)}
-							primaryVariant="primary"
-							secondaryText={false}
-							onPrimary={() => {}}
-							hideCloseButton
 							data-flx="messaging.markdown.renderers.link-renderer.handle-click.confirm-modal--2"
 						/>
 					)),
@@ -1003,11 +1004,6 @@ export const LinkRenderer = observer(function LinkRenderer({
 						<ConfirmModal
 							title={i18n._(LINK_UNAVAILABLE_DESCRIPTOR)}
 							description={i18n._(THIS_LINK_IS_NOT_AVAILABLE_FOR_YOUR_ACCOUNT_DESCRIPTOR)}
-							primaryText={i18n._(OKAY_DESCRIPTOR)}
-							primaryVariant="primary"
-							secondaryText={false}
-							onPrimary={() => {}}
-							hideCloseButton
 							data-flx="messaging.markdown.renderers.link-renderer.handle-click.confirm-modal--3"
 						/>
 					)),
@@ -1032,11 +1028,6 @@ export const LinkRenderer = observer(function LinkRenderer({
 					<ConfirmModal
 						title={i18n._(LINK_UNAVAILABLE_DESCRIPTOR)}
 						description={i18n._(THIS_LINK_IS_NOT_AVAILABLE_FOR_YOUR_ACCOUNT_DESCRIPTOR)}
-						primaryText={i18n._(OKAY_DESCRIPTOR)}
-						primaryVariant="primary"
-						secondaryText={false}
-						onPrimary={() => {}}
-						hideCloseButton
 						data-flx="messaging.markdown.renderers.link-renderer.handle-click.confirm-modal--4"
 					/>
 				)),
