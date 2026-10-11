@@ -104,6 +104,7 @@ export class ChannelOperationsService {
 				guildId: params.guildId,
 				userId: params.userId,
 				permission: Permissions.MANAGE_ROLES,
+				channelId: parentId ?? undefined,
 			});
 			if (!canManageRoles) throw new MissingPermissionsError();
 			const basePermissions = await this.gatewayService.getUserPermissions({
@@ -736,6 +737,7 @@ export class ChannelOperationsService {
 			ctx,
 			'max_channels_per_category',
 			maxChannels,
+			'guild',
 		);
 		if (count >= maxChannels) {
 			throw new MaxCategoryChannelsError(maxChannels);
@@ -747,7 +749,13 @@ export class ChannelOperationsService {
 		let maxChannels = MAX_GUILD_CHANNELS;
 		const guild = await this.guildRepository.findUnique(guildId);
 		const ctx = createLimitMatchContext({user: null, guildFeatures: guild?.features ?? null});
-		maxChannels = resolveLimitSafe(this.limitConfigService.getConfigSnapshot(), ctx, 'max_guild_channels', maxChannels);
+		maxChannels = resolveLimitSafe(
+			this.limitConfigService.getConfigSnapshot(),
+			ctx,
+			'max_guild_channels',
+			maxChannels,
+			'guild',
+		);
 		if (count >= maxChannels) {
 			throw new MaxGuildChannelsError(maxChannels);
 		}
