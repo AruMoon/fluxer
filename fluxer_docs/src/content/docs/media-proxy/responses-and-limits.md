@@ -124,7 +124,7 @@ No route sets `immutable`, `Expires`, `ETag`, or `Last-Modified` on a read respo
 
 One read selects a shorter policy. Under the `report` or `enforce` [signed attachment URL policy](/media-proxy/overview/#signed-attachment-urls), an attachment read whose signature is valid gets `public, max-age=` the seconds left on that signature in both headers, so no entry outlives the URL that made it. A data package URL never expires, so it gets the one-day ceiling instead. Every other read, and every attachment read under `off`, keeps the year.
 
-A one-year `max-age` is only safe where a purge path reaches every cache that stores media. With no `ETag` and no `Last-Modified` there is nothing to revalidate against, so a deleted or replaced object is served until its entry is purged or drops out. A cache with no purge path must set a shorter lifetime of its own instead. [Caching in front of Fluxer](/operator/reverse-proxy/#caching-in-front-of-fluxer) states how.
+A one-year `max-age` is only safe where a purge path reaches every cache that stores media. With no `ETag` and no `Last-Modified` there is nothing to revalidate against, so a deleted or replaced object is served until its entry is purged or drops out. A cache with no purge path must set a shorter lifetime of its own instead.
 
 Every route-produced error response uses `Cache-Control: no-store`, and a successful `/_metrics` read uses it too. A 416 response, a successful upload relay response, and the empty-body method rejection of a registered path set no cache policy at all.
 

@@ -91,7 +91,7 @@ An operator can limit which web origins read media through CORS. `FLUXER_MEDIA_P
 | `report` | Every response is the same as under `off`, and each read `enforce` would refuse is logged |
 | `enforce` | A read from an origin outside the allowlist returns 403 |
 
-Under `enforce`, an `Origin` is allowed when it equals the serialised form of an entry in `FLUXER_MEDIA_PROXY_CORS_ALLOWED_ORIGINS` byte for byte. The desktop app origin `fluxer-app://app` is always allowed and needs no entry. Anything else is refused, including `null`, a repeated `Origin` header, and a value that is not ASCII. A refused read returns 403 on every read path, and the Media Proxy reads no object and fetches no external URL for it. [Media Proxy settings](/operator/configuration/#media-proxy-settings) defines how an entry is parsed and serialised.
+Under `enforce`, an `Origin` is allowed when it equals the serialised form of an entry in `FLUXER_MEDIA_PROXY_CORS_ALLOWED_ORIGINS` byte for byte. The desktop app origin `fluxer-app://app` is always allowed and needs no entry. Anything else is refused, including `null`, a repeated `Origin` header, and a value that is not ASCII. A refused read returns 403 on every read path, and the Media Proxy reads no object and fetches no external URL for it.
 
 A read with no `Origin` is served without `Access-Control-Allow-Origin`. A browser sends no `Origin` for an `<img>` or a `<video>` without `crossorigin`, so those elements still load. An allowed read gets its own origin back in `Access-Control-Allow-Origin` on a media representation and on a 416. No error has CORS headers.
 
@@ -101,7 +101,7 @@ Under `enforce`, every response to a `GET` or `HEAD` on a read path has `Vary: A
 
 `report` changes no response. The Media Proxy logs a warning with the reason `cors_origin_would_deny` for each read `enforce` would refuse.
 
-The policy applies to a response the Media Proxy generates, and a shared cache in front of it answers a hit on its own. An entry stored while the policy was `off` holds `Access-Control-Allow-Origin: *` and a year of `Cache-Control`, and a foreign origin reading that URL gets both back until the entry goes. Purge `/attachments/` when you move the policy to `enforce`. [Caching in front of Fluxer](/operator/reverse-proxy/#caching-in-front-of-fluxer) states how.
+The policy applies to a response the Media Proxy generates, and a shared cache in front of it answers a hit on its own. An entry stored while the policy was `off` holds `Access-Control-Allow-Origin: *` and a year of `Cache-Control`, and a foreign origin reading that URL gets both back until the entry goes. Purge `/attachments/` when you move the policy to `enforce`.
 
 A `static` or `relay` endpoint ignores the policy. The [upload relay](/media-proxy/upload-relay/) and the [operator and internal endpoints](/media-proxy/routes/#operator-and-internal-endpoints) are exempt from it. A method other than `GET` or `HEAD` on a read path returns 405 whatever its `Origin`.
 
@@ -109,7 +109,7 @@ The reference self-hosted deployment leaves the policy `off`. An operator who tu
 
 ## Signed attachment URLs
 
-An operator can require a signature on every attachment read. `FLUXER_MEDIA_PROXY_ATTACHMENT_SIGNATURE_MODE` sets this signed attachment URL policy, and it defaults to `off`. The reference self-hosted deployment leaves it `off`, and turning it on takes a secret and the mode. The Media Proxy reads the mode once at start, and [Turning the signature policy on](/operator/reverse-proxy/#turning-the-signature-policy-on) gives the order to move it and a cache in front of it, and what each pairing of the two serves.
+An operator can require a signature on every attachment read. `FLUXER_MEDIA_PROXY_ATTACHMENT_SIGNATURE_MODE` sets this signed attachment URL policy, and it defaults to `off`. The reference self-hosted deployment leaves it `off`, and turning it on takes a secret and the mode. The Media Proxy reads the mode once at start.
 
 | Value | Description |
 | --- | --- |
@@ -145,7 +145,7 @@ The Media Proxy reads the raw query string. It splits it on `&`, skips empty fie
 - `hm` does not verify against any configured secret.
 - The current time is at or after `ex` on an ordinary URL.
 
-A shared cache in front of the Media Proxy must leave the signature parameters `ex`, `is`, `hm`, and `uc` out of its cache key, and must decode each parameter name before it compares it. A cache that keeps them stores a new entry every time the same object is signed again. [Caching in front of Fluxer](/operator/reverse-proxy/#caching-in-front-of-fluxer) states the rest of the rules.
+A shared cache in front of the Media Proxy must leave the signature parameters `ex`, `is`, `hm`, and `uc` out of its cache key, and must decode each parameter name before it compares it. A cache that keeps them stores a new entry every time the same object is signed again.
 
 Every other parameter is ignored, and so is the order of the parameters. The signature is over `ex`, `is`, `uc`, and the percent-decoded storage key, and never over the host, the scheme, the port, or another parameter. Because `uc` is signed, an ordinary URL relabelled `uc=dp` does not verify, and neither does a data package URL with `uc` removed. One signed URL therefore reads every [transformation](/media-proxy/transformations/) and `download` variant of its object. Every percent-encoded spelling of the same key verifies the same way, and a key whose decoded bytes are not valid UTF-8 is refused.
 
