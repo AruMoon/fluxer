@@ -855,7 +855,8 @@ mod tests {
 
     #[test]
     fn components_cover_every_self_hosting_service() {
-        let compose = include_str!("../../../deploy/self-hosting/docker-compose.yml");
+        let compose =
+            include_str!("../../../fluxer_rexctl/internal/stack/files/docker-compose.yml");
         let expected: BTreeSet<(&str, &str)> = COMPONENTS
             .iter()
             .flat_map(|component| {
