@@ -3,7 +3,6 @@
 use crate::{
     api::{
         client::{AdminApiClient, ApiResultExt},
-        enforcement::api_error_message,
         generated::types::CommunityRemovalBasis,
     },
     middleware::{
@@ -481,7 +480,7 @@ async fn remove_community(
         Ok(_) => FlashData::success("Community removed"),
         Err(error) => {
             tracing::warn!(%error, guild_id, "admin API request failed: remove community");
-            FlashData::error(api_error_message(&error).map_or_else(
+            FlashData::error(error.detail_message().map_or_else(
                 || "Failed to remove the community".to_owned(),
                 |message| format!("Failed to remove the community: {message}"),
             ))

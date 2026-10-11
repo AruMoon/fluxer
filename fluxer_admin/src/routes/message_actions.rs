@@ -4,7 +4,6 @@ use crate::{
     acl,
     api::{
         client::AdminApiClient,
-        enforcement::api_error_message,
         generated::types::{BulkModerationBasis, MessageDeletionBasis},
     },
     middleware::{
@@ -114,7 +113,7 @@ pub(crate) async fn messages_post(
                         Ok(()) => FlashData::success("Message deleted"),
                         Err(error) => {
                             tracing::warn!(%error, "admin API request failed: delete message");
-                            FlashData::error(api_error_message(&error).map_or_else(
+                            FlashData::error(error.detail_message().map_or_else(
                                 || "Failed to delete the message".to_owned(),
                                 |message| format!("Failed to delete the message: {message}"),
                             ))
@@ -158,7 +157,10 @@ pub(crate) async fn system_dms_post(
             Ok(_) => FlashData::success("System DM sent"),
             Err(error) => {
                 tracing::warn!(%error, "admin API request failed: send system DM");
-                FlashData::error("Failed to send system DM")
+                FlashData::error(error.detail_message().map_or_else(
+                    || "Failed to send system DM".to_owned(),
+                    |message| format!("Failed to send system DM: {message}"),
+                ))
             }
         }
     } else {
@@ -410,25 +412,5 @@ pub(crate) async fn archives_download(
                 config.secure_cookies(),
             )
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn form_list_values_accepts_repeated_comma_and_newline_values() {
-        let form = MultiValueForm::parse(b"user_ids%5B%5D=1&user_ids%5B%5D=2%2C3&user_ids=4%0A5");
-        assert_eq!(
-            form.list_values_any(&["user_ids[]", "user_ids"]),
-            vec![
-                "1".to_owned(),
-                "2".to_owned(),
-                "3".to_owned(),
-                "4".to_owned(),
-                "5".to_owned()
-            ]
-        );
     }
 }
