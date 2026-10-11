@@ -13,8 +13,8 @@ use super::image_probe::{
 };
 use super::loaded_image::{
     normalize_vips_image_to_uchar, page_height, resize_loaded_image, resize_loaded_image_by_scale,
-    validate_dimensions_u32, validate_jxl_decode_pixels, validate_static_output_pixels,
-    validate_vips_image,
+    static_output_pixels, validate_dimensions_u32, validate_jxl_decode_pixels,
+    validate_static_output_pixels, validate_vips_image,
 };
 use super::native_runtime::{clear_vips_error, ensure_vips_init, last_vips_error};
 use super::transform_plan::{
@@ -128,6 +128,31 @@ fn ensure_decode_cost_admissible(
     admitted
 }
 
+fn ensure_animated_output_admissible(
+    input: &[u8],
+    options: &ImageOptions,
+    media_limits: &MediaLimits,
+) -> Result<(), MediaError> {
+    let dims = probe_image_dims(media_limits, input)?;
+    if dims.pages <= 1 {
+        return Ok(());
+    }
+    let output_pixels = static_output_pixels(options, dims).saturating_mul(dims.pages as usize);
+    if output_pixels <= constants::MAX_ANIMATED_OUTPUT_PIXELS {
+        return Ok(());
+    }
+    tracing::warn!(
+        input_bytes = input.len(),
+        width = dims.width,
+        height = dims.height,
+        pages = dims.pages,
+        out_width = options.width.unwrap_or(0),
+        out_height = options.height.unwrap_or(0),
+        "animated transform refused by the output work budget"
+    );
+    Err(MediaError::TooLargeToProcess)
+}
+
 pub fn transform_image(
     input: &[u8],
     options: &ImageOptions,
@@ -161,15 +186,31 @@ pub fn transform_image(
         && !options.wants_cover_crop()
         && sniffed.mime == "image/gif"
     {
-        let bytes = if let Some(dims) = gif_resize_dims(sniffed, options) {
-            resize_animated_gif_with_ffmpeg(input, dims, options, media_limits)?
-        } else {
-            input.to_vec()
+        let bytes = match gif_resize_dims(sniffed, options) {
+            Some(dims) => {
+                let frames = probe_animated(media_limits, input)?.map_or(1, |probe| probe.pages);
+                if dims.fits_work_budget(frames) {
+                    resize_animated_gif_with_ffmpeg(input, dims, options, media_limits)?
+                } else {
+                    tracing::info!(
+                        input_bytes = input.len(),
+                        width = dims.width,
+                        height = dims.height,
+                        frames,
+                        "animated gif resize over the work budget, serving the source"
+                    );
+                    input.to_vec()
+                }
+            }
+            None => input.to_vec(),
         };
         return Ok(ProcessedMedia {
             bytes,
             content_type: "image/gif",
         });
+    }
+    if animated {
+        ensure_animated_output_admissible(input, options, media_limits)?;
     }
     if should_transform_animated_webp_direct(sniffed, options, format) {
         validate_dimensions_u32(media_limits, sniffed.width, sniffed.height)?;
@@ -382,13 +423,9 @@ pub fn transform_image(
     }
 
     let loader_options = if animated && source_supports_pages(sniffed.mime) {
-        if sniffed.mime == "image/jpeg" {
-            "n=-1,access=sequential"
-        } else {
-            "n=-1,access=sequential,fail=true"
-        }
+        "n=-1,access=sequential,fail=true"
     } else if sniffed.mime == "image/jpeg" {
-        "access=sequential"
+        ""
     } else {
         "access=sequential,fail=true"
     };

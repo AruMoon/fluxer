@@ -16,7 +16,7 @@ use crate::{
     image_quality::ImageQuality,
     image_transform::{AnimationLimits, AnimationMode, ImageOptions, ResizeMode},
     media_limits::MediaLimits,
-    media_process::MediaBytes,
+    media_process::{MediaBytes, MediaError},
     metrics::{self, transform::TransformMetrics},
     mime,
     output_format::OutputFormat,
@@ -24,7 +24,8 @@ use crate::{
         format_policy::{
             OriginalImageRequest, content_type_is_trustworthy, default_transform_quality,
             effective_animated_image_output_format, extension_from_mime,
-            external_default_output_extension, image_extension_from_filename, is_svg_content_type,
+            external_default_output_extension, image_extension_from_filename,
+            is_browser_displayable_image, is_svg_content_type,
             same_format_loaded_image_request_can_use_original_with_sniff, source_image_format,
             transform_response_content_type, transform_static_quality_default,
         },
@@ -310,6 +311,73 @@ fn original_bytes_response(request: OriginalBytes<'_>) -> Response {
     })
 }
 
+struct VideoTransformPlan {
+    format: OutputFormat,
+    quality: ImageQuality,
+    cache_key: String,
+}
+
+fn video_transform_plan(
+    route: TransformRoute,
+    cache_identity: &str,
+    transform: &ValidatedTransformParameters,
+    requested_format: AssetExtension,
+) -> VideoTransformPlan {
+    let format = OutputFormat::coerce_from_extension(requested_format);
+    let quality = transform.quality.unwrap_or(ImageQuality::High);
+    VideoTransformPlan {
+        format,
+        quality,
+        cache_key: transform_cache_key(TransformCacheKeyInput {
+            route,
+            asset_kind: None,
+            cache_identity,
+            width: transform.width,
+            height: transform.height,
+            format,
+            quality: Some(quality),
+            animated: transform.animated,
+            effort: None,
+            resize_mode: None,
+        }),
+    }
+}
+
+pub(in crate::server) struct CachedVideoTransformRequest<'a> {
+    pub(in crate::server) method: Method,
+    pub(in crate::server) cache_identity: &'a str,
+    pub(in crate::server) filename: &'a str,
+    pub(in crate::server) route: TransformRoute,
+    pub(in crate::server) params: &'a HashMap<String, String>,
+    pub(in crate::server) headers: &'a HeaderMap,
+}
+
+pub(in crate::server) fn cached_video_transform_response(
+    runtime: &TransformRuntime,
+    request: CachedVideoTransformRequest<'_>,
+) -> Option<Response> {
+    let transform =
+        validate_transform_parameters(request.params, &runtime.limits(), request.route).ok()?;
+    let plan = video_transform_plan(
+        request.route,
+        request.cache_identity,
+        &transform,
+        transform.explicit_format?,
+    );
+    let hit = cached_transform_hit(runtime, &plan.cache_key)?;
+    Some(transformed_response(TransformedBytes {
+        method: request.method,
+        data: hit.data.as_bytes().clone(),
+        content_type: hit.format.mime(),
+        filename: request.filename,
+        range_header: request
+            .headers
+            .get(header::RANGE)
+            .and_then(|v| v.to_str().ok()),
+        requested_download: transform.requested_download,
+    }))
+}
+
 struct VideoTransformRequest<'a> {
     method: Method,
     data: Bytes,
@@ -352,20 +420,11 @@ async fn serve_video_transform(
             requested_download: transform.requested_download,
         });
     };
-    let format = OutputFormat::coerce_from_extension(requested_format);
-    let quality = transform.quality.unwrap_or(ImageQuality::High);
-    let cache_key = transform_cache_key(TransformCacheKeyInput {
-        route,
-        asset_kind: None,
-        cache_identity,
-        width: transform.width,
-        height: transform.height,
+    let VideoTransformPlan {
         format,
-        quality: Some(quality),
-        animated: transform.animated,
-        effort: None,
-        resize_mode: None,
-    });
+        quality,
+        cache_key,
+    } = video_transform_plan(route, cache_identity, &transform, requested_format);
     if let Some(hit) = cached_transform_hit(runtime, &cache_key) {
         return transformed_response(TransformedBytes {
             method,
@@ -515,20 +574,42 @@ async fn serve_image_transform(
             requested_download: transform.requested_download,
         });
     }
+    let can_serve_original = ((transform.width.is_none() && transform.height.is_none())
+        || options.is_animated())
+        && is_browser_displayable_image(sniffed.mime);
+    let mut too_large_original = None;
+    let leader_original = &mut too_large_original;
     let transformed = match cached_transform(CachedTransformRequest {
         runtime,
         cache_key,
         format: options.format,
         deadline: deadline_instant(options.deadline_ms),
         work: move || async move {
-            coalesced_work_result(run_transform(runtime, data, options).await)
-                .map(|media| MediaBytes::from(media.bytes))
+            let original = can_serve_original.then(|| data.clone());
+            let result = coalesced_work_result(run_transform(runtime, data, options).await);
+            if result
+                .as_ref()
+                .is_err_and(|error| error.downcast_ref() == Some(&MediaError::TooLargeToProcess))
+            {
+                *leader_original = original;
+            }
+            result.map(|media| MediaBytes::from(media.bytes))
         },
     })
     .await
     {
         Ok(bytes) => bytes.as_bytes().clone(),
         Err(error) => {
+            if let Some(original) = too_large_original {
+                return original_bytes_response(OriginalBytes {
+                    method,
+                    data: original,
+                    content_type: sniffed.mime,
+                    filename,
+                    range_header,
+                    requested_download: transform.requested_download,
+                });
+            }
             if let Some(response) = coalescer_failure_response(error, "coalescer_timeout_image") {
                 return response;
             }

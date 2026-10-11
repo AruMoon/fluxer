@@ -9,7 +9,7 @@ use crate::{
         ExperimentDeliveryConfigResponse, GatewayRolloutConfigResponse, InstanceConfigResponse,
         InstanceIntegrationsResponse, InstanceMediaResponse, InstancePolicyResponse,
         InstanceRegistrationResponse, LimitConfigResponse, PendingRegistrationResponse,
-        PushRelayConfigResponse, RegistrationUrlResponse, SsoConfigResponse, TagStyle,
+        PremiumMode, PushRelayConfigResponse, RegistrationUrlResponse, SsoConfigResponse, TagStyle,
         VOICE_P2P_DEFAULT_SALT, VOICE_P2P_MAX_PARTICIPANTS_RANGE, VoiceP2pConfigResponse,
     },
     config::AdminConfig,
@@ -158,6 +158,7 @@ pub fn instance_config_page(
                                 csrf_token,
                                 &instance_config.policy,
                                 &instance_config.app_public.branding.premium_product_name,
+                                instance_config.billing.enabled == Some(true),
                             ))
                         },
                     ))
@@ -199,7 +200,12 @@ pub fn instance_config_page(
                     "Media & retention",
                     "Attachment expiry rules that can be changed without editing environment variables.",
                     html! {
-                        (media_config_section(base, csrf_token, &instance_config.media))
+                        (media_config_section(
+                            base,
+                            csrf_token,
+                            &instance_config.media,
+                            instance_config.self_hosted,
+                        ))
                     },
                 ))
                 (config_group(
@@ -264,6 +270,7 @@ fn policy_config_section(
     csrf_token: &str,
     policy: &InstancePolicyResponse,
     premium_name: &str,
+    billing_enabled: bool,
 ) -> Markup {
     section_card_with_description(
         "Community & Policy",
@@ -274,7 +281,7 @@ fn policy_config_section(
             div class="space-y-8" {
                 (single_community_form(base, csrf_token, policy))
                 (direct_messages_form(base, csrf_token, policy))
-                (premium_mode_form(base, csrf_token, policy, premium_name))
+                (premium_mode_form(base, csrf_token, policy, premium_name, billing_enabled))
                 (community_creation_form(base, csrf_token, policy))
                 (services_form(base, csrf_token, policy))
             }
@@ -373,6 +380,7 @@ fn premium_mode_form(
     csrf_token: &str,
     policy: &InstancePolicyResponse,
     premium_name: &str,
+    billing_enabled: bool,
 ) -> Markup {
     let mirror_label = format!("Mirror (Free and {premium_name} tiers)");
     let everyone_label = format!("Everyone (every member gets {premium_name} limits)");
@@ -386,6 +394,16 @@ fn premium_mode_form(
                         ("mirror", mirror_label.as_str()),
                         ("everyone", everyone_label.as_str()),
                     ], policy.premium_mode.as_str()))
+                    p class="text-xs text-neutral-500" {
+                        "Limits you have not edited follow the model. Limits you changed under Limit \
+                         Config keep your values in both models."
+                    }
+                    @if billing_enabled && matches!(policy.premium_mode, PremiumMode::Mirror) {
+                        p class="text-sm text-amber-700" {
+                            "Billing is enabled. Disable it under Premium & billing before switching \
+                             the premium model to Everyone."
+                        }
+                    }
                     (form_actions(html! {
                         (submit_button("Save premium model"))
                     }))
@@ -526,6 +544,16 @@ fn password_input(name: &str, label: &str, helper: Option<&str>) -> Markup {
                 autocomplete="new-password";
         },
     )
+}
+
+fn smtp_tls_mode_summary(mode: &str) -> &str {
+    match mode {
+        "implicit" => "implicit TLS",
+        "starttls" => "required STARTTLS",
+        "opportunistic" => "STARTTLS when the server offers it",
+        "none" => "no encryption",
+        other => other,
+    }
 }
 
 fn account_identity_section(account_identity: &AccountIdentityConfigResponse) -> Markup {
@@ -671,14 +699,33 @@ fn integrations_config_section(
                                 ))
                                 (password_input("integration_smtp_password", "SMTP password", Some("Leave blank to keep the current password.")))
                             }
-                            (checkbox("integration_smtp_secure", "true", "Use TLS", integrations.email.smtp.secure.unwrap_or(true), true))
+                            (select_input("integration_smtp_tls_mode", "SMTP encryption", &[
+                                ("", "Automatic"),
+                                ("implicit", "Implicit TLS"),
+                                ("starttls", "STARTTLS, required"),
+                                ("opportunistic", "STARTTLS, when the server offers it"),
+                                ("none", "None"),
+                            ], integrations.email.smtp.tls_mode.as_deref().unwrap_or("")))
+                            p class="text-xs text-neutral-500" {
+                                "Automatic follows FLUXER_EMAIL_SMTP_TLS_MODE when it is set, then the older FLUXER_EMAIL_SMTP_SECURE, where true means implicit TLS on any port. With neither set it uses implicit TLS on port 465 and requires STARTTLS on every other port."
+                            }
+                            @if let Some(mode) = integrations.email.smtp.effective_tls_mode.as_deref() {
+                                p class="text-xs text-neutral-500" {
+                                    "Outgoing email currently uses " (smtp_tls_mode_summary(mode))
+                                    @if let Some(port) = integrations.email.smtp.port { " on port " (port) }
+                                    "."
+                                }
+                            }
                             (checkbox("integration_email_disable_new_ip_authorization", "true", "Disable new IP login authorization", integrations.email.disable_new_ip_authorization, true))
                             div class="flex flex-wrap gap-2" {
                                 button type="submit"
                                     formaction={(base) "/instance-config?action=test_smtp"}
                                     class="inline-flex w-fit items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 font-medium text-base text-neutral-700 transition-all duration-150 hover:border-neutral-400 hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white" {
-                                    span { "Test SMTP connection" }
+                                    span { "Save and test SMTP" }
                                 }
+                            }
+                            p class="text-xs text-neutral-500" {
+                                "The test saves this form first, then connects with the saved settings, the same ones outgoing email uses."
                             }
                         }
                     }
@@ -739,7 +786,12 @@ fn integrations_config_section(
     )
 }
 
-fn media_config_section(base: &str, csrf_token: &str, media: &InstanceMediaResponse) -> Markup {
+fn media_config_section(
+    base: &str,
+    csrf_token: &str,
+    media: &InstanceMediaResponse,
+    self_hosted: bool,
+) -> Markup {
     let decay = &media.attachment_decay;
     let effective = &decay.effective;
     let enabled = decay.enabled.unwrap_or(effective.enabled);
@@ -767,9 +819,14 @@ fn media_config_section(base: &str, csrf_token: &str, media: &InstanceMediaRespo
         .renew_window_days
         .unwrap_or(effective.renew_window_days)
         .to_string();
+    let description = if self_hosted {
+        "Expire eligible attachments using size-based lifetimes. This is enabled by default and applies at runtime. On a self-hosted instance, changes also apply to attachments uploaded earlier, which are kept for at least the renew window before a new or shorter expiry deletes them."
+    } else {
+        "Expire eligible attachments using size-based lifetimes. This is enabled by default and applies at runtime. Changes apply to attachments uploaded from then on."
+    };
     section_card_with_description(
         "Media Expiry",
-        "Expire eligible attachments using size-based lifetimes. This is disabled by default and applies at runtime.",
+        description,
         html! {
             form method="post" action={(base) "/instance-config?action=update_media"} {
                 (csrf_input(csrf_token))
@@ -893,9 +950,9 @@ fn app_public_config_section(
                             ))
                             (text_input(
                                 "app_theme_color",
-                                "Theme Color",
+                                "Theme Color (hex)",
                                 app_public.branding.theme_color.as_deref().unwrap_or(""),
-                                "#5865f2",
+                                "#4641d9",
                             ))
                         }
                         div class="grid grid-cols-1 gap-4 sm:grid-cols-2" {

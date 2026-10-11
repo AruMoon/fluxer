@@ -39,12 +39,12 @@
 				"emoji-regex",
 				"ioredis",
 				"maxmind",
-				"nodemailer",
 				"pg",
 				"pino",
 				"undici",
 				"validator"
-			]
+			],
+			"ignoreBinaries": ["ffmpeg", "ffprobe"]
 		},
 		"fluxer_app": {
 			"entry": [

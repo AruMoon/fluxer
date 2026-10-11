@@ -1797,10 +1797,6 @@ msgstr "اشتراك {premiumProductName}"
 msgid "{presenceCount} online"
 msgstr "{presenceCount} متصل"
 
-#: src/features/app/components/BootstrapErrorScreen.tsx
-msgid "{PRODUCT_NAME} failed to start properly. This could be due to corrupted data or a temporary issue."
-msgstr "تعذر بدء تشغيل {PRODUCT_NAME} بشكل صحيح. قد يكون هذا بسبب بيانات تالفة أو مشكلة مؤقتة."
-
 #: src/features/auth/state/NewDeviceMonitoring.tsx
 msgid "{PRODUCT_NAME} has found a new audio device named <0>{deviceName}</0>. Do you want to switch to it?"
 msgstr "اكتشف {PRODUCT_NAME} جهازًا صوتيًا جديدًا باسم <0>{deviceName}</0>. هل تريد التبديل إليه؟"
@@ -1915,6 +1911,10 @@ msgstr "اكتشف {productName} هجومًا محتملاً في هذا الم�
 #: src/features/channel/components/InviteEmbed.tsx
 msgid "{productName} detected a potential raid, so new users can't join right now."
 msgstr "اكتشف {productName} هجومًا محتملاً، لذا لا يمكن للمستخدمين الجدد الانضمام الآن."
+
+#: src/features/app/components/BootstrapErrorScreen.tsx
+msgid "{productName} failed to start properly. This could be due to corrupted data or a temporary issue."
+msgstr "فشل بدء تشغيل {productName} بشكل صحيح. قد يكون هذا بسبب تلف البيانات أو مشكلة مؤقتة."
 
 #. Banner in a web app installed on iPhone, iPad or Mac. productName is the app name. host is the new domain, for example fluxer.com. Home Screen and Dock are Apple names.
 #: src/features/app/components/layout/app_layout/nagbars/DomainMovedNagbar.tsx
@@ -5414,8 +5414,10 @@ msgstr "اقتراح الإكمال التلقائي: {label}، {selectedOptionP
 #. Option label for a WebRTC content hint select.
 #. Option label for an SVC mode select.
 #. Option label for an encoder path select.
+#. SMTP encryption option that picks the mode from the port.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Voice region option label in the voice settings menu meaning let Fluxer pick the best region automatically.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
 #: src/features/channel/components/modals/channel_tabs/channel_overview_tab/RtcRegionSelect.tsx
 #: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedVideoControls.tsx
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
@@ -7738,6 +7740,10 @@ msgstr "تابع <0>{BLUESKY_PROVIDER_NAME} ({FLUXER_BLUESKY_HANDLE})</0> للا
 #: src/features/theme/components/modals/ShareThemeModal.tsx
 msgid "Check out my custom theme!"
 msgstr "ألقِ نظرة على سمتي المخصصة!"
+
+#: src/features/app/components/BootstrapErrorScreen.tsx
+msgid "Check the <0>status page</0> for updates."
+msgstr "تحقق من <0>صفحة الحالة</0> للحصول على آخر المستجدات."
 
 #. Error-state description in the channel and chat gif picker view.
 #: src/features/app/components/BootstrapErrorScreen.tsx
@@ -14556,6 +14562,11 @@ msgstr "تفضيل المُرمِّز لعمليات مشاركة الشاشة �
 msgid "Encoder, SVC, and bitrate presets"
 msgstr "المُرمّز، SVC، وإعدادات البت المسبقة"
 
+#. Label for the choice of how the SMTP connection is encrypted.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "Encryption"
+msgstr "التشفير"
+
 #: src/features/input/utils/KeybindUtils.ts
 msgctxt "keyboard-key-name"
 msgid "End"
@@ -18419,6 +18430,16 @@ msgstr "الصور"
 #: src/features/messaging/components/alerts/AttachmentPermissionDeniedModal.tsx
 msgid "Images pasted from your clipboard are sent as attachments, and you don't have permission to attach files in this channel."
 msgstr "يتم إرسال الصور الملصقة من حافظتك كمرفقات، وليس لديك إذن بإرفاق ملفات في هذه القناة."
+
+#. SMTP encryption option where the connection starts encrypted.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "Implicit TLS"
+msgstr "TLS ضمني"
+
+#. Description of the automatic SMTP encryption option.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "Implicit TLS on port 465, required STARTTLS on any other port."
+msgstr "TLS ضمني على المنفذ 465، مطلوب STARTTLS على أي منفذ آخر."
 
 #. Primary button in the favorite GIF import modal. Starts importing pasted GIF URLs.
 #: src/features/channel/components/pickers/gif/ImportFavoriteGifsModal.tsx
@@ -23948,8 +23969,10 @@ msgstr "عدم التحويل"
 #. Developer tools debug menu label. Internal-only surface for developers; translators may keep this terse.
 #. Library picker entry meaning no sound is selected for this scope.
 #. Member verification level option in the community moderation settings tab. Short standalone label for the lowest level (no verification).
+#. SMTP encryption option that never uses TLS.
 #. Short label in the visual tab. Keep it concise.
 #. Summary row value on the confirm step when no items in the category were selected.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
 #: src/features/channel/components/channel_header_components/developer_tools/DeveloperToolsShared.ts
 #: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogSharedMessages.ts
@@ -25637,10 +25660,10 @@ msgstr "إيقاف معاينة مشاركة الشاشة مؤقتًا في ال
 msgid "Pause notifications"
 msgstr "إيقاف الإشعارات مؤقتًا"
 
-#. Voice screen share menu preference that pauses the local stream preview while the app is unfocused.
+#. Voice screen share menu preference that pauses the local stream preview while the app is unfocused. {productName} is the app name.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
-msgid "Pause preview when Fluxer isn’t focused"
-msgstr "إيقاف المعاينة مؤقتًا عندما لا يكون Fluxer في المقدمة"
+msgid "Pause preview when {productName} isn’t focused"
+msgstr "إيقاف المعاينة عندما لا يكون {productName} في التركيز"
 
 #. Description shown for the emoji toggle while reduced motion is active.
 #: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
@@ -29825,10 +29848,10 @@ msgstr "ترميز مشاركة الشاشة"
 msgid "Screen sharing failed"
 msgstr "فشلت مشاركة الشاشة"
 
-#. Body shown when a failed screen share could not be fully stopped.
+#. Body shown when a failed screen share could not be fully stopped. {productName} is the app name.
 #: src/features/voice/components/alerts/ScreenShareRollbackIncompleteModal.tsx
-msgid "Screen sharing failed, but Fluxer could not confirm that every capture path stopped. Stop sharing or disconnect from the call before continuing."
-msgstr "فشلت مشاركة الشاشة، لكن Fluxer لم يتمكن من التأكد من توقف كل مسارات الالتقاط. أوقف المشاركة أو اقطع الاتصال بالمكالمة قبل المتابعة."
+msgid "Screen sharing failed, but {productName} could not confirm that every capture path stopped. Stop sharing or disconnect from the call before continuing."
+msgstr "فشل مشاركة الشاشة، لكن {productName} لم يتمكن من التأكد من إيقاف كل مسارات الالتقاط. أوقف المشاركة أو افصل عن المكالمة قبل المتابعة."
 
 #. Body of the screen-share-unsupported modal. Mentions specific browsers and OSes; keep all proper nouns intact.
 #: src/features/voice/components/alerts/ScreenShareUnsupportedModal.tsx
@@ -33153,6 +33176,16 @@ msgstr "بدأ بواسطة {name}"
 msgid "Started displaying members with this role separately"
 msgstr "بدأ عرض الأعضاء الذين لديهم هذا الدور بشكل منفصل"
 
+#. SMTP encryption option where a plain connection must upgrade with STARTTLS.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "STARTTLS"
+msgstr "STARTTLS"
+
+#. SMTP encryption option where STARTTLS is used only if the server offers it.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "STARTTLS when offered"
+msgstr "STARTTLS عند توفيرها"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts
 msgid "Startup"
@@ -34624,6 +34657,26 @@ msgstr "عطّل المجتمع الذي جاء منه هذا العنصر ال�
 #: src/features/app/components/layout/GuildLayout.tsx
 msgid "The community you're looking for may have been deleted or you may not have access to it."
 msgstr "ربما حُذف المجتمع الذي تبحث عنه أو ليس لديك صلاحية الوصول إليه."
+
+#. Description of the implicit TLS SMTP encryption option.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "The connection is encrypted from the start. Usually port 465."
+msgstr "يتم تشفير الاتصال من البداية. عادةً المنفذ 465."
+
+#. Description of the SMTP encryption option that never uses TLS.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "The connection is never encrypted. Only for a mail server on a network you trust."
+msgstr "لا يتم تشفير الاتصال أبدًا. فقط لخادم بريد على شبكة تثق بها."
+
+#. Description of the required STARTTLS SMTP encryption option.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "The connection must upgrade to TLS before signing in. Usually port 587."
+msgstr "يجب ترقية الاتصال إلى TLS قبل تسجيل الدخول. عادةً المنفذ 587."
+
+#. Description of the opportunistic STARTTLS SMTP encryption option.
+#: src/features/app/components/setup/SetupWizardSteps.tsx
+msgid "The connection upgrades to TLS only if the server offers it."
+msgstr "يتم ترقية الاتصال إلى TLS فقط إذا كان الخادم يقدمه."
 
 #. Modal body shown when a desktop update download fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx
@@ -38363,11 +38416,6 @@ msgstr "استخدام إعداد تقليل الحركة في نظام هذا �
 #: src/features/user/components/modals/tabs/accessibility_tab/MotionTab.tsx
 msgid "Use this device's system reduced motion preference, or customize it below."
 msgstr "استخدم تفضيل تقليل الحركة في نظام هذا الجهاز، أو خصصه أدناه."
-
-#. Label for SMTP TLS toggle.
-#: src/features/app/components/setup/SetupWizardSteps.tsx
-msgid "Use TLS"
-msgstr "استخدام TLS"
 
 #. Permission name: allows voice activation instead of requiring push-to-talk.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts

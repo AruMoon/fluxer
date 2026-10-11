@@ -3,6 +3,7 @@
 import crypto from 'node:crypto';
 import {Config} from '@app/api/Config';
 import type {APIConfig, BlueskyOAuthConfig, BlueskyOAuthKeyConfig} from '@app/api/config/APIConfig';
+import type {StoredLimitConfig} from '@app/api/constants/LimitConfig';
 import {executeConditional, fetchMany, fetchOne, upsertOne} from '@app/api/database/CassandraQueryExecution';
 import {Db, type PreparedQuery} from '@app/api/database/CassandraTypes';
 import type {InstanceConfigurationRow} from '@app/api/database/types/InstanceConfigTypes';
@@ -33,7 +34,7 @@ import {setCachedConfiguredLegalUrls} from '@app/api/instance/LegalUrls';
 import {getDefaultProductName, setCachedProductName} from '@app/api/instance/ProductName';
 import {normalizeSsoAllowedEmailDomains} from '@app/api/instance/SsoConfigValidation';
 import {Logger} from '@app/api/Logger';
-import {isLimitConfigSnapshot} from '@app/api/limits/LimitConfigValidation';
+import {isStoredLimitConfig} from '@app/api/limits/LimitConfigValidation';
 import {
 	getEffectiveBillingConfig,
 	isBillingActive,
@@ -50,12 +51,13 @@ import {
 	TagStyles,
 } from '@fluxer/constants/src/AccountIdentityConstants';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
+import {resolveSmtpTlsMode, type SmtpTlsMode, smtpTlsModeFromSecure} from '@fluxer/constants/src/SmtpConstants';
 import {ConflictError} from '@fluxer/errors/src/domains/core/ConflictError';
 import {ServiceUnavailableError} from '@fluxer/errors/src/domains/core/ServiceUnavailableError';
-import type {LimitConfigSnapshot} from '@fluxer/limits/src/LimitTypes';
 import {
 	InstanceConfigResponse,
 	InstanceConfigUpdateRequest,
+	type InstanceEmailSmtpTestRequest,
 	type PendingRegistrationResponse,
 	type RegistrationUrlResponse,
 } from '@fluxer/schema/src/domains/admin/AdminSchemas';
@@ -198,7 +200,7 @@ export interface InstanceBillingAdminConfig {
 export type InstancePremiumMode = 'mirror' | 'everyone';
 
 interface LimitConfigInputs {
-	config: LimitConfigSnapshot | null;
+	config: StoredLimitConfig | null;
 	premiumMode: InstancePremiumMode;
 }
 
@@ -229,6 +231,7 @@ interface InstanceEmailSmtpIntegrationConfig {
 	port: number | null;
 	username: string | null;
 	password: string | null;
+	tls_mode: SmtpTlsMode | null;
 	secure: boolean | null;
 }
 
@@ -290,7 +293,8 @@ interface InstanceIntegrationsAdminConfig {
 			port: number | null;
 			username: string | null;
 			password_set: boolean;
-			secure: boolean | null;
+			tls_mode: SmtpTlsMode | null;
+			effective_tls_mode: SmtpTlsMode | null;
 		};
 		disable_new_ip_authorization: boolean;
 		effective_disable_new_ip_authorization: boolean;
@@ -345,7 +349,7 @@ interface InstanceIntegrationsConfigPatch {
 	gif?: Partial<InstanceGifIntegrationConfig>;
 	youtube?: Partial<InstanceYoutubeIntegrationConfig>;
 	email?: Partial<Omit<InstanceEmailIntegrationConfig, 'smtp'>> & {
-		smtp?: Partial<InstanceEmailSmtpIntegrationConfig>;
+		smtp?: Partial<Omit<InstanceEmailSmtpIntegrationConfig, 'secure'>>;
 	};
 	bluesky?: Partial<Omit<InstanceBlueskyIntegrationConfig, 'keys'>> & {
 		keys?: Array<Partial<InstanceBlueskyKeyIntegrationConfig>>;
@@ -382,7 +386,7 @@ const FETCH_LIMIT_CONFIG_INPUTS_QUERY = InstanceConfiguration.selectCql({
 	where: InstanceConfiguration.where.in('key', 'keys'),
 });
 
-function parseStoredLimitConfig(raw: string | null): LimitConfigSnapshot | null {
+function parseStoredLimitConfig(raw: string | null): StoredLimitConfig | null {
 	if (raw === null) return null;
 	let parsed: unknown;
 	try {
@@ -391,7 +395,7 @@ function parseStoredLimitConfig(raw: string | null): LimitConfigSnapshot | null 
 		Logger.error({error}, 'Stored limit configuration is not valid JSON, falling back to default limits');
 		return null;
 	}
-	if (!isLimitConfigSnapshot(parsed)) {
+	if (!isStoredLimitConfig(parsed)) {
 		Logger.error('Stored limit configuration has an invalid shape, falling back to default limits');
 		return null;
 	}
@@ -404,6 +408,14 @@ function normalizeOptionalString(value: unknown): string | null {
 
 function normalizeOptionalPublicString(value: string | null | undefined, fallback: string | null): string | null {
 	return value === undefined ? fallback : normalizeOptionalString(value);
+}
+
+function normalizeThemeColor(value: unknown): string | null {
+	const match = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(normalizeOptionalString(value) ?? '');
+	if (match === null) return null;
+	const digits = match[1].toLowerCase();
+	const color = `#${digits.length === 3 ? digits.replace(/./g, '$&$&') : digits}`;
+	return color === '#000000' ? null : color;
 }
 
 function getDefaultPremiumProductName(): string {
@@ -419,7 +431,7 @@ function getDefaultAppPublicConfig(): InstanceAppPublicConfig {
 			logo_url: normalizeOptionalString(Config.instance.branding.logoUrl),
 			wordmark_url: normalizeOptionalString(Config.instance.branding.wordmarkUrl),
 			favicon_url: normalizeOptionalString(Config.instance.branding.faviconUrl),
-			theme_color: normalizeOptionalString(Config.instance.branding.themeColor),
+			theme_color: normalizeThemeColor(Config.instance.branding.themeColor),
 			status_page_url: normalizeOptionalString(Config.instance.branding.statusPageUrl),
 			status_page_incident_history_url: normalizeOptionalString(Config.instance.branding.statusPageIncidentHistoryUrl),
 			premium_product_name: getDefaultPremiumProductName(),
@@ -736,7 +748,8 @@ function buildAppPublicConfig(config: z.infer<typeof StoredInstanceAppPublicSche
 			logo_url: normalizeOptionalPublicString(branding.logo_url, defaults.branding.logo_url),
 			wordmark_url: normalizeOptionalPublicString(branding.wordmark_url, defaults.branding.wordmark_url),
 			favicon_url: normalizeOptionalPublicString(branding.favicon_url, defaults.branding.favicon_url),
-			theme_color: normalizeOptionalPublicString(branding.theme_color, defaults.branding.theme_color),
+			theme_color:
+				branding.theme_color === undefined ? defaults.branding.theme_color : normalizeThemeColor(branding.theme_color),
 			status_page_url: normalizeOptionalPublicString(branding.status_page_url, defaults.branding.status_page_url),
 			status_page_incident_history_url: normalizeOptionalPublicString(
 				branding.status_page_incident_history_url,
@@ -826,6 +839,7 @@ const StoredInstanceIntegrationsSchema = z.object({
 					port: SmtpIntegrationUpdateSchema.shape.port.default(null),
 					username: StoredIntegrationStringSchema,
 					password: StoredIntegrationStringSchema,
+					tls_mode: SmtpIntegrationUpdateSchema.shape.tls_mode.default(null),
 					secure: StoredNullableBooleanSchema,
 				})
 				.prefault({}),
@@ -950,19 +964,67 @@ function decodeInstanceMediaConfig(value: unknown): InstanceMediaConfig {
 	return validateStoredConfig(StoredInstanceMediaSchema, value, 'media');
 }
 
+function resolveEffectiveAttachmentDecayConfig(media: InstanceMediaConfig): InstanceAttachmentDecayEffectiveConfig {
+	const attachmentDecay = media.attachment_decay;
+	const minSizeMb = attachmentDecay.min_size_mb ?? DEFAULT_DECAY_CONSTANTS.MIN_MB;
+	const configuredMaxSizeMb = attachmentDecay.max_size_mb ?? DEFAULT_DECAY_CONSTANTS.MAX_MB;
+	const maxSizeMb = computeAttachmentDecayMaxSize(minSizeMb, configuredMaxSizeMb);
+	const configuredMaxEligibleSizeMb = attachmentDecay.max_eligible_size_mb ?? DEFAULT_DECAY_CONSTANTS.PLAN_MB;
+	const maxEligibleSizeMb = Math.max(maxSizeMb, configuredMaxEligibleSizeMb);
+	const minLifetimeDays = attachmentDecay.min_lifetime_days ?? DEFAULT_DECAY_CONSTANTS.MIN_DAYS;
+	const configuredMaxLifetimeDays = attachmentDecay.max_lifetime_days ?? DEFAULT_DECAY_CONSTANTS.MAX_DAYS;
+	const maxLifetimeDays =
+		configuredMaxLifetimeDays >= minLifetimeDays
+			? configuredMaxLifetimeDays
+			: Math.max(DEFAULT_DECAY_CONSTANTS.MAX_DAYS, minLifetimeDays);
+	return {
+		enabled: attachmentDecay.enabled ?? Config.attachmentDecayEnabled,
+		min_size_mb: minSizeMb,
+		max_size_mb: maxSizeMb,
+		max_eligible_size_mb: maxEligibleSizeMb,
+		min_lifetime_days: minLifetimeDays,
+		max_lifetime_days: maxLifetimeDays,
+		curve: attachmentDecay.curve ?? DEFAULT_DECAY_CONSTANTS.CURVE,
+		renew_threshold_days: attachmentDecay.renew_threshold_days ?? DEFAULT_RENEWAL_CONSTANTS.RENEW_THRESHOLD_DAYS,
+		renew_window_days: attachmentDecay.renew_window_days ?? DEFAULT_RENEWAL_CONSTANTS.RENEW_WINDOW_DAYS,
+	};
+}
+
 function parseStoredInstanceMediaConfig(raw: string | null): InstanceMediaConfig {
 	return decodeInstanceMediaConfig(parseStoredConfigValue(raw, 'media'));
 }
 
+type EffectiveSmtpConfig = NonNullable<APIConfig['email']['smtp']>;
+
+interface SmtpTestConfig {
+	smtp: EffectiveSmtpConfig;
+	problem: string | null;
+}
+
+function storedSmtpTlsMode(smtp: InstanceEmailSmtpIntegrationConfig): SmtpTlsMode | null {
+	return smtp.tls_mode ?? smtpTlsModeFromSecure(smtp.secure);
+}
+
+function resolveEffectiveSmtpConfig(smtp: InstanceEmailSmtpIntegrationConfig): EffectiveSmtpConfig {
+	return {
+		host: smtp.host ?? Config.email.smtp?.host ?? '',
+		port: smtp.port ?? Config.email.smtp?.port ?? 587,
+		username: smtp.username ?? Config.email.smtp?.username ?? '',
+		password: smtp.password ?? Config.email.smtp?.password ?? '',
+		tlsMode: storedSmtpTlsMode(smtp) ?? Config.email.smtp?.tlsMode ?? null,
+	};
+}
+
+function describeIncompleteSmtpConfig(smtp: EffectiveSmtpConfig): string | null {
+	if (!smtp.host.trim()) return 'No SMTP host is configured';
+	if (!smtp.port) return 'No SMTP port is configured';
+	if (!smtp.username.trim() || !smtp.password.trim()) return 'The SMTP username and password are both required';
+	return null;
+}
+
 function hasCompleteSmtpConfig(config: APIConfig['email']): boolean {
 	if (config.provider !== 'smtp' || !config.smtp) return false;
-	return Boolean(
-		config.fromEmail.trim() &&
-			config.smtp.host.trim() &&
-			config.smtp.port &&
-			config.smtp.username.trim() &&
-			config.smtp.password.trim(),
-	);
+	return Boolean(config.fromEmail.trim()) && describeIncompleteSmtpConfig(config.smtp) === null;
 }
 
 const StoredRegistrationConfigSchema = InstanceRegistrationSchema.extend({
@@ -1680,7 +1742,7 @@ export class InstanceConfigRepository {
 		};
 	}
 
-	async setLimitConfig(config: LimitConfigSnapshot): Promise<void> {
+	async setLimitConfig(config: StoredLimitConfig): Promise<void> {
 		await this.setConfig(LIMIT_CONFIG_KEY, JSON.stringify(config));
 	}
 
@@ -1852,6 +1914,7 @@ export class InstanceConfigRepository {
 					smtp: {
 						...current.email.smtp,
 						...(config.email?.smtp ?? {}),
+						...(config.email?.smtp?.tls_mode === undefined ? {} : {secure: null}),
 					},
 				},
 				bluesky: {
@@ -1881,30 +1944,12 @@ export class InstanceConfigRepository {
 	}
 
 	async getEffectiveAttachmentDecayConfig(): Promise<InstanceAttachmentDecayEffectiveConfig> {
-		const media = await this.getInstanceMediaConfig();
-		const attachmentDecay = media.attachment_decay;
-		const minSizeMb = attachmentDecay.min_size_mb ?? DEFAULT_DECAY_CONSTANTS.MIN_MB;
-		const configuredMaxSizeMb = attachmentDecay.max_size_mb ?? DEFAULT_DECAY_CONSTANTS.MAX_MB;
-		const maxSizeMb = computeAttachmentDecayMaxSize(minSizeMb, configuredMaxSizeMb);
-		const configuredMaxEligibleSizeMb = attachmentDecay.max_eligible_size_mb ?? DEFAULT_DECAY_CONSTANTS.PLAN_MB;
-		const maxEligibleSizeMb = Math.max(maxSizeMb, configuredMaxEligibleSizeMb);
-		const minLifetimeDays = attachmentDecay.min_lifetime_days ?? DEFAULT_DECAY_CONSTANTS.MIN_DAYS;
-		const configuredMaxLifetimeDays = attachmentDecay.max_lifetime_days ?? DEFAULT_DECAY_CONSTANTS.MAX_DAYS;
-		const maxLifetimeDays =
-			configuredMaxLifetimeDays >= minLifetimeDays
-				? configuredMaxLifetimeDays
-				: Math.max(DEFAULT_DECAY_CONSTANTS.MAX_DAYS, minLifetimeDays);
-		return {
-			enabled: attachmentDecay.enabled ?? Config.attachmentDecayEnabled,
-			min_size_mb: minSizeMb,
-			max_size_mb: maxSizeMb,
-			max_eligible_size_mb: maxEligibleSizeMb,
-			min_lifetime_days: minLifetimeDays,
-			max_lifetime_days: maxLifetimeDays,
-			curve: attachmentDecay.curve ?? DEFAULT_DECAY_CONSTANTS.CURVE,
-			renew_threshold_days: attachmentDecay.renew_threshold_days ?? DEFAULT_RENEWAL_CONSTANTS.RENEW_THRESHOLD_DAYS,
-			renew_window_days: attachmentDecay.renew_window_days ?? DEFAULT_RENEWAL_CONSTANTS.RENEW_WINDOW_DAYS,
-		};
+		return resolveEffectiveAttachmentDecayConfig(await this.getInstanceMediaConfig());
+	}
+
+	async fetchStoredEffectiveAttachmentDecayConfig(): Promise<InstanceAttachmentDecayEffectiveConfig> {
+		const raw = await this.fetchConfigFromDatabase(INSTANCE_MEDIA_CONFIG_KEY);
+		return resolveEffectiveAttachmentDecayConfig(parseStoredInstanceMediaConfig(raw));
 	}
 
 	async getInstanceMediaAdminConfig(): Promise<InstanceMediaAdminConfig> {
@@ -1935,22 +1980,35 @@ export class InstanceConfigRepository {
 		return integrations.youtube.api_key ?? normalizeOptionalString(Config.youtube.apiKey);
 	}
 
-	async getEffectiveEmailConfig(): Promise<APIConfig['email']> {
+	async getSmtpTestConfig(draft: InstanceEmailSmtpTestRequest): Promise<SmtpTestConfig> {
+		const saved = (await this.getInstanceIntegrationsConfig()).email.smtp;
+		const current = resolveEffectiveSmtpConfig(saved);
+		if (Object.values(draft).every((value) => value === undefined)) {
+			return {smtp: current, problem: await this.getEmailSendBlocker()};
+		}
+		const retargeted =
+			(draft.host != null && draft.host.toLowerCase() !== current.host.toLowerCase()) ||
+			(draft.username != null && draft.username !== current.username);
+		const smtp: EffectiveSmtpConfig = {
+			host: draft.host ?? current.host,
+			port: draft.port ?? current.port,
+			username: draft.username ?? current.username,
+			password: draft.password ?? (retargeted ? '' : current.password),
+			tlsMode: draft.tls_mode === undefined ? current.tlsMode : (draft.tls_mode ?? Config.email.smtp?.tlsMode ?? null),
+		};
+		if (retargeted && !smtp.password) {
+			return {smtp, problem: 'Enter the SMTP password to test a different host or username'};
+		}
+		return {smtp, problem: describeIncompleteSmtpConfig(smtp)};
+	}
+
+	private async resolveEmailConfig(): Promise<{email: APIConfig['email']; usernameMode: boolean}> {
 		const integrations = await this.getInstanceIntegrationsConfig();
 		const provider = integrations.email.provider ?? Config.email.provider;
 		const fromEmail = integrations.email.from_email ?? Config.email.fromEmail;
 		const fromName = integrations.email.from_name ?? Config.email.fromName;
-		const smtp =
-			provider === 'smtp'
-				? {
-						host: integrations.email.smtp.host ?? Config.email.smtp?.host ?? '',
-						port: integrations.email.smtp.port ?? Config.email.smtp?.port ?? 587,
-						username: integrations.email.smtp.username ?? Config.email.smtp?.username ?? '',
-						password: integrations.email.smtp.password ?? Config.email.smtp?.password ?? '',
-						secure: integrations.email.smtp.secure ?? Config.email.smtp?.secure ?? true,
-					}
-				: undefined;
-		const next: APIConfig['email'] = {
+		const smtp = provider === 'smtp' ? resolveEffectiveSmtpConfig(integrations.email.smtp) : undefined;
+		const email: APIConfig['email'] = {
 			...Config.email,
 			enabled: integrations.email.enabled ?? Config.email.enabled,
 			provider,
@@ -1959,9 +2017,23 @@ export class InstanceConfigRepository {
 			smtp,
 		};
 		const usernameMode = (await this.getAccountIdentityMode()) === AccountIdentityModes.USERNAME;
+		return {email, usernameMode};
+	}
+
+	private async getEmailSendBlocker(): Promise<string | null> {
+		const {email, usernameMode} = await this.resolveEmailConfig();
+		if (usernameMode) return 'Email is off while accounts sign in with usernames';
+		if (!email.enabled) return 'Email is turned off';
+		if (email.provider !== 'smtp' || !email.smtp) return 'The email provider is not SMTP';
+		if (!email.fromEmail.trim()) return 'No from address is set';
+		return describeIncompleteSmtpConfig(email.smtp);
+	}
+
+	async getEffectiveEmailConfig(): Promise<APIConfig['email']> {
+		const {email, usernameMode} = await this.resolveEmailConfig();
 		return {
-			...next,
-			enabled: !usernameMode && next.enabled && hasCompleteSmtpConfig(next),
+			...email,
+			enabled: !usernameMode && email.enabled && hasCompleteSmtpConfig(email),
 		};
 	}
 
@@ -2026,7 +2098,8 @@ export class InstanceConfigRepository {
 					port: email.smtp?.port ?? null,
 					username: email.smtp?.username || null,
 					password_set: secretIsSet(integrations.email.smtp.password) || secretIsSet(Config.email.smtp?.password),
-					secure: email.smtp?.secure ?? null,
+					tls_mode: storedSmtpTlsMode(integrations.email.smtp),
+					effective_tls_mode: email.smtp ? resolveSmtpTlsMode(email.smtp.tlsMode, email.smtp.port) : null,
 				},
 				disable_new_ip_authorization: integrations.email.disable_new_ip_authorization ?? false,
 				effective_disable_new_ip_authorization: integrations.email.disable_new_ip_authorization || !email.enabled,

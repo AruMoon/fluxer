@@ -14,11 +14,11 @@ use crate::{
             InstanceAttachmentDecayUpdateRequest, InstanceBlueskyIntegrationUpdateRequest,
             InstanceBlueskyKeyIntegrationUpdateRequest, InstanceConfigUpdateRequest,
             InstanceEmailIntegrationUpdateRequest, InstanceEmailSmtpIntegrationUpdateRequest,
-            InstanceEmailSmtpTestRequest, InstanceGifIntegrationUpdateRequest,
+            InstanceEmailSmtpTestResponse, InstanceGifIntegrationUpdateRequest,
             InstanceIntegrationsUpdateRequest, InstanceMediaUpdateRequest,
             InstancePolicyUpdateRequest, InstanceRegistrationConfigUpdateRequest,
             InstanceServicesUpdateRequest, InstanceYoutubeIntegrationUpdateRequest,
-            LimitConfigUpdateRequest, LimitRule, LimitRuleFilters, PremiumMode,
+            LimitConfigUpdateRequest, LimitKeyMetadata, LimitRule, LimitRuleFilters, PremiumMode,
             PushRelayConfigUpdateRequest, RegistrationMode, SsoConfigUpdateRequest,
             VOICE_P2P_MAX_PARTICIPANTS_RANGE, VoiceE2eeScope, VoiceP2pConfigUpdateRequest,
         },
@@ -233,21 +233,19 @@ pub async fn instance_config_post(
             Ok(update) => instance_config_result(client.update_instance_config(&update).await),
             Err(message) => FlashData::error(message),
         },
-        "test_smtp" => match build_smtp_test_request(&form) {
-            Ok(request) => match client.test_instance_smtp_config(&request).await {
-                Ok(response) if response.ok => FlashData::success("SMTP connection verified"),
-                Ok(response) => FlashData::error(
-                    response
-                        .error
-                        .unwrap_or_else(|| "SMTP validation failed".to_owned()),
-                ),
-                Err(error) => {
-                    tracing::warn!(%error, "admin API request failed: test SMTP config");
-                    FlashData::error("Failed to validate SMTP configuration")
-                }
-            },
-            Err(message) => FlashData::error(message),
-        },
+        "test_smtp" => {
+            let update = build_integrations_update(&form);
+            match client.update_instance_config(&update).await {
+                Ok(_) => match client.test_saved_instance_smtp_config().await {
+                    Ok(response) => smtp_test_flash(response),
+                    Err(error) => {
+                        tracing::warn!(%error, "admin API request failed: test SMTP config");
+                        FlashData::error("Settings saved, but the SMTP test could not run")
+                    }
+                },
+                Err(error) => instance_config_result(Err::<(), _>(error)),
+            }
+        }
         "disable_single_community" => {
             let update = build_single_community_update(false);
             instance_config_result(client.update_instance_config(&update).await)
@@ -405,14 +403,31 @@ fn render_fragment_with_toast(markup: Markup, flash: &FlashData) -> Response {
     response
 }
 
-fn instance_config_result<T, E: std::fmt::Display>(result: Result<T, E>) -> FlashData {
+fn instance_config_result<T>(result: Result<T, crate::api::client::ApiError>) -> FlashData {
     match result {
         Ok(_) => FlashData::success("Instance config updated"),
         Err(error) => {
             tracing::warn!(%error, "admin API request failed: update instance config");
-            FlashData::error("Failed to update instance config")
+            match super::billing_actions::validation_message(&error) {
+                Some(message) => {
+                    FlashData::error(format!("Failed to update instance config: {message}"))
+                }
+                None => FlashData::error("Failed to update instance config"),
+            }
         }
     }
+}
+
+fn smtp_test_flash(response: InstanceEmailSmtpTestResponse) -> FlashData {
+    if response.ok {
+        return FlashData::success("Settings saved and SMTP connection verified");
+    }
+    let reason = response
+        .error
+        .unwrap_or_else(|| "the server gave no reason".to_owned());
+    FlashData::error(format!(
+        "Settings saved, but the SMTP test failed: {reason}"
+    ))
 }
 
 fn build_sso_update(form: &MultiValueForm) -> InstanceConfigUpdateRequest {
@@ -891,7 +906,9 @@ fn build_integrations_update(form: &MultiValueForm) -> InstanceConfigUpdateReque
                     port: smtp_port,
                     username: clean("integration_smtp_username"),
                     password: clean("integration_smtp_password"),
-                    secure: Some(form.bool_value("integration_smtp_secure")),
+                    tls_mode: form
+                        .first("integration_smtp_tls_mode")
+                        .map(|value| Some(value.trim().to_owned()).filter(|mode| !mode.is_empty())),
                 }),
                 disable_new_ip_authorization: Some(
                     form.bool_value("integration_email_disable_new_ip_authorization"),
@@ -932,29 +949,6 @@ fn build_media_update(form: &MultiValueForm) -> InstanceConfigUpdateRequest {
         }),
         ..Default::default()
     }
-}
-
-fn build_smtp_test_request(form: &MultiValueForm) -> Result<InstanceEmailSmtpTestRequest, String> {
-    let host = form
-        .clean("integration_smtp_host")
-        .ok_or_else(|| "SMTP host is required".to_owned())?;
-    let port = form
-        .first("integration_smtp_port")
-        .and_then(|value| value.trim().parse::<u16>().ok())
-        .ok_or_else(|| "SMTP port must be between 1 and 65535".to_owned())?;
-    let username = form
-        .clean("integration_smtp_username")
-        .ok_or_else(|| "SMTP username is required".to_owned())?;
-    let password = form
-        .clean("integration_smtp_password")
-        .ok_or_else(|| "SMTP password is required for validation".to_owned())?;
-    Ok(InstanceEmailSmtpTestRequest {
-        host,
-        port,
-        username,
-        password,
-        secure: form.bool_value("integration_smtp_secure"),
-    })
 }
 
 fn build_single_community_update(enabled: bool) -> InstanceConfigUpdateRequest {
@@ -1042,6 +1036,7 @@ fn update_limit_rule_values(
     rule: &mut LimitRule,
     form: &MultiValueForm,
     limit_keys: &[String],
+    metadata: &std::collections::BTreeMap<String, LimitKeyMetadata>,
     fallback_limits: Option<&std::collections::BTreeMap<String, u64>>,
 ) {
     let mut limits = std::collections::BTreeMap::new();
@@ -1055,12 +1050,19 @@ fn update_limit_rule_values(
     {
         limits.extend(defaults.clone());
     }
+    for key in limit_keys {
+        if metadata.get(key).is_some_and(|metadata| metadata.is_toggle)
+            && rule.limits.contains_key(key)
+        {
+            limits.entry(key.clone()).or_insert(0);
+        }
+    }
     rule.limits = limits;
     rule.filters = build_limit_filters(form);
 }
 
-fn limit_config_result<T, E: std::fmt::Display>(
-    result: Result<T, E>,
+fn limit_config_result<T>(
+    result: Result<T, crate::api::client::ApiError>,
     success_message: &'static str,
     error_message: &'static str,
 ) -> FlashData {
@@ -1068,7 +1070,10 @@ fn limit_config_result<T, E: std::fmt::Display>(
         Ok(_) => FlashData::success(success_message),
         Err(error) => {
             tracing::warn!(%error, "admin API request failed: update limit config");
-            FlashData::error(error_message)
+            match super::billing_actions::validation_message(&error) {
+                Some(message) => FlashData::error(format!("{error_message}: {message}")),
+                None => FlashData::error(error_message),
+            }
         }
     }
 }
@@ -1137,13 +1142,56 @@ pub async fn limit_config_post(
                 .defaults
                 .get(&rule_id)
                 .or_else(|| current.defaults.get("default"));
-            update_limit_rule_values(rule, &form, &current.limit_keys, fallback);
+            update_limit_rule_values(
+                rule,
+                &form,
+                &current.limit_keys,
+                &current.metadata,
+                fallback,
+            );
             let request = LimitConfigUpdateRequest { limit_config };
             let result = client.update_limit_config(&request).await;
             let flash = limit_config_result(
                 result,
                 "Limit configuration updated",
                 "Failed to update limit configuration",
+            );
+            return redirect_back_with_flash(base, "/limit-config", flash, secure_cookies);
+        }
+        "reset" => {
+            let rule = aq
+                .rule
+                .as_deref()
+                .and_then(clean_string)
+                .and_then(|rule_id| {
+                    limit_config
+                        .rules
+                        .iter_mut()
+                        .find(|rule| rule.id == rule_id)
+                });
+            let Some(rule) = rule else {
+                return redirect_back_with_flash(
+                    base,
+                    "/limit-config",
+                    FlashData::error("Rule not found"),
+                    secure_cookies,
+                );
+            };
+            let Some(defaults) = current.defaults.get(&rule.id) else {
+                return redirect_back_with_flash(
+                    base,
+                    "/limit-config",
+                    FlashData::error("This rule has no defaults to reset to"),
+                    secure_cookies,
+                );
+            };
+            rule.limits = defaults.clone();
+            let request = LimitConfigUpdateRequest { limit_config };
+            let result = client.update_limit_config(&request).await;
+            let flash = limit_config_result(
+                result,
+                "Limit rule reset to defaults",
+                "Failed to reset limit rule",
             );
             return redirect_back_with_flash(base, "/limit-config", flash, secure_cookies);
         }
@@ -1311,6 +1359,49 @@ mod tests {
     }
 
     #[test]
+    fn build_integrations_update_sends_the_smtp_tls_mode_only_when_the_form_has_it() {
+        let smtp_update = |body: &[u8]| {
+            build_integrations_update(&MultiValueForm::parse(body))
+                .integrations
+                .and_then(|integrations| integrations.email)
+                .and_then(|email| email.smtp)
+                .expect("smtp update")
+        };
+        let body = |update| serde_json::to_value(update).expect("serialize smtp update");
+
+        let chosen = smtp_update(b"integration_email_present=1&integration_smtp_tls_mode=none");
+        assert_eq!(body(chosen), serde_json::json!({"tls_mode": "none"}));
+
+        let automatic = smtp_update(b"integration_email_present=1&integration_smtp_tls_mode=");
+        assert_eq!(body(automatic), serde_json::json!({"tls_mode": null}));
+
+        let from_an_older_page =
+            smtp_update(b"integration_email_present=1&integration_smtp_secure=true");
+        assert_eq!(body(from_an_older_page), serde_json::json!({}));
+    }
+
+    #[test]
+    fn smtp_test_flash_says_the_settings_were_saved_either_way() {
+        let passed = smtp_test_flash(InstanceEmailSmtpTestResponse {
+            ok: true,
+            error: None,
+        });
+        assert_eq!(
+            passed.message,
+            "Settings saved and SMTP connection verified"
+        );
+
+        let failed = smtp_test_flash(InstanceEmailSmtpTestResponse {
+            ok: false,
+            error: Some("wrong version number".to_owned()),
+        });
+        assert_eq!(
+            failed.message,
+            "Settings saved, but the SMTP test failed: wrong version number"
+        );
+    }
+
+    #[test]
     fn build_sso_update_keeps_repeated_allowed_domains() {
         let form = MultiValueForm::parse(
             b"sso_enabled=true&sso_auto_provision=on&sso_allowed_domains%5B%5D=example.com&sso_allowed_domains%5B%5D=example.org&sso_display_name= Fluxer ",
@@ -1357,6 +1448,109 @@ mod tests {
         assert_eq!(
             filters.guild_features,
             vec!["COMMUNITY".to_owned(), "NEWS".to_owned()]
+        );
+    }
+
+    #[test]
+    fn instance_config_result_surfaces_the_api_validation_message() {
+        let error = crate::api::client::ApiError::Http {
+            status: 400,
+            message: serde_json::json!({
+                "code": "INVALID_FORM_BODY",
+                "message": "Input Validation Error",
+                "errors": [{
+                    "path": "policy.premium_mode",
+                    "code": "X",
+                    "message": "Disable billing before switching the premium mode to everyone"
+                }]
+            })
+            .to_string(),
+        };
+        assert_eq!(
+            instance_config_result::<()>(Err(error)).message,
+            "Failed to update instance config: policy.premium_mode: Disable billing before switching the premium mode to everyone"
+        );
+    }
+
+    #[test]
+    fn limit_config_result_surfaces_the_api_validation_message() {
+        let error = crate::api::client::ApiError::Http {
+            status: 400,
+            message: serde_json::json!({
+                "code": "INVALID_FORM_BODY",
+                "message": "Input Validation Error",
+                "errors": [{
+                    "path": "limit_config.rules.0.limits.max_bio_length",
+                    "code": "VALUE_MUST_BE_INTEGER_IN_RANGE",
+                    "message": "Value must be an integer between 0 and 320."
+                }]
+            })
+            .to_string(),
+        };
+        assert_eq!(
+            limit_config_result::<()>(Err(error), "Saved", "Failed to update limit configuration")
+                .message,
+            "Failed to update limit configuration: limit_config.rules.0.limits.max_bio_length: Value must be an integer between 0 and 320."
+        );
+    }
+
+    #[test]
+    fn update_limit_rule_values_saves_unchecked_toggles_as_off() {
+        let toggle = |key: &str, is_toggle: bool| {
+            (
+                key.to_owned(),
+                LimitKeyMetadata {
+                    key: key.to_owned(),
+                    label: key.to_owned(),
+                    description: String::new(),
+                    category: "features".to_owned(),
+                    scope: "user".to_owned(),
+                    is_toggle,
+                    unit: None,
+                    min: None,
+                    max: None,
+                },
+            )
+        };
+        let metadata = std::collections::BTreeMap::from([
+            toggle("feature_animated_avatar", true),
+            toggle("feature_animated_banner", true),
+            toggle("max_guilds", false),
+        ]);
+        let limit_keys = metadata.keys().cloned().collect::<Vec<_>>();
+        let mut rule = LimitRule {
+            id: "premium".to_owned(),
+            filters: None,
+            limits: std::collections::BTreeMap::from([
+                ("feature_animated_avatar".to_owned(), 1),
+                ("feature_animated_banner".to_owned(), 1),
+                ("max_guilds".to_owned(), 200),
+            ]),
+            modified_fields: None,
+        };
+        let form =
+            MultiValueForm::parse(b"traits=premium&feature_animated_banner=1&max_guilds=250");
+        update_limit_rule_values(&mut rule, &form, &limit_keys, &metadata, None);
+        assert_eq!(
+            rule.limits,
+            std::collections::BTreeMap::from([
+                ("feature_animated_avatar".to_owned(), 0),
+                ("feature_animated_banner".to_owned(), 1),
+                ("max_guilds".to_owned(), 250),
+            ])
+        );
+
+        let mut custom = LimitRule {
+            id: "vip".to_owned(),
+            filters: None,
+            limits: std::collections::BTreeMap::from([("max_guilds".to_owned(), 300)]),
+            modified_fields: None,
+        };
+        let form = MultiValueForm::parse(b"traits=vip&max_guilds=300");
+        update_limit_rule_values(&mut custom, &form, &limit_keys, &metadata, None);
+        assert_eq!(
+            custom.limits,
+            std::collections::BTreeMap::from([("max_guilds".to_owned(), 300)])
         );
     }
 
@@ -1823,7 +2017,13 @@ mod tests {
             limits: std::collections::BTreeMap::new(),
             modified_fields: None,
         };
-        update_limit_rule_values(&mut rule, &form, &["message_send".to_owned()], None);
+        update_limit_rule_values(
+            &mut rule,
+            &form,
+            &["message_send".to_owned()],
+            &std::collections::BTreeMap::new(),
+            None,
+        );
         assert_eq!(rule.limits.get("message_send"), Some(&1));
         assert_eq!(
             rule.filters.expect("filters").traits,

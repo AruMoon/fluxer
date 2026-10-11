@@ -2,7 +2,7 @@
 
 use crate::{
     byte_budget::ByteBudget,
-    media_process::MediaError,
+    media_process::{MediaError, NativeCost},
     metrics::{
         self,
         transform::{NativeTransformMetrics, TransformMetrics},
@@ -96,7 +96,7 @@ impl NativeTaskExecutor {
     ) -> anyhow::Result<T>
     where
         T: Send + 'static,
-        C: FnOnce() -> anyhow::Result<usize> + Send + 'static,
+        C: FnOnce() -> anyhow::Result<NativeCost> + Send + 'static,
         F: FnOnce() -> anyhow::Result<T> + Send + 'static,
     {
         let admission = match self.native_transforms.try_admit() {
@@ -112,8 +112,10 @@ impl NativeTaskExecutor {
             .native_transforms
             .wait_until_admitted(&admission, deadline)
             .await;
+        let admitted = Instant::now();
+        let waited = admitted.duration_since(wait_started);
         self.native_metrics
-            .observe_wait(metrics::duration_millis(wait_started.elapsed()));
+            .observe_wait(metrics::duration_millis(waited));
         let permit = permit?;
         let memory = self.memory.clone();
         let capacity = self.memory_budget_bytes;
@@ -121,14 +123,17 @@ impl NativeTaskExecutor {
         self.run_task(deadline, move || {
             let _span = span.enter();
             let _permit = permit;
-            let bytes = cost()?;
-            if bytes > capacity {
-                warn!(
-                    bytes,
-                    capacity, "native work refused, larger than the memory budget"
-                );
-                return Err(MediaError::InvalidImageDimensions.into());
-            }
+            let bytes = match cost()? {
+                NativeCost::Bytes(bytes) if bytes > capacity => {
+                    warn!(
+                        bytes,
+                        capacity, "native work refused, larger than the memory budget"
+                    );
+                    return Err(MediaError::TooLargeToProcess.into());
+                }
+                NativeCost::Bytes(bytes) => bytes,
+                NativeCost::UpToBudget(bytes) => bytes.min(capacity),
+            };
             let Some(_reserved) = memory.try_reserve(bytes) else {
                 warn!(bytes, capacity, "native work refused, memory budget in use");
                 return Err(MediaError::AllocationFailed.into());
@@ -136,6 +141,15 @@ impl NativeTaskExecutor {
             work()
         })
         .await
+        .map_err(|error| {
+            let ran_short = deadline
+                .is_some_and(|deadline| deadline.saturating_duration_since(admitted) < waited);
+            if ran_short && error.downcast_ref() == Some(&MediaError::RequestTimeout) {
+                TimedSemaphoreError::RequestTimeout.into()
+            } else {
+                error
+            }
+        })
     }
 
     pub(in crate::server) fn begin_shutdown(&self) {
@@ -197,7 +211,7 @@ impl NativeTaskExecutor {
         let completion = match deadline {
             Some(deadline) => match tokio::time::timeout_at(deadline.into(), receiver).await {
                 Ok(completion) => completion,
-                Err(_) => return Err(TimedSemaphoreError::RequestTimeout.into()),
+                Err(_) => return Err(MediaError::RequestTimeout.into()),
             },
             None => receiver.await,
         };
@@ -298,7 +312,7 @@ mod tests {
         let error = executor
             .run_native(
                 Some(Instant::now() + Duration::from_millis(30)),
-                || Ok(0),
+                || Ok(NativeCost::Bytes(0)),
                 move || {
                     released.blocking_recv();
                     let _ = finished.blocking_send(());
@@ -308,8 +322,8 @@ mod tests {
             .await
             .expect_err("the task outlives its deadline");
         assert_eq!(
-            Some(&TimedSemaphoreError::RequestTimeout),
-            error.downcast_ref::<TimedSemaphoreError>()
+            Some(&MediaError::RequestTimeout),
+            error.downcast_ref::<MediaError>()
         );
         let rendered = metrics.render();
         assert_eq!(
@@ -345,13 +359,56 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn a_task_admitted_late_times_out_as_an_admission_timeout() {
+        let metrics = metrics::Metrics::new();
+        let executor = Arc::new(executor(&metrics, 1, 1));
+        let (release_holder, mut holder_released) = mpsc::channel::<()>(1);
+        let (release_queued, mut queued_released) = mpsc::channel::<()>(1);
+        let holder = Arc::clone(&executor);
+        let held = tokio::spawn(async move {
+            holder
+                .run_native(
+                    None,
+                    || Ok(NativeCost::Bytes(0)),
+                    move || {
+                        holder_released.blocking_recv();
+                        Ok(())
+                    },
+                )
+                .await
+        });
+        tokio::time::sleep(Duration::from_millis(20)).await;
+        let deadline = Instant::now() + Duration::from_millis(300);
+        let queued = executor.run_native(
+            Some(deadline),
+            || Ok(NativeCost::Bytes(0)),
+            move || {
+                queued_released.blocking_recv();
+                Ok(())
+            },
+        );
+        let release = async {
+            tokio::time::sleep(Duration::from_millis(240)).await;
+            drop(release_holder);
+        };
+        let (error, ()) = tokio::join!(queued, release);
+        let error = error.expect_err("the queued task outlives its deadline");
+        assert_eq!(
+            Some(&TimedSemaphoreError::RequestTimeout),
+            error.downcast_ref::<TimedSemaphoreError>()
+        );
+        drop(release_queued);
+        held.await.expect("held task").expect("held work");
+    }
+
+    #[tokio::test]
     async fn a_task_that_completes_before_its_deadline_is_never_detached() {
         let metrics = metrics::Metrics::new();
         let executor = executor(&metrics, 1, 0);
         let value = executor
             .run_native(
                 Some(Instant::now() + Duration::from_secs(30)),
-                || Ok(0),
+                || Ok(NativeCost::Bytes(0)),
                 || Ok(7u32),
             )
             .await
@@ -378,7 +435,7 @@ mod tests {
             holder
                 .run_native(
                     None,
-                    || Ok(0),
+                    || Ok(NativeCost::Bytes(0)),
                     move || {
                         released.blocking_recv();
                         Ok(())
@@ -388,7 +445,7 @@ mod tests {
         });
         tokio::time::sleep(Duration::from_millis(50)).await;
         let error = executor
-            .run_native(None, || Ok(0), || Ok(()))
+            .run_native(None, || Ok(NativeCost::Bytes(0)), || Ok(()))
             .await
             .expect_err("the admission queue is full");
         assert_eq!(
@@ -412,7 +469,7 @@ mod tests {
         let executor = executor(&metrics, 2, 4);
         executor.begin_shutdown();
         let error = executor
-            .run_native(None, || Ok(0), || Ok(()))
+            .run_native(None, || Ok(NativeCost::Bytes(0)), || Ok(()))
             .await
             .expect_err("a closed executor admits nothing");
         assert_eq!(
@@ -429,13 +486,13 @@ mod tests {
         let error = executor
             .run_native(
                 None,
-                || Ok(1025),
+                || Ok(NativeCost::Bytes(1025)),
                 || -> anyhow::Result<()> { panic!("refused work must not run") },
             )
             .await
             .expect_err("the job exceeds the whole budget");
         assert_eq!(
-            Some(&MediaError::InvalidImageDimensions),
+            Some(&MediaError::TooLargeToProcess),
             error.downcast_ref::<MediaError>()
         );
     }
@@ -451,7 +508,7 @@ mod tests {
             holder
                 .run_native(
                     None,
-                    || Ok(1000),
+                    || Ok(NativeCost::Bytes(1000)),
                     move || {
                         let _ = started.blocking_send(());
                         released.blocking_recv();
@@ -462,7 +519,7 @@ mod tests {
         });
         has_started.recv().await;
         let error = executor
-            .run_native(None, || Ok(100), || Ok(()))
+            .run_native(None, || Ok(NativeCost::Bytes(100)), || Ok(()))
             .await
             .expect_err("the budget is in use");
         assert_eq!(
@@ -472,8 +529,19 @@ mod tests {
         drop(release);
         held.await.expect("held task").expect("held work");
         executor
-            .run_native(None, || Ok(1024), || Ok(()))
+            .run_native(None, || Ok(NativeCost::Bytes(1024)), || Ok(()))
             .await
             .expect("the released budget admits a job of the full size");
+    }
+
+    #[tokio::test]
+    async fn work_that_reserves_up_to_the_budget_runs_on_a_budget_smaller_than_its_estimate() {
+        let metrics = metrics::Metrics::new();
+        let executor = executor(&metrics, 1, 0);
+        let value = executor
+            .run_native(None, || Ok(NativeCost::UpToBudget(1 << 30)), || Ok(7u32))
+            .await
+            .expect("the job takes the whole budget instead of being refused");
+        assert_eq!(7, value);
     }
 }

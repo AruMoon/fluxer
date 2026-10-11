@@ -144,6 +144,8 @@ enum MessagesStorage {
     Deletions(DeletedMessageKeys),
     #[cfg(test)]
     Memory(std::sync::Arc<Vec<Message>>),
+    #[cfg(test)]
+    Expiries(std::sync::Arc<HashMap<i64, DateTime<Utc>>>),
 }
 
 #[cfg(test)]
@@ -398,9 +400,18 @@ struct ResponseBuildOptions {
     include_hidden: bool,
     threads_mask: bool,
     excluded_types: Vec<i32>,
+    attachment_decay: bool,
 }
 
 impl ResponseBuildOptions {
+    fn expiring_attachment_ids(&self, messages: &[&Message]) -> HashSet<i64> {
+        if self.attachment_decay {
+            collect_attachment_ids(messages)
+        } else {
+            HashSet::new()
+        }
+    }
+
     fn hides(&self, message: &Message) -> bool {
         self.threads_mask && message.message_type == MESSAGE_TYPE_THREAD_CREATED
     }
@@ -1138,7 +1149,7 @@ impl<T: Transport> MessagesShard<T> {
             .chain(referenced_messages.values())
             .collect::<Vec<_>>();
         let mention_context = build_message_mention_context(&all_messages);
-        let attachment_ids = collect_attachment_ids(&all_messages);
+        let attachment_ids = options.expiring_attachment_ids(&all_messages);
         let channel_ids = collect_channel_mention_ids(&all_messages, &mention_context);
         let user_ids = collect_user_ids(&all_messages, &mention_context);
         let reactions_future = self.fetch_reactions_for_messages(messages, options);
@@ -1863,7 +1874,7 @@ impl MessagesStorage {
                 storage.get_by_id(channel_id, bucket, message_id).await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(None),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(None),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => Ok(messages
                 .iter()
@@ -1894,7 +1905,7 @@ impl MessagesStorage {
                     .await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(Vec::new()),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => Ok(memory_buckets(
                 messages, channel_id, min_bucket, max_bucket, limit, true,
@@ -1922,7 +1933,7 @@ impl MessagesStorage {
                     .await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(Vec::new()),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => Ok(memory_buckets(
                 messages, channel_id, min_bucket, max_bucket, limit, false,
@@ -1947,7 +1958,7 @@ impl MessagesStorage {
                 storage.fetch_latest_bucket(channel_id, bucket, limit).await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(Vec::new()),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => {
                 Ok(memory_bucket(messages, channel_id, bucket, None, limit))
@@ -1981,7 +1992,7 @@ impl MessagesStorage {
                     .await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(Vec::new()),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => Ok(memory_bucket(
                 messages,
@@ -2019,7 +2030,7 @@ impl MessagesStorage {
                     .await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+            MessagesStorage::Deletions(_) | MessagesStorage::Expiries(_) => Ok(Vec::new()),
             #[cfg(test)]
             MessagesStorage::Memory(messages) => Ok(memory_bucket(
                 messages,
@@ -2054,7 +2065,7 @@ impl MessagesStorage {
                 Ok(())
             }
             #[cfg(test)]
-            MessagesStorage::Memory(_) => Ok(()),
+            MessagesStorage::Memory(_) | MessagesStorage::Expiries(_) => Ok(()),
         }
     }
 
@@ -2088,7 +2099,9 @@ impl MessagesStorage {
                     .await
             }
             #[cfg(test)]
-            MessagesStorage::Deletions(_) | MessagesStorage::Memory(_) => HashMap::new(),
+            MessagesStorage::Deletions(_)
+            | MessagesStorage::Memory(_)
+            | MessagesStorage::Expiries(_) => HashMap::new(),
         }
     }
 
@@ -2106,6 +2119,11 @@ impl MessagesStorage {
             }
             #[cfg(test)]
             MessagesStorage::Deletions(_) | MessagesStorage::Memory(_) => Ok(HashMap::new()),
+            #[cfg(test)]
+            MessagesStorage::Expiries(expiries) => Ok(attachment_ids
+                .into_iter()
+                .filter_map(|id| expiries.get(&id).map(|expires_at| (id, *expires_at)))
+                .collect()),
         }
     }
 }
@@ -2549,6 +2567,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                 media_proxy_secret_key,
                 attachment_url_secret_base64,
                 include_reactions,
+                attachment_decay,
                 nonce,
                 tts,
                 include_hidden,
@@ -2576,6 +2595,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                                 attachment_url_secret_base64.as_deref(),
                             ),
                             include_reactions: include_reactions.unwrap_or(true),
+                            attachment_decay: attachment_decay.unwrap_or(true),
                             nonce,
                             tts: tts.unwrap_or(false),
                             include_hidden,
@@ -2599,6 +2619,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                 media_proxy_secret_key,
                 attachment_url_secret_base64,
                 include_reactions,
+                attachment_decay,
                 nonce,
                 tts,
                 include_hidden,
@@ -2623,6 +2644,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                                 attachment_url_secret_base64.as_deref(),
                             ),
                             include_reactions: include_reactions.unwrap_or(true),
+                            attachment_decay: attachment_decay.unwrap_or(true),
                             nonce,
                             tts: tts.unwrap_or(false),
                             include_hidden,
@@ -2646,6 +2668,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                 media_proxy_secret_key,
                 attachment_url_secret_base64,
                 include_reactions,
+                attachment_decay,
                 include_hidden,
                 threads_mask,
             } => {
@@ -2668,6 +2691,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                                 attachment_url_secret_base64.as_deref(),
                             ),
                             include_reactions: include_reactions.unwrap_or(true),
+                            attachment_decay: attachment_decay.unwrap_or(true),
                             nonce: None,
                             tts: false,
                             include_hidden,
@@ -2692,6 +2716,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                 media_proxy_secret_key,
                 attachment_url_secret_base64,
                 include_reactions,
+                attachment_decay,
                 include_hidden,
                 threads_mask,
                 mut exclude_types,
@@ -2735,6 +2760,7 @@ impl<T: Transport> ShardService for MessagesShard<T> {
                                 attachment_url_secret_base64.as_deref(),
                             ),
                             include_reactions: include_reactions.unwrap_or(true),
+                            attachment_decay: attachment_decay.unwrap_or(true),
                             nonce: None,
                             tts: false,
                             include_hidden,
@@ -4215,6 +4241,7 @@ mod tests {
             include_hidden: false,
             threads_mask: false,
             excluded_types: Vec::new(),
+            attachment_decay: true,
         }
     }
 
@@ -4687,6 +4714,67 @@ mod tests {
         assert_eq!(None, mapped.url);
         assert_eq!(None, mapped.proxy_url);
         assert_eq!(Some(true), mapped.expired);
+    }
+
+    #[test]
+    fn attachment_expiry_is_only_looked_up_while_decay_is_on() {
+        let mut message = orphaned_message(1);
+        message.attachments = Some(vec![signed_attachment()]);
+        let off = ResponseBuildOptions {
+            attachment_decay: false,
+            ..build_options()
+        };
+
+        assert_eq!(
+            HashSet::from([SIGNED_ATTACHMENT_ID]),
+            build_options().expiring_attachment_ids(&[&message])
+        );
+        assert!(off.expiring_attachment_ids(&[&message]).is_empty());
+    }
+
+    #[tokio::test]
+    async fn a_passed_expiry_is_ignored_in_responses_while_decay_is_off() {
+        let shard = MessagesShard {
+            storage: MessagesStorage::Expiries(std::sync::Arc::new(HashMap::from([(
+                SIGNED_ATTACHMENT_ID,
+                DateTime::<Utc>::from_timestamp_millis(now_epoch_millis() - 1_000).unwrap(),
+            )]))),
+            transport: InMemoryTransport::new(),
+        };
+        let users = stub_user_service(&shard.transport).await;
+        let mut message = authored_message(1_509_197_195_776_110_592);
+        message.attachments = Some(vec![signed_attachment()]);
+        let off = ResponseBuildOptions {
+            attachment_decay: false,
+            ..signing_options()
+        };
+
+        let while_on = shard
+            .build_api_response_from_message(message.clone(), signing_options())
+            .await
+            .unwrap()
+            .expect("the message is visible");
+        let while_off = shard
+            .build_api_response_from_message(message.clone(), off.clone())
+            .await
+            .unwrap()
+            .expect("the message is visible");
+        let listed_while_off = shard
+            .build_api_responses_from_messages(vec![message], off)
+            .await
+            .unwrap();
+        users.abort();
+
+        let expired = &while_on.attachments[0];
+        assert_eq!(Some(true), expired.expired);
+        assert_eq!(None, expired.url);
+        assert!(expired.expires_at.is_some());
+        for response in [&while_off, &listed_while_off[0]] {
+            let kept = &response.attachments[0];
+            assert_eq!(None, kept.expired);
+            assert_eq!(None, kept.expires_at);
+            assert!(kept.url.is_some());
+        }
     }
 
     #[test]
