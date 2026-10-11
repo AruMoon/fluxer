@@ -2,10 +2,8 @@
 
 use super::*;
 use crate::{
-    config::Config,
-    output_format::OutputFormat,
-    server::asset_path::parse_standard_asset_path,
-    storage::{Object, StorageError},
+    config::Config, output_format::OutputFormat, server::asset_path::parse_standard_asset_path,
+    storage::Object,
 };
 use axum::{body::to_bytes, http::header};
 use bytes::Bytes;
@@ -72,7 +70,7 @@ fn test_transform_cache() -> crate::transform_cache::TransformCache {
 #[test]
 fn asset_size_query_is_clamped_by_kind() {
     let params = HashMap::from([("size".to_owned(), "4096".to_owned())]);
-    let size = asset_size::parse_image_size(params.get("size").map(String::as_str));
+    let size = constants::parse_image_size(params.get("size").map(String::as_str));
     let selected = output_format::select_url_variant(output_format::Input {
         kind: AssetKind::Avatar,
         original: AssetExtension::Webp,
@@ -229,50 +227,6 @@ async fn an_asset_image_transform_is_served_and_then_reused_from_its_content_ide
     );
 }
 
-#[tokio::test]
-async fn an_asset_read_that_races_a_rewrite_is_refused_rather_than_cached() {
-    let tmp = tempfile::tempdir().unwrap();
-    let storage_root = tmp.path().canonicalize().unwrap();
-    let app = test_app_state(asset_test_config(&storage_root));
-    let asset = parse_standard_asset_path(ASSET_TEST_PATH).unwrap();
-    app.store
-        .write_object(
-            &app.cfg.storage.bucket_cdn,
-            &asset.storage_key,
-            &crate::test_fixtures::synthetic_png(512, 512),
-            "image/png",
-        )
-        .await
-        .unwrap();
-    let head = app
-        .store
-        .head_object(&app.cfg.storage.bucket_cdn, &asset.storage_key)
-        .await
-        .unwrap();
-    app.store
-        .write_object(
-            &app.cfg.storage.bucket_cdn,
-            &asset.storage_key,
-            &crate::test_fixtures::synthetic_png(256, 256),
-            "image/png",
-        )
-        .await
-        .unwrap();
-    let read_budget = storage::unversioned_read_budget(constants::MAX_MEDIA_PROXY_BYTES);
-    let error = app
-        .store
-        .read_object_versioned(storage::ObjectReadRequest {
-            bucket: &app.cfg.storage.bucket_cdn,
-            key: &asset.storage_key,
-            max_bytes: constants::MAX_MEDIA_PROXY_BYTES,
-            budget: &read_budget,
-            expected_identity: &head.identity,
-        })
-        .await
-        .expect_err("the rewritten object no longer matches its head");
-    assert!(matches!(error, StorageError::ObjectChanged));
-}
-
 #[test]
 fn a_transform_failure_on_a_source_the_browser_cannot_show_stays_an_error() {
     let svg_failure = |error| {
@@ -385,7 +339,7 @@ async fn an_asset_image_source_that_vanishes_mid_request_is_not_found() {
 }
 
 fn avatar_cache_key_for_requested_size(raw: &str) -> String {
-    let size = asset_size::parse_image_size(Some(raw));
+    let size = constants::parse_image_size(Some(raw));
     let selected = output_format::select_url_variant(output_format::Input {
         kind: AssetKind::Avatar,
         original: AssetExtension::Webp,

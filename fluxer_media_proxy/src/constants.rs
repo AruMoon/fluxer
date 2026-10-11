@@ -14,6 +14,10 @@ pub const MAX_VIDEO_PACKETS_FOR_THUMBNAIL: usize = 512;
 pub const DEFAULT_IMAGE_SIZE: u32 = 128;
 pub const MAX_ANIMATED_FRAMES_DEFAULT: u32 = 20_000;
 pub const MAX_ANIMATED_TOTAL_PIXELS_DEFAULT: usize = 4 * MAX_MEDIA_IMAGE_PIXELS_DEFAULT;
+pub const MAX_JXL_DECODE_PIXELS: usize = 4096 * 4096;
+pub const MAX_STATIC_OUTPUT_PIXELS: usize = 6144 * 4096;
+pub const SVG_RASTER_MAX_DIMENSION: u32 = 4096;
+pub const LARGE_SOURCE_LOG_PIXELS: usize = 4096 * 4096;
 const _: () = assert!(MAX_ANIMATED_FRAMES_DEFAULT >= 20_000);
 
 pub const IMAGE_SIZES: &[u32] = &[
@@ -143,7 +147,6 @@ pub fn clamp_size(raw_target: u32, kind: AssetKind) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::media_limits::MediaLimits;
 
     fn asset_cache_key(raw: Option<&str>, kind: AssetKind) -> u32 {
         clamp_size(parse_image_size(raw), kind)
@@ -158,6 +161,9 @@ mod tests {
         assert_eq!(16, parse_image_size(Some("0")));
         assert_eq!(16384, parse_image_size(Some("99999")));
         assert_eq!(128, parse_image_size(Some("not-a-number")));
+        assert_eq!(128, parse_image_size(Some("")));
+        assert_eq!(128, parse_image_size(Some("-1")));
+        assert_eq!(128, parse_image_size(Some("99999999999")));
     }
 
     #[test]
@@ -219,13 +225,5 @@ mod tests {
         assert_eq!(1024, asset_cache_key(Some("1024"), AssetKind::Avatar));
         assert_eq!(512, asset_cache_key(Some("99999"), AssetKind::Emoji));
         assert_eq!(512, asset_cache_key(Some("99999"), AssetKind::Sticker));
-    }
-
-    #[test]
-    fn animated_frame_default_allows_dense_short_clips() {
-        assert_eq!(
-            MAX_ANIMATED_FRAMES_DEFAULT,
-            MediaLimits::default_from_config().animated_frames()
-        );
     }
 }

@@ -2,16 +2,16 @@
 
 import type {ChannelID, GuildID, UserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
-import type {IChannelRepository} from '@app/api/channel/IChannelRepository';
+import type {ChannelRepository} from '@app/api/channel/ChannelRepository';
 import {resolveExperimentTargeting} from '@app/api/experiment/ExperimentTargeting';
-import type {IGuildRepositoryAggregate} from '@app/api/guild/repositories/IGuildRepositoryAggregate';
+import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import type {ListParticipantsResult} from '@app/api/infrastructure/ILiveKitService';
 import type {LiveKitService} from '@app/api/infrastructure/LiveKitService';
 import type {PinnedRoomServer, VoiceRoomStore} from '@app/api/infrastructure/VoiceRoomStore';
 import type {InstanceConfigRepository} from '@app/api/instance/InstanceConfigRepository';
 import {Logger} from '@app/api/Logger';
 import type {User} from '@app/api/models/User';
-import type {IUserRepository} from '@app/api/user/IUserRepository';
+import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import type {VoiceAccessContext, VoiceAvailabilityService} from '@app/api/voice/VoiceAvailabilityService';
 import type {VoiceRegionAvailability, VoiceServerRecord} from '@app/api/voice/VoiceModel';
 import {
@@ -78,24 +78,12 @@ interface VoicePermissions {
 	canVideo: boolean;
 }
 
-interface UpdateVoiceStateParams {
-	guildId?: GuildID;
-	channelId: ChannelID;
-	userId: UserID;
-	connectionId: string;
-	mute?: boolean;
-	deaf?: boolean;
-	canSpeak?: boolean;
-	canStream?: boolean;
-	canVideo?: boolean;
-}
-
 export class VoiceService {
 	constructor(
 		private liveKitService: LiveKitService,
-		private guildRepository: IGuildRepositoryAggregate,
-		private userRepository: IUserRepository,
-		private channelRepository: IChannelRepository,
+		private guildRepository: GuildRepository,
+		private userRepository: UserRepository,
+		private channelRepository: ChannelRepository,
 		private voiceRoomStore: VoiceRoomStore,
 		private voiceAvailabilityService: VoiceAvailabilityService,
 		private instanceConfigRepository: InstanceConfigRepository,
@@ -111,7 +99,7 @@ export class VoiceService {
 		if (!user) {
 			throw new UnknownUserError();
 		}
-		const channel = await this.channelRepository.findUnique(channelId);
+		const channel = await this.channelRepository.channelData.findUnique(channelId);
 		if (!channel) {
 			throw new UnknownChannelError();
 		}
@@ -439,27 +427,6 @@ export class VoiceService {
 		serverId: string;
 	}): Promise<ListParticipantsResult> {
 		return await this.liveKitService.listParticipants(params);
-	}
-
-	async updateVoiceState(params: UpdateVoiceStateParams): Promise<void> {
-		const {guildId, channelId, userId, connectionId, mute, deaf} = params;
-		const pinnedServer = await this.voiceRoomStore.getPinnedRoomServer(guildId, channelId);
-		if (!pinnedServer) {
-			return;
-		}
-		await this.liveKitService.updateParticipant({
-			userId,
-			guildId,
-			channelId,
-			connectionId,
-			regionId: pinnedServer.regionId,
-			serverId: pinnedServer.serverId,
-			mute,
-			deaf,
-			canSpeak: params.canSpeak,
-			canStream: params.canStream,
-			canVideo: params.canVideo,
-		});
 	}
 
 	async updateParticipant(params: {

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {AdminAuditLog} from '@app/api/admin/IAdminRepository';
+import type {AdminAuditLog} from '@app/api/admin/AdminRepository';
 import type {ChannelID, GuildID, MessageID, ReportID, UserID} from '@app/api/BrandedTypes';
-import type {IGuildDiscoveryRepository} from '@app/api/guild/repositories/GuildDiscoveryRepository';
+import type {GuildDiscoveryRepository} from '@app/api/guild/repositories/GuildDiscoveryRepository';
 import type {Guild} from '@app/api/models/Guild';
 import type {GuildMember} from '@app/api/models/GuildMember';
 import type {Message} from '@app/api/models/Message';
 import type {User} from '@app/api/models/User';
-import type {IARSubmission} from '@app/api/report/IReportRepository';
+import type {IARSubmission} from '@app/api/report/ReportModels';
 import {convertToSearchableAuditLog} from '@app/api/search/auditlog/AuditLogSearchSerializer';
 import {convertToSearchableGuild, type GuildDiscoveryContext} from '@app/api/search/guild/GuildSearchSerializer';
 import {resolveDiscoveryContextForIndexing} from '@app/api/search/guild/LazyDiscoveryMigration';
@@ -103,20 +103,12 @@ export class MeilisearchMessageSearchService
 		await this.updateDocument(convertToSearchableMessage(message, authorIsBot));
 	}
 
-	async deleteMessage(messageId: MessageID): Promise<void> {
-		await this.deleteDocument(messageId.toString());
-	}
-
 	async deleteMessages(messageIds: Array<MessageID>): Promise<void> {
 		await this.deleteDocuments(messageIds.map((id) => id.toString()));
 	}
 
 	async deleteChannelMessages(channelId: ChannelID): Promise<void> {
 		await this.adapter.deleteByFilter(meiliTermFilter('channelId', channelId.toString()));
-	}
-
-	async deleteGuildMessages(guildId: GuildID): Promise<void> {
-		await this.adapter.deleteByFilter(meiliTermFilter('guildId', guildId.toString()));
 	}
 
 	searchMessages(
@@ -136,9 +128,9 @@ export class MeilisearchGuildSearchService
 	extends SearchAdapterServiceBase<GuildSearchFilters, SearchableGuild, MeilisearchGuildAdapter>
 	implements IGuildSearchService
 {
-	private readonly discoveryRepository: IGuildDiscoveryRepository | undefined;
+	private readonly discoveryRepository: GuildDiscoveryRepository | undefined;
 
-	constructor(client: MeilisearchClient, discoveryRepository?: IGuildDiscoveryRepository) {
+	constructor(client: MeilisearchClient, discoveryRepository?: GuildDiscoveryRepository) {
 		super(new MeilisearchGuildAdapter({client}));
 		this.discoveryRepository = discoveryRepository;
 	}
@@ -170,10 +162,6 @@ export class MeilisearchGuildSearchService
 		await this.deleteDocument(guildId.toString());
 	}
 
-	async deleteGuilds(guildIds: Array<GuildID>): Promise<void> {
-		await this.deleteDocuments(guildIds.map((id) => id.toString()));
-	}
-
 	searchGuilds(
 		query: string,
 		filters: GuildSearchFilters,
@@ -202,14 +190,6 @@ export class MeilisearchUserSearchService
 
 	async updateUser(user: User): Promise<void> {
 		await this.updateDocument(convertToSearchableUser(user));
-	}
-
-	async deleteUser(userId: UserID): Promise<void> {
-		await this.deleteDocument(userId.toString());
-	}
-
-	async deleteUsers(userIds: Array<UserID>): Promise<void> {
-		await this.deleteDocuments(userIds.map((id) => id.toString()));
 	}
 
 	searchUsers(
@@ -249,10 +229,6 @@ export class MeilisearchReportSearchService
 		await this.deleteDocument(reportId.toString());
 	}
 
-	async deleteReports(reportIds: Array<ReportID>): Promise<void> {
-		await this.deleteDocuments(reportIds.map((id) => id.toString()));
-	}
-
 	searchReports(
 		query: string,
 		filters: ReportSearchFilters,
@@ -284,18 +260,6 @@ export class MeilisearchAuditLogSearchService
 	async indexAuditLogs(logs: Array<AdminAuditLog>): Promise<void> {
 		if (logs.length === 0) return;
 		await this.indexDocuments(logs.map(convertToSearchableAuditLog));
-	}
-
-	async updateAuditLog(log: AdminAuditLog): Promise<void> {
-		await this.updateDocument(convertToSearchableAuditLog(log));
-	}
-
-	async deleteAuditLog(logId: bigint): Promise<void> {
-		await this.deleteDocument(logId.toString());
-	}
-
-	async deleteAuditLogs(logIds: Array<bigint>): Promise<void> {
-		await this.deleteDocuments(logIds.map((id) => id.toString()));
 	}
 
 	searchAuditLogs(

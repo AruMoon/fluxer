@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {ReportID} from '@app/api/BrandedTypes';
-import type {IARSubmission} from '@app/api/report/IReportRepository';
+import type {IARSubmission} from '@app/api/report/ReportModels';
 import type {IReportSearchService} from '@app/api/search/IReportSearchService';
 import {convertToSearchableReport} from '@app/api/search/report/ReportSearchSerializer';
 import {SearchAdapterServiceBase} from '@app/api/search/SearchAdapterServiceBase';
@@ -37,10 +37,6 @@ export class ElasticsearchReportSearchService
 
 	async deleteReport(reportId: ReportID): Promise<void> {
 		await this.deleteDocument(reportId.toString());
-	}
-
-	async deleteReports(reportIds: Array<ReportID>): Promise<void> {
-		await this.deleteDocuments(reportIds.map((id) => id.toString()));
 	}
 
 	searchReports(

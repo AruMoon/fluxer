@@ -102,10 +102,6 @@ class CrosspostQueueWorker implements IWorkerService {
 		return false;
 	}
 
-	async retryDeadLetterJob(_jobId: bigint): Promise<boolean> {
-		return false;
-	}
-
 	syncJobs(): Array<QueuedJob> {
 		return this.recorded.filter((job) => job.taskType === CrosspostTaskNames.SYNC_CROSSPOSTED_MESSAGE);
 	}
@@ -213,7 +209,11 @@ function helpers(): WorkerTaskHelpers {
 }
 
 async function listCopies(channelId: string, sourceId: string): Promise<Array<string>> {
-	const messages = await new ChannelRepository().listMessages(createChannelID(BigInt(channelId)), undefined, 100);
+	const messages = await new ChannelRepository().messages.listMessages(
+		createChannelID(BigInt(channelId)),
+		undefined,
+		100,
+	);
 	return messages
 		.filter(
 			(message) =>

@@ -3,7 +3,7 @@
 import type {ApiContext} from '@app/api/ApiContext';
 import type {ChannelID, GuildID, MessageID, UserID} from '@app/api/BrandedTypes';
 import {createChannelID, createGuildID, createMessageID, createUserID} from '@app/api/BrandedTypes';
-import type {IChannelRepository} from '@app/api/channel/IChannelRepository';
+import type {ChannelRepository} from '@app/api/channel/ChannelRepository';
 import type {ChannelService} from '@app/api/channel/services/ChannelService';
 import {SYSTEM_THREAD_VIEWER, syncChannelThreadsConfig} from '@app/api/experiment/ChannelThreadsGate';
 import type {KVBulkMessageDeletionQueueService} from '@app/api/infrastructure/KVBulkMessageDeletionQueueService';
@@ -12,49 +12,19 @@ import type {LimitConfigService} from '@app/api/limits/LimitConfigService';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import type {Channel} from '@app/api/models/Channel';
 import {Message} from '@app/api/models/Message';
-import {UserContentService, UserContentServiceTestHooks} from '@app/api/user/services/UserContentService';
+import {UserContentService} from '@app/api/user/services/UserContentService';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {ChannelTypes, MessageTypes} from '@fluxer/constants/src/ChannelConstants';
 import {ServerMessageFlags} from '@fluxer/constants/src/ThreadConstants';
 import {UnknownChannelError} from '@fluxer/errors/src/domains/channel/UnknownChannelError';
-import {UnknownMessageError} from '@fluxer/errors/src/domains/channel/UnknownMessageError';
-import {AccessDeniedError} from '@fluxer/errors/src/domains/core/AccessDeniedError';
 import {BadGatewayError} from '@fluxer/errors/src/domains/core/BadGatewayError';
 import {MaxBookmarksError} from '@fluxer/errors/src/domains/core/MaxBookmarksError';
 import {MissingPermissionsError} from '@fluxer/errors/src/domains/core/MissingPermissionsError';
 import {UnknownGuildError} from '@fluxer/errors/src/domains/guild/UnknownGuildError';
-import {NsfwContentRequiresAgeVerificationError} from '@fluxer/errors/src/domains/moderation/NsfwContentRequiresAgeVerificationError';
 import type {LimitConfigSnapshot} from '@fluxer/limits/src/LimitTypes';
 import {ChannelThreadsConfigSchema} from '@fluxer/schema/src/domains/admin/ChannelThreadsSchemas';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-
-const {isUnreachableEntityError} = UserContentServiceTestHooks;
-
-describe('isUnreachableEntityError', () => {
-	it('treats a deleted or left community as unreachable rather than fatal', () => {
-		expect(isUnreachableEntityError(new UnknownGuildError())).toBe(true);
-	});
-
-	it('treats a gone channel and a lost permission as unreachable', () => {
-		expect(isUnreachableEntityError(new UnknownChannelError())).toBe(true);
-		expect(isUnreachableEntityError(new MissingPermissionsError())).toBe(true);
-	});
-
-	it('treats an age gate and an unresolved membership as unreachable', () => {
-		expect(isUnreachableEntityError(new AccessDeniedError())).toBe(true);
-		expect(isUnreachableEntityError(new NsfwContentRequiresAgeVerificationError())).toBe(true);
-	});
-
-	it('leaves a deleted message to the delete path instead of marking it unavailable', () => {
-		expect(isUnreachableEntityError(new UnknownMessageError())).toBe(false);
-	});
-
-	it('still lets unexpected failures surface', () => {
-		expect(isUnreachableEntityError(new Error('database is on fire'))).toBe(false);
-		expect(isUnreachableEntityError(null)).toBe(false);
-	});
-});
 
 const VIEWER_ID = createUserID(7n);
 
@@ -155,8 +125,10 @@ function createUserContentService({
 		(stored ?? readable).map((entry) => `${entry.channelId.toString()}:${entry.messageId.toString()}`),
 	);
 	const channelRepository = {
-		listChannels: async (channelIds: Array<ChannelID>) =>
-			channels.filter((channel) => channelIds.some((channelId) => channelId === channel.id)),
+		channelData: {
+			listChannels: async (channelIds: Array<ChannelID>) =>
+				channels.filter((channel) => channelIds.some((channelId) => channelId === channel.id)),
+		},
 		messages: {
 			getMessage: async (channelId: ChannelID, messageId: MessageID) =>
 				storedKeys.has(`${channelId.toString()}:${messageId.toString()}`) ? makeMessage(channelId, messageId) : null,
@@ -166,7 +138,7 @@ function createUserContentService({
 		{services: {users: userRepository, gateway: {}, worker: {}, snowflake: {}}} as unknown as ApiContext,
 		{} as unknown as UserCacheService,
 		channelService as unknown as ChannelService,
-		channelRepository as unknown as IChannelRepository,
+		channelRepository as unknown as ChannelRepository,
 		{} as unknown as KVBulkMessageDeletionQueueService,
 		{} as unknown as LimitConfigService,
 	);
@@ -582,7 +554,7 @@ describe('gateway dispatches after the write', () => {
 			} as unknown as ApiContext,
 			{} as unknown as UserCacheService,
 			channelService as unknown as ChannelService,
-			{} as unknown as IChannelRepository,
+			{} as unknown as ChannelRepository,
 			{} as unknown as KVBulkMessageDeletionQueueService,
 			{getConfigSnapshot: () => null} as unknown as LimitConfigService,
 		);
@@ -817,7 +789,7 @@ describe('bookmark ceiling', () => {
 			} as unknown as ApiContext,
 			{} as unknown as UserCacheService,
 			channelService as unknown as ChannelService,
-			{} as unknown as IChannelRepository,
+			{} as unknown as ChannelRepository,
 			{} as unknown as KVBulkMessageDeletionQueueService,
 			{getConfigSnapshot: () => snapshot} as unknown as LimitConfigService,
 		);

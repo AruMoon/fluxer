@@ -9,12 +9,11 @@ import {
 	syncChannelThreadsConfig,
 } from '@app/api/experiment/ChannelThreadsGate';
 import {ReadState} from '@app/api/models/ReadState';
-import type {ReadStateMarker} from '@app/api/read_state/IReadStateRepository';
 import {
 	clearReadStateChannelMetaCacheForTesting,
 	resolveReadStateMarker,
 } from '@app/api/read_state/ReadStateChannelMeta';
-import {ReadStateRepository} from '@app/api/read_state/ReadStateRepository';
+import {type ReadStateMarker, ReadStateRepository} from '@app/api/read_state/ReadStateRepository';
 import {mapReadStateResponse} from '@app/api/read_state/ReadStateResponseMapper';
 import {badgeReadStates, visibleReadStates} from '@app/api/read_state/ReadStateVisibility';
 import {ReadStates} from '@app/api/Tables';
@@ -222,12 +221,6 @@ describe('thread read state markers', () => {
 			load({enabled: true, enabled_guild_ids: [GUILD.toString()], included_user_ids: [USER.toString()]});
 			expect(visibleReadStates([control, marked], {userId: USER, capable: false})).toEqual([control]);
 			expect(visibleReadStates([control, marked], {userId: USER, capable: true})).toEqual([control, marked]);
-		});
-
-		it('counts marked rows in the badge for enrolled recipients whatever their client', () => {
-			expect(badgeReadStates([control, marked], USER)).toEqual([control]);
-			load({enabled: true, enabled_guild_ids: [GUILD.toString()], included_user_ids: [USER.toString()]});
-			expect(badgeReadStates([control, marked], USER)).toEqual([control, marked]);
 		});
 	});
 

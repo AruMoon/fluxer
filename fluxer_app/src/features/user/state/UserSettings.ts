@@ -29,9 +29,6 @@ import {
 import {setSyncedFieldUserSettings} from '@app/features/user/state/SyncedField';
 import {
 	changedSyncedPreferenceFields,
-	createEmptySyncedPreferences,
-	decodeSyncedPreferencesLenient,
-	encodeSyncedPreferences,
 	isSyncedPreferencesField,
 	mergeIncomingSyncedPreferences as mergeIncomingSyncedPreferencesWithEngine,
 	preferencesFromBytes,
@@ -54,6 +51,11 @@ import {
 	ThemeTypes,
 	TimeFormatTypes,
 } from '@fluxer/constants/src/UserConstants';
+import {
+	createEmptySyncedPreferences,
+	decodeSyncedPreferencesLenient,
+	encodeSyncedPreferences,
+} from '@fluxer/schema/src/domains/user/SyncedPreferencesCodec';
 import camelCase from 'lodash/camelCase';
 import isEqual from 'lodash/isEqual';
 import isPlainObject from 'lodash/isPlainObject';
@@ -392,10 +394,6 @@ class UserSettingsState {
 		writePersistedSyncedPreferences(SYNCED_PREFERENCES_WIRE_KEY, this.wireSyncedPreferences);
 	}
 
-	getStatus(): StatusType {
-		return this.status;
-	}
-
 	getStatusResetsAt(): string | null {
 		return this.statusResetsAt;
 	}
@@ -651,6 +649,7 @@ class UserSettingsState {
 		const {hydrate = true} = options;
 		const previousStatus = this.status;
 		const previousCustomStatus = this.customStatus;
+		const previousAfkTimeout = this.afkTimeout;
 		const wasHydrated = this.hydrated;
 		if (userSettings === null || userSettings === undefined) {
 			return;
@@ -744,13 +743,11 @@ class UserSettingsState {
 		) {
 			this.mergeIncomingSyncedPreferences(decodeSyncedPreferencesLenient(incomingSyncedPreferences));
 		}
-		if (normalizedStatus !== previousStatus) {
-			const presence = LocalPresence.getPresence();
-			if (!presence.afk) {
-				LocalPresence.updatePresence();
-			}
-		}
-		if (!isEqual(this.customStatus, previousCustomStatus)) {
+		if (
+			normalizedStatus !== previousStatus ||
+			!isEqual(this.customStatus, previousCustomStatus) ||
+			this.afkTimeout !== previousAfkTimeout
+		) {
 			LocalPresence.updatePresence();
 		}
 		if (hydrate && !wasHydrated) {

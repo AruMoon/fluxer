@@ -18,7 +18,6 @@ import {GuildDataRepository} from '@app/api/guild/repositories/GuildDataReposito
 import {GuildMemberRepository} from '@app/api/guild/repositories/GuildMemberRepository';
 import {GuildModerationRepository} from '@app/api/guild/repositories/GuildModerationRepository';
 import {GuildRoleRepository} from '@app/api/guild/repositories/GuildRoleRepository';
-import type {IGuildRepositoryAggregate} from '@app/api/guild/repositories/IGuildRepositoryAggregate';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import type {Guild} from '@app/api/models/Guild';
 import type {GuildAuditLog} from '@app/api/models/GuildAuditLog';
@@ -29,7 +28,7 @@ import type {GuildRole} from '@app/api/models/GuildRole';
 import type {GuildSticker} from '@app/api/models/GuildSticker';
 import type {AuditLogActionType} from '@fluxer/constants/src/AuditLogActionType';
 
-export class GuildRepository implements IGuildRepositoryAggregate {
+export class GuildRepository {
 	private dataRepo: GuildDataRepository;
 	private memberRepo: GuildMemberRepository;
 	private roleRepo: GuildRoleRepository;
@@ -40,7 +39,7 @@ export class GuildRepository implements IGuildRepositoryAggregate {
 		this.dataRepo = new GuildDataRepository(requestCache);
 		this.memberRepo = new GuildMemberRepository();
 		this.roleRepo = new GuildRoleRepository();
-		this.moderationRepo = new GuildModerationRepository(requestCache);
+		this.moderationRepo = new GuildModerationRepository();
 		this.contentRepo = new GuildContentRepository();
 	}
 
@@ -226,10 +225,6 @@ export class GuildRepository implements IGuildRepositoryAggregate {
 		return await this.moderationRepo.batchDeleteAndCreateAuditLogs(guildId, logsToDelete, logToCreate);
 	}
 
-	async updateAuditLogsIndexedAt(guildId: GuildID, indexedAt: Date | null): Promise<void> {
-		return await this.moderationRepo.updateAuditLogsIndexedAt(guildId, indexedAt);
-	}
-
 	async getEmoji(emojiId: EmojiID, guildId: GuildID): Promise<GuildEmoji | null> {
 		return await this.contentRepo.getEmoji(emojiId, guildId);
 	}
@@ -240,10 +235,6 @@ export class GuildRepository implements IGuildRepositoryAggregate {
 
 	async listEmojis(guildId: GuildID): Promise<Array<GuildEmoji>> {
 		return await this.contentRepo.listEmojis(guildId);
-	}
-
-	async countEmojis(guildId: GuildID): Promise<number> {
-		return await this.contentRepo.countEmojis(guildId);
 	}
 
 	async upsertEmoji(data: GuildEmojiRow): Promise<GuildEmoji> {
@@ -264,10 +255,6 @@ export class GuildRepository implements IGuildRepositoryAggregate {
 
 	async listStickers(guildId: GuildID): Promise<Array<GuildSticker>> {
 		return await this.contentRepo.listStickers(guildId);
-	}
-
-	async countStickers(guildId: GuildID): Promise<number> {
-		return await this.contentRepo.countStickers(guildId);
 	}
 
 	async upsertSticker(data: GuildStickerRow): Promise<GuildSticker> {

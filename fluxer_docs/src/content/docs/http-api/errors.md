@@ -286,10 +286,6 @@ You can't send messages in a non-text channel
 
 You can't send messages to this user
 
-### `CANNOT_SHRINK_RESERVED_SLOTS`
-
-You can't shrink reserved slots
-
 ### `CANNOT_TRANSFER_OWNERSHIP_TO_BOT`
 
 Community ownership can't be transferred to a bot
@@ -1343,14 +1339,6 @@ Animated community banner requires ANIMATED_BANNER feature
 
 Attachments aren't allowed for this message
 
-### `ATTACHMENT_FIELDS_REQUIRED`
-
-`attachment_id`, `channel_id`, `message_id`, and `expires_at` are required
-
-### `ATTACHMENT_IDS_MUST_BE_VALID_INTEGERS`
-
-`attachment_id`, `channel_id`, and `message_id` must be valid integers
-
 ### `ATTACHMENT_ID_NOT_FOUND_IN_MESSAGE`
 
 Attachment with ID {attachmentId} wasn't found in the message
@@ -1394,10 +1382,6 @@ Bot discriminator can't be changed
 ### `BOT_SEARCH_SCOPE_UNAVAILABLE`
 
 Bots can only search within a single community or channel
-
-### `BUCKET_IS_REQUIRED`
-
-`bucket` is required
 
 ### `CANNOT_ADD_YOURSELF_TO_GROUP_DM`
 
@@ -2019,17 +2003,9 @@ Recipient IDs must be valid snowflakes
 
 Referenced attachment "{filename}" wasn't found in message attachments
 
-### `ROWS_IS_REQUIRED`
-
-`rows` is required
-
 ### `SESSION_TIMEOUT`
 
 Session timed out
-
-### `SIZE_BYTES_MUST_BE_VALID_INTEGER`
-
-`size_bytes` must be a valid integer
 
 ### `SNOWFLAKE_OUT_OF_RANGE`
 

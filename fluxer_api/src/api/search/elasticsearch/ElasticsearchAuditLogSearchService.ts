@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {AdminAuditLog} from '@app/api/admin/IAdminRepository';
+import type {AdminAuditLog} from '@app/api/admin/AdminRepository';
 import {convertToSearchableAuditLog} from '@app/api/search/auditlog/AuditLogSearchSerializer';
 import type {IAuditLogSearchService} from '@app/api/search/IAuditLogSearchService';
 import {SearchAdapterServiceBase} from '@app/api/search/SearchAdapterServiceBase';
@@ -28,18 +28,6 @@ export class ElasticsearchAuditLogSearchService
 	async indexAuditLogs(logs: Array<AdminAuditLog>): Promise<void> {
 		if (logs.length === 0) return;
 		await this.indexDocuments(logs.map(convertToSearchableAuditLog));
-	}
-
-	async updateAuditLog(log: AdminAuditLog): Promise<void> {
-		await this.updateDocument(convertToSearchableAuditLog(log));
-	}
-
-	async deleteAuditLog(logId: bigint): Promise<void> {
-		await this.deleteDocument(logId.toString());
-	}
-
-	async deleteAuditLogs(logIds: Array<bigint>): Promise<void> {
-		await this.deleteDocuments(logIds.map((id) => id.toString()));
 	}
 
 	searchAuditLogs(

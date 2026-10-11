@@ -9,7 +9,6 @@ import {
 	type GuildEmojiRow,
 	type GuildStickerRow,
 } from '@app/api/database/types/GuildTypes';
-import {IGuildContentRepository} from '@app/api/guild/repositories/IGuildContentRepository';
 import {GuildEmoji} from '@app/api/models/GuildEmoji';
 import {GuildSticker} from '@app/api/models/GuildSticker';
 import {GuildEmojis, GuildEmojisByEmojiId, GuildStickers, GuildStickersByStickerId} from '@app/api/Tables';
@@ -37,7 +36,7 @@ const FETCH_GUILD_STICKER_BY_STICKER_ID_ONLY_QUERY = GuildStickersByStickerId.se
 	limit: 1,
 });
 
-export class GuildContentRepository extends IGuildContentRepository {
+export class GuildContentRepository {
 	async getEmoji(emojiId: EmojiID, guildId: GuildID): Promise<GuildEmoji | null> {
 		const emoji = await fetchOne<GuildEmojiRow>(FETCH_GUILD_EMOJI_BY_ID_QUERY, {
 			guild_id: guildId,
@@ -58,13 +57,6 @@ export class GuildContentRepository extends IGuildContentRepository {
 			guild_id: guildId,
 		});
 		return emojis.map((emoji) => new GuildEmoji(emoji));
-	}
-
-	async countEmojis(guildId: GuildID): Promise<number> {
-		const emojis = await fetchMany<GuildEmojiRow>(FETCH_GUILD_EMOJIS_BY_GUILD_ID_QUERY, {
-			guild_id: guildId,
-		});
-		return emojis.length;
 	}
 
 	async upsertEmoji(data: GuildEmojiRow, oldData?: GuildEmojiRow | null): Promise<GuildEmoji> {
@@ -119,13 +111,6 @@ export class GuildContentRepository extends IGuildContentRepository {
 			guild_id: guildId,
 		});
 		return stickers.map((sticker) => new GuildSticker(sticker));
-	}
-
-	async countStickers(guildId: GuildID): Promise<number> {
-		const stickers = await fetchMany<GuildStickerRow>(FETCH_GUILD_STICKERS_BY_GUILD_ID_QUERY, {
-			guild_id: guildId,
-		});
-		return stickers.length;
 	}
 
 	async upsertSticker(data: GuildStickerRow, oldData?: GuildStickerRow | null): Promise<GuildSticker> {

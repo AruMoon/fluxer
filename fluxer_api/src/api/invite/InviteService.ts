@@ -7,13 +7,12 @@ import type {ChannelService} from '@app/api/channel/services/ChannelService';
 import {THREAD_FEATURE_CHANNEL_TYPES, type ThreadViewer} from '@app/api/experiment/ChannelThreadsGate';
 import type {GuildAuditLogService} from '@app/api/guild/GuildAuditLogService';
 import type {GuildService} from '@app/api/guild/services/GuildService';
-import type {IInviteRepository} from '@app/api/invite/IInviteRepository';
+import type {InviteRepository} from '@app/api/invite/InviteRepository';
 import {Logger} from '@app/api/Logger';
 import type {LimitConfigService} from '@app/api/limits/LimitConfigService';
 import {resolveLimitSafe} from '@app/api/limits/LimitConfigUtils';
 import {createLimitMatchContext} from '@app/api/limits/LimitMatchContextBuilder';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
-import type {Channel} from '@app/api/models/Channel';
 import {Invite} from '@app/api/models/Invite';
 import {assertAccountNotLimited} from '@app/api/user/AccountLimit';
 import * as RandomUtils from '@app/api/utils/RandomUtils';
@@ -106,7 +105,7 @@ interface ReusableInviteCriteria {
 export class InviteService {
 	constructor(
 		private readonly apiContext: ApiContext,
-		private inviteRepository: IInviteRepository,
+		private inviteRepository: InviteRepository,
 		private guildService: GuildService,
 		private channelService: ChannelService,
 		private readonly guildAuditLogService: GuildAuditLogService,
@@ -252,7 +251,7 @@ export class InviteService {
 		if (!invite) throw new UnknownInviteError();
 		if (invite.maxUses > 0 && invite.uses >= invite.maxUses) {
 			if (invite.type === InviteTypes.GUILD && invite.guildId) {
-				const guild = await this.guildService.data.getGuildSystem(invite.guildId);
+				const guild = await this.guildService.data.operations.getGuildSystem(invite.guildId);
 				const vanityCode = guild.vanityUrlCode ? vanityCodeToInviteCode(guild.vanityUrlCode) : null;
 				if (invite.code !== vanityCode) {
 					await this.inviteRepository.delete(invite.code);
@@ -287,7 +286,7 @@ export class InviteService {
 			return this.completeInviteUse(reservedInvite, {deleteWhenExhausted: true});
 		}
 		if (!invite.guildId) throw new UnknownInviteError();
-		const guild = await this.guildService.data.getGuildSystem(invite.guildId);
+		const guild = await this.guildService.data.operations.getGuildSystem(invite.guildId);
 		if ((guild.disabledOperations & GuildOperations.INSTANT_INVITES) !== 0) {
 			throw new FeatureTemporarilyDisabledError();
 		}
@@ -459,12 +458,6 @@ export class InviteService {
 			action: 'delete',
 			auditLogReason,
 		});
-	}
-
-	async resolveVanityUrlChannel(guildId: GuildID): Promise<Channel | null> {
-		const channelId = await this.apiContext.services.gateway.getVanityUrlChannel(guildId);
-		if (!channelId) return null;
-		return await this.channelService.channelData.operations.getChannelSystem(channelId);
 	}
 
 	async getChannelInvitesSorted({userId, viewer, channelId}: GetChannelInvitesSortedParams): Promise<Array<Invite>> {

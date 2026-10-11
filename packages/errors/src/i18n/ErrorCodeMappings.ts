@@ -72,7 +72,6 @@ export const ErrorCodeToI18nKey = {
 	[APIErrorCodes.CANNOT_SEND_MESSAGES_IN_NON_TEXT_CHANNEL]: 'misc.cannot_send_messages_in_non_text_channel',
 	[APIErrorCodes.CANNOT_SEND_MESSAGES_TO_USER]: 'friends_and_dms.cannot_send_messages_to_user',
 	[APIErrorCodes.CANNOT_TRANSFER_OWNERSHIP_TO_BOT]: 'channels_and_guilds.cannot_transfer_ownership_to_bot',
-	[APIErrorCodes.CANNOT_SHRINK_RESERVED_SLOTS]: 'limits.cannot_shrink_reserved_slots',
 	[APIErrorCodes.CAPTCHA_REQUIRED]: 'captcha.required',
 	[APIErrorCodes.COMMUNICATION_DISABLED]: 'account.communication_disabled',
 	[APIErrorCodes.CONNECTION_ALREADY_EXISTS]: 'connections.already_exists',
@@ -375,9 +374,6 @@ export const ErrorCodeToI18nKey = {
 	[ValidationErrorCodes.NO_FILE_FOR_ATTACHMENT_METADATA]:
 		'attachments_and_uploads.no_file_uploaded_for_attachment_metadata',
 	[ValidationErrorCodes.NO_UPLOADED_PARTS_TO_FINALIZE]: 'attachments_and_uploads.no_uploaded_parts_to_finalize',
-	[ValidationErrorCodes.ATTACHMENT_FIELDS_REQUIRED]: 'attachments_and_uploads.attachment_fields_required',
-	[ValidationErrorCodes.ATTACHMENT_IDS_MUST_BE_VALID_INTEGERS]:
-		'attachments_and_uploads.attachment_ids_must_be_valid_integers',
 	[ValidationErrorCodes.ATTACHMENTS_NOT_ALLOWED_FOR_MESSAGE]:
 		'attachments_and_uploads.attachments_not_allowed_for_message',
 	[ValidationErrorCodes.DUPLICATE_ATTACHMENT_IDS_NOT_ALLOWED]:
@@ -398,7 +394,6 @@ export const ErrorCodeToI18nKey = {
 	[ValidationErrorCodes.MULTIPLE_FILES_FOR_INDEX_NOT_ALLOWED]:
 		'attachments_and_uploads.multiple_files_for_index_not_allowed',
 	[ValidationErrorCodes.NO_VALID_MEDIA_IN_MESSAGE]: 'attachments_and_uploads.no_valid_media_in_message',
-	[ValidationErrorCodes.SIZE_BYTES_MUST_BE_VALID_INTEGER]: 'attachments_and_uploads.size_bytes_must_be_valid_integer',
 	[ValidationErrorCodes.TOO_MANY_FILES]: 'attachments_and_uploads.too_many_files',
 	[ValidationErrorCodes.UNRESOLVED_ATTACHMENT_URL]: 'attachments_and_uploads.unresolved_attachment_url',
 	[ValidationErrorCodes.UPLOADED_ATTACHMENT_NOT_FOUND]: 'attachments_and_uploads.uploaded_attachment_not_found',
@@ -539,7 +534,6 @@ export const ErrorCodeToI18nKey = {
 	[ValidationErrorCodes.VANITY_URL_INVALID_CHARACTERS]: 'vanity_urls.vanity_url_invalid_characters',
 	[ValidationErrorCodes.WEBHOOK_NAME_LENGTH_INVALID]: 'webhooks.webhook_name_length_invalid',
 	[ValidationErrorCodes.AT_LEAST_ONE_ENTRY_IS_REQUIRED]: 'limits.at_least_one_entry_required',
-	[ValidationErrorCodes.BUCKET_IS_REQUIRED]: 'limits.bucket_required',
 	[ValidationErrorCodes.CANNOT_PRELOAD_MORE_THAN_100_CHANNELS]: 'messages.cannot_preload_more_than_100_channels',
 	[ValidationErrorCodes.INTEGER_OUT_OF_INT64_RANGE]: 'limits.integer_out_of_int64_range',
 	[ValidationErrorCodes.INVALID_AUDIT_LOG_REASON]: 'admin_and_system.invalid_audit_log_reason',
@@ -559,7 +553,6 @@ export const ErrorCodeToI18nKey = {
 		'mfa_and_passkeys.must_enable_2fa_before_enforcing_for_mods',
 	[ValidationErrorCodes.TOTP_NOT_ENABLED]: 'mfa_and_passkeys.totp_not_enabled',
 	[ValidationErrorCodes.NAME_EMPTY_AFTER_NORMALIZATION]: 'names_and_normalization.name_empty_after_normalization',
-	[ValidationErrorCodes.ROWS_IS_REQUIRED]: 'limits.rows_required',
 	[ValidationErrorCodes.SNOWFLAKE_OUT_OF_RANGE]: 'misc.invalid_snowflake',
 	[ValidationErrorCodes.STRING_LENGTH_EXACT]: 'limits.string_length_exact',
 	[ValidationErrorCodes.TICKET_ALREADY_COMPLETED]: 'tickets.ticket_already_completed',
