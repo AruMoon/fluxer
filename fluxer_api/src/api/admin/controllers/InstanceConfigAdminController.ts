@@ -2,9 +2,11 @@
 
 import {AdminAuditReadActions} from '@app/api/admin/AdminAuditActions';
 import {recordAdminRead, recordAdminWrite} from '@app/api/admin/AdminAuditRecorder';
+import {startAttachmentDecayReconcile} from '@app/api/attachment/AttachmentDecayReconcileRun';
 import {createUserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
 import {
+	type InstanceAttachmentDecayEffectiveConfig,
 	type InstancePolicyConfig,
 	REGISTRATION_PENDING_APPROVAL_TRAIT,
 	REGISTRATION_REJECTED_TRAIT,
@@ -13,6 +15,7 @@ import {deriveSsoRedirectUri, normalizeAndValidateSsoConfig} from '@app/api/inst
 import {requireAdminACL} from '@app/api/middleware/AdminMiddleware';
 import {RateLimitMiddleware} from '@app/api/middleware/RateLimitMiddleware';
 import {OpenAPI} from '@app/api/middleware/ResponseTypeMiddleware';
+import {getKVClient, getWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {
 	getGatewayRolloutConfigPublisher,
 	getInstanceConfigRepository,
@@ -47,6 +50,22 @@ import type {Context} from 'hono';
 import {createMiddleware} from 'hono/factory';
 
 const INSTANCE_BRANDING_ENTITY_ID = 0n;
+const ATTACHMENT_EXPIRY_RULE_FIELDS = [
+	'enabled',
+	'min_size_mb',
+	'max_size_mb',
+	'max_eligible_size_mb',
+	'min_lifetime_days',
+	'max_lifetime_days',
+	'curve',
+] as const satisfies ReadonlyArray<keyof InstanceAttachmentDecayEffectiveConfig>;
+
+function attachmentExpiryRulesChanged(
+	previous: InstanceAttachmentDecayEffectiveConfig,
+	next: InstanceAttachmentDecayEffectiveConfig,
+): boolean {
+	return ATTACHMENT_EXPIRY_RULE_FIELDS.some((field) => previous[field] !== next[field]);
+}
 
 function readOptionalField<T extends object, K extends keyof T>(value: T, key: K): T[K] | undefined {
 	return Object.hasOwn(value, key) ? value[key] : undefined;
@@ -556,6 +575,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 				});
 			}
 			if (data.media) {
+				const previousAttachmentDecay = await instanceConfigRepository.getEffectiveAttachmentDecayConfig();
 				await instanceConfigRepository.setInstanceMediaConfig({
 					attachment_decay: data.media.attachment_decay
 						? omitUndefinedFields({
@@ -571,6 +591,10 @@ export function InstanceConfigAdminController(app: HonoApp) {
 							})
 						: undefined,
 				});
+				const attachmentDecay = await instanceConfigRepository.getEffectiveAttachmentDecayConfig();
+				if (attachmentDecay.enabled && attachmentExpiryRulesChanged(previousAttachmentDecay, attachmentDecay)) {
+					await startAttachmentDecayReconcile(getKVClient(), getWorkerService());
+				}
 			}
 			if (data.policy) {
 				await applyInstancePolicyUpdate(
