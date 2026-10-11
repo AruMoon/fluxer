@@ -17,6 +17,14 @@ pub struct FlashData {
     pub flash_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub detail: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub field_error: Option<FieldError>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FieldError {
+    pub field: String,
+    pub message: String,
 }
 
 impl FlashData {
@@ -25,6 +33,7 @@ impl FlashData {
             message: message.into(),
             flash_type: "success".to_owned(),
             detail: None,
+            field_error: None,
         }
     }
 
@@ -33,6 +42,7 @@ impl FlashData {
             message: message.into(),
             flash_type: "error".to_owned(),
             detail: None,
+            field_error: None,
         }
     }
 
@@ -41,7 +51,16 @@ impl FlashData {
             message: message.into(),
             flash_type: "info".to_owned(),
             detail: None,
+            field_error: None,
         }
+    }
+
+    pub fn with_field_error(mut self, field: &str, message: impl Into<String>) -> Self {
+        self.field_error = Some(FieldError {
+            field: field.to_owned(),
+            message: message.into(),
+        });
+        self
     }
 
     pub fn to_flash_message(&self) -> FlashMessage {
