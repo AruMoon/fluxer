@@ -3,6 +3,7 @@
 import type {ApiContext} from '@app/api/ApiContext';
 import {trySendAdminNotification} from '@app/api/admin/services/AdminNotification';
 import type {UserID} from '@app/api/BrandedTypes';
+import {Config} from '@app/api/Config';
 import {listActiveFeatureLimits} from '@app/api/enforcement/FeatureLimitState';
 import {resolveContactEmails} from '@app/api/instance/ContactEmails';
 import {getInstanceProductName} from '@app/api/instance/ProductName';
@@ -13,7 +14,7 @@ import type {IARSubmission} from '@app/api/report/ReportModels';
 import {type SystemDmDeps, systemDmBody, trySendSystemDm} from '@app/api/user/services/SystemDmMessage';
 import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import type {ReportItemOutcome} from '@fluxer/schema/src/domains/admin/AdminSchemas';
-import {getEmailTemplate} from '@pkgs/email/src/email_i18n/EmailI18n';
+import {emailLinkUrls, renderEmailTemplateText, reportResolvedSlots} from '@pkgs/email/src/EmailService';
 
 interface ReporterResolutionNotifierDeps {
 	apiContext: ApiContext;
@@ -97,7 +98,7 @@ export class ReporterResolutionNotifier {
 		const emailSent = email
 			? await trySendAdminNotification(
 					() =>
-						emailService.sendReportResolvedEmail(email, reporter.username, reportId, comment, outcome, reporter.locale),
+						emailService.send('report_resolved', email, {reportId, publicComment: comment, outcome}, reporter.locale),
 					{action: 'resolve_report', targetId: reportId},
 				)
 			: false;
@@ -127,7 +128,8 @@ export class ReporterResolutionNotifier {
 		const {email: emailService} = this.deps.apiContext.services;
 		const reportId = report.reportId.toString();
 		const dsaEmailSent = await trySendAdminNotification(
-			() => emailService.sendDsaReportResolvedEmail(email, reportId, comment, outcome, report.flowLocale),
+			() =>
+				emailService.send('dsa_report_resolved', email, {reportId, publicComment: comment, outcome}, report.flowLocale),
 			{action: 'resolve_report', targetId: reportId},
 		);
 		return {dmSent: false, emailSent: false, dsaEmailSent, skipped: null};
@@ -143,31 +145,24 @@ export class ReporterResolutionNotifier {
 		if (!systemDm) {
 			return false;
 		}
-		const template = getEmailTemplate(
+		const text = renderEmailTemplateText(
 			'report_resolved',
 			reporter.locale,
-			{
-				username: reporter.username,
-				reportId,
-				publicComment: comment,
-				hasComment: comment ? 'yes' : 'no',
-				outcome,
-				appeals_email: resolveContactEmails().appealsEmail,
-			},
+			{outcome, appeals_email: resolveContactEmails().appealsEmail},
 			getInstanceProductName(),
+			(template) => reportResolvedSlots(template, reportId, comment),
+			{
+				format: 'markdown',
+				urls: emailLinkUrls({appBaseUrl: Config.endpoints.webApp, marketingBaseUrl: Config.endpoints.marketing}),
+			},
 		);
-		if (!template.ok) {
+		if (text === null) {
 			Logger.warn(
-				{reportId, reporterId: reporter.id.toString(), locale: reporter.locale, error: template.error},
+				{reportId, reporterId: reporter.id.toString(), locale: reporter.locale},
 				'Skipping report review system DM because the email template could not be resolved',
 			);
 			return false;
 		}
-		return trySendSystemDm(
-			systemDm,
-			this.deps.apiContext.services.users,
-			reporter.id,
-			systemDmBody(template.value.body),
-		);
+		return trySendSystemDm(systemDm, this.deps.apiContext.services.users, reporter.id, systemDmBody(text));
 	}
 }

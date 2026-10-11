@@ -15,7 +15,6 @@ import {reschedulePendingDeletion} from '@app/api/user/services/PendingDeletionC
 import {DeletionReasons} from '@fluxer/constants/src/Core';
 import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import {UserOwnsGuildsError} from '@fluxer/errors/src/domains/guild/UserOwnsGuildsError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {IEmailService} from '@pkgs/email/src/IEmailService';
 import {ms} from 'itty-time';
 
@@ -73,10 +72,10 @@ export class UserAccountLifecycleService {
 		});
 		await revokeAllAuthSessions(this.deps.apiContext.services, userId);
 		if (user.email) {
-			await this.deps.emailService.sendSelfDeletionScheduledEmail(
+			await this.deps.emailService.send(
+				'self_deletion_scheduled',
 				user.email,
-				user.username,
-				pendingDeletionAt,
+				{deletionDate: pendingDeletionAt},
 				user.locale,
 			);
 		}
