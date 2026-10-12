@@ -8,6 +8,8 @@ import {
 	setHighlightRanges,
 } from '@app/features/messaging/utils/CSSHighlightSearch';
 import {remFromPx} from '@app/features/theme/layout/RemFromPx';
+import {ThemesInlineContent} from '@app/features/theme_settings/ThemesTab';
+import {CaretRightIcon} from '@app/features/ui/icons/DirectionalIcons';
 import {AccessibilityInlineContent} from '@app/features/user/components/modals/tabs/AccessibilityTab';
 import {AppearanceInlineContent} from '@app/features/user/components/modals/tabs/AppearanceTab';
 import {AccountSecurityInlineTab} from '@app/features/user/components/modals/tabs/account_security_tab/AccountSecurityTabInline';
@@ -38,7 +40,6 @@ import type {
 import {SettingsItemStatusBadges} from '@app/features/user/components/settings_utils/SettingsStatusBadge';
 import Users from '@app/features/user/state/Users';
 import {Plural, Trans} from '@lingui/react/macro';
-import {CaretRightIcon} from '@phosphor-icons/react';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
@@ -69,6 +70,7 @@ const INLINE_TAB_COMPONENTS: Partial<Record<UserSettingsTabType, React.Component
 	blocked_users: AccountSecurityInlineTab,
 	devices: AccountSecurityInlineTab,
 	appearance: AppearanceInlineContent,
+	themes: ThemesInlineContent,
 	accessibility: AccessibilityInlineContent,
 	chat_settings: ChatSettingsInlineContent,
 	voice_video: VoiceVideoInlineContent,
