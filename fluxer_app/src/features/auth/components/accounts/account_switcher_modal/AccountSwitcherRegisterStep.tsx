@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {RuntimeConfigSnapshot} from '@app/features/app/state/InstanceSnapshotStore';
+import {usesUsernameSignIn} from '@app/features/app/utils/AccountIdentityFeatures';
 import type * as AuthenticationCommands from '@app/features/auth/commands/AuthenticationCommands';
 import authStyles from '@app/features/auth/components/accounts/account_switcher_modal/AccountSwitcherAuthFlow.module.css';
 import pageStyles from '@app/features/auth/flow/AuthPageStyles.module.css';
 import {AuthRegisterFormCore} from '@app/features/auth/flow/AuthRegisterFormCore';
-import {AuthSsoPanel, isInstanceSsoAvailable, resolveAuthPanelSso} from '@app/features/auth/flow/AuthSsoPanel';
+import {AuthSsoPanel, isSsoLoginEnforced, resolveAuthPanelSso} from '@app/features/auth/flow/AuthSsoPanel';
 import type {LoginSuccessPayload} from '@app/features/auth/state/AuthFlow';
 import Theme from '@app/features/theme/state/Theme';
 import {flxElementClassName} from '@app/lib/react';
@@ -25,7 +26,7 @@ export const AccountSwitcherRegisterStep = observer(function AccountSwitcherRegi
 	onBrowserLogin,
 }: AccountSwitcherRegisterStepProps): React.ReactElement {
 	const ssoConfig = resolveAuthPanelSso(runtimeSnapshot);
-	if (isInstanceSsoAvailable(ssoConfig) && ssoConfig?.enforced === true) {
+	if (isSsoLoginEnforced(ssoConfig)) {
 		return (
 			<AuthSsoPanel
 				runtimeSnapshot={runtimeSnapshot}
@@ -35,6 +36,7 @@ export const AccountSwitcherRegisterStep = observer(function AccountSwitcherRegi
 			/>
 		);
 	}
+	const usernameSignIn = usesUsernameSignIn(runtimeSnapshot.features);
 	return (
 		<>
 			<h1
@@ -49,13 +51,15 @@ export const AccountSwitcherRegisterStep = observer(function AccountSwitcherRegi
 			>
 				<AuthRegisterFormCore
 					fields={{
-						showEmail: true,
+						showEmail: !usernameSignIn,
 						showPassword: true,
 						showPasswordConfirmation: true,
 						showUsernameValidation: true,
+						requireUsername: usernameSignIn,
 					}}
 					submitLabel={<Trans>Create account</Trans>}
 					redirectPath=""
+					offerRecoveryKit={usernameSignIn}
 					runtimeSnapshot={runtimeSnapshot}
 					onRegister={onRegister}
 					showLegalConsent

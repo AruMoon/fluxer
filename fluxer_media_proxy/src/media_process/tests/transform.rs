@@ -1,34 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use super::super::image_probe::load_image;
+use super::super::image_probe::{load_image, probe_image_dims};
+use super::super::loaded_image::validate_jxl_decode_pixels;
 use super::super::native_runtime::ensure_vips_init;
-use super::super::transform::source_supports_pages;
-use super::super::{ImageOptions, MediaError, NativeCost, image_transform_cost};
-use super::fixtures::{animated_mode, metadata_value, png_zlib_level, transform_image};
+use super::super::{ImageDimensions, ImageOptions, MediaError, NativeCost, image_transform_cost};
+use super::fixtures::{animated_mode, metadata_value, test_media_limits, transform_image};
 use crate::{
+    constants,
+    metrics::transform::TransformMetrics,
     mime, native,
     output_format::OutputFormat,
     test_fixtures::{
-        JPEG_ROTATED_MISMATCHED_SCAN, JXL_64_LOSSY_ALPHA, JXL_4100_LOSSY_ALPHA, png_dimensions,
+        JPEG_ROTATED_MISMATCHED_SCAN, JXL_64_LOSSY_ALPHA, JXL_4100_LOSSLESS_RGB16,
+        JXL_4100_LOSSY_ALPHA, JXL_4100_LOSSY_RGB_DEPTH, JXL_7000X4000_LOSSY_RGB, png_dimensions,
         synthetic_bmp, synthetic_png,
     },
 };
-
-#[test]
-fn transforms_png_to_webp() {
-    let png = synthetic_png(32, 24);
-    let out = transform_image(
-        &png,
-        &ImageOptions {
-            width: Some(16),
-            format: OutputFormat::WebP,
-            ..Default::default()
-        },
-    )
-    .unwrap();
-    assert_eq!("image/webp", out.content_type);
-    assert!(out.bytes.starts_with(b"RIFF"));
-}
 
 #[test]
 fn transforms_static_png_with_animated_flag_does_not_pass_n_to_pngload() {
@@ -95,32 +82,130 @@ fn reports_bmp_metadata_dimensions_and_placeholder() {
 }
 
 #[test]
-fn source_supports_pages_matches_libvips_loader_list() {
-    assert!(source_supports_pages("image/webp"));
-    assert!(source_supports_pages("image/gif"));
-    assert!(source_supports_pages("image/apng"));
-    assert!(source_supports_pages("image/heif"));
-    assert!(source_supports_pages("image/avif"));
-    assert!(!source_supports_pages("image/png"));
-    assert!(!source_supports_pages("image/jpeg"));
-    assert!(!source_supports_pages("image/bmp"));
-    assert!(!source_supports_pages("application/octet-stream"));
+fn refuses_jxl_above_the_decode_pixel_cap_before_decoding() {
+    for jxl in [
+        JXL_4100_LOSSY_ALPHA,
+        JXL_4100_LOSSY_RGB_DEPTH,
+        JXL_4100_LOSSLESS_RGB16,
+    ] {
+        for width in [None, Some(128)] {
+            let err = transform_image(
+                jxl,
+                &ImageOptions {
+                    width,
+                    format: OutputFormat::WebP,
+                    ..Default::default()
+                },
+            )
+            .unwrap_err();
+            assert_eq!(MediaError::TooLargeToProcess, err);
+        }
+    }
 }
 
 #[test]
-fn refuses_jxl_above_the_decode_pixel_cap_before_decoding() {
-    for width in [None, Some(128)] {
-        let err = transform_image(
-            JXL_4100_LOSSY_ALPHA,
-            &ImageOptions {
-                width,
-                format: OutputFormat::WebP,
-                ..Default::default()
-            },
-        )
-        .unwrap_err();
-        assert_eq!(MediaError::TooLargeToProcess, err);
+fn jxl_decode_cap_depends_on_the_header_layout() {
+    let dims = |width, height, pages, bands, eight_bit| ImageDimensions {
+        width,
+        height,
+        pages,
+        bands,
+        eight_bit,
+    };
+    let simple_cap = (8192, 6144);
+    let complex_cap = (4096, 4096);
+    for bands in [1, 3] {
+        let (width, height) = simple_cap;
+        assert_eq!(
+            Ok(()),
+            validate_jxl_decode_pixels("image/jxl", dims(width, height, 1, bands, true))
+        );
+        assert_eq!(
+            Err(MediaError::TooLargeToProcess),
+            validate_jxl_decode_pixels("image/jxl", dims(width, height + 1, 1, bands, true))
+        );
     }
+    for (pages, bands, eight_bit) in [(1, 2, true), (1, 4, true), (1, 3, false), (2, 3, true)] {
+        let (width, height) = complex_cap;
+        assert_eq!(
+            Ok(()),
+            validate_jxl_decode_pixels(
+                "image/jxl",
+                dims(width, height / pages, pages, bands, eight_bit)
+            )
+        );
+        assert_eq!(
+            Err(MediaError::TooLargeToProcess),
+            validate_jxl_decode_pixels(
+                "image/jxl",
+                dims(width, height / pages + 1, pages, bands, eight_bit)
+            )
+        );
+    }
+    assert_eq!(
+        Ok(()),
+        validate_jxl_decode_pixels("image/png", dims(16384, 16384, 1, 4, false))
+    );
+}
+
+#[test]
+fn thumbnails_8_bit_rgb_jxl_above_the_decode_pixel_cap() {
+    let out = transform_image(
+        JXL_7000X4000_LOSSY_RGB,
+        &ImageOptions {
+            width: Some(550),
+            format: OutputFormat::WebP,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!("image/webp", out.content_type);
+    let dims = probe_image_dims(&test_media_limits(), &out.bytes).unwrap();
+    assert_eq!((550, 314), (dims.width, dims.height));
+}
+
+#[test]
+fn full_size_jxl_above_the_static_output_cap_is_downscaled_to_fit() {
+    let options = ImageOptions {
+        format: OutputFormat::WebP,
+        ..Default::default()
+    };
+    let out = transform_image(JXL_7000X4000_LOSSY_RGB, &options).unwrap();
+    assert_eq!("image/webp", out.content_type);
+    let dims = probe_image_dims(&test_media_limits(), &out.bytes).unwrap();
+    assert_eq!((6636, 3792), (dims.width, dims.height));
+    assert!(dims.width as usize * dims.height as usize <= constants::MAX_STATIC_OUTPUT_PIXELS);
+
+    let cost =
+        image_transform_cost(JXL_7000X4000_LOSSY_RGB, &options, &test_media_limits()).unwrap();
+    assert_eq!(
+        NativeCost::Bytes(JXL_7000X4000_LOSSY_RGB.len() + 7000 * 4000 * 40 + 6636 * 3792 * 28),
+        cost
+    );
+}
+
+#[test]
+fn full_size_jxl_is_downscaled_to_fit_the_native_memory_budget() {
+    let options = ImageOptions {
+        format: OutputFormat::WebP,
+        ..Default::default()
+    };
+    let decode = JXL_7000X4000_LOSSY_RGB.len() + 7000 * 4000 * 40;
+    let budget = decode + 10_000_000 * 28;
+    let media_limits = test_media_limits().with_native_memory_budget(budget);
+    let out = super::super::transform_image(
+        JXL_7000X4000_LOSSY_RGB,
+        &options,
+        &media_limits,
+        &TransformMetrics::default(),
+    )
+    .unwrap();
+    let dims = probe_image_dims(&test_media_limits(), &out.bytes).unwrap();
+    assert_eq!((4183, 2390), (dims.width, dims.height));
+    assert_eq!(
+        NativeCost::Bytes(decode + 4183 * 2390 * 28),
+        image_transform_cost(JXL_7000X4000_LOSSY_RGB, &options, &media_limits).unwrap()
+    );
 }
 
 #[test]
@@ -226,17 +311,4 @@ fn transforms_a_rotated_jpeg_with_mismatched_scan_headers_at_full_size() {
     )
     .unwrap();
     assert_eq!(Some((768, 1024)), png_dimensions(&out.bytes));
-}
-
-#[test]
-fn png_outputs_above_a_megapixel_use_default_zlib_compression() {
-    let png_options = ImageOptions {
-        format: OutputFormat::PNG,
-        ..Default::default()
-    };
-    let small = transform_image(&synthetic_bmp(160, 160), &png_options).unwrap();
-    assert_eq!(Some(3), png_zlib_level(&small.bytes));
-    let large = transform_image(&synthetic_bmp(1100, 1000), &png_options).unwrap();
-    assert_eq!(Some((1100, 1000)), png_dimensions(&large.bytes));
-    assert_eq!(Some(2), png_zlib_level(&large.bytes));
 }

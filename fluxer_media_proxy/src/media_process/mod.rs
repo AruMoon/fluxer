@@ -30,13 +30,8 @@ mod video_thumbnail;
 #[cfg(test)]
 mod tests;
 
-pub use av_metadata::{
-    AVMetadata, AVMetadataFrame, AVProbe, NSFW_PREVIEW_MAX_DIMENSION, probe_av_metadata,
-};
-pub use metadata::{
-    MetadataOptions, PreparedMetadata, finish_metadata, metadata_json_with_options,
-    prepare_metadata,
-};
+pub use av_metadata::{NSFW_PREVIEW_MAX_DIMENSION, probe_av_metadata};
+pub use metadata::{MetadataOptions, finish_metadata, prepare_metadata};
 pub use native_cost::{
     AV_NATIVE_COST_BYTES, NativeCost, av_native_cost, image_transform_cost, metadata_cost,
 };
@@ -138,6 +133,8 @@ pub struct ImageDimensions {
     pub width: u32,
     pub height: u32,
     pub pages: u32,
+    pub bands: u32,
+    pub eight_bit: bool,
 }
 
 #[derive(Clone, Copy, Debug, Error, Eq, PartialEq)]

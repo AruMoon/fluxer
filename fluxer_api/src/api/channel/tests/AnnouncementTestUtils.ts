@@ -11,7 +11,7 @@ import {
 	createPermissionOverwrite,
 	createRole,
 } from '@app/api/channel/tests/ChannelTestUtils';
-import {createTestChannelService} from '@app/api/channel/tests/CrosspostTestUtils';
+import {createTestGuildStack} from '@app/api/channel/tests/CrosspostTestUtils';
 import {getGatewayService, getSnowflakeService, setInjectedWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {
 	getAvatarService,
@@ -31,6 +31,7 @@ import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {WebhookRepository} from '@app/api/webhook/WebhookRepository';
 import crosspostMessage from '@app/api/worker/tasks/CrosspostMessage';
 import crosspostMessageChunk from '@app/api/worker/tasks/CrosspostMessageChunk';
+import guildProcessDeletion from '@app/api/worker/tasks/GuildProcessDeletion';
 import removeChannelFollowers from '@app/api/worker/tasks/RemoveChannelFollowers';
 import syncCrosspostCopies from '@app/api/worker/tasks/SyncCrosspostCopies';
 import syncCrosspostedMessage from '@app/api/worker/tasks/SyncCrosspostedMessage';
@@ -41,7 +42,6 @@ import {ContentWarningLevel} from '@fluxer/constants/src/GuildConstants';
 import type {FollowedChannelResponse} from '@fluxer/schema/src/domains/channel/ChannelFollowSchemas';
 import type {ChannelResponse} from '@fluxer/schema/src/domains/channel/ChannelSchemas';
 import type {GuildResponse} from '@fluxer/schema/src/domains/guild/GuildResponseSchemas';
-import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
 
 export interface AnnouncementSourceGuild {
@@ -181,19 +181,6 @@ export async function follow(
 	return followRequest(harness, token, sourceChannelId, targetChannelId).execute();
 }
 
-export function publishRequest(harness: ApiTestHarness, token: string, channelId: string, messageId: string) {
-	return createBuilder<MessageResponse>(harness, token).post(`/channels/${channelId}/messages/${messageId}/crosspost`);
-}
-
-export async function publish(
-	harness: ApiTestHarness,
-	token: string,
-	channelId: string,
-	messageId: string,
-): Promise<MessageResponse> {
-	return publishRequest(harness, token, channelId, messageId).execute();
-}
-
 export async function findWebhookRow(webhookId: string) {
 	return new WebhookRepository().findUnique(createWebhookID(BigInt(webhookId)));
 }
@@ -209,12 +196,13 @@ export async function setGuildFeatures(
 		.execute();
 }
 
-const crosspostTaskHandlers: Record<string, WorkerTaskHandler> = {
+export const crosspostTaskHandlers: Record<string, WorkerTaskHandler> = {
 	crosspostMessage,
 	crosspostMessageChunk,
 	syncCrosspostedMessage,
 	syncCrosspostCopies,
 	removeChannelFollowers,
+	guildProcessDeletion,
 };
 
 export function enableCrosspostWorker(
@@ -224,6 +212,7 @@ export function enableCrosspostWorker(
 	const worker = new SyncTaskWorkerService({...crosspostTaskHandlers, ...extraHandlers}, {deferred: true});
 	setInjectedWorkerService(worker);
 	resetApiServicesForTesting();
+	const guildStack = createTestGuildStack();
 	setWorkerDependenciesForTest({
 		channelRepository: getChannelRepository(),
 		webhookRepository: getWebhookRepository(),
@@ -236,7 +225,8 @@ export function enableCrosspostWorker(
 		snowflakeService: getSnowflakeService(),
 		cacheService: getCacheService(),
 		limitConfigService: getLimitConfigService(),
-		channelService: createTestChannelService(),
+		channelService: guildStack.channelService,
+		guildService: guildStack.guildService,
 		workerService: worker,
 		...extraDependencies,
 	});
@@ -248,3 +238,5 @@ export function disableCrosspostWorker(): void {
 	resetApiServicesForTesting();
 	clearWorkerDependencies();
 }
+
+export {crosspostRequest as publishRequest, publish} from '@app/api/channel/tests/CrosspostTestUtils';

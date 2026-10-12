@@ -20,12 +20,14 @@ import expireReportSnapshots from '@app/api/worker/tasks/ExpireReportSnapshots';
 import expireStaleJobs from '@app/api/worker/tasks/ExpireStaleJobs';
 import extractEmbeds from '@app/api/worker/tasks/ExtractEmbeds';
 import flushUserActivityBuffer from '@app/api/worker/tasks/FlushUserActivityBuffer';
+import guildProcessDeletion from '@app/api/worker/tasks/GuildProcessDeletion';
 import handleMentionChunk from '@app/api/worker/tasks/HandleMentionChunk';
 import handleMentions from '@app/api/worker/tasks/HandleMentions';
 import harvestGuildData from '@app/api/worker/tasks/HarvestGuildData';
 import harvestUserData from '@app/api/worker/tasks/HarvestUserData';
 import indexChannelMessages from '@app/api/worker/tasks/IndexChannelMessages';
 import indexGuildMembers from '@app/api/worker/tasks/IndexGuildMembers';
+import liftExpiredGuildInvitePauses from '@app/api/worker/tasks/LiftExpiredGuildInvitePauses';
 import messageShred from '@app/api/worker/tasks/MessageShred';
 import pollAppStoreNotificationHistory from '@app/api/worker/tasks/PollAppStoreNotificationHistory';
 import pollGooglePlayVoidedPurchases from '@app/api/worker/tasks/PollGooglePlayVoidedPurchases';
@@ -91,12 +93,14 @@ export const workerTasks: Record<WorkerTaskName, WorkerTaskHandler> = {
 	expireReportSnapshots,
 	expireStaleJobs,
 	extractEmbeds,
+	guildProcessDeletion,
 	handleMentions,
 	handleMentionChunk,
 	harvestGuildData,
 	harvestUserData,
 	indexChannelMessages,
 	indexGuildMembers,
+	liftExpiredGuildInvitePauses,
 	messageShred,
 	processAssetDeletionQueue,
 	processCachePurgeQueue,
