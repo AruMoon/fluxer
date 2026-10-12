@@ -5,19 +5,21 @@ import {Logger} from '@app/features/platform/utils/AppLogger';
 import {ContextMenu} from '@app/features/ui/action_menu/ContextMenu';
 import {SVGMasks} from '@app/features/ui/components/SVGMasks';
 import {getActivePortalHost, PortalHostContext, setActivePortalHost} from '@app/features/ui/overlay/PortalHostContext';
-import {Popouts} from '@app/features/ui/popover/PopoverPopouts';
-import {
-	createWindowFocusInteractionGuard,
-	UNFOCUSED_FULLY_INTERACTIVE_CLASS,
-} from '@app/features/ui/utils/WindowFocusInteractionGuard';
-import {PopoutTitlebar} from '@app/features/voice/components/popout/PopoutTitlebar';
-import styles from '@app/features/voice/components/popout/PopoutWindow.module.css';
+import {PopoutTitlebar} from '@app/features/ui/popout_window/PopoutTitlebar';
+import styles from '@app/features/ui/popout_window/PopoutWindow.module.css';
 import {
 	copyStylesheetsIntoDocument,
 	observeDocumentStylesheets,
 	observeDocumentThemeAttributes,
+	type StylesheetMirrorOptions,
 	syncDocumentThemeAttributes,
-} from '@app/features/voice/components/popout/PopoutWindowDocument';
+} from '@app/features/ui/popout_window/PopoutWindowDocument';
+import {Popouts} from '@app/features/ui/popover/PopoverPopouts';
+import {Toasts} from '@app/features/ui/toast/Toasts';
+import {
+	createWindowFocusInteractionGuard,
+	UNFOCUSED_FULLY_INTERACTIVE_CLASS,
+} from '@app/features/ui/utils/WindowFocusInteractionGuard';
 import type React from 'react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
@@ -33,10 +35,12 @@ interface PopoutWindowProps {
 	height: number;
 	isAlwaysOnTop: boolean;
 	onToggleAlwaysOnTop?: () => void;
-	onRestore: () => void;
+	onRestore?: () => void;
 	onClosed: (windowGeneration: number) => void;
+	onCloseRequest?: (close: () => void) => void;
 	onWindowOpened?: (childWindow: Window, windowGeneration: number) => void;
 	existingWindow?: Window | null;
+	stylesheetMirror?: StylesheetMirrorOptions;
 	children: React.ReactNode;
 }
 
@@ -55,15 +59,20 @@ const PopoutWindowOverlayTree: React.FC<PopoutWindowOverlayTreeProps> = ({ownerD
 		<ModalStack ownerDocument={ownerDocument} data-flx="voice.popout-window.modal-stack" />
 		<Popouts ownerDocument={ownerDocument} data-flx="voice.popout-window.popouts" />
 		<ContextMenu ownerDocument={ownerDocument} data-flx="voice.popout-window.context-menu" />
+		<Toasts ownerDocument={ownerDocument} data-flx="ui.popout-window.toasts" />
 	</>
 );
 
-function prepareChildDocument(childWindow: Window, title: string): HTMLElement {
+function prepareChildDocument(
+	childWindow: Window,
+	title: string,
+	stylesheetMirror: StylesheetMirrorOptions | undefined,
+): HTMLElement {
 	const childDocument = childWindow.document;
 	childDocument.title = title;
 	syncDocumentThemeAttributes(document, childDocument);
 	childDocument.documentElement.classList.add(UNFOCUSED_FULLY_INTERACTIVE_CLASS);
-	copyStylesheetsIntoDocument(document, childDocument);
+	copyStylesheetsIntoDocument(document, childDocument, stylesheetMirror);
 	childDocument.body.style.margin = '0';
 	const container = childDocument.createElement('div');
 	container.className = styles.root;
@@ -82,8 +91,10 @@ export const PopoutWindow: React.FC<PopoutWindowProps> = ({
 	onToggleAlwaysOnTop,
 	onRestore,
 	onClosed,
+	onCloseRequest,
 	onWindowOpened,
 	existingWindow,
+	stylesheetMirror,
 	children,
 }) => {
 	const [childState, setChildState] = useState<PopoutChildState | null>(null);
@@ -92,6 +103,7 @@ export const PopoutWindow: React.FC<PopoutWindowProps> = ({
 	const initialSizeRef = useRef({width, height});
 	const initialTitleRef = useRef(title);
 	const initialWindowRef = useRef(existingWindow);
+	const stylesheetMirrorRef = useRef(stylesheetMirror);
 	onClosedRef.current = onClosed;
 	onWindowOpenedRef.current = onWindowOpened;
 	useEffect(() => {
@@ -104,9 +116,13 @@ export const PopoutWindow: React.FC<PopoutWindowProps> = ({
 			onClosedRef.current(windowGeneration);
 			return;
 		}
-		const container = prepareChildDocument(childWindow, initialTitleRef.current);
+		const container = prepareChildDocument(childWindow, initialTitleRef.current, stylesheetMirrorRef.current);
 		const disconnectThemeObserver = observeDocumentThemeAttributes(document, childWindow.document);
-		const disconnectStylesheetObserver = observeDocumentStylesheets(document, childWindow.document);
+		const disconnectStylesheetObserver = observeDocumentStylesheets(
+			document,
+			childWindow.document,
+			stylesheetMirrorRef.current,
+		);
 		let closed = false;
 		const handlePageHide = (): void => {
 			if (closed) return;
@@ -174,8 +190,14 @@ export const PopoutWindow: React.FC<PopoutWindowProps> = ({
 			onClosedRef.current(childState?.windowGeneration ?? windowGeneration);
 			return;
 		}
-		childState.childWindow.close();
-	}, [childState, windowGeneration]);
+		const {childWindow} = childState;
+		const close = (): void => childWindow.close();
+		if (onCloseRequest) {
+			onCloseRequest(close);
+			return;
+		}
+		close();
+	}, [childState, onCloseRequest, windowGeneration]);
 	if (!childState) {
 		return null;
 	}

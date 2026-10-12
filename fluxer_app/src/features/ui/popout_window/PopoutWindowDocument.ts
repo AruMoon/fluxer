@@ -45,6 +45,10 @@ interface DocumentStylesheetMirror {
 	mirroredStyles: WeakMap<Node, HTMLStyleElement>;
 }
 
+export interface StylesheetMirrorOptions {
+	exclude?: (node: Element) => boolean;
+}
+
 const documentMirrors = new WeakMap<Document, DocumentStylesheetMirror>();
 
 function getDocumentMirror(targetDocument: Document): DocumentStylesheetMirror {
@@ -102,11 +106,31 @@ function copyStyleElement(sourceStyle: HTMLStyleElement, targetDocument: Documen
 	targetDocument.head.appendChild(styleElement);
 }
 
-export function copyStylesheetsIntoDocument(sourceDocument: Document, targetDocument: Document): void {
+function removeMirroredStylesheet(stylesheetMirror: DocumentStylesheetMirror, node: Node): void {
+	const mirroredStyle = stylesheetMirror.mirroredStyles.get(node);
+	if (mirroredStyle) {
+		mirroredStyle.remove();
+		stylesheetMirror.mirroredStyles.delete(node);
+	}
+	const mirroredLink = stylesheetMirror.mirroredLinks.get(node);
+	if (mirroredLink) {
+		mirroredLink.remove();
+		stylesheetMirror.mirroredLinks.delete(node);
+	}
+}
+
+export function copyStylesheetsIntoDocument(
+	sourceDocument: Document,
+	targetDocument: Document,
+	{exclude}: StylesheetMirrorOptions = {},
+): void {
 	const styleNodes = sourceDocument.querySelectorAll('link[rel="stylesheet"], style');
 	const copyCount = Math.min(styleNodes.length, POPOUT_STYLESHEET_COPY_MAX);
 	for (let index = 0; index < copyCount; index += 1) {
 		const node = styleNodes[index];
+		if (exclude?.(node)) {
+			continue;
+		}
 		if (node instanceof HTMLLinkElement) {
 			copyLinkStylesheet(node, targetDocument);
 			continue;
@@ -117,7 +141,11 @@ export function copyStylesheetsIntoDocument(sourceDocument: Document, targetDocu
 	}
 }
 
-export function observeDocumentStylesheets(sourceDocument: Document, targetDocument: Document): () => void {
+export function observeDocumentStylesheets(
+	sourceDocument: Document,
+	targetDocument: Document,
+	{exclude}: StylesheetMirrorOptions = {},
+): () => void {
 	if (typeof MutationObserver === 'undefined') {
 		return () => undefined;
 	}
@@ -128,13 +156,20 @@ export function observeDocumentStylesheets(sourceDocument: Document, targetDocum
 				const sourceStyle =
 					mutation.target instanceof HTMLStyleElement ? mutation.target : mutation.target.parentElement;
 				if (sourceStyle instanceof HTMLStyleElement) {
-					const mirroredStyle = stylesheetMirror.mirroredStyles.get(sourceStyle);
-					if (mirroredStyle) {
-						mirroredStyle.textContent = sourceStyle.textContent;
+					if (exclude?.(sourceStyle)) {
+						removeMirroredStylesheet(stylesheetMirror, sourceStyle);
+					} else {
+						const mirroredStyle = stylesheetMirror.mirroredStyles.get(sourceStyle);
+						if (mirroredStyle) {
+							mirroredStyle.textContent = sourceStyle.textContent;
+						}
 					}
 				}
 			}
 			for (const node of Array.from(mutation.addedNodes)) {
+				if (node instanceof Element && exclude?.(node)) {
+					continue;
+				}
 				if (node instanceof HTMLLinkElement && node.rel === 'stylesheet') {
 					copyLinkStylesheet(node, targetDocument);
 					continue;
@@ -144,16 +179,7 @@ export function observeDocumentStylesheets(sourceDocument: Document, targetDocum
 				}
 			}
 			for (const node of Array.from(mutation.removedNodes)) {
-				const mirroredStyle = stylesheetMirror.mirroredStyles.get(node);
-				if (mirroredStyle) {
-					mirroredStyle.remove();
-					stylesheetMirror.mirroredStyles.delete(node);
-				}
-				const mirroredLink = stylesheetMirror.mirroredLinks.get(node);
-				if (mirroredLink) {
-					mirroredLink.remove();
-					stylesheetMirror.mirroredLinks.delete(node);
-				}
+				removeMirroredStylesheet(stylesheetMirror, node);
 			}
 		}
 	});

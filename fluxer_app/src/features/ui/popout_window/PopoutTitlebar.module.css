@@ -5,14 +5,14 @@
 	align-items: center;
 	flex: 0 0 auto;
 	height: 32px;
-	padding-left: var(--spacing-3);
-	gap: var(--spacing-2);
+	padding-inline-start: 12px;
+	gap: 8px;
 	background: var(--background-secondary);
 	-webkit-app-region: drag;
 	user-select: none;
 }
 
-.titlebarMac {
+.titlebar.titlebarMac {
 	padding-left: calc(var(--macos-traffic-light-inset) + env(safe-area-inset-left));
 }
 
@@ -22,7 +22,7 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	font-size: 0.8125rem;
+	font-size: 13px;
 	font-weight: 600;
 	color: var(--text-primary-muted);
 }
@@ -32,7 +32,7 @@
 	align-items: stretch;
 	height: 100%;
 	gap: 0;
-	margin-left: auto;
+	margin-inline-start: auto;
 	-webkit-app-region: no-drag;
 }
 

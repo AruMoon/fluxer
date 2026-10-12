@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
+import styles from '@app/features/ui/popout_window/PopoutTitlebar.module.css';
 import {getNativePlatformSync} from '@app/features/ui/utils/NativeUtils';
-import styles from '@app/features/voice/components/popout/PopoutTitlebar.module.css';
 import {POP_BACK_IN_DESCRIPTOR} from '@app/features/voice/utils/VoiceSharedMessageDescriptors';
 import {NATIVE_TITLEBAR_CLASS} from '@fluxer/desktop_ipc/src/NativeTitlebarShell';
 import {msg} from '@lingui/core/macro';
@@ -33,7 +33,7 @@ interface PopoutTitlebarProps {
 	showTitle?: boolean;
 	isAlwaysOnTop: boolean;
 	onToggleAlwaysOnTop?: () => void;
-	onRestore: () => void;
+	onRestore?: () => void;
 	onClose: () => void;
 }
 
@@ -79,18 +79,20 @@ export const PopoutTitlebar: React.FC<PopoutTitlebarProps> = ({
 						</button>
 					</FocusRing>
 				)}
-				<FocusRing offset={-2} data-flx="voice.popout-titlebar.focus-ring.restore">
-					<button
-						type="button"
-						className={NATIVE_TITLEBAR_CLASS.control}
-						onClick={onRestore}
-						aria-label={i18n._(POP_BACK_IN_DESCRIPTOR)}
-						title={i18n._(POP_BACK_IN_DESCRIPTOR)}
-						data-flx="voice.popout-titlebar.control-button.restore"
-					>
-						<ArrowSquareInIcon weight="bold" data-flx="voice.popout-titlebar.arrow-square-in-icon" />
-					</button>
-				</FocusRing>
+				{onRestore && (
+					<FocusRing offset={-2} data-flx="voice.popout-titlebar.focus-ring.restore">
+						<button
+							type="button"
+							className={NATIVE_TITLEBAR_CLASS.control}
+							onClick={onRestore}
+							aria-label={i18n._(POP_BACK_IN_DESCRIPTOR)}
+							title={i18n._(POP_BACK_IN_DESCRIPTOR)}
+							data-flx="voice.popout-titlebar.control-button.restore"
+						>
+							<ArrowSquareInIcon weight="bold" data-flx="voice.popout-titlebar.arrow-square-in-icon" />
+						</button>
+					</FocusRing>
+				)}
 				{!usesSystemChrome && (
 					<FocusRing offset={-2} data-flx="voice.popout-titlebar.focus-ring.close">
 						<button
