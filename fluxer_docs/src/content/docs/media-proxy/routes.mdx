@@ -26,7 +26,7 @@ Every media read route can produce these statuses in addition to the ones in its
 | 413 | Payload too large | The stored object exceeds the 500 MiB media bound and the route neither streams it unchanged nor spools it |
 | 502 | Bad gateway | The object store could not be read |
 
-The 500 MiB media bound applies where a route holds an object in memory. A read that streams the stored object unchanged, such as an attachment read without a transformation parameter, has no size bound. An attachment read that asks for a frame of a video above the bound copies the video to the [spool directory](/operator/configuration/#media-proxy-settings) first, one video at a time, and returns 413 when the video exceeds the spool ceiling. Any other transformation of an object above the bound returns 413.
+The 500 MiB media bound applies where a route holds an object in memory. A read that streams the stored object unchanged, such as an attachment read without a transformation parameter, has no size bound. An attachment read that asks for a frame of a video above the bound copies the video to the spool directory first, one video at a time, and returns 413 when the video exceeds the spool ceiling. Any other transformation of an object above the bound returns 413.
 
 ## Get attachment
 
@@ -240,7 +240,7 @@ Fluxer matches an asset path by its shape alone. A path with the wrong number of
 
 Use the hash returned by the API. Do not calculate one from the image yourself.
 
-An owner segment of the literal `.` or `..` parses as an asset path but produces an unsafe storage key and returns 400. So does a hash of the literal `a_` on an avatar, icon, branding, banner, splash, embed splash, or guild member asset path.
+An owner segment of the literal `.` or `..` parses as an asset path but produces an unsafe storage key and returns 400. So does a hash of the literal `a_` on an avatar, icon, branding, sign-in backdrop, banner, splash, embed splash, or guild member asset path.
 
 ### Query parameters
 
@@ -252,7 +252,7 @@ An owner segment of the literal `.` or `..` parses as an asset path but produces
 | animated?<sup>3</sup> | boolean | Whether animated output is requested |
 | download? | boolean | Whether attachment disposition is requested |
 
-<sup>1</sup> An absent or unparsable value selects 128 before clamping. No value is rejected
+<sup>1</sup> An absent or unparsable value selects 128 before clamping, except that an absent value on a branding or sign-in backdrop path keeps the original size. No value is rejected
 
 <sup>2</sup> Accepts case-insensitive `auto`, `png`, `jpg`, `jpeg`, `webp`, `gif`, `apng`, and `avif`, where `auto` keeps path-based selection and `avif` selects WebP. Any other value falls back to path-based selection, and a sticker path always selects WebP and ignores the field
 
@@ -318,7 +318,7 @@ The [image asset response](#image-asset-response) applies.
 
 <RouteHeader method="GET" path="/branding/{entity_id}/{hash}.{ext}" unauthenticated />
 
-Returns the instance branding image written by [Create branding asset](/admin-api/instance/#create-branding-asset), under the icon size class.
+Returns the instance branding image written by [Create branding asset](/admin-api/instance/#create-branding-asset), under the branding size class.
 
 ### Path parameters
 
@@ -326,6 +326,24 @@ Returns the instance branding image written by [Create branding asset](/admin-ap
 | --- | --- | --- |
 | entity_id | string | The instance branding entity key supplied by the branding URL |
 | hash | string | The branding hash, under the [image asset contract](#image-asset-contract) |
+| ext | string | The path extension, which selects the output format |
+
+### Response
+
+The [image asset response](#image-asset-response) applies.
+
+## Get instance sign-in backdrop
+
+<RouteHeader method="GET" path="/branding-backdrops/{entity_id}/{hash}.{ext}" unauthenticated />
+
+Returns the sign-in backdrop written by [Create branding asset](/admin-api/instance/#create-branding-asset) with the `sign_in_backdrop` kind, under the branding size class.
+
+### Path parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| entity_id | string | The instance branding entity key supplied by the backdrop URL |
+| hash | string | The backdrop hash, under the [image asset contract](#image-asset-contract) |
 | ext | string | The path extension, which selects the output format |
 
 ### Response

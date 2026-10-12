@@ -69,14 +69,15 @@ An asset request snaps `size` to the ladder and then clamps the result into the 
 
 | Asset class | Routes | Range |
 | --- | --- | --- |
-| Icon | avatars, icons, branding, guild member avatars | 128 through 1024 |
+| Icon | avatars, icons, guild member avatars | 128 through 1024 |
 | Banner<sup>1</sup> | banners, splashes, embed splashes, guild member banners | 480 through 2400 |
 | Emoji | emojis | 32 through 512 |
 | Sticker | stickers | 128 through 512 |
+| Branding | branding, sign-in backdrops | 16 through 4096 |
 
 <sup>1</sup> The banner maximum of 2400 is not a ladder rung and is reachable only by clamping, so 3072 and every larger request collapse onto it
 
-An absent `size` resolves to 128 before clamping, so an avatar defaults to 128 and a banner defaults to 480. Emoji and sticker assets also default to 128. Every ladder value below a class minimum collapses onto that minimum, and every value above a class maximum collapses onto that maximum.
+An absent `size` resolves to 128 before clamping, so an avatar defaults to 128 and a banner defaults to 480. Emoji and sticker assets also default to 128. A branding asset with no `size` is served at its original size. Every ladder value below a class minimum collapses onto that minimum, and every value above a class maximum collapses onto that maximum.
 
 ## Attachment and external formats
 
