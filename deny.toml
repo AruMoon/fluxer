@@ -110,6 +110,7 @@ skip = [
     { crate = "sha1@0.10.7", reason = "transitive dependency requires the older digest API" },
     { crate = "sha2@0.10.9", reason = "transitive dependency requires the older digest API" },
     { crate = "signature@2.2.0", reason = "transitive dependency requires the older signature API" },
+    { crate = "spin@0.9.9", reason = "multer, which axum multipart uses in fluxer_admin, requires the older release line" },
     { crate = "spki@0.7.3", reason = "transitive dependency requires the older SPKI API" },
     { crate = "string_cache@0.9.0", reason = "transitive dependency requires the older release line" },
     { crate = "string_cache_codegen@0.6.1", reason = "transitive dependency requires the older release line" },
