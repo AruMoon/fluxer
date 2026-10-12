@@ -71,7 +71,7 @@
 	border-radius: 0.75rem;
 	cursor: pointer;
 	transition: none;
-	text-align: left;
+	text-align: start;
 	touch-action: manipulation;
 	-webkit-tap-highlight-color: transparent;
 	user-select: none;
@@ -107,7 +107,7 @@
 
 .channelIcon {
 	flex-shrink: 0;
-	margin-right: 0.75rem;
+	margin-inline-end: 0.75rem;
 	height: 1.25rem;
 	width: 1.25rem;
 	color: var(--text-secondary);
