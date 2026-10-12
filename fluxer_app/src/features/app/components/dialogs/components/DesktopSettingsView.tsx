@@ -27,6 +27,7 @@ import {
 } from '@app/features/app/components/dialogs/shared/SettingsModalLayout';
 import {
 	BACK_TO_SETTINGS_DESCRIPTOR,
+	DONATE_DESCRIPTOR,
 	OPENS_IN_BROWSER_DESCRIPTOR,
 	SEARCH_SETTINGS_PLACEHOLDER_DESCRIPTOR,
 	SIGN_OUT_DESCRIPTOR,
@@ -40,6 +41,7 @@ import * as ModalCommands from '@app/features/ui/commands/ModalCommands';
 import {modal} from '@app/features/ui/commands/ModalCommands';
 import {MentionBadgeAnimated} from '@app/features/ui/components/MentionBadge';
 import {StatusAwareAvatar} from '@app/features/ui/components/StatusAwareAvatar';
+import {ArrowLeftIcon, ArrowRightIcon, CaretRightIcon} from '@app/features/ui/icons/DirectionalIcons';
 import SettingsSidebar from '@app/features/ui/state/SettingsSidebar';
 import {openExternalUrl} from '@app/features/ui/utils/NativeUtils';
 import {
@@ -94,15 +96,7 @@ import {
 } from '@app/features/user/utils/SettingsModalLayoutUtils';
 import type {I18n} from '@lingui/core';
 import {Trans, useLingui} from '@lingui/react/macro';
-import {
-	ArrowLeftIcon,
-	ArrowRightIcon,
-	ArrowSquareOutIcon,
-	CaretRightIcon,
-	ChatCircleDotsIcon,
-	SignOutIcon,
-	SparkleIcon,
-} from '@phosphor-icons/react';
+import {ArrowSquareOutIcon, ChatCircleDotsIcon, HandHeartIcon, SignOutIcon, SparkleIcon} from '@phosphor-icons/react';
 import {clsx} from 'clsx';
 import {AnimatePresence, motion} from 'framer-motion';
 import {observer} from 'mobx-react-lite';
@@ -378,6 +372,7 @@ export const DesktopSettingsView: React.FC<DesktopSettingsViewProps> = observer(
 		};
 		const patchNotesUrl = Routes.patchNotes();
 		const feedbackUrl = Routes.feedback();
+		const donateUrl = Routes.donate();
 		const handleTabSelect = (tabType: UserSettingsTabType) => {
 			if (checkUnsavedChanges()) return;
 			onTabSelect(tabType);
@@ -431,19 +426,24 @@ export const DesktopSettingsView: React.FC<DesktopSettingsViewProps> = observer(
 		const applicationsTabLabel = getUserSettingsTabLabel(i18n, 'applications');
 		const applicationDetailTitle =
 			ApplicationsTabState.selectedApplication?.name ?? i18n._(APPLICATION_DETAILS_DESCRIPTOR);
-		const desktopTitle = isSearchActive ? (
-			i18n._(SEARCH_RESULTS_DESCRIPTOR)
-		) : isApplicationsDetailTitle ? (
-			<BreadcrumbTitle
-				parentLabel={applicationsTabLabel}
-				currentLabel={applicationDetailTitle}
-				onParentClick={handleApplicationsBreadcrumbClick}
-				parentDataFlx="app.desktop-settings-view.breadcrumb-button.applications"
-				data-flx="app.desktop-settings-view.breadcrumb-title"
-			/>
-		) : (
-			currentTab?.label || i18n._(USER_SETTINGS_LABEL_DESCRIPTOR)
-		);
+		let desktopTitle: React.ReactNode;
+		if (isSearchActive) {
+			desktopTitle = i18n._(SEARCH_RESULTS_DESCRIPTOR);
+		} else if (isApplicationsDetailTitle) {
+			desktopTitle = (
+				<BreadcrumbTitle
+					parentLabel={applicationsTabLabel}
+					currentLabel={applicationDetailTitle}
+					onParentClick={handleApplicationsBreadcrumbClick}
+					parentDataFlx="app.desktop-settings-view.breadcrumb-button.applications"
+					data-flx="app.desktop-settings-view.breadcrumb-title"
+				/>
+			);
+		} else {
+			desktopTitle = currentTab?.label || i18n._(USER_SETTINGS_LABEL_DESCRIPTOR);
+		}
+		const termsUrl = Routes.terms();
+		const privacyUrl = Routes.privacy();
 		const sidebarFooter = (
 			<AnimatePresence data-flx="app.desktop-settings-view.animate-presence">
 				{!useOverride && (
@@ -457,26 +457,32 @@ export const DesktopSettingsView: React.FC<DesktopSettingsViewProps> = observer(
 						<SettingsModalSidebarFooter data-flx="app.desktop-settings-view.settings-modal-sidebar-footer">
 							<div className={styles.footerContent} data-flx="app.desktop-settings-view.footer-content">
 								<ClientInfo data-flx="app.desktop-settings-view.client-info" />
-								<div className={styles.legalLinks} data-flx="app.desktop-settings-view.legal-links">
-									<a
-										href={Routes.terms()}
-										target="_blank"
-										rel="noopener noreferrer"
-										className={styles.legalLink}
-										data-flx="app.desktop-settings-view.legal-link"
-									>
-										<Trans>Terms of service</Trans>
-									</a>
-									<a
-										href={Routes.privacy()}
-										target="_blank"
-										rel="noopener noreferrer"
-										className={styles.legalLink}
-										data-flx="app.desktop-settings-view.legal-link--2"
-									>
-										<Trans>Privacy policy</Trans>
-									</a>
-								</div>
+								{termsUrl || privacyUrl ? (
+									<div className={styles.legalLinks} data-flx="app.desktop-settings-view.legal-links">
+										{termsUrl ? (
+											<a
+												href={termsUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className={styles.legalLink}
+												data-flx="app.desktop-settings-view.legal-link"
+											>
+												<Trans>Terms of service</Trans>
+											</a>
+										) : null}
+										{privacyUrl ? (
+											<a
+												href={privacyUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className={styles.legalLink}
+												data-flx="app.desktop-settings-view.legal-link--2"
+											>
+												<Trans>Privacy policy</Trans>
+											</a>
+										) : null}
+									</div>
+								) : null}
 								<div className={styles.footerSpacer} data-flx="app.desktop-settings-view.footer-spacer" />
 							</div>
 						</SettingsModalSidebarFooter>
@@ -672,6 +678,20 @@ export const DesktopSettingsView: React.FC<DesktopSettingsViewProps> = observer(
 													}
 													onClick={() => void openExternalUrl(feedbackUrl)}
 													data-flx="app.desktop-settings-view.settings-modal-sidebar-item.submit-feedback"
+												/>
+											)}
+											{donateUrl && (
+												<SettingsModalSidebarItem
+													icon={HandHeartIcon}
+													label={
+														<ExternalSidebarItemLabel
+															label={i18n._(DONATE_DESCRIPTOR)}
+															hint={i18n._(OPENS_IN_BROWSER_DESCRIPTOR)}
+															data-flx="app.desktop-settings-view.donate-label"
+														/>
+													}
+													onClick={() => void openExternalUrl(donateUrl)}
+													data-flx="app.desktop-settings-view.settings-modal-sidebar-item.donate"
 												/>
 											)}
 											<SettingsModalSidebarItem
