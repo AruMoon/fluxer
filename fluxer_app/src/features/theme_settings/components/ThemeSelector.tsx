@@ -2,21 +2,17 @@
 
 import {THEME_DESCRIPTOR} from '@app/features/i18n/utils/CommonMessageDescriptors';
 import {isKeyboardActivationKey} from '@app/features/input/utils/KeyboardUtils';
-import * as ThemePreferenceCommands from '@app/features/theme/commands/ThemePreferenceCommands';
 import {remFromPx} from '@app/features/theme/layout/RemFromPx';
 import Theme from '@app/features/theme/state/Theme';
-import * as ThemeStudioCommands from '@app/features/theme_studio/commands/ThemeStudioCommands';
-import {Button} from '@app/features/ui/button/Button';
-import {Switch} from '@app/features/ui/components/form/FormSwitch';
+import {ThemeButton} from '@app/features/theme_settings/components/ThemeButton';
+import styles from '@app/features/theme_settings/components/ThemeSelector.module.css';
 import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
-import styles from '@app/features/user/components/modals/tabs/appearance_tab/ThemeTab.module.css';
-import {ThemeButton} from '@app/features/user/components/modals/tabs/appearance_tab/theme/ThemeButton';
 import {SYSTEM_THEME_DESCRIPTOR} from '@app/features/user/utils/UserMessageDescriptors';
 import type {ThemeType} from '@fluxer/constants/src/UserConstants';
 import {ThemeTypes} from '@fluxer/constants/src/UserConstants';
 import {msg} from '@lingui/core/macro';
 import {useLingui} from '@lingui/react/macro';
-import {ArrowsCounterClockwiseIcon, PaintBrushBroadIcon} from '@phosphor-icons/react';
+import {ArrowsCounterClockwiseIcon} from '@phosphor-icons/react';
 import {observer} from 'mobx-react-lite';
 import type React from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
@@ -62,19 +58,6 @@ const SYSTEM_LIGHT_THEME_AUTOMATICALLY_SYNC_WITH_YOUR_SYSTEM_DESCRIPTOR = msg({
 	message: "System: light theme (automatically sync with your system's dark/light preference)",
 	comment: 'Description text in the theme tab content.',
 });
-const SYNC_THEME_ACROSS_DEVICES_DESCRIPTOR = msg({
-	message: 'Sync theme across devices',
-	comment: 'Label in the theme tab content.',
-});
-const WHEN_ENABLED_THEME_CHANGES_WILL_SYNC_TO_ALL_DESCRIPTOR = msg({
-	message: 'Theme changes sync to all your devices. Off keeps this device on its own theme.',
-	comment: 'Label in the theme tab content.',
-});
-const OPEN_THEME_STUDIO_DESCRIPTOR = msg({
-	message: 'Open theme studio…',
-	comment: 'Button or menu action label in the theme tab content. Keep it concise.',
-});
-
 interface ThemeSelectorProps {
 	value: ThemeType;
 	onChange: (theme: ThemeType) => void;
@@ -221,52 +204,5 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = observer(({value, onC
 				</Tooltip>
 			))}
 		</div>
-	);
-});
-
-export const ThemeTabContent: React.FC = observer(() => {
-	const {i18n} = useLingui();
-	const syncAcrossDevices = Theme.syncAcrossDevices;
-	const themePreference = Theme.themePreference;
-	const currentSelectedTheme: ThemeType = themePreference;
-	const handleThemeChange = useCallback(
-		(newTheme: ThemeType) => {
-			if (newTheme === currentSelectedTheme) return;
-			ThemePreferenceCommands.updateThemePreference(newTheme);
-		},
-		[currentSelectedTheme],
-	);
-	const handleOpenStudio = useCallback(() => {
-		ThemeStudioCommands.openThemeStudio();
-	}, []);
-	return (
-		<>
-			<ThemeSelector
-				value={currentSelectedTheme}
-				onChange={handleThemeChange}
-				data-flx="user.appearance-tab.theme.theme-tab-content.theme-selector.theme-change"
-			/>
-			<Switch
-				label={i18n._(SYNC_THEME_ACROSS_DEVICES_DESCRIPTOR)}
-				description={i18n._(WHEN_ENABLED_THEME_CHANGES_WILL_SYNC_TO_ALL_DESCRIPTOR)}
-				value={syncAcrossDevices}
-				onChange={(value) => ThemePreferenceCommands.setSyncAcrossDevices(value)}
-				data-flx="user.appearance-tab.theme.theme-tab-content.switch.set-sync-across-devices"
-			/>
-			<Button
-				variant="secondary"
-				fitContent
-				leftIcon={
-					<PaintBrushBroadIcon
-						size={18}
-						data-flx="user.appearance-tab.theme.theme-tab-content.paint-brush-broad-icon"
-					/>
-				}
-				onClick={handleOpenStudio}
-				data-flx="user.appearance-tab.theme.theme-tab-content.button.open-studio"
-			>
-				{i18n._(OPEN_THEME_STUDIO_DESCRIPTOR)}
-			</Button>
-		</>
 	);
 });

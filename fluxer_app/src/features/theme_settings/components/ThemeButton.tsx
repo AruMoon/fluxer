@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {remFromPx} from '@app/features/theme/layout/RemFromPx';
+import styles from '@app/features/theme_settings/components/ThemeSelector.module.css';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
-import styles from '@app/features/user/components/modals/tabs/appearance_tab/ThemeTab.module.css';
 import type {ThemeType} from '@fluxer/constants/src/UserConstants';
 import {CheckIcon} from '@phosphor-icons/react';
 import {clsx} from 'clsx';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
 
-export interface ThemeButtonProps {
+interface ThemeButtonProps {
 	themeType: ThemeType;
 	currentTheme: ThemeType;
 	label: string;
@@ -25,17 +25,14 @@ export const ThemeButton = observer(
 	React.forwardRef<HTMLButtonElement, ThemeButtonProps>(
 		({themeType, currentTheme, label, backgroundColor, isLight, disabled = false, onKeyDown, onClick, icon}, ref) => {
 			const isSelected = currentTheme === themeType;
-			const getButtonClassName = () => {
-				const classes = [styles.themeButton];
-				if (isSelected) {
-					classes.push(styles.themeButtonSelected);
-				} else if (isLight) {
-					classes.push(styles.themeButtonLight);
-				} else {
-					classes.push(styles.themeButtonDark);
-				}
-				return clsx(classes);
-			};
+			const classes = [styles.themeButton];
+			if (isSelected) {
+				classes.push(styles.themeButtonSelected);
+			} else if (isLight) {
+				classes.push(styles.themeButtonLight);
+			} else {
+				classes.push(styles.themeButtonDark);
+			}
 			return (
 				<FocusRing offset={-2} data-flx="user.appearance-tab.theme.theme-button.focus-ring">
 					<button
@@ -43,14 +40,14 @@ export const ThemeButton = observer(
 						type="button"
 						onClick={() => onClick(themeType)}
 						onKeyDown={(e) => onKeyDown(e, themeType)}
-						className={getButtonClassName()}
+						className={clsx(classes)}
 						style={{backgroundColor}}
 						disabled={disabled}
 						role="radio"
 						aria-checked={isSelected}
 						aria-disabled={disabled}
 						aria-label={label}
-						tabIndex={disabled ? -1 : isSelected ? 0 : -1}
+						tabIndex={!disabled && isSelected ? 0 : -1}
 						data-flx="user.appearance-tab.theme.theme-button.radio.click.button"
 					>
 						{icon && (
