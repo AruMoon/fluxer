@@ -6,42 +6,22 @@
 	--voice-surface-2: #1c1c1e;
 	--voice-surface-3: #232326;
 	--voice-surface-4: #2a2a2d;
-	--voice-surface-5: #353539;
-	--voice-overlay-base: #000;
 	--voice-overlay-strong: rgba(0, 0, 0, 0.78);
 	--voice-overlay: rgba(0, 0, 0, 0.62);
 	--voice-overlay-soft: rgba(0, 0, 0, 0.46);
-	--voice-overlay-subtle: rgba(0, 0, 0, 0.32);
 	--voice-overlay-light: rgba(255, 255, 255, 0.12);
 	--voice-overlay-light-strong: rgba(255, 255, 255, 0.2);
-	--voice-overlay-light-bold: rgba(255, 255, 255, 0.48);
 	--voice-text-strong: #fff;
 	--voice-text-muted: rgba(255, 255, 255, 0.72);
-	--voice-text-subtle: rgba(255, 255, 255, 0.52);
 	--voice-shadow-base: #000;
 	--voice-shadow-strong: color-mix(in srgb, var(--voice-shadow-base) 40%, transparent);
 	--voice-shadow-medium: color-mix(in srgb, var(--voice-shadow-base) 30%, transparent);
 	--voice-shadow-soft: color-mix(in srgb, var(--voice-shadow-base) 20%, transparent);
 	--voice-status-success: var(--status-online);
-	--voice-status-success-bg: color-mix(in srgb, var(--voice-status-success) 20%, transparent);
-	--voice-status-success-bg-solid: color-mix(in srgb, var(--voice-status-success) 20%, var(--voice-surface-2));
-	--voice-status-success-bg-strong: color-mix(in srgb, var(--voice-status-success) 30%, transparent);
-	--voice-status-success-bg-strong-solid: color-mix(in srgb, var(--voice-status-success) 30%, var(--voice-surface-2));
 	--voice-status-warning: var(--status-warning);
-	--voice-status-warning-alt: var(--status-idle);
-	--voice-status-caution: var(--alert-caution-color);
-	--voice-status-warning-bg: color-mix(in srgb, var(--voice-status-warning-alt) 20%, transparent);
 	--voice-status-danger: var(--status-danger);
-	--voice-status-danger-bg: color-mix(in srgb, var(--voice-status-danger) 20%, transparent);
-	--voice-status-danger-bg-solid: color-mix(in srgb, var(--voice-status-danger) 20%, var(--voice-surface-2));
-	--voice-status-danger-bg-strong: color-mix(in srgb, var(--voice-status-danger) 30%, transparent);
-	--voice-status-danger-bg-strong-solid: color-mix(in srgb, var(--voice-status-danger) 30%, var(--voice-surface-2));
-	--voice-hud-material-top: #000;
-	--voice-hud-material-bottom: #000;
-	--voice-hud-material-highlight: transparent;
 	--voice-hud-material-border: rgba(255, 255, 255, 0.1);
 	--voice-hud-material-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.24);
-	--voice-hud-material-blur: none;
 	--voice-hud-button-bg: #000;
 	--voice-hud-button-bg-hover: #111;
 	--voice-edge-gradient-extension: 2.5rem;
@@ -151,17 +131,17 @@
 	overflow: hidden;
 	white-space: nowrap;
 	max-width: var(--participant-metadata-max-width);
-	margin-left: 0;
+	margin-inline-start: 0;
 	line-height: 1.2;
 }
 
 .participantName {
-	margin-left: 0.1875rem;
+	margin-inline-start: 0.1875rem;
 	line-height: 1.2;
 }
 
 .participantConn {
-	margin-left: 0;
+	margin-inline-start: 0;
 	line-height: 1.2;
 }
 
@@ -194,7 +174,8 @@
 	justify-content: center;
 	width: 1.25rem;
 	height: 1.25rem;
-	margin: -0.125rem 0.1875rem -0.125rem -0.1875rem;
+	margin-block: -0.125rem;
+	margin-inline: -0.1875rem 0.1875rem;
 	border-radius: 0.4375rem;
 	color: rgba(255, 255, 255, 0.78);
 	cursor: pointer;
@@ -225,7 +206,7 @@
 
 .lkParticipantMetadataItem:first-child {
 	position: absolute;
-	left: 0;
+	inset-inline-start: 0;
 	bottom: 0;
 	flex: 0 1 auto;
 	min-width: 0;
@@ -235,7 +216,7 @@
 .tileControlPill {
 	position: absolute;
 	top: 0.375rem;
-	left: 0.375rem;
+	inset-inline-start: 0.375rem;
 	display: inline-flex;
 	align-items: stretch;
 	height: 1.5rem;
@@ -272,7 +253,7 @@
 }
 
 .tileControlPillSlot + .tileControlPillSlot {
-	border-left: 0.0625rem solid var(--voice-hud-material-border);
+	border-inline-start: 0.0625rem solid var(--voice-hud-material-border);
 }
 
 .tileControlPillSlot:hover {
@@ -489,8 +470,8 @@
 
 .focusLayoutMembersRow {
 	position: absolute;
-	left: 0;
-	right: 0;
+	inset-inline-start: 0;
+	inset-inline-end: 0;
 	bottom: var(--voice-focus-members-row-bottom, 0px);
 	width: 100%;
 	height: var(--voice-focus-members-row-height, 7.25rem);
@@ -827,18 +808,11 @@
 	padding-bottom: 0;
 }
 
-.focusLayoutContentAppFullscreen.focusLayoutContentFullscreenMembersVisible {
-	--voice-focus-safe-bottom: calc(
-		var(--voice-focus-members-row-height, 7.25rem) +
-		var(--voice-focus-control-clearance)
-	);
-}
-
 .focusLayoutContentFullscreenMembersVisible::after {
 	content: '';
 	position: absolute;
-	left: 0;
-	right: 0;
+	inset-inline-start: 0;
+	inset-inline-end: 0;
 	bottom: 0;
 	height: calc(var(--voice-focus-members-row-bottom, 0px) + var(--voice-focus-members-row-height, 7.25rem) + 2.5rem);
 	z-index: 1;
@@ -971,12 +945,12 @@
 	.participantMetadataMenuButton {
 		width: 1.125rem;
 		height: 1.125rem;
-		margin-right: 0.125rem;
+		margin-inline-end: 0.125rem;
 	}
 
 	.tileControlPill {
 		top: 0.3125rem;
-		left: 0.3125rem;
+		inset-inline-start: 0.3125rem;
 		height: 1.375rem;
 		border-radius: 0.4375rem;
 	}
@@ -1023,8 +997,8 @@
 .voiceEdgeFadeBottom::before {
 	content: '';
 	position: absolute;
-	left: 0;
-	right: 0;
+	inset-inline-start: 0;
+	inset-inline-end: 0;
 	background: var(--voice-edge-gradient);
 	pointer-events: none;
 }
@@ -1086,8 +1060,8 @@
 @media (max-width: 768px) {
 	.mainContent {
 		--voice-call-horizontal-padding: 1rem;
-		padding-left: 1rem;
-		padding-right: 1rem;
+		padding-inline-start: 1rem;
+		padding-inline-end: 1rem;
 		justify-content: flex-start;
 		align-items: stretch;
 		gap: 0.5rem;
@@ -1103,7 +1077,6 @@
 	}
 
 	.focusMiniGrid {
-		--focus-mini-tile-size: clamp(var(--focus-mini-tile-min-width), 24vw, var(--focus-mini-tile-max-width));
 		--focus-mini-grid-gap: 0.5rem;
 	}
 
@@ -1137,7 +1110,7 @@
 
 	.fullscreenButtonWrap {
 		bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-		right: 1rem;
+		inset-inline-end: 1rem;
 	}
 }
 
@@ -1163,8 +1136,6 @@
 	height: 100%;
 	width: 100%;
 	background-color: #000;
-	--voice-focus-safe-top: 4rem;
-	--voice-focus-safe-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .rootFocused .mainContent {
@@ -1190,8 +1161,8 @@
 	align-items: center;
 	gap: 0.5rem;
 	border-radius: 62.4375rem;
-	padding-left: 0.75rem;
-	padding-right: 0.75rem;
+	padding-inline-start: 0.75rem;
+	padding-inline-end: 0.75rem;
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 	border: 0.0625rem solid color-mix(in srgb, currentColor 18%, transparent);
@@ -1259,8 +1230,8 @@
 		clamp(1.25rem, 3.5dvh, 2.25rem),
 		calc(var(--voice-edge-gradient-extension) + 0.5rem)
 	);
-	padding-left: var(--voice-call-horizontal-padding);
-	padding-right: var(--voice-call-horizontal-padding);
+	padding-inline-start: var(--voice-call-horizontal-padding);
+	padding-inline-end: var(--voice-call-horizontal-padding);
 	padding-top: var(--voice-call-safe-top-padding);
 	padding-bottom: var(--voice-call-safe-bottom-padding);
 	min-height: 0;
@@ -1295,7 +1266,6 @@
 }
 
 .audioAvatarFallbackList {
-	--avatar-voice-indicator-cutout-surface: #000;
 	max-width: 56rem;
 }
 
@@ -1321,17 +1291,18 @@
 	--voice-control-horizontal-padding: 1.5rem;
 	--voice-control-top-padding: 0.5rem;
 	--voice-control-bottom-padding: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-	padding-left: var(--voice-control-horizontal-padding);
-	padding-right: var(--voice-control-horizontal-padding);
-	padding-top: var(--voice-control-top-padding);
+	padding-inline-start: var(--voice-control-horizontal-padding);
+	padding-inline-end: var(--voice-control-horizontal-padding);
+	padding-top: calc(var(--voice-control-top-padding) + var(--voice-call-corner-lift, 0px));
 	padding-bottom: var(--voice-control-bottom-padding);
 	pointer-events: none;
 }
 
 .fullscreenButtonWrap {
 	position: absolute;
-	right: clamp(1rem, 2vw, 2rem);
+	inset-inline-end: clamp(1rem, 2vw, 2rem);
 	bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+	margin-bottom: var(--voice-call-corner-lift, 0px);
 	z-index: 35;
 	display: flex;
 	align-items: center;
