@@ -2,6 +2,7 @@
 
 import {Routes} from '@app/app/Routes';
 import {UserSettingsModal} from '@app/features/app/components/dialogs/LoadableSettingsModals';
+import {switchToSavedAccount} from '@app/features/auth/utils/AccountSwitcherModalUtils';
 import * as PrivateChannelCommands from '@app/features/channel/commands/PrivateChannelCommands';
 import {focusChannelTextareaAfterNavigation} from '@app/features/messaging/utils/ChannelTextareaFocusUtils';
 import {goToMessage, parseMessagePath} from '@app/features/messaging/utils/MessageNavigator';
@@ -40,9 +41,25 @@ export async function confirmSelection(): Promise<void> {
 	await switchTo(result);
 }
 
+export async function switchToOtherAccount(accountKey: string, redirectAfterSwitch?: string): Promise<void> {
+	await switchToSavedAccount({
+		accountKey,
+		redirectAfterSwitch,
+		onSelectCurrent: redirectAfterSwitch === undefined ? null : () => RouterUtils.transitionTo(redirectAfterSwitch),
+	});
+}
+
 export async function switchTo(result: QuickSwitcherExecutableResult): Promise<void> {
 	try {
 		switch (result.type) {
+			case QuickSwitcherResultTypes.ACCOUNT: {
+				void switchToOtherAccount(result.accountKey);
+				break;
+			}
+			case QuickSwitcherResultTypes.ACCOUNT_CHANNEL: {
+				void switchToOtherAccount(result.accountKey, Routes.guildChannel(result.guildId ?? ME, result.channelId));
+				break;
+			}
 			case QuickSwitcherResultTypes.USER: {
 				const channelId = result.dmChannelId ?? (await PrivateChannelCommands.ensureDMChannel(result.user.id));
 				NavigationCommands.selectChannel(ME, channelId);
