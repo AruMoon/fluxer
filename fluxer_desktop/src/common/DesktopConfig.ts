@@ -57,6 +57,7 @@ export type ChromiumSwitchesSetting = ReadonlyArray<string> | Record<string, unk
 
 interface PersistedDesktopWindowBehaviorSettings {
 	showTrayIcon?: boolean;
+	coloredTrayIcon?: boolean;
 	useNativeTitleBar?: boolean;
 	minimizeToTrayV2?: boolean;
 	closeToTrayV2?: boolean;
@@ -69,6 +70,7 @@ interface PersistedDesktopWindowBehaviorSettings {
 
 interface PersistedDesktopTroubleshootingSettings {
 	disableHardwareAcceleration?: boolean;
+	disableModuleUpdates?: boolean;
 }
 
 const INSTANCE_ENDPOINT_ARGS = ['--fluxer-instance'];
@@ -81,12 +83,14 @@ let configPath: string | null = null;
 function getDefaultDesktopTroubleshootingSettings(): DesktopTroubleshootingSettings {
 	return {
 		disableHardwareAcceleration: false,
+		disableModuleUpdates: false,
 	};
 }
 
 function getDefaultDesktopWindowBehaviorSettings(): DesktopWindowBehaviorSettings {
 	return {
 		showTrayIcon: true,
+		coloredTrayIcon: false,
 		minimizeToTray: false,
 		closeToTray: true,
 		startMinimized: false,
@@ -111,6 +115,9 @@ function sanitizePersistedDesktopWindowBehaviorSettings(
 	const settings: PersistedDesktopWindowBehaviorSettings = {};
 	if (typeof value.showTrayIcon === 'boolean') {
 		settings.showTrayIcon = value.showTrayIcon;
+	}
+	if (typeof value.coloredTrayIcon === 'boolean') {
+		settings.coloredTrayIcon = value.coloredTrayIcon;
 	}
 	if (typeof value.useNativeTitleBar === 'boolean') {
 		settings.useNativeTitleBar = value.useNativeTitleBar;
@@ -150,6 +157,9 @@ function sanitizePersistedDesktopTroubleshootingSettings(
 	const settings: PersistedDesktopTroubleshootingSettings = {};
 	if (typeof value.disableHardwareAcceleration === 'boolean') {
 		settings.disableHardwareAcceleration = value.disableHardwareAcceleration;
+	}
+	if (typeof value.disableModuleUpdates === 'boolean') {
+		settings.disableModuleUpdates = value.disableModuleUpdates;
 	}
 	return Object.keys(settings).length > 0 ? settings : undefined;
 }
@@ -321,6 +331,10 @@ function normalizeDesktopWindowBehaviorSettings(
 	const normalized = {
 		showTrayIcon:
 			typeof normalizedSettings?.showTrayIcon === 'boolean' ? normalizedSettings.showTrayIcon : defaults.showTrayIcon,
+		coloredTrayIcon:
+			typeof normalizedSettings?.coloredTrayIcon === 'boolean'
+				? normalizedSettings.coloredTrayIcon
+				: defaults.coloredTrayIcon,
 		minimizeToTray:
 			typeof normalizedSettings?.minimizeToTray === 'boolean'
 				? normalizedSettings.minimizeToTray
@@ -395,6 +409,7 @@ function serializeDesktopWindowBehaviorSettings(
 ): PersistedDesktopWindowBehaviorSettings {
 	return {
 		showTrayIcon: settings.showTrayIcon,
+		coloredTrayIcon: settings.coloredTrayIcon,
 		useNativeTitleBar: settings.useNativeTitleBar,
 		rememberWindowState: settings.rememberWindowState,
 		allowTransparency: settings.allowTransparency,
@@ -415,6 +430,10 @@ function normalizeDesktopTroubleshootingSettings(
 			typeof settings?.disableHardwareAcceleration === 'boolean'
 				? settings.disableHardwareAcceleration
 				: defaults.disableHardwareAcceleration,
+		disableModuleUpdates:
+			typeof settings?.disableModuleUpdates === 'boolean'
+				? settings.disableModuleUpdates
+				: defaults.disableModuleUpdates,
 	};
 }
 
@@ -423,6 +442,7 @@ function serializeDesktopTroubleshootingSettings(
 ): PersistedDesktopTroubleshootingSettings {
 	return {
 		disableHardwareAcceleration: settings.disableHardwareAcceleration,
+		disableModuleUpdates: settings.disableModuleUpdates,
 	};
 }
 
