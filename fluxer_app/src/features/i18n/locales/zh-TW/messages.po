@@ -13050,10 +13050,22 @@ msgstr "完成"
 msgid "Double-click"
 msgstr "按兩下"
 
+#. Settings search entry label. Names the settings search entry in the settings UI.
+#. Short label for an advanced preference that edits your own message or replies to someone else's when you double-click it.
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedChatControls.tsx
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
+msgid "Double-click a message to edit or reply"
+msgstr "按兩下訊息即可編輯或回覆"
+
 #. Empty / hint text on the screen-share hover card explaining how to start watching a remote stream.
 #: src/features/voice/components/StreamWatchHoverCard.tsx
 msgid "Double-click someone to watch their stream."
 msgstr "對某人按兩下即可觀看他們的直播。"
+
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
+msgid "Double-click your own message to edit it, or someone else's message to reply to it"
+msgstr "按兩下自己的訊息即可編輯，按兩下別人的訊息即可回覆"
 
 #. Button that downloads account backup codes as a text file.
 #. Generic action label that downloads an attachment / file.
@@ -13252,6 +13264,11 @@ msgstr "拖曳以重新調整群組圖示的位置，並使用滾輪或雙指縮
 #: src/features/expressions/components/modals/AssetCropModal.tsx
 msgid "Drag to reposition your invite background and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels (16:9)."
 msgstr "拖曳以重新調整邀請背景位置，並使用滾輪或雙指縮放。建議的最小尺寸為 {minimumWidth}×{minimumHeight} 像素 (16:9)。"
+
+#. Desktop setting description under the dark taskbar badge toggle on Windows.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Draw the unread badge on the {productName} taskbar button in dark gray instead of red."
+msgstr "在 Windows 上，將 {productName} 工作列按鈕上的未讀徽章繪製成深灰色，而非紅色。"
 
 #. Description text in the theme studio assets section.
 #: src/features/theme_studio/sections/AssetsSection.tsx
@@ -26456,6 +26473,11 @@ msgstr "快速 CSS 已從「{fileName}」取代。"
 msgid "Quick reactions"
 msgstr "快速反應"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
+msgid "Quick reply"
+msgstr "快速回覆"
+
 #. Accessible label for the desktop quick switcher modal.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/channel/components/direct_message/DirectMessageList.tsx
@@ -37181,6 +37203,11 @@ msgstr "在任何社群中使用自訂表情符號和貼圖"
 #: src/features/user/utils/UserMessageDescriptors.ts
 msgid "Use custom image"
 msgstr "使用自訂圖片"
+
+#. Desktop setting toggle label on Windows. Switches the unread badge drawn over the taskbar button from red to dark gray.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Use dark taskbar badge"
+msgstr "使用深色工作列徽章"
 
 #. Short label in the theme tab content. Keep it concise.
 #: src/features/user/components/modals/tabs/appearance_tab/theme/ThemeTabContent.tsx
