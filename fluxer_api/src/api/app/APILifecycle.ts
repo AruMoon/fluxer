@@ -36,6 +36,7 @@ import {
 	getKVAccountDeletionQueue,
 	getReportRepository,
 	getUserRepository,
+	type ServiceSingletonDependencies,
 	shutdownInstanceConfigRepository,
 	shutdownServiceSingletons,
 } from '@app/api/middleware/ServiceSingletons';
@@ -47,7 +48,7 @@ import {JetStreamWorkerQueue} from '@app/api/worker/JetStreamWorkerQueue';
 import {WorkerService} from '@app/api/worker/WorkerService';
 import {registerMetricsSection} from '@fluxer/hono/src/middleware/Metrics';
 import type {LoggerInterface} from '@fluxer/logger/src/LoggerInterface';
-import {initCassandra, shutdownCassandra} from '@pkgs/cassandra/src/Client';
+import {getClient, initCassandra, shutdownCassandra} from '@pkgs/cassandra/src/Client';
 import {ensureGeoipDatabaseOnStartup} from '@pkgs/geoip/src/GeoipStartup';
 import {JetStreamConnectionManager} from '@pkgs/nats/src/JetStreamConnectionManager';
 import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/postgres/src/Client';
@@ -99,7 +100,11 @@ function unsupportedDatabaseBackend(backend: never): never {
 	throw new Error(`Unsupported database backend during shutdown: ${String(backend)}`);
 }
 
-export function createInitializer(config: APIConfig, logger: LoggerInterface): () => Promise<void> {
+export function createInitializer(
+	config: APIConfig,
+	logger: LoggerInterface,
+	dependencies: ServiceSingletonDependencies = {},
+): () => Promise<void> {
 	return async (): Promise<void> => {
 		try {
 			logger.info('Initializing API service...');
@@ -140,8 +145,21 @@ export function createInitializer(config: APIConfig, logger: LoggerInterface): (
 					localDc: config.cassandra.localDc,
 					username: config.cassandra.username || undefined,
 					password: config.cassandra.password || undefined,
+				}).catch((error: unknown) => {
+					if (config.instance.selfHosted) {
+						logMissingCassandraKeyspace(error, config.cassandra.keyspace, config.cassandra.localDc, logger);
+					}
+					throw error;
 				});
 				logger.info('Cassandra client initialized');
+				if (config.instance.selfHosted) {
+					await ensureCassandraSchema({
+						client: getClient(),
+						keyspace: config.cassandra.keyspace,
+						kv: getKVClient(),
+						logger,
+					});
+				}
 			} else if (config.database.backend === 'cassandra') {
 				logger.info('Using injected database query executor for tests');
 			}
@@ -165,7 +183,7 @@ export function createInitializer(config: APIConfig, logger: LoggerInterface): (
 			const {profileSubstringBlocklistCache} = await import('@app/api/middleware/ProfileSubstringBlocklistCache');
 			profileSubstringBlocklistCache.setRefreshSubscriber(kvClient);
 			await initializeRefreshCache(profileSubstringBlocklistCache, 'Profile substring blocklist cache', logger);
-			await initializeServiceSingletons();
+			await initializeServiceSingletons(dependencies);
 			logger.info('Service singletons initialized');
 			if (!config.dev.testModeEnabled) {
 				jsConnectionManager = new JetStreamConnectionManager({
