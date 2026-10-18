@@ -86,6 +86,8 @@ type LabelSource = 'header' | 'screen-reader';
 
 export type ModalTransitionPreset = 'default' | 'instant' | 'quick' | 'profile-slide';
 
+export type ModalBackdropTone = 'default' | 'strong';
+
 export interface ModalProps {
 	children: ReactNode;
 	className?: string;
@@ -95,6 +97,7 @@ export interface ModalProps {
 	onClose?: () => void;
 	onAnimationComplete?: () => void;
 	backdropSlot?: ReactNode;
+	backdropTone?: ModalBackdropTone;
 	transitionPreset?: ModalTransitionPreset;
 	disableHistoryManagement?: boolean;
 }
