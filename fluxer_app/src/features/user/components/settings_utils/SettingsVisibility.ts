@@ -14,3 +14,15 @@ export function shouldShowEmailAccountSettings(): boolean {
 export function shouldShowRecoveryKitSettings(): boolean {
 	return RuntimeConfig.usesUsernameSignIn && shouldShowClaimedAccountSettings();
 }
+
+export function shouldShowFriendSettings(): boolean {
+	return !RuntimeConfig.friendsDisabled;
+}
+
+export function shouldShowDirectMessageSettings(): boolean {
+	return !RuntimeConfig.directMessagesDisabled;
+}
+
+export function shouldShowFriendsAndDirectMessageSettings(): boolean {
+	return shouldShowFriendSettings() || shouldShowDirectMessageSettings();
+}
