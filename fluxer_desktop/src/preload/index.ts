@@ -60,6 +60,7 @@ import type {
 	VirtmicAvailability,
 	VirtmicNode,
 } from '@electron/common/Types';
+import {createAccountEnginePreloadAPI} from '@electron/preload/AccountEnginePreload';
 import {createBrowserHandoffPreloadAPI} from '@electron/preload/BrowserHandoffPreload';
 import {createDesktopStoragePreloadAPI} from '@electron/preload/DesktopStoragePreload';
 import {createFirstContentPaintSignal} from '@electron/preload/FirstContentPaint';
@@ -69,6 +70,11 @@ import {createNativeGatewayPreloadAPI} from '@electron/preload/NativeGatewayPrel
 import {createOtherPlatformTemplatePreloadAPI} from '@electron/preload/OtherPlatformTemplatePreload';
 import type {DesktopCapabilityManifest} from '@fluxer/desktop_ipc/src/CapabilityManifest';
 import {DESKTOP_CAPABILITY_MANIFEST_CHANNEL} from '@fluxer/desktop_ipc/src/CapabilityManifest';
+import {DESKTOP_DIRECT_MESSAGES_AVAILABLE_CHANNEL} from '@fluxer/desktop_ipc/src/DirectMessagesContract';
+import {
+	DESKTOP_INSTANCE_PRODUCT_NAME_CHANNEL,
+	readInstanceProductName,
+} from '@fluxer/desktop_ipc/src/InstanceProductNameContract';
 import {DESKTOP_LAST_ROUTE_CHANNEL} from '@fluxer/desktop_ipc/src/LastRouteContract';
 import {
 	buildNativeTitlebarStartupHtml,
@@ -96,7 +102,7 @@ const ACTIVE_USE_NATIVE_TITLEBAR_RENDERER_ARG = '--fluxer-active-use-native-titl
 const CUSTOM_TITLEBAR_HEIGHT = '32px';
 const NATIVE_TITLEBAR_HEIGHT = '0px';
 const STARTUP_NATIVE_TITLEBAR_ID = 'fluxer-startup-native-titlebar';
-const THEME_STUDIO_STANDALONE_PATHNAME = '/theme-studio';
+const SERVED_PRODUCT_NAME_SELECTOR = 'meta[name="apple-mobile-web-app-title"]:not([data-fluxer-branding])';
 const DESKTOP_CAPABILITY_MANIFEST_KEYS = Object.freeze(['appStore', 'gatewaySocket'] as const);
 
 class DesktopCapabilityManifestContractError extends TypeError {
@@ -285,12 +291,13 @@ function wireStartupNativeTitlebarControls(titlebar: HTMLElement): void {
 	});
 }
 
+function readServedProductName(): string | null {
+	const content = document.head?.querySelector<HTMLMetaElement>(SERVED_PRODUCT_NAME_SELECTOR)?.getAttribute('content');
+	return readInstanceProductName(content);
+}
+
 function installStartupNativeTitlebar(activeUseNativeTitleBar: boolean): void {
-	if (
-		activeUseNativeTitleBar ||
-		window.location.protocol === 'data:' ||
-		window.location.pathname === THEME_STUDIO_STANDALONE_PATHNAME
-	) {
+	if (activeUseNativeTitleBar || window.location.protocol === 'data:') {
 		return;
 	}
 	const layout = startupNativeTitlebarLayout();
@@ -303,7 +310,7 @@ function installStartupNativeTitlebar(activeUseNativeTitleBar: boolean): void {
 		titlebar.setAttribute('aria-hidden', 'true');
 		titlebar.setAttribute('data-native-titlebar', '');
 		titlebar.setAttribute('data-platform', getStartupPlatform());
-		titlebar.innerHTML = buildNativeTitlebarStartupHtml(layout);
+		titlebar.innerHTML = buildNativeTitlebarStartupHtml(layout, readServedProductName());
 		if (layout === 'controls') {
 			wireStartupNativeTitlebarControls(titlebar);
 		}
@@ -405,9 +412,13 @@ const api: ElectronAPI = {
 	...createLocalAppPreloadAPI(ipcRenderer),
 	...createBrowserHandoffPreloadAPI(ipcRenderer),
 	...createNativeGatewayPreloadAPI(ipcRenderer),
+	...createAccountEnginePreloadAPI(ipcRenderer),
 	...createOtherPlatformTemplatePreloadAPI(ipcRenderer),
 	reportLastRoute: (routePath: string): void => {
 		ipcRenderer.send(DESKTOP_LAST_ROUTE_CHANNEL, routePath);
+	},
+	reportInstanceProductName: (instanceKey: string, productName: string): void => {
+		ipcRenderer.send(DESKTOP_INSTANCE_PRODUCT_NAME_CHANNEL, {instanceKey, productName});
 	},
 	notifyFirstContentPainted: createFirstContentPaintSignal(ipcRenderer, (callback) =>
 		window.requestAnimationFrame(callback),
@@ -464,11 +475,11 @@ const api: ElectronAPI = {
 		ipcRenderer.send('window-close');
 	},
 	windowIsMaximized: (): Promise<boolean> => ipcRenderer.invoke('window-is-maximized'),
-	focusThemeStudioPopout: (): Promise<boolean> => ipcRenderer.invoke('theme-studio-popout-focus'),
 
 	popoutSetAlwaysOnTop: (key: string, flag: boolean): Promise<boolean> =>
 		ipcRenderer.invoke('popout:set-always-on-top', key, flag),
 	popoutFocus: (key: string): Promise<boolean> => ipcRenderer.invoke('popout:focus', key),
+	cssEditorWindow: true,
 	openVoiceDebugEventSinkPopout: (entries: Array<DesktopVoiceDebugEventSinkEntry>): Promise<void> =>
 		ipcRenderer.invoke('voice-debug-event-sink:open', entries),
 	appendVoiceDebugEventSinkEntries: (entries: Array<DesktopVoiceDebugEventSinkEntry>): void => {
@@ -580,9 +591,12 @@ const api: ElectronAPI = {
 	closeNotifications: (ids: Array<string>): void => {
 		ipcRenderer.send('close-notifications', ids);
 	},
-	onNotificationClick: (callback: (id: string, url?: string) => void): (() => void) => {
-		const handler = (_event: Electron.IpcRendererEvent, id: string, url?: string): void => {
-			callback(id, url);
+	onNotificationClick: (
+		callback: (id: string, url: string | null, accountKey: string | null) => void,
+	): (() => void) => {
+		const handler = (_event: Electron.IpcRendererEvent, id: unknown, url: unknown, accountKey: unknown): void => {
+			if (typeof id !== 'string') return;
+			callback(id, typeof url === 'string' ? url : null, typeof accountKey === 'string' ? accountKey : null);
 		};
 		ipcRenderer.on('notification-click', handler);
 		return () => {
@@ -622,6 +636,9 @@ const api: ElectronAPI = {
 		return () => ipcRenderer.removeListener('accessibility-support-changed', handler);
 	},
 	getLinuxAppearance: (): Promise<LinuxAppearanceSnapshot> => ipcRenderer.invoke('linux-appearance-get'),
+	setPrebootTheme: (theme: string): void => {
+		ipcRenderer.send(DESKTOP_PREBOOT_THEME_CHANNEL, theme);
+	},
 	onLinuxAppearanceChanged: (callback: (snapshot: LinuxAppearanceSnapshot) => void): (() => void) => {
 		const handler = (_event: Electron.IpcRendererEvent, snapshot: LinuxAppearanceSnapshot): void => callback(snapshot);
 		ipcRenderer.on('linux-appearance-changed', handler);
@@ -649,6 +666,9 @@ const api: ElectronAPI = {
 	},
 	setTrayRuntimeState: (state: Partial<TrayRuntimeStatePayload>): void => {
 		ipcRenderer.send('tray-runtime-state-update', state);
+	},
+	setDirectMessagesAvailable: (available: boolean): void => {
+		ipcRenderer.send(DESKTOP_DIRECT_MESSAGES_AVAILABLE_CHANNEL, available);
 	},
 	acquireStreamingPriority: (): void => {
 		ipcRenderer.send('streaming-priority-acquire');
