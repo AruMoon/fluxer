@@ -60,7 +60,7 @@ export interface DesktopHandoffRequest {
 	readonly identifier: string | null;
 }
 
-export function readDesktopHandoffRequest(search: string): DesktopHandoffRequest {
+function readDesktopHandoffRequest(search: string): DesktopHandoffRequest {
 	const params = new URLSearchParams(search);
 	const code = parseDesktopHandoffCode(params.get('code') ?? '');
 	return {
