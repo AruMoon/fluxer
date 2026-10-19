@@ -297,6 +297,7 @@ export interface TrayRuntimeStatePayload {
 	selfDeaf: boolean;
 	presenceStatus: TrayPresenceStatus | null;
 	buildInfo: string | null;
+	hidePersonalInformation: boolean;
 }
 
 export type GlobalShortcutsBackend = 'portal' | 'x11' | 'evdev' | 'windows' | 'macos' | 'none';
