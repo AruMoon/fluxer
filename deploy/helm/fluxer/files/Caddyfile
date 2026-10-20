@@ -7,6 +7,8 @@
 }
 
 {$FLUXER_EDGE_SITE_ADDRESS} {
+	{$FLUXER_EDGE_TLS_DIRECTIVE}
+	import /etc/caddy/conf.d/*.caddy
 	encode {$FLUXER_EDGE_ENCODE:zstd gzip}
 
 	handle /_health {
