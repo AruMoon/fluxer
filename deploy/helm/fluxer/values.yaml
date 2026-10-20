@@ -318,6 +318,15 @@ seaweedfs:
     pullPolicy: IfNotPresent
   # Volumes grown per bucket. 1 keeps the store usable on small disks.
   volumeGrowth: 1
+  # Size in MB at which SeaweedFS stops writing to a volume and opens another.
+  volumeSizeLimitMB: 1024
+  # Most volumes SeaweedFS may hold. It creates one only when a bucket needs
+  # room, so a high count reserves no disk. 0 derives the count from the free
+  # disk, which leaves a small volume with fewer than the four buckets need.
+  volumeMax: 10000
+  # How long a file stays in the uploads bucket. A file moves out when its
+  # message is sent, so this removes uploads nobody sent. off removes the rule.
+  uploadsTtl: 1d
   gomemlimit: 1536MiB
   # Tries, 2 seconds apart, the bucket setup makes before it starts over.
   initAttempts: 60
