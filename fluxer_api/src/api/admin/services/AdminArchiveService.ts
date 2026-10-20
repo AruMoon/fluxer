@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import {buildAdminDownloadUrl} from '@app/api/admin/AdminSignedDownloads';
 import {AdminArchive} from '@app/api/admin/models/AdminArchiveModel';
 import type {AdminArchiveRepository} from '@app/api/admin/repositories/AdminArchiveRepository';
 import type {GuildID, UserID} from '@app/api/BrandedTypes';
-import {Config} from '@app/api/Config';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import type {ISnowflakeService} from '@app/api/infrastructure/ISnowflakeService';
 import type {IStorageService} from '@app/api/infrastructure/IStorageService';
@@ -15,7 +15,6 @@ import {HarvestExpiredError} from '@fluxer/errors/src/domains/moderation/Harvest
 import {HarvestFailedError} from '@fluxer/errors/src/domains/moderation/HarvestFailedError';
 import {HarvestNotReadyError} from '@fluxer/errors/src/domains/moderation/HarvestNotReadyError';
 import {UnknownHarvestError} from '@fluxer/errors/src/domains/moderation/UnknownHarvestError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {AdminArchiveResponse, ArchiveSubjectType} from '@fluxer/schema/src/domains/admin/AdminArchiveSchemas';
 import type {IWorkerService} from '@pkgs/worker/src/contracts/IWorkerService';
 import {ms, seconds} from 'itty-time';
@@ -180,10 +179,11 @@ export class AdminArchiveService {
 		if (archive.expiresAt && archive.expiresAt < new Date()) {
 			throw new HarvestExpiredError();
 		}
-		const downloadUrl = await this.storageService.getPresignedDownloadURL({
-			bucket: Config.s3.buckets.harvests,
+		const downloadUrl = await buildAdminDownloadUrl(this.storageService, {
+			bucket: 'harvests',
 			key: archive.storageKey,
-			expiresIn: DOWNLOAD_LINK_SECONDS,
+			filename: `${subjectType}-${subjectId}-${archiveId}.zip`,
+			expiresInSeconds: DOWNLOAD_LINK_SECONDS,
 		});
 		const expiresAt = new Date(Date.now() + ms('7 days'));
 		return {downloadUrl, expiresAt: expiresAt.toISOString()};
