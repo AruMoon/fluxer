@@ -349,7 +349,7 @@ const UserAreaInner = observer(
 										onClick={isMuteToggleLocked ? undefined : () => VoiceStateCommands.toggleSelfMute(null)}
 										onContextMenu={handleMicContextMenu}
 										disabled={isMuteToggleLocked}
-										data-flx="app.user-area.user-area-inner.control-button.undefined"
+										data-flx="app.user-area.user-area-inner.control-button.mute"
 									>
 										{effectiveMuted ? (
 											<MicrophoneSlashIcon
@@ -399,7 +399,7 @@ const UserAreaInner = observer(
 										onClick={isGuildDeafened ? undefined : () => VoiceStateCommands.toggleSelfDeaf(null)}
 										onContextMenu={handleSpeakerContextMenu}
 										disabled={isGuildDeafened}
-										data-flx="app.user-area.user-area-inner.control-button.undefined--2"
+										data-flx="app.user-area.user-area-inner.control-button.deafen"
 									>
 										{isDeafened || isGuildDeafened ? (
 											<SpeakerSlashIcon
