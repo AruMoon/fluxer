@@ -10,7 +10,6 @@ import {Logger} from '@app/features/platform/utils/AppLogger';
 
 export type {
 	AppStorageBootstrapHandle,
-	AppStorageFinalizationResult,
 	AppStorageSessionAccount,
 } from '@app/features/platform/state/AppStorageBootstrapContract';
 
