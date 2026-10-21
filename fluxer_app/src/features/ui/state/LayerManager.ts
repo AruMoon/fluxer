@@ -12,7 +12,7 @@ export const LayerType = Object.freeze({
 
 export type LayerType = (typeof LayerType)[keyof typeof LayerType];
 
-export interface Layer {
+interface Layer {
 	type: LayerType;
 	key: string | PopoutKey;
 	onClose?: () => void;

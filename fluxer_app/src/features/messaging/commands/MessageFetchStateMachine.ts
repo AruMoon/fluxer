@@ -25,7 +25,7 @@ export type MessageFetchPreflightDecision =
 			type: 'startFetch';
 	  };
 
-export type MessageFetchPreflightState = 'inFlight' | 'accountTransition' | 'blocked' | 'cached' | 'network';
+type MessageFetchPreflightState = 'inFlight' | 'accountTransition' | 'blocked' | 'cached' | 'network';
 
 export interface MessageFetchExecutionInput {
 	forceFailure: boolean;
@@ -63,10 +63,6 @@ function buildPreflightDecision(
 		case 'network':
 			return {type: 'startFetch'};
 	}
-}
-
-function buildExecutionDecision(input: MessageFetchExecutionInput): MessageFetchExecutionDecision {
-	return input.forceFailure ? {type: 'simulateFailure'} : {type: 'requestNetwork'};
 }
 
 export function resolveMessageFetchPreflightDecision(input: MessageFetchPreflightInput): MessageFetchPreflightDecision {
