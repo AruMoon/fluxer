@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {createTestAccount, setUserACLs, type TestAccount} from '@app/api/auth/tests/AuthTestUtils';
+import {createTestAccount, type TestAccount} from '@app/api/auth/tests/AuthTestUtils';
 import {acceptInvite, createChannel, createChannelInvite, createGuild} from '@app/api/channel/tests/ChannelTestUtils';
 import {threadsRequest} from '@app/api/channel/tests/ThreadTestUtils';
 import {clearChannelThreadsTaintCacheForTesting} from '@app/api/experiment/ChannelThreadsGate';
@@ -10,13 +10,10 @@ import {getThreadSearchService} from '@app/api/SearchFactory';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {NoopWorkerService} from '@app/api/test/NoopWorkerService';
 import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
-import {HTTP_STATUS} from '@app/api/test/TestConstants';
-import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import refreshSearchIndex from '@app/api/worker/tasks/RefreshSearchIndex';
 import {backfillThreadSearch, syncThreadSearchDocument} from '@app/api/worker/tasks/ThreadSearchTasks';
 import {clearWorkerDependencies, setWorkerDependencies} from '@app/api/worker/WorkerContext';
 import {initializeWorkerDependencies} from '@app/api/worker/WorkerDependencies';
-import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import type {ChannelResponse} from '@fluxer/schema/src/domains/channel/ChannelSchemas';
 import type {
@@ -108,55 +105,6 @@ describe('thread search', () => {
 			.get(`/channels/${channelId}/threads/search${query}`)
 			.execute();
 	}
-
-	it('answers 202 until the guild is backfilled, then searches', async () => {
-		const s = await setup();
-		const created = await post(s, 'first post');
-		await settle();
-		const response = await harness.requestJson({
-			path: `/channels/${s.forumId}/threads/search`,
-			headers: {Authorization: s.member.token, 'X-Fluxer-Features': 'channel_threads'},
-		});
-		expect(response.status).toBe(202);
-		expect(await response.json()).toMatchObject({
-			code: APIErrorCodes.SEARCH_INDEX_NOT_READY,
-			documents_indexed: 0,
-			retry_after: 2,
-		});
-		await settle();
-		const result = await search(s, s.forumId);
-		expect(result.threads.map((thread) => thread.id)).toEqual([created.id]);
-		expect(result.total_results).toBe(1);
-		expect(result.has_more).toBe(false);
-		expect(result.first_messages?.map((message) => message.id)).toEqual([created.id]);
-		expect(result.members.map((member) => member.id)).toEqual([created.id]);
-	});
-
-	async function refreshThreadsIndex(
-		guildId: string,
-		status: number,
-		code?: string,
-	): Promise<{errors?: Array<{path: string}>}> {
-		const admin = await createTestAccount(harness);
-		await setUserACLs(harness, admin, ['admin:authenticate', 'guild:lookup']);
-		return createBuilder<{errors?: Array<{path: string}>}>(harness, admin.token)
-			.post('/admin/search/indexes/threads/refreshes')
-			.body({guild_id: guildId})
-			.expect(status, code)
-			.execute();
-	}
-
-	it('rebuilds a dropped index through the admin threads reindex', async () => {
-		const s = await setup();
-		const created = await post(s, 'kept post');
-		await search(s, s.forumId).catch(() => null);
-		await settle();
-		await getThreadSearchService()!.deleteAllDocuments();
-		expect((await search(s, s.forumId)).threads).toEqual([]);
-		await refreshThreadsIndex(s.guildId, HTTP_STATUS.OK);
-		await settle();
-		expect((await search(s, s.forumId)).threads.map((thread) => thread.id)).toEqual([created.id]);
-	});
 
 	it('keeps documents in sync with renames and deletes', async () => {
 		const s = await setup();

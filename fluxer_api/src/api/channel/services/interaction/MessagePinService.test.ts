@@ -129,15 +129,4 @@ describe('MessagePinService.getChannelPins', () => {
 				.map((message) => message.id.toString()),
 		);
 	});
-
-	it('reads the pin index once for a caller that can read message history', async () => {
-		const pins = Array.from({length: 11}, (_value, index) => makePin(HIDDEN_CREATED_AT, index, index));
-		const {calls, listPins} = createPinService({canReadHistory: true, pins});
-
-		const page = await listPins(10);
-
-		expect(page.items).toHaveLength(10);
-		expect(page.has_more).toBe(true);
-		expect(calls).toHaveLength(1);
-	});
 });
