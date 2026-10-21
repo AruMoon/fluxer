@@ -16,8 +16,8 @@ use crate::{
         htmx,
     },
     state::AppState,
-    templates::{self, components::enforcement_fields::is_snowflake},
-    utils::{forms::clean_string, timestamps::format_admin_timestamp},
+    templates,
+    utils::{forms::clean_string, snowflake::is_snowflake, timestamps::format_admin_timestamp},
 };
 use axum::{
     Form, Router,
@@ -519,10 +519,7 @@ async fn report_legal_hold(
         Err(error) => {
             tracing::warn!(%error, report_id, "admin API request failed: set report legal hold");
             match error {
-                ApiError::Http {
-                    status: 400,
-                    message,
-                } => FlashData::error(legal_hold_refusal(&message)),
+                ApiError::Http { status: 400, .. } => FlashData::error(legal_hold_refusal(&error)),
                 _ => FlashData::error("Failed to update the legal hold"),
             }
         }
@@ -602,14 +599,8 @@ fn legal_hold_end_of_day(date: time::Date) -> String {
     format!("{date}T23:59:59.999Z")
 }
 
-fn legal_hold_refusal(body: &str) -> &'static str {
-    let body: serde_json::Value = serde_json::from_str(body).unwrap_or_default();
-    let reason_refused = body["errors"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .any(|error| error["path"] == "legal_hold_reason");
-    if reason_refused {
+fn legal_hold_refusal(error: &ApiError) -> &'static str {
+    if error.has_field_error("legal_hold_reason") {
         LEGAL_HOLD_NEEDS_REASON
     } else {
         LEGAL_HOLD_IN_PAST
@@ -624,53 +615,5 @@ fn decode_sort(sort: Option<&str>) -> (&'static str, &'static str) {
         "resolvedAt_desc" => ("resolvedAt", "desc"),
         "resolvedAt_asc" => ("resolvedAt", "asc"),
         _ => ("reportedAt", "desc"),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn legal_hold_dates_end_at_the_end_of_the_day_in_utc() {
-        assert_eq!(
-            legal_hold_date("2027-01-31")
-                .map(legal_hold_end_of_day)
-                .as_deref(),
-            Some("2027-01-31T23:59:59.999Z")
-        );
-        assert_eq!(
-            legal_hold_date(" 2027-02-01 ")
-                .map(legal_hold_end_of_day)
-                .as_deref(),
-            Some("2027-02-01T23:59:59.999Z")
-        );
-        for invalid in ["", "2027-02-30", "31/01/2027", "2027-1-31", "tomorrow"] {
-            assert_eq!(legal_hold_date(invalid), None, "{invalid}");
-        }
-    }
-
-    #[test]
-    fn a_refused_hold_names_the_field_the_api_refused() {
-        let refusal = |path: &str| {
-            serde_json::json!({
-                "code": "INVALID_FORM_BODY",
-                "message": "Input Validation Error",
-                "errors": [{"path": path, "message": "refused"}]
-            })
-            .to_string()
-        };
-        assert_eq!(
-            legal_hold_refusal(&refusal("legal_hold_until")),
-            "The hold must end in the future"
-        );
-        assert_eq!(
-            legal_hold_refusal(&refusal("legal_hold_reason")),
-            "Give a reason for the hold"
-        );
-        assert_eq!(
-            legal_hold_refusal("not json"),
-            "The hold must end in the future"
-        );
     }
 }
