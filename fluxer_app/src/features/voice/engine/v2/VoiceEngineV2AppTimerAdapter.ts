@@ -9,15 +9,6 @@ const VOICE_ENGINE_V2_TIMER_REGISTRY_CAP = 256;
 const VOICE_ENGINE_V2_TIMER_ID_MAX_LENGTH = 128;
 const VOICE_ENGINE_V2_TIMER_DELAY_MAX_MS = 24 * 60 * 60 * 1000;
 
-type GlobalTimeoutHandle = number | NodeJS.Timeout;
-
-type VoiceEngineV2AppTimerHandle = unknown;
-
-export interface VoiceEngineV2AppTimerScheduler {
-	setTimeout(callback: () => void, ms: number): VoiceEngineV2AppTimerHandle;
-	clearTimeout(handle: VoiceEngineV2AppTimerHandle): void;
-}
-
 interface VoiceEngineV2AppTimerFireEvent {
 	timerId: string;
 	scheduledAtMs: number;
@@ -26,8 +17,6 @@ interface VoiceEngineV2AppTimerFireEvent {
 
 export interface VoiceEngineV2AppTimerAdapterOptions {
 	clock: VoiceEngineV2ClockPort;
-	scheduler?: VoiceEngineV2AppTimerScheduler;
-	registryCap?: number;
 	onFire?: (event: VoiceEngineV2AppTimerFireEvent) => void;
 	onError?: (operation: 'fire', timerId: string, error: unknown) => void;
 }
@@ -48,17 +37,6 @@ class VoiceEngineV2AppTimerRegistryFullError extends Error {
 		this.timerId = timerId;
 		this.cap = cap;
 	}
-}
-
-function defaultScheduler(): VoiceEngineV2AppTimerScheduler {
-	return {
-		setTimeout(callback, ms): VoiceEngineV2AppTimerHandle {
-			return globalThis.setTimeout(callback, ms);
-		},
-		clearTimeout(handle): void {
-			globalThis.clearTimeout(handle as GlobalTimeoutHandle);
-		},
-	};
 }
 
 function assertOptions(options: VoiceEngineV2TimerOptions): void {
