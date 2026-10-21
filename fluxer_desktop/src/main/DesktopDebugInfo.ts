@@ -81,7 +81,7 @@ export function shouldDisableHardwareAccelerationForLaunch(argv: ReadonlyArray<s
 	return hasFlag(argv, DISABLE_HARDWARE_ACCELERATION_ARGS) || isSafeModeLaunch(argv);
 }
 
-export function resolveEffectiveDesktopTroubleshootingSettings(
+function resolveEffectiveDesktopTroubleshootingSettings(
 	settings: DesktopTroubleshootingSettings,
 	argv: ReadonlyArray<string>,
 	platform: NodeJS.Platform,
