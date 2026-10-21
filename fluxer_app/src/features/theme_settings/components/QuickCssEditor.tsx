@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import Accessibility from '@app/features/accessibility/state/Accessibility';
-import {getTokenVariableDefinition, TOKEN_GROUPS} from '@app/features/theme_studio/sections/TokenGroups';
-import type {ThemeStudioBaseTheme} from '@app/features/theme_studio/utils/ThemeStudioPinnedVariables';
+import type {ThemeBaseKind} from '@app/features/theme_settings/utils/ThemeDefaultVariables';
+import {getTokenVariableDefinition, TOKEN_GROUPS} from '@app/features/theme_settings/utils/TokenGroups';
 import type {CompletionContext, CompletionResult} from '@codemirror/autocomplete';
 import {indentWithTab} from '@codemirror/commands';
 import {css, cssLanguage} from '@codemirror/lang-css';
@@ -36,33 +36,33 @@ function themeTokenCompletionSource(context: CompletionContext): CompletionResul
 	};
 }
 
-function buildEditorTheme(baseTheme: ThemeStudioBaseTheme): Extension {
+function buildEditorTheme(baseTheme: ThemeBaseKind): Extension {
 	const dark = baseTheme === 'dark';
 	return EditorView.theme(
 		{
 			'&': {
 				height: '100%',
-				color: 'var(--studio-fg-primary)',
-				backgroundColor: 'var(--studio-bg-editor)',
+				color: 'var(--text-primary)',
+				backgroundColor: 'var(--background-secondary)',
 				fontSize: '13px',
 			},
 			'.cm-scroller': {
-				fontFamily: 'var(--studio-font-mono)',
+				fontFamily: 'var(--font-mono, ui-monospace, monospace)',
 				lineHeight: '1.6',
 				padding: '4px 0',
 			},
 			'.cm-content': {
-				caretColor: 'var(--studio-fg-primary)',
+				caretColor: 'var(--text-primary)',
 				padding: '8px 0',
 			},
 			'.cm-gutters': {
-				backgroundColor: 'var(--studio-bg-editor)',
-				color: 'var(--studio-fg-muted)',
+				backgroundColor: 'var(--background-secondary)',
+				color: 'var(--text-tertiary)',
 				border: 'none',
 			},
 			'.cm-activeLineGutter': {
 				backgroundColor: 'transparent',
-				color: 'var(--studio-fg-primary)',
+				color: 'var(--text-primary)',
 			},
 			'.cm-activeLine': {
 				backgroundColor: dark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)',
@@ -74,7 +74,7 @@ function buildEditorTheme(baseTheme: ThemeStudioBaseTheme): Extension {
 				outline: 'none',
 			},
 			'.cm-cursor, .cm-dropCursor': {
-				borderLeftColor: 'var(--studio-fg-primary)',
+				borderLeftColor: 'var(--text-primary)',
 			},
 			'&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
 				backgroundColor: dark ? 'rgba(120, 160, 220, 0.28)' : 'rgba(80, 130, 210, 0.22)',
@@ -87,18 +87,18 @@ function buildEditorTheme(baseTheme: ThemeStudioBaseTheme): Extension {
 				outline: 'none',
 			},
 			'.cm-tooltip': {
-				backgroundColor: 'var(--studio-bg-elevated)',
-				border: '1px solid var(--studio-border)',
+				backgroundColor: 'var(--background-primary)',
+				border: '1px solid var(--background-modifier-accent)',
 				borderRadius: '6px',
 				boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
-				color: 'var(--studio-fg-primary)',
+				color: 'var(--text-primary)',
 			},
 			'.cm-tooltip-autocomplete > ul > li[aria-selected]': {
-				backgroundColor: 'var(--studio-accent, rgba(120, 160, 220, 0.3))',
-				color: 'var(--studio-fg-on-accent)',
+				backgroundColor: 'var(--brand-primary)',
+				color: 'var(--brand-primary-fill)',
 			},
 			'.cm-tooltip-autocomplete > ul > li': {
-				fontFamily: 'var(--studio-font-mono)',
+				fontFamily: 'var(--font-mono, ui-monospace, monospace)',
 			},
 		},
 		{dark},
@@ -122,9 +122,9 @@ function buildHighlightStyle(): HighlightStyle {
 	]);
 }
 
-export interface QuickCssEditorProps {
+interface QuickCssEditorProps {
 	ariaLabel: string;
-	baseTheme: ThemeStudioBaseTheme;
+	baseTheme: ThemeBaseKind;
 	className?: string;
 	onChange: (value: string) => void;
 	readOnly?: boolean;

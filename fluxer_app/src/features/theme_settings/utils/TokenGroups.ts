@@ -41,83 +41,96 @@ const GROUP_ORDER: ReadonlyArray<string> = [
 const GROUP_LABEL_DESCRIPTORS: Readonly<Record<string, MessageDescriptor | undefined>> = {
 	typography: msg({
 		message: 'Typography',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for font and text-sizing tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for font and text-sizing tokens.',
 	}),
 	surfaces: msg({
 		message: 'Surfaces',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for background surface tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for background surface tokens.',
 	}),
 	text: msg({
 		message: 'Text',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for text color tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for text color tokens.',
 	}),
 	brand: msg({
 		message: 'Brand & accents',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for brand and accent color tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for brand and accent color tokens.',
 	}),
 	status: msg({
 		message: 'Status indicators',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for presence and status color tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for presence and status color tokens.',
 	}),
 	buttons: msg({
 		message: 'Buttons',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for button color tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for button color tokens.',
 	}),
 	borders: msg({
 		message: 'Borders & focus',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for border and focus ring tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for border and focus ring tokens.',
 	}),
 	alerts: msg({
 		message: 'Alerts & callouts',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for alert and callout tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for alert and callout tokens.',
 	}),
 	markup: msg({
 		message: 'Markup & mentions',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for markdown and mention tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for markdown and mention tokens.',
 	}),
 	code: msg({
 		message: 'Code & terminal',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for code block and terminal tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for code block and terminal tokens.',
 	}),
 	tables: msg({
 		message: 'Tables',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for table tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for table tokens.',
 	}),
 	messages: msg({
 		message: 'Messages',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for chat message tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for chat message tokens.',
 	}),
 	forms: msg({
 		message: 'Forms',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for form input tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for form input tokens.',
 	}),
 	layout: msg({
 		message: 'Layout',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for spacing and sizing tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for spacing and sizing tokens.',
 	}),
 	scrolling: msg({
 		message: 'Scrolling',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for scrollbar tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for scrollbar tokens.',
 	}),
 	motion: msg({
 		message: 'Motion',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for animation and transition tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for animation and transition tokens.',
 	}),
 	layering: msg({
 		message: 'Layering',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for stacking order tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for stacking order tokens.',
 	}),
 	media: msg({
 		message: 'Media',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for image and video tokens.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for image and video tokens.',
 	}),
 	emoji: msg({
 		message: 'Emoji',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for emoji tokens.',
+		comment: 'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for emoji tokens.',
 	}),
 	other: msg({
 		message: 'Other',
-		comment: 'Collapsible group heading in the Theme Studio tokens list, for tokens that fit no other group.',
+		comment:
+			'Collapsible group heading in the "Colors and fonts" list in Settings > Themes, for tokens that fit no other group.',
 	}),
 };
 
@@ -154,14 +167,13 @@ function buildGroups(): ReadonlyArray<TokenGroupDefinition> {
 }
 
 export const TOKEN_GROUPS: ReadonlyArray<TokenGroupDefinition> = buildGroups();
-export const DEFAULT_EXPANDED_GROUP_IDS: ReadonlyArray<string> = ['surfaces', 'text', 'brand', 'messages'];
 
 function assertTokenGroupsCoverConstants(): void {
 	const grouped = new Set<string>();
 	for (const group of TOKEN_GROUPS) {
 		for (const variable of group.variables) {
 			if (grouped.has(variable)) {
-				throw new Error(`Token Studio: variable ${variable} is assigned to more than one group`);
+				throw new Error(`Theme tokens: variable ${variable} is assigned to more than one group`);
 			}
 			grouped.add(variable);
 		}
@@ -169,12 +181,12 @@ function assertTokenGroupsCoverConstants(): void {
 	const expected = new Set<string>(THEME_VARIABLE_NAMES);
 	for (const variable of expected) {
 		if (!grouped.has(variable)) {
-			throw new Error(`Token Studio: variable ${variable} is missing from TokenGroups`);
+			throw new Error(`Theme tokens: variable ${variable} is missing from TokenGroups`);
 		}
 	}
 	for (const variable of grouped) {
 		if (!expected.has(variable)) {
-			throw new Error(`Token Studio: variable ${variable} is not present in theme constants`);
+			throw new Error(`Theme tokens: variable ${variable} is not present in theme constants`);
 		}
 	}
 }
@@ -183,7 +195,7 @@ if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
 	try {
 		assertTokenGroupsCoverConstants();
 	} catch (error) {
-		console.error('[ThemeStudio] TokenGroups taxonomy mismatch:', error);
+		console.error('[ThemeSettings] TokenGroups taxonomy mismatch:', error);
 	}
 }
 
