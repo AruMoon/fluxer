@@ -31,9 +31,6 @@ import {
 } from '@app/api/search/SearchServices';
 import {ThreadSearchIndex} from '@app/api/search/thread/ThreadSearchIndex';
 import {DEFAULT_SEARCH_CLIENT_TIMEOUT_MS} from '@fluxer/constants/src/Timeouts';
-import {ElasticsearchAuditLogAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchAuditLogAdapter';
-import {ElasticsearchGuildAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchGuildAdapter';
-import {ElasticsearchGuildMemberAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchGuildMemberAdapter';
 import type {ElasticsearchDistributedLock} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchIndexAdapter';
 import {ElasticsearchMessageAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchMessageAdapter';
 import {ElasticsearchReportAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchReportAdapter';
@@ -57,9 +54,7 @@ function createElasticsearchSearchProvider(lock?: ElasticsearchDistributedLock):
 		node: Config.search.url,
 		auth: Config.search.apiKey
 			? {apiKey: Config.search.apiKey}
-			: Config.search.username
-				? {username: Config.search.username, password: Config.search.password}
-				: undefined,
+			: {username: Config.search.username, password: Config.search.password},
 		requestTimeoutMs: DEFAULT_SEARCH_CLIENT_TIMEOUT_MS,
 		tlsRejectUnauthorized: Config.search.tlsRejectUnauthorized,
 	};
@@ -108,6 +103,10 @@ function createMeilisearchSearchProvider(): ISearchProvider {
 }
 
 function createSearchProvider(lock?: ElasticsearchDistributedLock): ISearchProvider {
+	if (Config.search.engine === 'none') {
+		Logger.info('Search is turned off');
+		return new SearchProvider(null);
+	}
 	if (Config.search.engine === 'meilisearch') {
 		return createMeilisearchSearchProvider();
 	}
