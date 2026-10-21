@@ -91,65 +91,6 @@ fn nsfw_badge(level: Option<i32>) -> Markup {
     }
 }
 
-struct GuildHeaderData<'a> {
-    base: &'a str,
-    config: &'a AdminConfig,
-    guild_id: &'a str,
-    name: &'a str,
-    icon: Option<&'a str>,
-    member_count: u64,
-    nsfw_level: Option<i32>,
-    owner_id: &'a str,
-    owner_username: Option<&'a str>,
-    owner_global_name: Option<&'a str>,
-    owner_discriminator: Option<&'a str>,
-}
-
-fn guild_header(data: GuildHeaderData<'_>) -> Markup {
-    let icon_url = guild_icon_url(data.config, data.guild_id, data.icon, 160, true);
-    let owner = owner_display(
-        data.owner_id,
-        data.owner_username,
-        data.owner_global_name,
-        data.owner_discriminator,
-    );
-    html! {
-        div class="flex items-start gap-4" {
-            @if let Some(url) = icon_url {
-                img src=(url) alt=(data.name) class="h-16 w-16 flex-shrink-0 rounded-full bg-neutral-200";
-            } @else {
-                div class="flex h-16 w-16 flex-shrink-0 items-center justify-center \
-                           rounded-full bg-neutral-200 font-medium text-base text-neutral-600" {
-                    (initials(data.name))
-                }
-            }
-            div class="min-w-0 flex-1" {
-                div class="flex flex-wrap items-center gap-2" {
-                    h2 class="text-lg font-semibold text-neutral-900" { (data.name) }
-                    (nsfw_badge(data.nsfw_level))
-                }
-                p class="text-sm text-neutral-500 break-all" {
-                    "ID: "
-                    a href={(data.base) "/guilds/" (data.guild_id)}
-                        class="hover:text-blue-600 hover:underline" {
-                        (data.guild_id)
-                    }
-                }
-                p class="text-sm text-neutral-500" {
-                    "Members: " (data.member_count)
-                }
-                p class="text-sm text-neutral-500" {
-                    "Owner: "
-                    a href={(data.base) "/users/" (data.owner_id)}
-                        class="hover:text-blue-600 hover:underline" {
-                        (owner)
-                    }
-                }
-            }
-        }
-    }
-}
-
 fn tag_list(tags: &[String]) -> Markup {
     html! {
         @if tags.is_empty() {
@@ -332,7 +273,7 @@ fn listed_card(
                         button type="submit"
                             class="inline-flex items-center justify-center gap-2 font-medium \
                                    rounded-lg bg-red-600 text-white px-3 py-1.5 text-sm" {
-                            "Remove from discovery"
+                            "Remove from Explore"
                         }
                     }
                 }
@@ -362,8 +303,8 @@ pub fn discovery_page(
     let listed_count = listed.map(|l| l.len()).unwrap_or(0);
     let content = html! {
         (page_header(
-            "Discovery",
-            Some("Review pending discovery applications and manage currently-listed guilds."),
+            "Explore",
+            Some("Review pending applications to Explore and manage guilds listed in Explore."),
         ))
 
         (tabs_bar(base, tab, pending_count, listed_count))
@@ -374,12 +315,12 @@ pub fn discovery_page(
 
         @if tab == "pending" && !can_review {
             div class="rounded-lg border border-neutral-200 bg-white p-6 text-sm text-neutral-500" {
-                "You do not have permission to review discovery applications."
+                "You do not have permission to review applications to Explore."
             }
         } @else if load_error.is_some() {
         } @else if tab == "listed" && !can_remove {
             div class="rounded-lg border border-neutral-200 bg-white p-6 text-sm text-neutral-500" {
-                "You do not have permission to manage listed discovery guilds."
+                "You do not have permission to manage guilds listed in Explore."
             }
         } @else if tab == "pending" {
             @if let Some(apps) = pending {
@@ -398,7 +339,7 @@ pub fn discovery_page(
         } @else {
             @if let Some(guilds) = listed {
                 @if guilds.is_empty() {
-                    (empty_state("No guilds currently listed in discovery."))
+                    (empty_state("No guilds are listed in Explore."))
                 } @else {
                     div class="flex flex-col gap-4" {
                         @for guild in guilds {
@@ -407,9 +348,9 @@ pub fn discovery_page(
                     }
                 }
             } @else {
-                (empty_state("No guilds currently listed in discovery."))
+                (empty_state("No guilds are listed in Explore."))
             }
         }
     };
-    admin_layout(config, auth, "Discovery", "discovery", None, content)
+    admin_layout(config, auth, "Explore", "discovery", None, content)
 }
