@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-FROM erlang:28-slim AS build
+FROM erlang:28.5.0.8-slim AS build
 
 ARG RUST_TOOLCHAIN=1.98.1
 
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	ca-certificates \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://github.com/erlang/rebar3/releases/download/3.27.0/rebar3 -o /usr/local/bin/rebar3 && \
+RUN curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://github.com/erlang/rebar3/releases/download/3.27.3/rebar3 -o /usr/local/bin/rebar3 && \
 	chmod +x /usr/local/bin/rebar3
 
 RUN curl --retry 5 --retry-delay 2 --retry-all-errors --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | \
@@ -30,7 +30,7 @@ RUN rebar3 compile --deps_only
 RUN cp config/sys.config.template config/sys.config && \
 	rebar3 as prod release
 
-FROM erlang:28-slim
+FROM erlang:28.5.0.8-slim
 
 ARG BUILD_VERSION=""
 ARG SOURCE_SHA=""
