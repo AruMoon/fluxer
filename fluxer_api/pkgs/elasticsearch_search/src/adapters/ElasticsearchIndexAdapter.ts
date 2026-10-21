@@ -269,20 +269,23 @@ export class ElasticsearchIndexAdapter<
 		const offset = options?.offset ?? (options?.page ? (options.page - 1) * (options.hitsPerPage ?? 25) : 0);
 		const filterClauses = compactFilters(this.buildFilters(filters));
 		const sort = this.buildSort?.(filters);
-		const must: Array<Record<string, unknown>> = query
-			? [
-					{
-						multi_match: {
-							query,
-							fields: this.searchableFields,
-							type: this.searchType,
-							operator: 'or',
-							...(this.fuzziness != null ? {fuzziness: this.fuzziness} : {}),
-							...(this.minimumShouldMatch != null ? {minimum_should_match: this.minimumShouldMatch} : {}),
-						},
+		let must: Array<Record<string, unknown>>;
+		if (query) {
+			must = [
+				{
+					multi_match: {
+						query,
+						fields: this.searchableFields,
+						type: this.searchType,
+						operator: 'or',
+						...(this.fuzziness != null ? {fuzziness: this.fuzziness} : {}),
+						...(this.minimumShouldMatch != null ? {minimum_should_match: this.minimumShouldMatch} : {}),
 					},
-				]
-			: [{match_all: {}}];
+				},
+			];
+		} else {
+			must = [{match_all: {}}];
+		}
 		const facets = options?.facets;
 		const searchParams: ElasticsearchBaseSearchRequest = {
 			index: this.indexDefinition.indexName,
