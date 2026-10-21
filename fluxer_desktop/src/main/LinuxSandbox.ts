@@ -14,7 +14,7 @@ export function isFlatpakRuntime(): boolean {
 	}
 }
 
-export function parseFlatpakInfoAppId(contents: string): string | null {
+function parseFlatpakInfoAppId(contents: string): string | null {
 	let inApplication = false;
 	for (const rawLine of contents.split('\n')) {
 		const line = rawLine.trim();
