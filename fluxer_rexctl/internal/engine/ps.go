@@ -1,0 +1,220 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+package engine
+
+import (
+	"context"
+	"errors"
+	"slices"
+	"strconv"
+	"strings"
+	"time"
+
+	cerrdefs "github.com/containerd/errdefs"
+	"github.com/distribution/reference"
+	"github.com/docker/compose/v5/pkg/api"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
+)
+
+var ErrNoContainers = errors.New("engine: the project has no containers")
+
+func projectFilter(project string) client.Filters {
+	return make(client.Filters).Add("label", api.ProjectLabel+"="+project)
+}
+
+func (p *Project) PS(ctx context.Context) ([]Container, error) {
+	c, err := p.Engine.api()
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.ContainerList(ctx, client.ContainerListOptions{All: true, Filters: projectFilter(p.Name)})
+	if err != nil {
+		return nil, &Error{Op: "ps", Class: ClassOf(err), Err: err}
+	}
+	out := make([]Container, 0, len(res.Items))
+	for _, s := range res.Items {
+		if s.Labels[api.OneoffLabel] == "True" {
+			continue
+		}
+		ct := Container{
+			ID:      s.ID,
+			Service: s.Labels[api.ServiceLabel],
+			State:   strings.ToLower(string(s.State)),
+			Image:   s.Image,
+			ImageID: s.ImageID,
+			Labels:  s.Labels,
+			Created: time.Unix(s.Created, 0),
+		}
+		if len(s.Names) > 0 {
+			ct.Name = strings.TrimPrefix(s.Names[0], "/")
+		}
+		ct.Number, _ = strconv.Atoi(s.Labels[api.ContainerNumberLabel])
+		if s.Health != nil && s.Health.Status != container.NoHealthcheck {
+			ct.Health = strings.ToLower(string(s.Health.Status))
+		} else {
+			ct.Health = healthFromStatus(s.Status)
+		}
+		podmanHealth := p.Engine.Kind == Podman && ct.State == "running" && ct.Health == ""
+		if needsInspect(ct) || podmanHealth {
+			in, err := c.ContainerInspect(ctx, s.ID, client.ContainerInspectOptions{})
+			if err == nil {
+				ct.RestartCount = in.Container.RestartCount
+				if st := in.Container.State; st != nil {
+					ct.ExitCode = st.ExitCode
+					if podmanHealth && st.Health != nil && st.Health.Status != "" && st.Health.Status != container.NoHealthcheck {
+						ct.Health = strings.ToLower(string(st.Health.Status))
+					}
+				}
+			} else if !cerrdefs.IsNotFound(err) {
+				return nil, &Error{Op: "ps", Class: ClassOf(err), Err: err}
+			}
+		}
+		out = append(out, ct)
+	}
+	slices.SortFunc(out, func(a, b Container) int {
+		if c := strings.Compare(a.Service, b.Service); c != 0 {
+			return c
+		}
+		return a.Number - b.Number
+	})
+	return out, nil
+}
+
+func needsInspect(c Container) bool {
+	switch c.State {
+	case "running":
+		return c.Health != "" && c.Health != "healthy"
+	case "created", "paused", "removing":
+		return false
+	}
+	return true
+}
+
+func healthFromStatus(status string) string {
+	s := strings.ToLower(status)
+	switch {
+	case strings.Contains(s, "(healthy)"):
+		return "healthy"
+	case strings.Contains(s, "(unhealthy)"):
+		return "unhealthy"
+	case strings.Contains(s, "(health: starting)"), strings.Contains(s, "(starting)"):
+		return "starting"
+	}
+	return ""
+}
+
+func (e *Engine) Volumes(ctx context.Context, project string) ([]Volume, error) {
+	c, err := e.api()
+	if err != nil {
+		return nil, err
+	}
+	opts := client.VolumeListOptions{}
+	if project != "" {
+		opts.Filters = projectFilter(project)
+	}
+	res, err := c.VolumeList(ctx, opts)
+	if err != nil {
+		return nil, &Error{Op: "volumes", Class: ClassOf(err), Err: err}
+	}
+	out := make([]Volume, 0, len(res.Items))
+	for _, v := range res.Items {
+		labels := v.Labels
+		if labels == nil {
+			labels = map[string]string{}
+		}
+		out = append(out, Volume{Name: v.Name, Project: labels[api.ProjectLabel], Labels: labels})
+	}
+	slices.SortFunc(out, func(a, b Volume) int { return strings.Compare(a.Name, b.Name) })
+	return out, nil
+}
+
+func (e *Engine) Projects(ctx context.Context) ([]ProjectInfo, error) {
+	c, err := e.conn()
+	if err != nil {
+		return nil, err
+	}
+	stacks, err := c.svc.List(ctx, api.ListOptions{All: true})
+	if err != nil {
+		return nil, &Error{Op: "projects", Class: ClassOf(err), Err: err}
+	}
+	out := make([]ProjectInfo, 0, len(stacks))
+	for _, s := range stacks {
+		out = append(out, ProjectInfo{Name: s.Name, Status: s.Status, ConfigFiles: s.ConfigFiles})
+	}
+	return out, nil
+}
+
+func (e *Engine) LocalImage(ctx context.Context, ref string) (string, bool, error) {
+	c, err := e.api()
+	if err != nil {
+		return "", false, err
+	}
+	res, err := c.ImageInspect(ctx, ref)
+	if err != nil {
+		if cerrdefs.IsNotFound(err) {
+			return "", false, nil
+		}
+		return "", false, &Error{Op: "image", Class: ClassOf(err), Err: err}
+	}
+	return res.ID, true, nil
+}
+
+func (e *Engine) RepoDigest(ctx context.Context, image, ref string) (string, error) {
+	named, err := reference.ParseNormalizedNamed(ref)
+	if err != nil {
+		return "", nil
+	}
+	c, err := e.api()
+	if err != nil {
+		return "", err
+	}
+	res, err := c.ImageInspect(ctx, image)
+	if err != nil {
+		if cerrdefs.IsNotFound(err) {
+			return "", nil
+		}
+		return "", &Error{Op: "image", Class: ClassOf(err), Err: err}
+	}
+	for _, d := range res.RepoDigests {
+		dn, err := reference.ParseNormalizedNamed(d)
+		if err != nil || dn.Name() != named.Name() {
+			continue
+		}
+		digested, ok := dn.(reference.Digested)
+		if !ok {
+			continue
+		}
+		if tagged, ok := named.(reference.NamedTagged); ok {
+			if full, err := reference.WithDigest(tagged, digested.Digest()); err == nil {
+				return reference.FamiliarString(full), nil
+			}
+		}
+		return reference.FamiliarString(dn), nil
+	}
+	return "", nil
+}
+
+func (e *Engine) RemoveImages(ctx context.Context, refs []string) error {
+	c, err := e.api()
+	if err != nil {
+		return err
+	}
+	var errs []error
+	var failed []string
+	for _, ref := range refs {
+		_, err := c.ImageRemove(ctx, ref, client.ImageRemoveOptions{})
+		if err == nil || cerrdefs.IsNotFound(err) {
+			continue
+		}
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		errs = append(errs, err)
+		failed = append(failed, ref)
+	}
+	if err := errors.Join(errs...); err != nil {
+		return &Error{Op: "remove images", Class: ClassOf(err), Images: failed, Err: err}
+	}
+	return nil
+}
