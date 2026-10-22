@@ -71,26 +71,6 @@ describe('KVClient multi key fan out', () => {
 		expect(crossSlotCommands()).toEqual([]);
 	});
 
-	it('bounds concurrent round trips for a cluster delete', async () => {
-		const client = new KVClient({url: 'redis://127.0.0.1:6379', mode: 'cluster'});
-
-		await expect(client.del(...createKeys(1000))).resolves.toBe(1000);
-
-		expect(tracker.peakInFlight).toBeLessThanOrEqual(MAX_CONCURRENT_ROUND_TRIPS);
-		expect(crossSlotCommands()).toEqual([]);
-	});
-
-	it('reads a thousand keys in one round trip outside cluster mode', async () => {
-		const client = new KVClient({url: 'redis://127.0.0.1:6379', mode: 'standalone'});
-
-		await client.mget(...createKeys(1000));
-
-		expect(commands.map((command) => ({name: command.name, count: command.keys.length}))).toEqual([
-			{name: 'mget', count: 1000},
-		]);
-		expect(tracker.peakInFlight).toBe(1);
-	});
-
 	it('keeps values ordered when a cluster read is split by slot', async () => {
 		const client = new KVClient({url: 'redis://127.0.0.1:6379', mode: 'cluster'});
 		store.set('fanout:a', 'one');

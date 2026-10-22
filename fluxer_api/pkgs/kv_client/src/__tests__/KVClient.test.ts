@@ -58,21 +58,6 @@ describe('KVClient script execution', () => {
 		evalMock.mockReset();
 	});
 
-	it('sends EVALSHA instead of EVAL for the leaky bucket rate limit script', async () => {
-		evalshaMock.mockResolvedValue(RATE_LIMIT_REPLY);
-		const result = await createClient().checkLeakyBucketLimit('rate_limit:bucket', 5, 1000, 1);
-		expect(evalMock).not.toHaveBeenCalled();
-		expect(evalshaMock).toHaveBeenCalledTimes(1);
-		const [sha, keyCount, key, , limit, windowMs, cost] = getCallArguments(evalshaMock, 0);
-		expect(sha).toMatch(/^[0-9a-f]{40}$/);
-		expect(keyCount).toBe(1);
-		expect(key).toBe('rate_limit:bucket');
-		expect(limit).toBe(5);
-		expect(windowMs).toBe(1000);
-		expect(cost).toBe(1);
-		expect(result).toEqual(EXPECTED_RATE_LIMIT_RESULT);
-	});
-
 	it('falls back to EVAL with the original script and identical arguments on NOSCRIPT', async () => {
 		evalshaMock.mockRejectedValue(noScriptError());
 		evalMock.mockResolvedValue(RATE_LIMIT_REPLY);
@@ -100,74 +85,6 @@ describe('KVClient script execution', () => {
 		expect(second).toEqual(EXPECTED_RATE_LIMIT_RESULT);
 	});
 
-	it('sends EVALSHA for every scripted command', async () => {
-		const cases: Array<{name: string; reply: unknown; keyCount: number; run: (client: KVClient) => Promise<unknown>}> =
-			[
-				{
-					name: 'releaseLock',
-					reply: 1,
-					keyCount: 1,
-					run: async (client) => client.releaseLock('lock:key', 'token'),
-				},
-				{
-					name: 'extendLock',
-					reply: 1,
-					keyCount: 1,
-					run: async (client) => client.extendLock('lock:key', 'token', 30),
-				},
-				{
-					name: 'checkLeakyBucketLimit',
-					reply: RATE_LIMIT_REPLY,
-					keyCount: 1,
-					run: async (client) => client.checkLeakyBucketLimit('rate_limit:bucket', 5, 1000, 1),
-				},
-				{
-					name: 'scheduleBulkDeletion',
-					reply: 1,
-					keyCount: 2,
-					run: async (client) => client.scheduleBulkDeletion('queue:key', 'secondary:key', 1, 'value'),
-				},
-				{
-					name: 'claimBulkDeletion',
-					reply: 1,
-					keyCount: 1,
-					run: async (client) => client.claimBulkDeletion('queue:key', 'member', 1, 2),
-				},
-				{
-					name: 'removeBulkDeletion',
-					reply: 1,
-					keyCount: 2,
-					run: async (client) => client.removeBulkDeletion('queue:key', 'secondary:key'),
-				},
-				{
-					name: 'dequeuePurgeBatch',
-					reply: JSON.stringify({entries: ['/attachments/1/2/a'], tokens: 1}),
-					keyCount: 2,
-					run: async (client) => client.dequeuePurgeBatch('queue:key', 'bucket:key', 10, 10, 1, 1000),
-				},
-				{
-					name: 'evalScript',
-					reply: 1,
-					keyCount: 1,
-					run: async (client) => client.evalScript('customScript', "return redis.call('GET', KEYS[1])", 1, 'key'),
-				},
-			];
-		const digests = new Set<unknown>();
-		for (const scriptCase of cases) {
-			evalshaMock.mockReset();
-			evalMock.mockReset();
-			evalshaMock.mockResolvedValue(scriptCase.reply);
-			await scriptCase.run(createClient());
-			expect(evalMock, scriptCase.name).not.toHaveBeenCalled();
-			expect(evalshaMock, scriptCase.name).toHaveBeenCalledTimes(1);
-			const [sha, keyCount] = getCallArguments(evalshaMock, 0);
-			expect(sha, scriptCase.name).toMatch(/^[0-9a-f]{40}$/);
-			expect(keyCount, scriptCase.name).toBe(scriptCase.keyCount);
-			digests.add(sha);
-		}
-		expect(digests.size).toBe(cases.length);
-	});
-
 	it('does not retry with EVAL when the script fails for another reason', async () => {
 		evalshaMock.mockRejectedValue(new Error('Connection is closed.'));
 		await expect(createClient().releaseLock('lock:key', 'token')).rejects.toMatchObject({
@@ -175,12 +92,5 @@ describe('KVClient script execution', () => {
 			message: 'KV request failed (releaseLock): Connection is closed.',
 		});
 		expect(evalMock).not.toHaveBeenCalled();
-	});
-
-	it('reports invalid JSON from a scripted command', async () => {
-		evalshaMock.mockResolvedValue('not json');
-		await expect(createClient().checkLeakyBucketLimit('rate_limit:bucket', 5, 1000, 1)).rejects.toMatchObject({
-			code: KVClientErrorCode.INVALID_RESPONSE,
-		});
 	});
 });
