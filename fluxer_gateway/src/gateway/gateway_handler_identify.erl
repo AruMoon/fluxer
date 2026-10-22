@@ -7,19 +7,12 @@
     handle_identify/3,
     handle_resume/2,
     handle_rollout_config_changed/1,
-    handle_pending_identify_retry/2,
-    start_session/3,
-    start_session_with_drain_guard/4,
-    handle_session_start_result/2,
-    validate_identify_data/1,
-    validate_resume_data/1,
-    parse_ignored_events/1
+    handle_pending_identify_retry/2
 ]).
 
 -type state() :: gateway_handler:state().
 -type ws_result() :: gateway_handler:ws_result().
 -type pending_retry_timer() :: {reference(), reference()} | undefined.
-
 -export_type([state/0, ws_result/0]).
 
 -define(PENDING_IDENTIFY_RETRY_BASE_MS, 1000).
@@ -102,7 +95,7 @@ do_identify(
     GwTimings,
     State
 ) ->
-    ok = channel_threads_config:note_identify(
+    ok = channel_threads_identify_counts:note(
         session_manager_shard_drain:thread_channels_capable(#{flags => Flags}), Properties
     ),
     SessionId = utils:generate_session_id(),
@@ -290,10 +283,6 @@ start_session_with_drain_guard(false, Request, SocketPid, State) ->
     StartResult = session_manager:start(Request, SocketPid),
     handle_session_start_result(StartResult, Request, SocketPid, State).
 
--spec handle_session_start_result(term(), state()) -> ws_result().
-handle_session_start_result(StartResult, State) ->
-    handle_session_start_result(StartResult, undefined, undefined, State).
-
 -spec handle_session_start_result(term(), map() | undefined, pid() | undefined, state()) ->
     ws_result().
 handle_session_start_result({success, Pid}, _Request, _SocketPid, State) when is_pid(Pid) ->
@@ -381,8 +370,6 @@ retry_pending_identify(#{pending_identify := {Request, SocketPid}} = State) when
 ->
     case gateway_rollout_config:session_rollout_percentage() > 0 of
         true ->
-            gateway_rollout_config:unsubscribe_changes(self()),
-            RetryState = clear_pending_identify(State),
             start_session_with_drain_guard(
                 gateway_node_router:is_draining(),
                 Request,
@@ -450,25 +437,3 @@ cancel_pending_identify_retry_value({TimerRef, _Token}) ->
 -spec handle_resume(map(), state()) -> ws_result().
 handle_resume(Data, State) ->
     gateway_handler_resume:handle_resume(Data, State).
-
--spec validate_resume_data(map()) -> {ok, binary(), binary(), integer()} | {error, atom()}.
-validate_resume_data(Data) ->
-    gateway_handler_resume:validate_resume_data(Data).
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-handle_session_start_capacity_holds_without_reconnect_test() ->
-    {ok, _State} = handle_session_start_result({error, at_capacity}, identify_test_state()).
-
-handle_session_start_rate_limit_holds_without_close_test() ->
-    {ok, _State} = handle_session_start_result({error, rate_limited}, identify_test_state()).
-
-identify_test_state() ->
-    #{
-        encoding => json,
-        compress_ctx => gateway_compress:new_context(none),
-        peer_ip => <<"127.0.0.1">>
-    }.
-
--endif.
