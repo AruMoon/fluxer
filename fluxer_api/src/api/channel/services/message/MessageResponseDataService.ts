@@ -6,6 +6,7 @@ import {createUserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
 import type {ChannelRepository} from '@app/api/channel/ChannelRepository';
 import {requestSvcJson} from '@app/api/infrastructure/SvcErrorReply';
+import {getInstanceProductName} from '@app/api/instance/ProductName';
 import {Logger} from '@app/api/Logger';
 import type {Channel} from '@app/api/models/Channel';
 import type {Message} from '@app/api/models/Message';
@@ -96,6 +97,7 @@ export class MessageResponseDataService {
 			media_proxy_secret_key: Config.mediaProxy.secretKey,
 			attachment_url_secret_base64: Config.mediaProxy.attachmentUrls.secretsBase64[0],
 			attachment_decay: await attachmentDecayEnabled(),
+			instance_name: getInstanceProductName(),
 		};
 	}
 	constructor(private readonly connectionManager: INatsConnectionManager) {}
@@ -211,7 +213,6 @@ export class MessageResponseDataService {
 		userId: UserID;
 		messages: Array<Message>;
 		access: MessageResponseAccessContext;
-		includeReactions?: boolean;
 	}): Promise<Array<MessageResponse>> {
 		if (params.messages.length === 0) return [];
 		const responses: Array<MessageResponse> = [];
@@ -293,7 +294,7 @@ function messageResponseViewerId(message: Message, currentUserId?: UserID): User
 	return currentUserId ?? message.authorId ?? createUserID(0n);
 }
 
-export function messageResponseAccessForChannel(channel: Pick<Channel, 'guildId'>): MessageResponseAccessContext {
+function messageResponseAccessForChannel(channel: Pick<Channel, 'guildId'>): MessageResponseAccessContext {
 	return messageResponseAccessForGuild(channel.guildId);
 }
 
