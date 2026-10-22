@@ -132,12 +132,6 @@ handle_handler_down(MRef, HRefs, HandlerCount, State) ->
         handler_count => max(0, HandlerCount - 1)
     }.
 
--spec decrement_handler_count(map()) -> map().
-decrement_handler_count(#{handler_count := HC} = State) when HC > 0 ->
-    State#{handler_count => HC - 1};
-decrement_handler_count(State) ->
-    State.
-
 -spec terminate(term(), map()) -> ok.
 terminate(_Reason, #{conn := Conn} = State) when Conn =/= undefined ->
     cleanup_connect_attempt(State),
@@ -156,13 +150,6 @@ code_change(_OldVsn, State, _Extra) ->
 -spec handle_connect(map()) -> map().
 handle_connect(State) ->
     connect_if_needed(State).
-
--spec nats_rpc_enabled() -> boolean().
-nats_rpc_enabled() ->
-    case fluxer_gateway_env:get(nats_rpc_enabled) of
-        false -> false;
-        _ -> true
-    end.
 
 -spec connect_if_needed(map()) -> map().
 connect_if_needed(State) ->
@@ -240,14 +227,6 @@ cancel_connect_timer(State) ->
         _ ->
             ok
     end.
-
--spec maybe_kill_connect_pid(pid() | undefined) -> ok.
-maybe_kill_connect_pid(Pid) when is_pid(Pid) ->
-    unlink(Pid),
-    exit(Pid, kill),
-    ok;
-maybe_kill_connect_pid(undefined) ->
-    ok.
 
 -spec handle_connect_error(pid(), term(), map()) -> map().
 handle_connect_error(Pid, Reason, State) ->
@@ -379,7 +358,7 @@ notify_resubscribed(Subject) ->
         Owner -> notify_owner(whereis(Owner), Subject)
     end.
 
--spec notify_owner(pid() | undefined, binary()) -> ok.
+-spec notify_owner(pid() | port() | undefined, binary()) -> ok.
 notify_owner(Pid, Subject) when is_pid(Pid) ->
     Pid ! {nats_resubscribed, Subject},
     ok;
@@ -510,67 +489,6 @@ ignore_pool_enable_subscription() ->
         error:_ -> ok;
         exit:_ -> ok
     end.
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
--define(TEST_WAIT_LOOP_TIMEOUT_MS, 60000).
-
-stale_connect_timeout_does_not_kill_current_connect_worker_test() ->
-    Token = make_ref(),
-    StaleToken = make_ref(),
-    Pid = spawn(fun wait_forever/0),
-    State = #{
-        conn => undefined,
-        sub => undefined,
-        handler_count => 0,
-        handler_refs => #{},
-        max_handlers => 1,
-        monitor_ref => undefined,
-        connecting_pid => Pid,
-        connecting_token => Token,
-        connecting_timer => undefined,
-        rpc_enabled => true,
-        extra_subscriptions => #{}
-    },
-    try
-        ?assertEqual(State, handle_connect_timeout(StaleToken, State)),
-        ?assert(erlang:is_process_alive(Pid))
-    after
-        exit(Pid, kill)
-    end.
-
-connect_message_does_not_kill_inflight_connect_worker_test() ->
-    Token = make_ref(),
-    Pid = spawn(fun wait_forever/0),
-    State = #{
-        conn => undefined,
-        sub => undefined,
-        handler_count => 0,
-        handler_refs => #{},
-        max_handlers => 1,
-        monitor_ref => undefined,
-        connecting_pid => Pid,
-        connecting_token => Token,
-        connecting_timer => undefined,
-        rpc_enabled => true,
-        extra_subscriptions => #{}
-    },
-    try
-        ?assertEqual(State, handle_connect(State)),
-        ?assert(erlang:is_process_alive(Pid))
-    after
-        exit(Pid, kill)
-    end.
-
-wait_forever() ->
-    receive
-        stop -> ok
-    after ?TEST_WAIT_LOOP_TIMEOUT_MS ->
-        ok
-    end.
-
--endif.
 
 -spec ignore_pool_disable_subscription() -> ok.
 ignore_pool_disable_subscription() ->

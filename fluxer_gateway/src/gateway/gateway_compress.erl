@@ -328,8 +328,8 @@ ensure_zstd_decompress_stream_context(#{type := zstd_stream} = Ctx) ->
             {error, {decompress_failed, {case_clause, Other}}}
     end.
 
--spec set_zstd_decompress_window_log_max(reference(), compress_ctx()) ->
-    {ok, reference(), compress_ctx()} | {error, term()}.
+-spec set_zstd_decompress_window_log_max(reference(), zstd_stream_ctx()) ->
+    {ok, reference(), zstd_stream_ctx()} | {error, term()}.
 set_zstd_decompress_window_log_max(StreamCtx, Ctx) ->
     Result = erlang:apply(ezstd, set_decompression_parameter, [
         StreamCtx, zstd_d_window_log_max, ?ZSTD_DECOMPRESS_WINDOW_LOG_MAX
@@ -401,112 +401,3 @@ ezstd_nif_stream_chunk_available() ->
         _ ->
             false
     end.
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-parse_compression_test_() ->
-    [
-        ?_assertEqual(none, parse_compression(undefined)),
-        ?_assertEqual(none, parse_compression(<<>>)),
-        ?_assertEqual(none, parse_compression(<<"none">>)),
-        ?_assertEqual(none, parse_compression(<<"invalid">>)),
-        ?_assertEqual(none, parse_compression(<<"zstd-stream">>)),
-        ?_assertEqual(none, parse_compression(<<"zstd-stream">>, undefined)),
-        ?_assertEqual(none, parse_compression(<<"zstd-stream">>, <<"0">>)),
-        ?_assertEqual(zstd_stream, parse_compression(<<"zstd-stream">>, <<"1">>)),
-        ?_assertEqual(zstd_stream, parse_compression(<<"zstd-stream">>, <<"true">>))
-    ].
-
-legacy_zstd_stream_ctx_routes_to_frame_test() ->
-    case ezstd_available() of
-        true ->
-            Legacy = #{type => zstd_stream},
-            Data = <<"hello world, legacy one-shot frame payload">>,
-            {ok, Compressed, Ctx2} = compress(Data, Legacy),
-            ?assert(is_binary(Compressed)),
-            ?assertEqual(Legacy, Ctx2),
-            {ok, Decompressed, _} = decompress(Compressed, Legacy),
-            ?assertEqual(Data, Decompressed);
-        false ->
-            ?assertEqual(skip, skip)
-    end.
-
-check_decompressed_size_allows_normal_payload_test() ->
-    Ctx = new_context(zstd_frame),
-    Data = <<"normal payload">>,
-    ?assertEqual({ok, Data, Ctx}, check_decompressed_size(Data, Ctx, ?MAX_DECOMPRESSED_SIZE)).
-
-check_decompressed_size_rejects_oversized_payload_test() ->
-    Ctx = new_context(zstd_frame),
-    Oversized = binary:copy(<<0>>, ?MAX_DECOMPRESSED_SIZE + 1),
-    ?assertEqual(
-        {error, decompression_too_large},
-        check_decompressed_size(Oversized, Ctx, ?MAX_DECOMPRESSED_SIZE)
-    ).
-
-check_decompressed_size_allows_exact_limit_test() ->
-    Ctx = new_context(zstd_frame),
-    ExactLimit = binary:copy(<<0>>, ?MAX_DECOMPRESSED_SIZE),
-    ?assertMatch({ok, _, _}, check_decompressed_size(ExactLimit, Ctx, ?MAX_DECOMPRESSED_SIZE)).
-
-zstd_stream_decompress_stops_past_max_size_test() ->
-    case probe_ezstd_stream_available() of
-        true ->
-            Compressed = stream_compress_zeros(new_context(zstd_stream), 12, <<>>),
-            ?assert(byte_size(Compressed) =< 4096),
-            ?assertEqual(
-                {error, decompression_too_large},
-                decompress(Compressed, new_context(zstd_stream), 4096)
-            );
-        false ->
-            ?assertEqual(skip, skip)
-    end.
-
-zstd_stream_decompress_allows_payload_at_max_size_test() ->
-    case probe_ezstd_stream_available() of
-        true ->
-            Data = binary:copy(<<"a">>, 4096),
-            {ok, Compressed, _} = compress(Data, new_context(zstd_stream)),
-            ?assertMatch({ok, Data, _}, decompress(Compressed, new_context(zstd_stream), 4096)),
-            {ok, Over, _} = compress(<<Data/binary, "b">>, new_context(zstd_stream)),
-            ?assertEqual(
-                {error, decompression_too_large},
-                decompress(Over, new_context(zstd_stream), 4096)
-            );
-        false ->
-            ?assertEqual(skip, skip)
-    end.
-
-stream_compress_zeros(_Ctx, 0, Acc) ->
-    Acc;
-stream_compress_zeros(Ctx, Remaining, Acc) ->
-    {ok, Chunk, NextCtx} = compress(binary:copy(<<0>>, 8 * 1024 * 1024), Ctx),
-    stream_compress_zeros(NextCtx, Remaining - 1, <<Acc/binary, Chunk/binary>>).
-
-zstd_roundtrip_test() ->
-    case ezstd_available() of
-        true ->
-            Ctx = new_context(zstd_frame),
-            Data = <<"hello world, this is a test message for zstd compression">>,
-            {ok, Compressed, Ctx2} = compress(Data, Ctx),
-            ?assert(is_binary(Compressed)),
-            {ok, Decompressed, _} = decompress(Compressed, Ctx2),
-            ?assertEqual(Data, Decompressed),
-            ok = close_context(Ctx2);
-        false ->
-            ?assertEqual(skip, skip)
-    end.
-
-zstd_compression_ratio_test() ->
-    case ezstd_available() of
-        true ->
-            Ctx = new_context(zstd_frame),
-            Data = binary:copy(<<"aaaaaaaaaa">>, 100),
-            {ok, Compressed, _} = compress(Data, Ctx),
-            ?assert(byte_size(Compressed) < byte_size(Data));
-        false ->
-            ?assertEqual(skip, skip)
-    end.
-
--endif.

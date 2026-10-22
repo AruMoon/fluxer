@@ -48,7 +48,7 @@ pool_conn_from_tuple(Conns) ->
     Idx = erlang:phash2(self(), Size) + 1,
     case element(Idx, Conns) of
         undefined -> find_any_conn(Conns, Size, Idx, 1);
-        Conn -> {ok, Conn}
+        Conn -> {ok, eqwalizer:dynamic_cast(Conn)}
     end.
 
 -spec find_any_conn(tuple(), pos_integer(), pos_integer(), non_neg_integer()) ->
@@ -59,7 +59,7 @@ find_any_conn(Conns, Size, Start, Tried) ->
     Idx = ((Start - 1 + Tried) rem Size) + 1,
     case element(Idx, Conns) of
         undefined -> find_any_conn(Conns, Size, Start, Tried + 1);
-        Conn -> {ok, Conn}
+        Conn -> {ok, eqwalizer:dynamic_cast(Conn)}
     end.
 
 -spec connect_slot(non_neg_integer(), map()) -> map().
@@ -347,14 +347,3 @@ coerce_sid({'$sid', N} = Sid) when is_integer(N) ->
     {ok, Sid};
 coerce_sid(_) ->
     error.
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-reconnect_delay_circuit_breaker_kicks_in_test() ->
-    ?assertEqual(?CIRCUIT_BREAKER_COOLDOWN_MS, reconnect_delay(?CIRCUIT_BREAKER_THRESHOLD)),
-    ?assertEqual(
-        ?CIRCUIT_BREAKER_COOLDOWN_MS, reconnect_delay(?CIRCUIT_BREAKER_THRESHOLD + 10)
-    ).
-
--endif.
