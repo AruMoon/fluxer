@@ -255,14 +255,13 @@ class VoiceEngineV2AppScreenShareExecutionAdapter extends Store {
 	}
 
 	private transitionScreenShareCodecReadiness(status: ScreenShareCodecReadinessStatus): void {
-		this.transitionScreenShareLifecycleInternal({
-			type:
-				status === 'loading'
-					? 'share.codecReadiness.loading'
-					: status === 'ready'
-						? 'share.codecReadiness.ready'
-						: 'share.codecReadiness.timeout',
-		});
+		if (status === 'loading') {
+			this.transitionScreenShareLifecycleInternal({type: 'share.codecReadiness.loading'});
+		} else if (status === 'ready') {
+			this.transitionScreenShareLifecycleInternal({type: 'share.codecReadiness.ready'});
+		} else {
+			this.transitionScreenShareLifecycleInternal({type: 'share.codecReadiness.timeout'});
+		}
 	}
 
 	async getEffectivePublishOptionsInternal(
@@ -858,7 +857,6 @@ class VoiceEngineV2AppScreenShareExecutionAdapter extends Store {
 	async ensureLinuxScreenShareAudioPublication(
 		room: Room | null,
 		linuxRule?: NonNullable<NativeAudioStartOptions['linuxRule']>,
-		options: {includeSelfWindowAudio?: boolean; replaceExisting?: boolean} = {},
 	): Promise<boolean> {
 		const participant = room?.localParticipant;
 		if (!participant?.isScreenShareEnabled) return false;
