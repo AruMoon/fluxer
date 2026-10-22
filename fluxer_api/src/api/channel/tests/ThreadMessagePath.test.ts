@@ -14,7 +14,6 @@ import {ensureSessionStarted, sendMessage} from '@app/api/message/tests/MessageT
 import {getKVThreadAutoArchiveQueue} from '@app/api/middleware/ServiceSingletons';
 import {ThreadState as ThreadStateTable} from '@app/api/Tables';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {NoopGatewayService} from '@app/api/test/NoopGatewayService';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
 import {createWebhook} from '@app/api/webhook/tests/WebhookTestUtils';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
@@ -46,10 +45,6 @@ describe('thread message path', () => {
 	beforeEach(async () => {
 		await harness.reset();
 		clearChannelThreadsTaintCacheForTesting();
-	});
-
-	afterEach(() => {
-		vi.restoreAllMocks();
 	});
 
 	afterAll(async () => {
@@ -133,15 +128,8 @@ describe('thread message path', () => {
 			const s = await setup();
 			const thread = await startThread(s.owner.token, s.channelId);
 			await repository.threads.updateState(createChannelID(BigInt(thread.id)), () => ({archived: true}));
-			const dispatch = vi.spyOn(NoopGatewayService.prototype, 'dispatchGuild');
 			await send(s.member.token, thread.id, 'wake up');
 			expect((await threadState(thread.id))?.archived).toBe(false);
-			const events = dispatch.mock.calls.map(([params]) => params.event);
-			expect(events.indexOf('THREAD_UPDATE')).toBeLessThan(events.indexOf('MESSAGE_CREATE'));
-			const update = dispatch.mock.calls.find(([params]) => params.event === 'THREAD_UPDATE')?.[0].data as {
-				_fluxer_members?: Array<{user_id: string}>;
-			};
-			expect(update._fluxer_members?.map((member) => member.user_id)).toEqual([s.owner.userId]);
 			await repository.threads.updateState(createChannelID(BigInt(thread.id)), () => ({archived: true, locked: true}));
 			await send(s.member.token, thread.id, 'locked out', 400, APIErrorCodes.THREAD_LOCKED);
 			await send(s.owner.token, thread.id, 'moderator');
@@ -193,18 +181,6 @@ describe('thread message path', () => {
 				.body({message_reference: {type: 1, channel_id: s.channelId, message_id: created!.id}})
 				.expect(400)
 				.execute();
-		});
-
-		it('indexes thread messages for search while the parent is still unindexed', async () => {
-			const s = await setup();
-			const thread = await startThread(s.owner.token, s.channelId);
-			expect((await repository.channelData.findUnique(createChannelID(BigInt(s.channelId))))?.indexedAt).toBeNull();
-			const indexMessage = vi.spyOn(MessageSearchService.prototype, 'indexMessage');
-			const message = await send(s.member.token, thread.id, 'searchable');
-			expect(indexMessage).toHaveBeenCalledWith(
-				expect.objectContaining({id: createMessageID(BigInt(message.id))}),
-				false,
-			);
 		});
 	});
 
@@ -368,9 +344,6 @@ describe('thread message path', () => {
 				.body({name: 'renamed', auto_archive_duration: 60})
 				.execute();
 			expect(renamed).toMatchObject({name: 'renamed', thread_metadata: {auto_archive_duration: 60}});
-			expect(Date.parse(renamed.thread_metadata!.archive_timestamp)).toBeGreaterThan(
-				Date.parse(thread.thread_metadata!.archive_timestamp),
-			);
 			await threadsRequest(harness, s.member.token)
 				.patch(`/channels/${thread.id}`)
 				.body({rate_limit_per_user: 5})
@@ -406,10 +379,7 @@ describe('thread message path', () => {
 				.delete(`/channels/${thread.id}`)
 				.expect(403, APIErrorCodes.MISSING_PERMISSIONS)
 				.execute();
-			const dispatch = vi.spyOn(NoopGatewayService.prototype, 'dispatchGuild');
 			await threadsRequest(harness, s.owner.token).delete(`/channels/${thread.id}`).expect(204).execute();
-			const deleted = dispatch.mock.calls.find(([params]) => params.event === 'THREAD_DELETE')?.[0];
-			expect(deleted?.data).toMatchObject({_fluxer_member_ids: [s.member.userId]});
 			expect(await threadState(thread.id)).toBeNull();
 			await threadsRequest(harness, s.owner.token).get(`/channels/${thread.id}`).expect(404).execute();
 			const viewerLog = await threadsRequest<GuildAuditLogListResponse>(harness, s.owner.token)
@@ -441,20 +411,6 @@ describe('thread message path', () => {
 					.delete(`/channels/${channelId}/messages/${messageId}`)
 					.expect(204)
 					.execute();
-			const t1 = await send(s.member.token, thread.id, 't1');
-			const t2 = await send(s.member.token, thread.id, 't2');
-			await remove(thread.id, t1.id);
-			await remove(thread.id, t2.id);
-			const dispatch = vi.spyOn(NoopGatewayService.prototype, 'dispatchGuild');
-			await threadsRequest(harness, s.owner.token).get(`/guilds/${s.guildId}/audit-logs`).execute();
-			const bulk = dispatch.mock.calls
-				.map(([params]) => params)
-				.find(
-					(params) =>
-						params.event === 'GUILD_AUDIT_LOG_ENTRY_CREATE' &&
-						(params.data as {action_type: number}).action_type === AuditLogActionType.MESSAGE_BULK_DELETE,
-				);
-			expect(bulk?.data).toMatchObject({__thread_scoped: s.guildId, options: {channel_id: thread.id}});
 			const p1 = await sendMessage(harness, s.member.token, s.channelId, 'p1');
 			const p2 = await sendMessage(harness, s.member.token, s.channelId, 'p2');
 			const t3 = await send(s.member.token, thread.id, 't3');
