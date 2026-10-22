@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+//go:build !windows
+
+package instance
+
+import (
+	"os"
+	"syscall"
+)
+
+func (i *Instance) OwnerUID() (int, bool) {
+	info, err := os.Stat(i.Dir)
+	if err != nil {
+		return 0, false
+	}
+	st, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return 0, false
+	}
+	return int(st.Uid), true
+}
