@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {Logger} from '@app/api/Logger';
-import {parseJsonRecord} from '@app/api/utils/JsonBoundaryUtils';
+import {isRecord} from '@fluxer/record_utils/src/RecordGuards';
 import Bowser from 'bowser';
 
 type SessionDeviceClass = 'mobile' | 'desktop';
@@ -12,7 +12,7 @@ interface SessionClientSignals {
 	productName: string;
 }
 
-export interface SessionClientInfo {
+interface SessionClientInfo {
 	platform: string | null;
 	os: string | null;
 	browser: string | null;
@@ -76,14 +76,18 @@ export function parseReportedClientOs(headerValue: string | null): OsToken | nul
 	if (!headerValue) return null;
 	const trimmed = headerValue.trim();
 	if (!trimmed || trimmed.length > CLIENT_PROPERTIES_HEADER_MAX_LENGTH) return null;
-	let decoded: string;
+	let record: Record<string, unknown>;
 	try {
-		decoded = Buffer.from(trimmed, 'base64').toString('utf8');
-	} catch {
+		const decoded = Buffer.from(trimmed, 'base64').toString('utf8');
+		const value: unknown = JSON.parse(decoded);
+		if (!isRecord(value)) return null;
+		record = value;
+	} catch (error) {
+		if (!(error instanceof SyntaxError)) {
+			Logger.warn({error}, 'Failed to decode reported client operating system');
+		}
 		return null;
 	}
-	const record = parseJsonRecord(decoded);
-	if (!record) return null;
 	const os = record.os;
 	return typeof os === 'string' ? narrowOsToken(os) : null;
 }
@@ -97,15 +101,18 @@ export function resolveSessionClientInfo({
 	const nativeMatch = NATIVE_UA_REGEX.exec(ua);
 
 	if (nativeMatch) {
-		const productToken = nativeMatch[1] as keyof typeof PRODUCT_TOKEN_OS;
+		const productToken = nativeMatch[1];
 		const osToken = narrowOsToken(reportedOs) ?? PRODUCT_TOKEN_OS[productToken] ?? bowserOsToken(ua);
 		const osDisplay = osToken ? OS_DISPLAY[osToken] : null;
 		const mobile = osToken === 'ios' || osToken === 'android';
-		const platform = osDisplay
-			? mobile
-				? `${productName} ${osDisplay}`
-				: `${productName} Lite ${osDisplay}`
-			: `${productName} Lite`;
+		let platform: string;
+		if (!osDisplay) {
+			platform = `${productName} Lite`;
+		} else if (mobile) {
+			platform = `${productName} ${osDisplay}`;
+		} else {
+			platform = `${productName} Lite ${osDisplay}`;
+		}
 		return {platform, os: osDisplay, browser: null, device: mobile ? 'mobile' : 'desktop'};
 	}
 
