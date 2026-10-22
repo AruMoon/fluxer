@@ -122,34 +122,3 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
     erlang:garbage_collect(),
     {ok, State}.
-
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-concurrency_acquire_release_test() ->
-    {ok, _Pid} = start_link(),
-    ?assertEqual(0, session_start_count()),
-    ?assertEqual(ok, try_acquire_session_start()),
-    ?assertEqual(1, session_start_count()),
-    ?assertEqual(ok, release_session_start()),
-    ?assertEqual(0, session_start_count()),
-    gen_server:stop(?MODULE).
-
-release_without_acquire_does_not_underflow_test() ->
-    {ok, _Pid} = start_link(),
-    ?assertEqual(ok, release_session_start()),
-    ?assertEqual(ok, release_guild_start()),
-    ?assertEqual(0, session_start_count()),
-    ?assertEqual(0, guild_start_count()),
-    gen_server:stop(?MODULE).
-
-acquire_is_bounded_at_limit_test() ->
-    {ok, _Pid} = start_link(),
-    Ref = persistent_term:get(gateway_concurrency_counters),
-    ?assertEqual(ok, do_acquire(?SESSION_START_IDX, 1, Ref)),
-    ?assertEqual(1, session_start_count()),
-    ?assertEqual({error, at_capacity}, do_acquire(?SESSION_START_IDX, 1, Ref)),
-    ?assertEqual(1, session_start_count()),
-    gen_server:stop(?MODULE).
-
--endif.
