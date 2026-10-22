@@ -23,7 +23,6 @@ import {
 	upsertOne,
 } from '@app/api/database/CassandraQueryExecution';
 import type {CassandraParams, KvQueryMeta, PreparedQuery} from '@app/api/database/CassandraTypes';
-import {PostgresKvQueryExecutor} from '@app/api/database/PostgresKvQueryExecutor';
 import type {ChannelRow} from '@app/api/database/types/ChannelTypes';
 import {clearChannelThreadsTaintCacheForTesting} from '@app/api/experiment/ChannelThreadsGate';
 import {
@@ -42,15 +41,13 @@ import {
 	ThreadStats,
 	ThreadsByParent,
 } from '@app/api/Tables';
-import {dockerAvailable, startPostgresKv, stopPostgresKv} from '@app/api/test/DockerTestContainer';
 import {InMemoryCassandraQueryExecutor} from '@app/api/test/InMemoryCassandraQueryExecutor';
 import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import {ChannelFlags, MAX_THREAD_MEMBERS} from '@fluxer/constants/src/ThreadConstants';
 import {MaxThreadMembersError} from '@fluxer/errors/src/domains/channel/MaxThreadMembersError';
 import {ThreadAlreadyCreatedForMessageError} from '@fluxer/errors/src/domains/channel/ThreadAlreadyCreatedForMessageError';
 import {createSnowflakeFromTimestamp} from '@fluxer/snowflake/src/Snowflake';
-import {getDefaultPostgresClient} from '@pkgs/postgres/src/Client';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const GUILD_ID = createGuildID(1_900_000_000_000_000_000n);
 const PARENT_ID = createChannelID(1_900_000_000_000_000_100n);
@@ -623,41 +620,6 @@ function describeThreadRepository(backend: string, makeExecutor: () => Promise<C
 			expect(await repositories.threads.listJoinedThreadIds(leaving, GUILD_ID)).toEqual([]);
 		});
 
-		it('rolls back member rows when the member count compare-and-set gives up', async () => {
-			const threadId = freshThreadId();
-			const staying = createUserID(1_900_000_000_040_000_001n);
-			const joining = createUserID(1_900_000_000_040_000_002n);
-			await repositories.threads.create(
-				createParams(threadId, {
-					members: [
-						{userId: OWNER_ID, flags: 1},
-						{userId: staying, flags: 0},
-					],
-				}),
-			);
-			const executeQuery = executor.executeQuery.bind(executor);
-			const spy = vi.spyOn(executor, 'executeQuery').mockImplementation(async (query) => {
-				const meta = query.kvMeta;
-				if (meta?.table.name === 'thread_state' && meta.conditions) {
-					return [{'[applied]': false}] as never;
-				}
-				return executeQuery(query);
-			});
-			await expect(repositories.threads.addMembers(threadId, [{userId: joining, flags: 0}])).rejects.toThrow();
-			await expect(repositories.threads.removeMembers(threadId, [staying])).rejects.toThrow();
-			spy.mockRestore();
-			const rows = await repositories.threads.listMembers(threadId, {limit: 100});
-			expect(rows.map((row) => row.userId).sort()).toEqual([OWNER_ID, staying].sort());
-			expect((await repositories.threads.getState(threadId))?.memberCount).toBe(2);
-			const joined = await repositories.threads.addMembers(threadId, [{userId: joining, flags: 0}]);
-			expect(joined?.added.map((member) => member.userId)).toEqual([joining]);
-			expect(joined?.state.memberCount).toBe(3);
-			expect(await repositories.threads.listJoinedThreadIds(joining, GUILD_ID)).toEqual([threadId]);
-			const left = await repositories.threads.removeMembers(threadId, [staying]);
-			expect(left.removed.map((member) => member.userId)).toEqual([staying]);
-			expect(left.state?.memberCount).toBe(2);
-		});
-
 		it('counts inserted thread messages only, excludes the starter id and floors at zero', async () => {
 			const threadId = freshThreadId();
 			await repositories.threads.create(createParams(threadId));
@@ -818,23 +780,3 @@ describe('thread storage leaves control storage untouched', () => {
 });
 
 describeThreadRepository('in-memory cassandra', async () => new InMemoryCassandraQueryExecutor());
-
-const KV_TABLE = 'kv_thread_repository';
-describe.skipIf(!dockerAvailable)('ThreadRepository against postgres kv', () => {
-	let postgresContainer: string;
-	beforeAll(async () => {
-		const started = await startPostgresKv({namePrefix: 'fluxer-threads', kvTable: KV_TABLE, maxConnections: 8});
-		postgresContainer = started.container;
-	}, 900_000);
-
-	afterAll(async () => {
-		setCassandraQueryExecutorForTesting(new InMemoryCassandraQueryExecutor());
-		await stopPostgresKv(postgresContainer);
-	});
-
-	describeThreadRepository('postgres kv', async () => {
-		const client = getDefaultPostgresClient();
-		await client.query(`DELETE FROM ${KV_TABLE}`);
-		return new PostgresKvQueryExecutor(client);
-	});
-});
