@@ -179,16 +179,17 @@ export class MessagePersistenceService {
 			} as const);
 		const isBot = params.user?.isBot ?? false;
 		const isBugHunterBot = isBot && ((params.user?.flags ?? 0n) & UserFlags.BUG_HUNTER) !== 0n;
-		const isNSFWAllowed = this.contentService.isNSFWContentAllowed({
+		const attachmentNsfwMode = this.contentService.attachmentNsfwMode({
 			channel: params.channel ? await this.nsfwScopeChannel(params.channel) : undefined,
 			guild: params.guild,
 			member: params.member,
 			isBot,
 			dmNsfwContext: params.dmNsfwContext,
 		});
+		const isNSFWAllowed = attachmentNsfwMode !== 'block';
 		const [sanitizedContent, attachmentResult, processedStickers] = await Promise.all([
 			this.sanitizeContentIfNeeded(params, authorId),
-			this.processAttachments(params, isNSFWAllowed ? 'allow' : 'block'),
+			this.processAttachments(params, attachmentNsfwMode),
 			this.processStickers(params, authorId),
 		]);
 		let messageContent = sanitizedContent;
@@ -412,13 +413,14 @@ export class MessagePersistenceService {
 		if (message.messageSnapshots && message.messageSnapshots.length > 0) {
 			throw InputValidationError.fromCode('message', ValidationErrorCodes.MESSAGES_WITH_SNAPSHOTS_CANNOT_BE_EDITED);
 		}
-		const isNSFWAllowed = this.contentService.isNSFWContentAllowed({
+		const attachmentNsfwMode = this.contentService.attachmentNsfwMode({
 			channel: await this.nsfwScopeChannel(channel),
 			guild,
 			member,
 			isBot: params.isBot,
 			dmNsfwContext: params.dmNsfwContext,
 		});
+		const isNSFWAllowed = attachmentNsfwMode !== 'block';
 		const updatedRowData = {...message.toRow()};
 		let hasChanges = false;
 		const allowEmbeds = params.allowEmbeds ?? true;
@@ -521,7 +523,7 @@ export class MessagePersistenceService {
 						channel,
 						guild,
 						member,
-						nsfwMode: isNSFWAllowed ? 'allow' : 'block',
+						nsfwMode: attachmentNsfwMode,
 					});
 					processedNewAttachments = attachmentResult.attachments;
 					if (attachmentResult.hasVirusDetected) {
