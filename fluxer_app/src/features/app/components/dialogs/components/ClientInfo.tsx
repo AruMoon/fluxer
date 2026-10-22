@@ -86,14 +86,14 @@ export const ClientInfo = observer(() => {
 				desktopVersion: desktopVersionLabel,
 			})
 		: null;
-	const buildLabel = desktopBuildLabel
-		? primaryDesktopReleaseChannel === releaseChannel
-			? i18n._(WEB_BUILD_SECONDARY_DESCRIPTOR, {buildVersion})
-			: i18n._(WEB_BUILD_SECONDARY_WITH_CHANNEL_DESCRIPTOR, {releaseChannel, buildVersion})
-		: i18n._(WEB_BUILD_DESCRIPTOR, {
-				releaseChannel,
-				buildVersion,
-			});
+	let buildLabel: string;
+	if (!desktopBuildLabel) {
+		buildLabel = i18n._(WEB_BUILD_DESCRIPTOR, {releaseChannel, buildVersion});
+	} else if (primaryDesktopReleaseChannel === releaseChannel) {
+		buildLabel = i18n._(WEB_BUILD_SECONDARY_DESCRIPTOR, {buildVersion});
+	} else {
+		buildLabel = i18n._(WEB_BUILD_SECONDARY_WITH_CHANNEL_DESCRIPTOR, {releaseChannel, buildVersion});
+	}
 	const onClick = () => {
 		const justUnlocked = DeveloperMode.registerBuildTap();
 		if (justUnlocked) {
