@@ -334,9 +334,20 @@ export class EmailService implements IEmailService {
 		email_change_new: async (email, {code}, locale) => {
 			return this.sendCode(email, 'email_change_new', locale, code, {minutes: CODE_MINUTES});
 		},
-		password_reset: async (email, {resetToken}, locale) => {
+		password_reset: async (email, {resetToken, ipAddress, location}, locale) => {
 			const resetUrl = `${this.config.appBaseUrl}/reset#token=${resetToken}`;
-			return this.sendTemplatedEmail(email, 'password_reset', locale, {}, {slots: () => ({cta_url: resetUrl})});
+			return this.sendTemplatedEmail(
+				email,
+				'password_reset',
+				locale,
+				{},
+				{
+					slots: (template) => ({
+						cta_url: resetUrl,
+						...facts([template.ip_label, ipAddress], [template.location_label, location]),
+					}),
+				},
+			);
 		},
 		email_verification: async (email, {verificationToken}, locale) => {
 			const verifyUrl = `${this.config.appBaseUrl}/verify#token=${verificationToken}`;

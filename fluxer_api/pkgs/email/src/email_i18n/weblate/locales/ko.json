@@ -363,6 +363,8 @@
 		"expiry": "이 링크는 1시간 후에 만료돼요.",
 		"footer_reason": "회원님의 {product_name} 계정 비밀번호 재설정이 요청되어 이 이메일을 받으셨어요.",
 		"intro": "{product_name} 비밀번호 재설정을 요청하셨어요.",
+		"ip_label": "IP 주소",
+		"location_label": "위치",
 		"note": "요청하지 않으셨다면 이 이메일을 무시해도 돼요.",
 		"signoff": "{product_name} 팀 드림",
 		"subject": "{product_name} 비밀번호 재설정"

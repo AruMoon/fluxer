@@ -363,6 +363,8 @@
 		"expiry": "Dette link udløber om 1 time.",
 		"footer_reason": "Du har modtaget denne e-mail, fordi der blev anmodet om nulstilling af adgangskode til din {product_name}-konto.",
 		"intro": "Du har bedt om at nulstille din {product_name}-adgangskode.",
+		"ip_label": "IP-adresse",
+		"location_label": "Sted",
 		"note": "Hvis du ikke har bedt om dette, kan du ignorere denne e-mail.",
 		"signoff": "Teamet bag {product_name}",
 		"subject": "Nulstil din {product_name}-adgangskode"

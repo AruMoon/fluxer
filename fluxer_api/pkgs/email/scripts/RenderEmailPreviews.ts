@@ -144,7 +144,13 @@ const previews: Record<string, Preview> = {
 			},
 			locale,
 		),
-	password_reset: (locale) => service.send('password_reset', USER, {resetToken: token}, locale),
+	password_reset: (locale) =>
+		service.send(
+			'password_reset',
+			USER,
+			{resetToken: token, ipAddress: '203.0.113.42', location: 'Stockholm, Sweden'},
+			locale,
+		),
 	email_verification: (locale) => service.send('email_verification', USER, {verificationToken: token}, locale),
 	ip_authorization: (locale) =>
 		service.send(

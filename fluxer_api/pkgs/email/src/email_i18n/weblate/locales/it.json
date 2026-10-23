@@ -363,6 +363,8 @@
 		"expiry": "Questo link scade tra 1 ora.",
 		"footer_reason": "Hai ricevuto questa email perché è stata richiesta la reimpostazione della password per il tuo account {product_name}.",
 		"intro": "Hai chiesto di reimpostare la password di {product_name}.",
+		"ip_label": "Indirizzo IP",
+		"location_label": "Posizione",
 		"note": "Se non l'hai chiesto tu, puoi ignorare questa email.",
 		"signoff": "Il team di {product_name}",
 		"subject": "Reimposta la password di {product_name}"

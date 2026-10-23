@@ -363,6 +363,8 @@
 		"expiry": "Tämä linkki vanhenee tunnin kuluttua.",
 		"footer_reason": "Sait tämän sähköpostin, koska {product_name}-tilisi salasanan nollausta pyydettiin.",
 		"intro": "Pyysit {product_name}-salasanasi nollaamista.",
+		"ip_label": "IP-osoite",
+		"location_label": "Sijainti",
 		"note": "Jos et pyytänyt tätä, voit jättää tämän sähköpostin huomiotta.",
 		"signoff": "{product_name}-tiimi",
 		"subject": "Nollaa {product_name}-salasanasi"

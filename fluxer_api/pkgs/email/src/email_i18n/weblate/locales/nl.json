@@ -363,6 +363,8 @@
 		"expiry": "Deze link verloopt over 1 uur.",
 		"footer_reason": "Je hebt deze e-mail ontvangen omdat er een wachtwoordreset is aangevraagd voor je {product_name}-account.",
 		"intro": "Je hebt gevraagd om je {product_name}-wachtwoord opnieuw in te stellen.",
+		"ip_label": "IP-adres",
+		"location_label": "Locatie",
 		"note": "Als je hier niet om hebt gevraagd, kun je deze e-mail negeren.",
 		"signoff": "Het team van {product_name}",
 		"subject": "Stel je {product_name}-wachtwoord opnieuw in"

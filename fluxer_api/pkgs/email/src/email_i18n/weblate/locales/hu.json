@@ -363,6 +363,8 @@
 		"expiry": "Ez a link 1 óra múlva lejár.",
 		"footer_reason": "Ezt az e-mailt azért kaptad, mert jelszó-visszaállítást kértek a {product_name}-fiókodhoz.",
 		"intro": "Kérted {product_name}-jelszavad visszaállítását.",
+		"ip_label": "IP-cím",
+		"location_label": "Helyszín",
 		"note": "Ha nem te kérted, figyelmen kívül hagyhatod ezt az e-mailt.",
 		"signoff": "{product_name} csapata",
 		"subject": "Állítsd vissza {product_name}-fiókod jelszavát"

@@ -72,8 +72,12 @@ export class TestEmailService implements IEmailService {
 		email_change_new: async (email, {code}) => {
 			return this.record(email, 'email_change_new', {code});
 		},
-		password_reset: async (email, {resetToken}) => {
-			return this.record(email, 'password_reset', {token: resetToken});
+		password_reset: async (email, {resetToken, ipAddress, location}) => {
+			return this.record(email, 'password_reset', {
+				token: resetToken,
+				...(ipAddress ? {ip: ipAddress} : {}),
+				...(location ? {location} : {}),
+			});
 		},
 		email_verification: async (email, {verificationToken}) => {
 			return this.record(email, 'email_verification', {token: verificationToken});

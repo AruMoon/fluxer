@@ -363,6 +363,8 @@
 		"expiry": "Este link expira em 1 hora.",
 		"footer_reason": "Você recebeu este e-mail porque uma redefinição de senha foi solicitada para sua conta do {product_name}.",
 		"intro": "Você pediu para redefinir sua senha do {product_name}.",
+		"ip_label": "Endereço IP",
+		"location_label": "Localização",
 		"note": "Se você não pediu isso, pode ignorar este e-mail.",
 		"signoff": "Equipe do {product_name}",
 		"subject": "Redefina a senha da sua conta do {product_name}"

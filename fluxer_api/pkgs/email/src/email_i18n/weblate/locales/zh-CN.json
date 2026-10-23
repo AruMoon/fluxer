@@ -363,6 +363,8 @@
 		"expiry": "此链接将在 1 小时后过期。",
 		"footer_reason": "你收到此邮件是因为你的 {product_name} 账号请求了密码重置。",
 		"intro": "你申请了重置 {product_name} 密码。",
+		"ip_label": "IP 地址",
+		"location_label": "位置",
 		"note": "如果你没有提出此请求，可以忽略此邮件。",
 		"signoff": "{product_name} 团队",
 		"subject": "重置你的 {product_name} 账号密码"

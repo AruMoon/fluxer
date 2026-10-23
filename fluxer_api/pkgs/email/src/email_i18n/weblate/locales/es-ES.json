@@ -363,6 +363,8 @@
 		"expiry": "Este enlace caduca en 1 hora.",
 		"footer_reason": "Has recibido este correo electrónico porque se ha solicitado un restablecimiento de contraseña para tu cuenta de {product_name}.",
 		"intro": "Has pedido restablecer tu contraseña de {product_name}.",
+		"ip_label": "Dirección IP",
+		"location_label": "Ubicación",
 		"note": "Si no lo has pedido tú, puedes ignorar este correo.",
 		"signoff": "El equipo de {product_name}",
 		"subject": "Restablece tu contraseña en {product_name}"

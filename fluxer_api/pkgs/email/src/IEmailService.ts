@@ -153,7 +153,7 @@ export interface EmailSendParams {
 	reauth_code: {code: string; expiresAt: Date};
 	email_change_original: {code: string};
 	email_change_new: {code: string};
-	password_reset: {resetToken: string};
+	password_reset: {resetToken: string; ipAddress?: string; location?: string};
 	email_verification: {verificationToken: string};
 	ip_authorization: {authorizationToken: string; ipAddress: string; location: string};
 	email_change_revert: {newEmail: string; token: string};

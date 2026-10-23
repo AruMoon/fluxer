@@ -363,6 +363,8 @@
 		"expiry": "此連結將在 1 小時後到期。",
 		"footer_reason": "您收到這封電子郵件，是因為您的 {product_name} 帳號要求重設密碼。",
 		"intro": "您要求重設 {product_name} 密碼。",
+		"ip_label": "IP 位址",
+		"location_label": "位置",
 		"note": "如果您沒有提出這項要求，可以忽略這封電子郵件。",
 		"signoff": "{product_name} 團隊",
 		"subject": "重設您的 {product_name} 密碼"

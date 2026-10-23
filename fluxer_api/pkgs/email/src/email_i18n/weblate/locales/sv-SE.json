@@ -363,6 +363,8 @@
 		"expiry": "Länken går ut om 1 timme.",
 		"footer_reason": "Du fick det här mejlet eftersom en begäran om återställning av lösenord gjordes för ditt {product_name}-konto.",
 		"intro": "Du har bett om att återställa ditt lösenord på {product_name}.",
+		"ip_label": "IP-adress",
+		"location_label": "Plats",
 		"note": "Om du inte bad om det här kan du ignorera det här mejlet.",
 		"signoff": "{product_name}-teamet",
 		"subject": "Återställ ditt lösenord på {product_name}"

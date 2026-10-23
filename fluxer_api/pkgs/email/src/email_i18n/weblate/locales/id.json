@@ -363,6 +363,8 @@
 		"expiry": "Tautan ini kedaluwarsa dalam 1 jam.",
 		"footer_reason": "Kamu menerima email ini karena ada permintaan pengaturan ulang kata sandi untuk akun {product_name} kamu.",
 		"intro": "Kamu meminta untuk mengatur ulang kata sandi {product_name} kamu.",
+		"ip_label": "Alamat IP",
+		"location_label": "Lokasi",
 		"note": "Jika kamu tidak memintanya, kamu bisa mengabaikan email ini.",
 		"signoff": "Tim {product_name}",
 		"subject": "Atur ulang kata sandi {product_name} kamu"

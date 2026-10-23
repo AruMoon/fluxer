@@ -363,6 +363,8 @@
 		"expiry": "Ši nuoroda galioja 1 valandą.",
 		"footer_reason": "Gavai šį el. laišką, nes buvo paprašyta iš naujo nustatyti tavo {product_name} paskyros slaptažodį.",
 		"intro": "Paprašei iš naujo nustatyti savo {product_name} slaptažodį.",
+		"ip_label": "IP adresas",
+		"location_label": "Vieta",
 		"note": "Jei to neprašei, gali ignoruoti šį el. laišką.",
 		"signoff": "{product_name} komanda",
 		"subject": "Iš naujo nustatyk savo {product_name} slaptažodį"

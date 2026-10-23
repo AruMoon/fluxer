@@ -363,6 +363,8 @@
 		"expiry": "Ten link wygaśnie za 1 godzinę.",
 		"footer_reason": "Otrzymujesz tę wiadomość, ponieważ wpłynęła prośba o zresetowanie hasła do Twojego konta {product_name}.",
 		"intro": "Otrzymaliśmy prośbę o zresetowanie Twojego hasła do {product_name}.",
+		"ip_label": "Adres IP",
+		"location_label": "Lokalizacja",
 		"note": "Jeśli ta prośba nie pochodzi od Ciebie, możesz zignorować tę wiadomość.",
 		"signoff": "Zespół {product_name}",
 		"subject": "Zresetuj hasło w {product_name}"

@@ -363,6 +363,8 @@
 		"expiry": "Denne lenken utløper om 1 time.",
 		"footer_reason": "Du mottok denne e-posten fordi en tilbakestilling av passord ble forespurt for din {product_name}-konto.",
 		"intro": "Du ba om å tilbakestille {product_name}-passordet ditt.",
+		"ip_label": "IP-adresse",
+		"location_label": "Sted",
 		"note": "Hvis du ikke ba om dette, kan du ignorere denne e-posten.",
 		"signoff": "{product_name}-teamet",
 		"subject": "Tilbakestill {product_name}-passordet ditt"

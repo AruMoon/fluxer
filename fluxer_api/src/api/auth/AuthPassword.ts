@@ -10,6 +10,7 @@ import {RecoveryKitRepository} from '@app/api/auth/services/RecoveryKitRepositor
 import {resolveWebAuthnSecondFactor} from '@app/api/auth/services/WebAuthnSecondFactor';
 import {createPasswordResetToken} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
+import {getContentMessage} from '@app/api/content_i18n/ContentI18n';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import {Logger} from '@app/api/Logger';
 import {getKVClient} from '@app/api/middleware/ServiceRegistry';
@@ -17,6 +18,7 @@ import type {User} from '@app/api/models/User';
 import {PASSWORD_RESET_TOKEN_TTL_SECONDS} from '@app/api/user/repositories/auth/TokenRepository';
 import {EXTERNAL_RESPONSE_LIMITS} from '@app/api/utils/ExternalResponseLimits';
 import * as FetchUtils from '@app/api/utils/FetchUtils';
+import {lookupGeoip} from '@app/api/utils/IpUtils';
 import {hashPassword} from '@app/api/utils/PasswordUtils';
 import * as RandomUtils from '@app/api/utils/RandomUtils';
 import {createRateLimitError} from '@app/api/utils/RateLimitUtils';
@@ -27,6 +29,7 @@ import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {getSameIpDecisionKey} from '@fluxer/ip_utils/src/IpAddress';
 import type {ForgotPasswordRequest, ResetPasswordRequest} from '@fluxer/schema/src/domains/auth/AuthSchemas';
+import {formatGeoipLocation} from '@pkgs/geoip/src/GeoipLookup';
 import {ms} from 'itty-time';
 
 const PWNED_PASSWORDS_TIMEOUT_MS = ms('5 seconds');
@@ -218,7 +221,10 @@ export async function forgotPassword(ctx: ApiContext, {data, request}: ForgotPas
 		user_id: user.id,
 		email: user.email!,
 	});
-	await email.send('password_reset', user.email!, {resetToken: token}, user.locale);
+	const location =
+		formatGeoipLocation(await lookupGeoip(clientIp), user.locale) ??
+		getContentMessage('auth.unknown_location', user.locale);
+	await email.send('password_reset', user.email!, {resetToken: token, ipAddress: clientIp, location}, user.locale);
 }
 
 function resetTokenMatchesUser(user: User, tokenEmail: string | null): boolean {

@@ -363,6 +363,8 @@
 		"expiry": "Ova poveznica istječe za 1 sat.",
 		"footer_reason": "Ovu si e-poruku primio jer je zatraženo poništavanje lozinke za tvoj {product_name} račun.",
 		"intro": "Zatražio si poništavanje lozinke za {product_name}.",
+		"ip_label": "IP adresa",
+		"location_label": "Lokacija",
 		"note": "Ako to nisi zatražio, možeš zanemariti ovu e-poruku.",
 		"signoff": "Tim {product_name}a",
 		"subject": "Poništi svoju lozinku za {product_name}"

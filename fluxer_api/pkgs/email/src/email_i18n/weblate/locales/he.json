@@ -363,6 +363,8 @@
 		"expiry": "הקישור הזה יפוג בעוד שעה.",
 		"footer_reason": "קיבלתם את האימייל הזה כי איפוס סיסמה התבקש עבור חשבון ה־{product_name} שלכם.",
 		"intro": "ביקשתם לאפס את הסיסמה שלכם ב-{product_name}.",
+		"ip_label": "כתובת IP",
+		"location_label": "מיקום",
 		"note": "אם לא ביקשתם את זה, אפשר להתעלם מהאימייל הזה.",
 		"signoff": "צוות {product_name}",
 		"subject": "איפוס הסיסמה שלכם ב-{product_name}"

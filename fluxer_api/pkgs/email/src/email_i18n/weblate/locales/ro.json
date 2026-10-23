@@ -363,6 +363,8 @@
 		"expiry": "Acest link expiră într-o oră.",
 		"footer_reason": "Ai primit acest e-mail deoarece a fost solicitată o resetare a parolei pentru contul tău {product_name}.",
 		"intro": "Ai cerut resetarea parolei {product_name}.",
+		"ip_label": "Adresă IP",
+		"location_label": "Locație",
 		"note": "Dacă nu ai cerut asta, poți ignora acest e-mail.",
 		"signoff": "Echipa {product_name}",
 		"subject": "Resetează-ți parola pentru {product_name}"

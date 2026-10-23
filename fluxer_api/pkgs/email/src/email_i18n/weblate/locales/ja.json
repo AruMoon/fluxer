@@ -363,6 +363,8 @@
 		"expiry": "このリンクは1時間後に期限切れになります。",
 		"footer_reason": "このメールは、お使いの{product_name}アカウントのパスワードリセットがリクエストされたため送信されました。",
 		"intro": "{product_name}のパスワードのリセットを受け付けました。",
+		"ip_label": "IPアドレス",
+		"location_label": "場所",
 		"note": "リクエストしていない場合は、このメールを無視してかまいません。",
 		"signoff": "{product_name}チーム",
 		"subject": "{product_name}のパスワードをリセット"

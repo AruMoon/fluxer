@@ -363,6 +363,8 @@
 		"expiry": "This link expires in 1 hour.",
 		"footer_reason": "You received this email because a password reset was requested for your {product_name} account.",
 		"intro": "You asked to reset your {product_name} password.",
+		"ip_label": "IP address",
+		"location_label": "Location",
 		"note": "If you didn't ask for this, you can ignore this email.",
 		"signoff": "The {product_name} team",
 		"subject": "Reset your {product_name} password"

@@ -363,6 +363,8 @@
 		"expiry": "Tento odkaz vyprší za 1 hodinu.",
 		"footer_reason": "Tento e-mail jste obdrželi, protože bylo požádáno o obnovení hesla pro váš účet {product_name}.",
 		"intro": "Požádali jste o obnovení hesla k účtu {product_name}.",
+		"ip_label": "IP adresa",
+		"location_label": "Poloha",
 		"note": "Pokud jste o to nežádali, můžete tento e-mail ignorovat.",
 		"signoff": "Tým {product_name}",
 		"subject": "Obnovte své heslo k účtu {product_name}"

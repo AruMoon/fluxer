@@ -415,6 +415,8 @@ export const EMAIL_I18N_MESSAGES = {
 	password_reset: {
 		subject: 'Reset your {product_name} password',
 		intro: 'You asked to reset your {product_name} password.',
+		ip_label: 'IP address',
+		location_label: 'Location',
 		cta: 'Set a new password',
 		expiry: 'This link expires in 1 hour.',
 		note: "If you didn't ask for this, you can ignore this email.",

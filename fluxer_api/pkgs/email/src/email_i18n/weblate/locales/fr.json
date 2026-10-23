@@ -363,6 +363,8 @@
 		"expiry": "Ce lien expire dans 1 heure.",
 		"footer_reason": "Vous avez reçu cet e-mail car une réinitialisation de mot de passe a été demandée pour votre compte {product_name}.",
 		"intro": "Vous avez demandé à réinitialiser votre mot de passe {product_name}.",
+		"ip_label": "Adresse IP",
+		"location_label": "Localisation",
 		"note": "Si vous n’avez rien demandé, vous pouvez ignorer cet e-mail.",
 		"signoff": "L’équipe {product_name}",
 		"subject": "Réinitialiser votre mot de passe {product_name}"

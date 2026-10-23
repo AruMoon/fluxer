@@ -363,6 +363,8 @@
 		"expiry": "Liên kết này sẽ hết hạn sau 1 giờ.",
 		"footer_reason": "Bạn nhận được email này vì đã có yêu cầu đặt lại mật khẩu cho tài khoản {product_name} của bạn.",
 		"intro": "Bạn đã yêu cầu đặt lại mật khẩu {product_name} của mình.",
+		"ip_label": "Địa chỉ IP",
+		"location_label": "Vị trí",
 		"note": "Nếu bạn không yêu cầu việc này, bạn có thể bỏ qua email này.",
 		"signoff": "Đội ngũ {product_name}",
 		"subject": "Đặt lại mật khẩu của bạn trên {product_name}"

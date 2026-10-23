@@ -363,6 +363,8 @@
 		"expiry": "Bu bağlantının süresi 1 saat içinde dolacak.",
 		"footer_reason": "Bu e-postayı, {product_name} hesabınız için şifre sıfırlama istendiği için aldınız.",
 		"intro": "{product_name} şifrenizi sıfırlamak istediniz.",
+		"ip_label": "IP adresi",
+		"location_label": "Konum",
 		"note": "Bunu siz istemediyseniz bu e-postayı yok sayabilirsiniz.",
 		"signoff": "{product_name} ekibi",
 		"subject": "{product_name} şifrenizi sıfırlayın"
