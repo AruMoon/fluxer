@@ -14,8 +14,6 @@ Every target is a list of IDs. There is no search, role, tag, email, or IP selec
 
 ## Bulk job creation object
 
-A bulk job creation has the identifier of the queued job.
-
 ### Structure
 
 | Field | Type | Description |
@@ -75,8 +73,6 @@ Body validation runs ahead of authentication and ACL evaluation, so a malformed 
 
 ### JSON body
 
-The `task` discriminator selects one of these structures. Every ID array has an upper bound and no lower bound, so an empty array queues a job that processes nothing and finishes with the status `succeeded`.
-
 #### Update user flags structure
 
 | Field | Type | Description |
@@ -116,7 +112,7 @@ The `task` discriminator selects one of these structures. Every ID array has an 
 | days_until_deletion<sup>1</sup> | integer | The delay before deletion in whole days (1-365) |
 | basis<sup>2</sup> | [basis](/admin-api/enforcement/#basis) object | Why the accounts are closed |
 
-<sup>1</sup> Fluxer raises the value to the minimum of the basis, 74 days for a broken rule and 14 days otherwise. A self-hosted instance has no appeal route and raises every basis to 14 days
+<sup>1</sup> Fluxer raises the value to 14 days, the minimum of every basis
 
 <sup>2</sup> The `enforcement` basis takes a bulk decision with `reason_code`, `source` (always `own_review`), `automation` and a required `statement`. Reports, evidence messages and any other field are refused, because per-account facts cannot be given in bulk. The `X-Audit-Log-Reason` header is required with this basis, or the request fails with `ENFORCEMENT_INTERNAL_NOTE_REQUIRED`, and becomes the first note on every decision
 

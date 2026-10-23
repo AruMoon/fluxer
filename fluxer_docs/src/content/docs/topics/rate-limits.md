@@ -28,22 +28,6 @@ Some operations enforce a further limit inside the handler. `RATE_LIMIT_BYPASS` 
 Every bucket is a leaky bucket. It admits at most the declared limit at once and refills continuously at that limit for each declared window, so a client that exhausts an allowance can send again as soon as enough of it has drained.
 :::
 
-:::note[The headers and the body report different instants]
-`X-RateLimit-Reset` and `X-RateLimit-Reset-After` report when the bucket has drained completely. `retry_after` in the response body reports the shorter delay after which one further request is admitted.
-:::
-
-:::note[A 429 can hide a 401 or 403]
-A rate-limited request can return 429 even if its credentials would otherwise be rejected with 401 or 403.
-:::
-
-Some routes declare a second route bucket, including group direct message creation, adding group recipients, and deleting guild emoji or stickers. Each operation lists its limits. Fluxer counts a request against its route buckets before the handler runs, so a request the handler rejects still uses up allowance.
-
-:::caution[A global denial revokes a user session]
-When the global bucket denies a request authenticated by a non-bot account's user session token, Fluxer revokes that token before writing the 429. The client must authenticate again. A bot token, an OAuth2 access token, and an Admin API key are never revoked this way, and a route bucket denial never revokes a credential.
-:::
-
-A deployment can disable both buckets through instance configuration. While they are disabled, no response has an `X-RateLimit-*` header and no request is refused with 429 `RATE_LIMITED`. That switch also turns off the login allowances. Every other [limit enforced inside a handler](#limits-enforced-inside-a-handler) stays in force.
-
 ## Rate limit response object
 
 The denial body has the members of the ordinary [error response](/http-api/#error-response) and two further members.
@@ -77,20 +61,6 @@ A [slowmode](#slowmode) denial answers 400 `SLOWMODE_RATE_LIMITED`.
   "retry_after": 0.428
 }
 ```
-
-## Rate limit scopes
-
-The `X-RateLimit-Scope` header is the scope that produced a denial.
-
-| Value | Description |
-| --- | --- |
-| user | The denial came from an allowance keyed by the caller alone |
-| global | The denial came from the global bucket |
-| shared<sup>1</sup> | The denial came from an allowance that several accounts can exhaust for each other |
-
-<sup>1</sup> No route bucket declares a scope of its own, so every route bucket denial reports `user`. The announcement channel allowances are the live sources of `shared`
-
-[Crosspost message](/http-api/messages/#crosspost-message) reports `shared` for its channel publish allowance, and an edit of a published message reports it for the per-message edit allowance. Every member who publishes or edits draws on the same allowance.
 
 ## Rate limit headers
 
@@ -188,19 +158,17 @@ Each is a leaky bucket like the route buckets. It admits a burst of its full siz
 | [Modify current guild member](/http-api/guild-members/#modify-current-guild-member) | 25 per 30 minutes on the guild pronouns, when the submitted value differs | `PRONOUNS_CHANGED_TOO_MANY_TIMES` |
 | [Modify current guild member](/http-api/guild-members/#modify-current-guild-member) | 25 per 30 minutes on the guild accent colour, when the submitted value differs | `ACCENT_COLOR_CHANGED_TOO_MANY_TIMES` |
 | [Modify voice activity sharing](/http-api/users/settings/#modify-voice-activity-sharing) | 1 per 24 hours on the sharing default | `VOICE_ACTIVITY_SHARING_ON_COOLDOWN` |
-| [Complete login with TOTP](/http-api/authentication/#complete-login-with-totp), [Complete login with WebAuthn MFA](/http-api/authentication/#complete-login-with-webauthn-mfa), and [Complete passkey bridge](/http-api/authentication/#complete-passkey-bridge) for `login_mfa` | 10 multi-factor attempts per 15 minutes | `INVALID_CODE` |
-| [Complete login with TOTP](/http-api/authentication/#complete-login-with-totp), [Complete login with WebAuthn MFA](/http-api/authentication/#complete-login-with-webauthn-mfa), and [Complete passkey bridge](/http-api/authentication/#complete-passkey-bridge) for `login_mfa` | 5 multi-factor attempts per 5 minutes on one MFA ticket | `INVALID_CODE` |
-| [Sudo mode](/http-api/users/mfa/#sudo-mode) with the `totp` method, and [Complete passkey bridge](/http-api/authentication/#complete-passkey-bridge) for `sudo` | 10 multi-factor attempts per 15 minutes | `INVALID_MFA_CODE` |
+| [Complete login with TOTP](/http-api/authentication/#complete-login-with-totp), and [Complete login with WebAuthn MFA](/http-api/authentication/#complete-login-with-webauthn-mfa) | 10 multi-factor attempts per 15 minutes | `INVALID_CODE` |
+| [Complete login with TOTP](/http-api/authentication/#complete-login-with-totp), and [Complete login with WebAuthn MFA](/http-api/authentication/#complete-login-with-webauthn-mfa) | 5 multi-factor attempts per 5 minutes on one MFA ticket | `INVALID_CODE` |
+| [Sudo mode](/http-api/users/mfa/#sudo-mode) with the `totp` method | 10 multi-factor attempts per 15 minutes | `INVALID_MFA_CODE` |
 
 Every Modify current user allowance is keyed by the authenticated account, and the bot tag allowance by the bot account, so an owner changing a bot's tag draws on the bot's allowance. The guild member allowances are keyed by the guild and the member together, and one account holds a separate allowance in each guild. The login allowances are keyed by the account and by the MFA ticket respectively, and the sudo allowance by the account.
 
-Fluxer consumes every multi-factor allowance before it checks the code, so a correct code drawn against an exhausted allowance is reported exactly like a wrong one. A correct code clears the counter. A completed passkey bridge ceremony clears nothing, and redeeming a `login_mfa` ceremony clears the login counters. The ticket allowance also destroys the MFA ticket as it denies, and the client restarts from [Log in with a password](/http-api/authentication/#log-in-with-a-password).
+Fluxer consumes every multi-factor allowance before it checks the code, so a correct code drawn against an exhausted allowance is reported exactly like a wrong one. A correct code clears the counter. The ticket allowance also destroys the MFA ticket as it denies, and the client restarts from [Log in with a password](/http-api/authentication/#log-in-with-a-password).
 
 ### Allowances answering neither shape
 
 [Get desktop handoff information](/http-api/authentication/#get-desktop-handoff-information) and [Complete desktop handoff](/http-api/authentication/#complete-desktop-handoff) share one failed-attempt counter keyed by the client IP address. Five failures block both operations for 15 minutes from the most recent failure, and a blocked request returns 400 `INVALID_HANDOFF_CODE` as a top-level code with no validation entry. Get desktop handoff information separately permits three successful lookups for each handoff code and reports a fourth with the same top-level code.
-
-[Refund latest purchase](/http-api/billing/#refund-latest-purchase) permits one self-serve refund every 30 days for each account and reports a request inside that window as 403 `STRIPE_REFUND_COOLDOWN_ACTIVE`.
 
 [Slowmode](#slowmode) is enforced inside the handler as well.
 

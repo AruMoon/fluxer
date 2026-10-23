@@ -36,7 +36,7 @@ The [global HTTP limit](/topics/rate-limits/) applies to every management route.
 
 ## Origin refusal
 
-Fluxer refuses a call from a first-party web client on [Execute webhook](#execute-webhook), [Get webhook message](#get-webhook-message), [Edit webhook message](#edit-webhook-message), and [Delete webhook message](#delete-webhook-message). A request whose `Origin` header is exactly `https://web.fluxer.app`, `https://web.canary.fluxer.app`, or one of the instance's own web app origins returns 403 `INVALID_API_ORIGIN`. Those are the origin of `FLUXER_APP_ENDPOINT` and every `FLUXER_APP_ORIGIN_ALIASES` entry.
+Fluxer refuses a call from a first-party web client on [Execute webhook](#execute-webhook), [Get webhook message](#get-webhook-message), [Edit webhook message](#edit-webhook-message), and [Delete webhook message](#delete-webhook-message). A request whose `Origin` header is one of the instance's own web app origins returns 403 `INVALID_API_ORIGIN`. Those are the origin of `FLUXER_APP_ENDPOINT` and every `FLUXER_APP_ORIGIN_ALIASES` entry.
 
 A request that sends no `Origin`, or any other `Origin` value, passes the check. It runs after the route rate limit and before path validation.
 
