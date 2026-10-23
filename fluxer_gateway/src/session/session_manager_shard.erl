@@ -4,8 +4,6 @@
 -typing([eqwalizer]).
 -behaviour(gen_server).
 
--include_lib("fluxer_gateway/include/timeout_config.hrl").
-
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export_type([session_data/0, user_id/0]).

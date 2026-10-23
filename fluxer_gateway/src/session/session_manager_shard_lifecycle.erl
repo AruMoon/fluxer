@@ -8,14 +8,12 @@
     start_session_process/4,
     start_identify_fetch/5,
     note_identify_slot_acquired/3,
-    complete_identify_fetch/3,
-    complete_identify_fetch/4,
+    complete_identify_fetch/3, complete_identify_fetch/4,
     handle_identify_fetch_timeout/3,
     maybe_fail_pending_identify/4,
     cleanup_identify_worker/2,
     resolve_identify_result/4,
-    reply_to_waiters/2,
-    build_and_start_session/8
+    reply_to_waiters/2
 ]).
 
 -export_type([session_id/0, session_ref/0, state/0, pending_identify/0, start_reply/0]).
@@ -135,7 +133,6 @@ handle_existing_pending(
         true ->
             UpdatedPending = PendingIdentify#{
                 request => Request,
-                socket_pid => SocketPid,
                 froms => [From | maps:get(froms, PendingIdentify, [])]
             },
             NewPending = PendingIdentifies#{SessionId := UpdatedPending},

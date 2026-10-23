@@ -5,11 +5,6 @@
 -behaviour(cowboy_websocket).
 
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
--export([new_state/0]).
-
--ifdef(TEST).
--export([parse_forwarded_for/1]).
--endif.
 
 -type state() :: #{
     version := 1 | undefined,
