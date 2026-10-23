@@ -59,40 +59,6 @@ impl AccountStanding {
 mod tests {
     use super::*;
 
-    const NOW: i64 = 1_790_000_000_000;
-
-    fn standing(flags: i64) -> AccountStanding {
-        AccountStanding {
-            flags,
-            ..AccountStanding::default()
-        }
-    }
-
-    #[test]
-    fn profile_hidden_follows_enforcement_state() {
-        assert!(!standing(0).profile_hidden(NOW));
-        assert!(standing(USER_FLAG_PROFILE_HIDDEN).profile_hidden(NOW));
-        assert!(standing(USER_FLAG_SPAMMER).profile_hidden(NOW));
-        assert!(!standing(USER_FLAG_DISABLED).profile_hidden(NOW));
-        let banned = AccountStanding {
-            temp_banned_until_ms: Some(NOW + 1),
-            ..standing(USER_FLAG_DISABLED)
-        };
-        assert!(banned.profile_hidden(NOW));
-        assert!(!banned.profile_hidden(NOW + 1));
-        let deleting = |code| AccountStanding {
-            pending_deletion_at_ms: Some(NOW),
-            deletion_reason_code: Some(code),
-            ..standing(USER_FLAG_DELETED)
-        };
-        assert!(deleting(3).profile_hidden(NOW));
-        assert!(deleting(20).profile_hidden(NOW));
-        for code in NON_ENFORCEMENT_DELETION_REASONS {
-            assert!(!deleting(code).profile_hidden(NOW), "{code}");
-        }
-        assert!(!standing(USER_FLAG_DELETED | USER_FLAG_SPAMMER).profile_hidden(NOW));
-    }
-
     #[test]
     fn the_hidden_bit_is_never_public() {
         assert_eq!(

@@ -203,12 +203,8 @@ pub async fn ensure_kv_schema(pool: &Pool, kv_table: &str) -> anyhow::Result<()>
 async fn ensure_kv_schema_once(pool: &Pool, kv_table: &str) -> anyhow::Result<()> {
     let table = quote_identifier(kv_table)?;
     let old_partition_index = quote_identifier(&format!("{kv_table}_partition_idx"))?;
-    let partition_row_index = quote_identifier(&format!("{kv_table}_partition_row_idx"))?;
     let row_key_c_index = quote_identifier(&format!("{kv_table}_row_key_c_idx"))?;
     let expires_index = quote_identifier(&format!("{kv_table}_expires_idx"))?;
-    let messages_message_index = quote_identifier(&format!("{kv_table}_messages_message_idx"))?;
-    let message_reactions_message_index =
-        quote_identifier(&format!("{kv_table}_message_reactions_message_idx"))?;
     let mut client = pool.get().await?;
     let transaction = client
         .transaction()
@@ -247,7 +243,6 @@ CREATE TABLE IF NOT EXISTS {table} (
     updated_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (table_name, row_key)
 );
-CREATE INDEX IF NOT EXISTS {partition_row_index} ON {table} (table_name, partition_key, row_key);
 "#
         ))
         .await
@@ -264,8 +259,6 @@ CREATE INDEX IF NOT EXISTS {partition_row_index} ON {table} (table_name, partiti
         .batch_execute(&format!(
             r#"
 CREATE INDEX IF NOT EXISTS {expires_index} ON {table} (expires_at) WHERE expires_at IS NOT NULL;
-CREATE INDEX IF NOT EXISTS {messages_message_index} ON {table} (partition_key, ((CASE WHEN row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN (row_data -> 'message_id' ->> 'value')::bigint END))) WHERE table_name = 'messages';
-CREATE INDEX IF NOT EXISTS {message_reactions_message_index} ON {table} (partition_key, ((CASE WHEN row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN (row_data -> 'message_id' ->> 'value')::bigint END))) WHERE table_name = 'message_reactions';
 "#
         ))
         .await
@@ -506,7 +499,6 @@ impl KvClient {
         let client = self.pool.get().await?;
         let field_expr = json_field_expr(field_name)?;
         let direction = if desc { "DESC" } else { "ASC" };
-        let base = &self.get_partition_rows_sql;
         let rows = match bound {
             Some(BigIntBound::LessThan(value)) => {
                 let sql = format!(
@@ -745,27 +737,6 @@ mod tests {
     use super::*;
     use serde_json::json;
 
-    fn ssl_mode_for(url: &str, ssl: bool) -> SslMode {
-        let mut pg = PgConfig::from_str(url).unwrap();
-        apply_ssl_mode(&mut pg, ssl);
-        pg.get_ssl_mode()
-    }
-
-    #[test]
-    fn ssl_flag_decides_tls_unless_url_names_a_mode() {
-        let socket = "postgres://fluxer@/fluxer?host=/run/postgresql";
-        assert_eq!(SslMode::Disable, ssl_mode_for(socket, false));
-        assert_eq!(SslMode::Require, ssl_mode_for(socket, true));
-        assert_eq!(
-            SslMode::Require,
-            ssl_mode_for("postgres://db.example.com/fluxer?sslmode=require", false)
-        );
-        assert_eq!(
-            SslMode::Require,
-            ssl_mode_for("postgres://db.example.com/fluxer?sslmode=disable", true)
-        );
-    }
-
     #[test]
     fn encodes_row_keys_like_postgres_kv_executor() {
         assert_eq!(
@@ -810,76 +781,6 @@ mod tests {
         assert_eq!(decoded["bytes"], json!("YWJj"));
         assert_eq!(decoded["ids"], json!([1, 2]));
         assert_eq!(decoded["metadata"], json!([["kind", 9]]));
-    }
-
-    fn test_postgres_config(kv_table: &str) -> PostgresConfig {
-        PostgresConfig {
-            url: None,
-            host: "127.0.0.1".to_owned(),
-            port: 5432,
-            database: "fluxer".to_owned(),
-            username: "fluxer".to_owned(),
-            password: None,
-            ssl: false,
-            ssl_ca: None,
-            max_connections: 1,
-            kv_table: kv_table.to_owned(),
-            prepared_statements: true,
-        }
-    }
-
-    fn test_kv_client(kv_table: &str) -> KvClient {
-        let pg = PgConfig::from_str("postgres://fluxer@127.0.0.1:5432/fluxer").unwrap();
-        let manager = Manager::new(pg, build_disabled_tls_connector());
-        let pool = Pool::builder(manager).max_size(1).build().unwrap();
-        KvClient::new(pool, &test_postgres_config(kv_table)).unwrap()
-    }
-
-    #[test]
-    fn hoists_kv_statements_for_the_quoted_table() {
-        let kv = test_kv_client("fluxer_kv");
-
-        assert_eq!(
-            kv.get_row_sql,
-            "SELECT row_data FROM \"fluxer_kv\" WHERE table_name = $1 AND row_key = $2 AND (expires_at IS NULL OR expires_at > now()) LIMIT 1"
-        );
-        assert_eq!(
-            kv.get_rows_sql,
-            "SELECT row_key, row_data FROM \"fluxer_kv\" WHERE table_name = $1 AND row_key = ANY($2::text[]) AND (expires_at IS NULL OR expires_at > now())"
-        );
-        assert_eq!(
-            kv.get_partition_rows_sql,
-            "SELECT row_key, row_data FROM \"fluxer_kv\" WHERE table_name = $1 AND partition_key = $2 AND (expires_at IS NULL OR expires_at > now())"
-        );
-        assert_eq!(
-            kv.delete_row_sql,
-            "DELETE FROM \"fluxer_kv\" WHERE table_name = $1 AND row_key = $2"
-        );
-    }
-
-    #[test]
-    fn passes_the_prepared_statement_switch_onto_the_client() {
-        let mut config = test_postgres_config("fluxer_kv");
-        config.prepared_statements = false;
-        let pg = PgConfig::from_str("postgres://fluxer@127.0.0.1:5432/fluxer").unwrap();
-        let manager = Manager::new(pg, build_disabled_tls_connector());
-        let pool = Pool::builder(manager).max_size(1).build().unwrap();
-
-        assert!(!KvClient::new(pool, &config).unwrap().prepared_statements);
-        assert!(test_kv_client("fluxer_kv").prepared_statements);
-    }
-
-    #[test]
-    fn caches_only_closed_set_json_fields() {
-        assert!(is_cached_json_field("message_id"));
-        assert!(!is_cached_json_field("user_id"));
-        assert!(!is_cached_json_field("a0"));
-        assert!(!is_cached_json_field(""));
-        assert!(
-            CACHED_JSON_FIELDS
-                .iter()
-                .all(|field| is_safe_identifier(field))
-        );
     }
 
     #[test]

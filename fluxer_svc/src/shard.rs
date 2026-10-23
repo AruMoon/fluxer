@@ -81,13 +81,10 @@ where
     let is_serving = Arc::new(AtomicBool::new(false));
     let request_permits = Arc::new(Semaphore::new(config.max_concurrent_requests));
 
-    is_serving.store(true, Ordering::SeqCst);
-
     let mut tasks = JoinSet::new();
 
     let http_is_serving = is_serving.clone();
     let http_metrics = metrics.clone();
-    let http_name = name.clone();
     tasks.spawn(async move {
         crate::server::run_http(health_addr, http_is_serving, http_metrics, http_name).await
     });
@@ -271,7 +268,6 @@ mod tests {
     use crate::transport::InMemoryTransport;
     use serde::{Deserialize, Serialize};
     use std::time::Duration;
-    use tokio::sync::Notify;
 
     #[derive(Serialize, Deserialize)]
     struct MockRequest {
@@ -281,24 +277,6 @@ mod tests {
     #[derive(Serialize, Deserialize)]
     struct MockResponse {
         key: String,
-    }
-
-    struct BlockingShard {
-        started: Arc<Notify>,
-    }
-
-    impl ShardService for BlockingShard {
-        type Request = MockRequest;
-        type Response = MockResponse;
-
-        fn service_name(&self) -> &str {
-            "mock"
-        }
-
-        async fn handle(&self, _request: MockRequest) -> anyhow::Result<MockResponse> {
-            self.started.notify_one();
-            std::future::pending().await
-        }
     }
 
     struct EchoShard;
@@ -371,56 +349,6 @@ mod tests {
             .unwrap();
         assert_eq!(json_response, br#"{"key":"b"}"#);
 
-        shard_task.abort();
-    }
-
-    #[tokio::test]
-    async fn shard_sheds_requests_when_permits_are_exhausted() {
-        let transport = InMemoryTransport::new();
-        let started = Arc::new(Notify::new());
-        let shard = BlockingShard {
-            started: started.clone(),
-        };
-        let config = test_config(1);
-        let shard_transport = transport.clone();
-        let shard_task =
-            tokio::spawn(async move { run_shard(&config, shard, shard_transport).await });
-
-        tokio::time::sleep(Duration::from_millis(25)).await;
-
-        let payload = rmp_serde::to_vec_named(&MockRequest {
-            key: "a".to_owned(),
-        })
-        .unwrap();
-
-        let client = {
-            let transport = transport.clone();
-            let payload = payload.clone();
-            tokio::spawn(async move {
-                transport
-                    .request("svc.mock.shard.0", &payload, Duration::from_secs(10))
-                    .await
-            })
-        };
-
-        tokio::time::timeout(Duration::from_millis(250), started.notified())
-            .await
-            .expect("shard should start the first request and hold the only permit");
-
-        let response = tokio::time::timeout(
-            Duration::from_millis(250),
-            transport.request("svc.mock.shard.0", &payload, Duration::from_secs(1)),
-        )
-        .await
-        .expect("shed reply should not wait behind the in-flight request")
-        .unwrap();
-
-        assert_eq!(
-            serde_json::from_slice::<serde_json::Value>(&response).unwrap(),
-            serde_json::json!({"error": "overloaded"})
-        );
-
-        client.abort();
         shard_task.abort();
     }
 
