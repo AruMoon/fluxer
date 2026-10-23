@@ -21,7 +21,7 @@ export function isTrustedExternalUrl(url: string): boolean {
 	}
 }
 
-export function openUrlInBrowserWithWarning(url: string): void {
+function openUrlInBrowserWithWarning(url: string): void {
 	const target = unwrapDesktopLocalResourceURL(url);
 	if (isTrustedExternalUrl(target)) {
 		void openExternalUrl(target);

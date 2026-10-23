@@ -25,7 +25,7 @@ import {useLingui} from '@lingui/react/macro';
 import {observer} from 'mobx-react-lite';
 import {useEffect} from 'react';
 
-export function useThreadRosterSubscription(thread: Channel | undefined): void {
+function useThreadRosterSubscription(thread: Channel | undefined): void {
 	const guildId = thread?.guildId;
 	const threadId = thread?.id;
 	useEffect(() => {
@@ -61,6 +61,7 @@ const RosterGroup = observer(({id, guildRole, label, members, thread, ownerId}: 
 				name={label}
 				count={members.length}
 				className={styles.groupHeader}
+				data-flx="threads.thread-members-panel.roster-group.group-header"
 			/>
 			<div className={styles.membersList} data-flx="threads.thread-members-panel.roster-group.members-list">
 				{members.map(({user, member, status, mobile, customStatus}) => (
