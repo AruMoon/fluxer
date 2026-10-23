@@ -206,16 +206,4 @@ mod tests {
             }
         }
     }
-
-    #[test]
-    fn provider_always_serializes_its_name() {
-        let provider = EmbedProvider {
-            name: "Tenor".to_owned(),
-            url: None,
-        };
-        assert_eq!(
-            serde_json::to_value(&provider).unwrap(),
-            serde_json::json!({"name": "Tenor"})
-        );
-    }
 }

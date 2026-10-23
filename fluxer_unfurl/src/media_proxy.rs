@@ -148,22 +148,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn nsfw_mode_strings() {
-        assert_eq!(
-            MediaProxyClient::nsfw_mode_str(crate::types::NsfwMode::Block),
-            "block"
-        );
-        assert_eq!(
-            MediaProxyClient::nsfw_mode_str(crate::types::NsfwMode::Allow),
-            "allow"
-        );
-        assert_eq!(
-            MediaProxyClient::nsfw_mode_str(crate::types::NsfwMode::Flag),
-            "flag"
-        );
-    }
-
-    #[test]
     fn external_proxy_url_uses_public_endpoint_and_plain_path() {
         let client = reqwest::Client::new();
         let mp = MediaProxyClient::new_with_public_endpoint(

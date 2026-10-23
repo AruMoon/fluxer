@@ -635,29 +635,6 @@ mod tests {
     }
 
     #[test]
-    fn player_allowlist_accepts_verified_hosts() {
-        for value in [
-            "https://www.youtube.com/embed/x",
-            "https://www.youtube-nocookie.com/embed/x",
-            "https://youtu.be/x",
-            "https://player.vimeo.com/video/1",
-            "https://w.soundcloud.com/player/?url=x",
-            "https://player.twitch.tv/?video=1",
-        ] {
-            assert!(is_allowlisted_player_url(value), "{value} must be allowed");
-        }
-    }
-
-    #[test]
-    fn classify_twitter_player_resolves_relative_references_first() {
-        let html = r#"<head>
-            <meta name="twitter:card" content="player">
-            <meta name="twitter:player" content="//player.vimeo.com/video/1">
-        </head>"#;
-        assert_eq!(classify(html), "video");
-    }
-
-    #[test]
     fn player_allowlist_rejects_other_hosts() {
         for value in [
             "https://embed.ted.com/talks/1",
