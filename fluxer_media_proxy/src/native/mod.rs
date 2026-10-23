@@ -133,15 +133,6 @@ unsafe extern "C" {
         bands: *mut c_int,
         format: *mut c_int,
     ) -> c_int;
-    pub fn fluxer_apng_probe(
-        buf: *const c_void,
-        len: size_t,
-        max_frames: c_int,
-        max_total_pixels: size_t,
-        width: *mut c_int,
-        height: *mut c_int,
-        frames: *mut c_int,
-    ) -> c_int;
     pub fn fluxer_vips_image_new_from_buffer(
         buf: *const c_void,
         len: size_t,
@@ -245,11 +236,6 @@ unsafe extern "C" {
     fn fluxer_av_free(mem: *mut c_void);
     fn fluxer_free_int_array(values: *mut c_int);
 
-    pub fn fluxer_heif_validate(
-        buf: *const c_void,
-        len: size_t,
-        deadline_monotonic_ms: c_longlong,
-    ) -> c_int;
     pub fn fluxer_heif_decode_primary_still(
         buf: *const c_void,
         len: size_t,
@@ -285,13 +271,6 @@ unsafe extern "C" {
         out_buf: *mut *mut c_void,
         out_size: *mut size_t,
         out_capacity: *mut size_t,
-    ) -> c_int;
-    pub fn fluxer_validate_gif_animation(
-        gif_data: *const c_void,
-        gif_len: size_t,
-        max_frames: c_int,
-        max_duration_ms: c_int,
-        max_total_pixels: size_t,
     ) -> c_int;
     pub fn fluxer_ffmpeg_video_thumbnail_ex(
         media_data: *const c_void,

@@ -41,8 +41,6 @@ void fluxer_vips_error_clear(void);
 const char *fluxer_vips_error_buffer(void);
 void fluxer_vips_tune_for_server(int per_pipeline_threads);
 int fluxer_vips_probe_animated(const void *buf, size_t len, int *width, int *height, int *pages, int *bands, int *format);
-int fluxer_apng_probe(const void *buf, size_t len, int max_frames,
-                      size_t max_total_pixels, int *width, int *height, int *frames);
 VipsImage *fluxer_vips_image_new_from_buffer(const void *buf, size_t len, const char *option_string);
 VipsImage *fluxer_vips_image_new_from_memory(const void *data, size_t size, int width, int height, int bands, int format);
 VipsImage *fluxer_vips_image_new_from_memory_copy(const void *data, size_t size, int width, int height, int bands, int format);
@@ -123,14 +121,6 @@ int fluxer_ffmpeg_resize_gif(
     void **out_buf,
     size_t *out_size,
     size_t *out_capacity
-);
-
-int fluxer_validate_gif_animation(
-    const void *gif_data,
-    size_t gif_len,
-    int max_frames,
-    int max_duration_ms,
-    size_t max_total_pixels
 );
 
 int fluxer_ffmpeg_video_thumbnail_ex(
