@@ -36,13 +36,6 @@ To obtain the creation time in Unix milliseconds, shift the snowflake right by 2
 
 ```text
 timestamp_ms = (snowflake >> 22) + 1420070400000
-```
-
-A thread started from a message has the ID of that message. The formula then returns the time of the message, and `create_timestamp` in the [thread metadata](/http-api/threads/#thread-metadata-object) is the time the thread was created.
-
-The inverse expression produces the smallest possible snowflake for a Unix millisecond timestamp. It is useful as a pagination boundary.
-
-```text
 snowflake = (timestamp_ms - 1420070400000) << 22
 ```
 
@@ -59,13 +52,13 @@ Fluxer emits a snowflake as an unsigned decimal string in every JSON body, path 
 | HTTP request<sup>1</sup> | `0`, or a non-zero digit followed by further digits, sent as a JSON string or as a JSON integer |
 | Gateway command<sup>2</sup> | A non-zero digit followed by further digits, sent as a string of ASCII digits or as a positive JSON integer |
 
-<sup>1</sup> Fluxer removes leading and trailing whitespace before it reads the text. In that text a leading zero, a sign, a decimal point, and any other non-digit character are rejected with the validation code [`INVALID_SNOWFLAKE_FORMAT`](/http-api/errors/#validation-error-code-registry), and a well-formed value above 9223372036854775807 is rejected with [`SNOWFLAKE_OUT_OF_RANGE`](/http-api/errors/#validation-error-code-registry)
+<sup>1</sup> Fluxer removes leading and trailing whitespace before it reads the text. In that text a leading zero, a sign, a decimal point, and any other non-digit character are rejected with the validation code [`INVALID_SNOWFLAKE_FORMAT`](/http-api/errors/#validation-error-codes), and a well-formed value above 9223372036854775807 is rejected with [`SNOWFLAKE_OUT_OF_RANGE`](/http-api/errors/#validation-error-codes)
 
 <sup>2</sup> The Gateway rejects `0`, a leading zero, a signed value, a negative integer, and a value above 9223372036854775807
 
-Both HTTP validation codes are element codes inside a 400 [`INVALID_FORM_BODY`](/http-api/errors/#api-error-code-registry) response. Each Gateway [command](/gateway/commands/) states what its own rejection does, from discarding the field to abandoning the whole command.
+Both HTTP validation codes are element codes inside a 400 [`INVALID_FORM_BODY`](/http-api/errors/#api-error-codes) response. Each Gateway [command](/gateway/commands/) states what its own rejection does, from discarding the field to abandoning the whole command.
 
-A snowflake sent as a JSON number keeps its exact value at any size. A fractional JSON number is an ordinary type failure and reports [`INVALID_FORMAT`](/http-api/errors/#validation-error-code-registry). Fluxer reads an exponent form as the number it means, and one above 9007199254740991 reports [`INVALID_SNOWFLAKE_FORMAT`](/http-api/errors/#validation-error-code-registry). Path parameters and query string parameters always arrive as text.
+A snowflake sent as a JSON number keeps its exact value at any size. A fractional JSON number is an ordinary type failure and reports [`INVALID_FORMAT`](/http-api/errors/#validation-error-codes). Fluxer reads an exponent form as the number it means, and one above 9007199254740991 reports [`INVALID_SNOWFLAKE_FORMAT`](/http-api/errors/#validation-error-codes). Path parameters and query string parameters always arrive as text.
 
 :::note[`0` is the beginning of snowflake time]
 An HTTP pagination cursor accepts `0`. An HTTP path parameter or field that identifies a real resource also accepts `0`, and the request then receives the ordinary not-found result for that resource.

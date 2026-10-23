@@ -76,4 +76,4 @@ Fluxer skips the check in three cases, and the operation then proceeds with no C
 | CAPTCHA_REQUIRED | 400 | The operation is gated and the request has no token |
 | INVALID_CAPTCHA | 400 | The token is malformed, expired, already used, or wrong |
 
-Both codes are defined in the [API error code registry](/http-api/errors/#api-error-code-registry). Both bodies are the ordinary [error response](/http-api/#error-response) envelope with `captcha_provider` and `altcha_challenge` added.
+Both codes are listed under [API error codes](/http-api/errors/#api-error-codes). Both bodies are the ordinary [error response](/http-api/#error-response) envelope with `captcha_provider` and `altcha_challenge` added.

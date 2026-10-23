@@ -352,6 +352,8 @@ A verification level gates member participation. Fluxer evaluates it when a memb
 
 The guild owner, a bot, and any member holding at least one role bypass the check at every level.
 
+An unclaimed account that fails the check gets 403 `GUILD_VERIFICATION_REQUIRED`, and an unverified email address gets 403 `GUILD_EMAIL_VERIFICATION_REQUIRED`. An account younger than 5 minutes gets 403 `ACCOUNT_TOO_NEW_FOR_GUILD`. At HIGH, a membership younger than 10 minutes gets 403 `GUILD_VERIFICATION_REQUIRED`.
+
 ## MFA levels
 
 | Value | Name | Description |

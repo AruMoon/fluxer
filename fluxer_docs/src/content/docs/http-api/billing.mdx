@@ -83,6 +83,7 @@ Creates a recurring premium checkout session and returns a [redirect URL](#redir
 - A gift price, a price outside the resolved country catalogue, and an omitted country code for a price that requires one all return 400 `STRIPE_INVALID_PRODUCT_CONFIGURATION`.
 - An unclaimed account returns 400 `UNCLAIMED_ACCOUNT_CANNOT_MAKE_PURCHASES`.
 - An unverified email address returns 403 `PURCHASE_EMAIL_VERIFICATION_REQUIRED`.
+- A verified account with no email address, such as any account on a `username` instance, returns 403 `PURCHASE_RECEIPT_EMAIL_REQUIRED`.
 - The purchase-disabled premium flag returns 403 `PREMIUM_PURCHASE_BLOCKED` with the reason `purchase_disabled`.
 - An open payment dispute the account made returns 403 `PREMIUM_PURCHASE_BLOCKED` with the reason `payment_dispute_open`, for a subscription and a gift alike.
 - A lifetime premium account cannot buy a recurring subscription and returns 403 `PREMIUM_PURCHASE_BLOCKED` with the reason `lifetime`.
@@ -147,6 +148,7 @@ Creates a one-off premium gift checkout session and returns a [redirect URL](#re
 ### Limitations
 
 - The claimed account, verified email, purchase flag and open payment dispute requirements of [create subscription checkout](#create-subscription-checkout) apply unchanged, with the same codes.
+- A verified account with no email address can still buy a gift, so `PURCHASE_RECEIPT_EMAIL_REQUIRED` does not apply.
 - The submitted price is a registered gift price for the resolved country catalogue, so a recurring price returns 400 `STRIPE_INVALID_PRODUCT_CONFIGURATION`.
 
 Neither the lifetime block nor the existing subscription block applies here, so a lifetime premium account can buy gifts.

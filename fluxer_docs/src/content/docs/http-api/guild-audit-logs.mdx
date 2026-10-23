@@ -241,8 +241,6 @@ An update records one change object per differing field, so an unchanged field i
 
 ### Change fields
 
-Each table below names the fields an action of that family can record.
-
 #### Guild change fields
 
 Recorded by [GUILD_UPDATE](#audit-actions).
@@ -530,7 +528,7 @@ A guild ID that names no guild returns 404 `UNKNOWN_GUILD`. A non-member of an e
 
 <sup>1</sup> A negative value and a value above 100 are both rejected, and the accepted value `0` is processed as `1`
 
-<sup>2</sup> The cursors are mutually exclusive, and supplying both returns 400 `INVALID_FORM_BODY` with [`CANNOT_SPECIFY_BOTH_BEFORE_AND_AFTER`](/http-api/errors/#validation-error-code-registry) against `before`
+<sup>2</sup> The cursors are mutually exclusive, and supplying both returns 400 `INVALID_FORM_BODY` with [`CANNOT_SPECIFY_BOTH_BEFORE_AND_AFTER`](/http-api/errors/#validation-error-codes) against `before`
 
 <sup>3</sup> Supplying either filter disables message deletion consolidation for the request, so a page filtered by actor or action returns the unconsolidated entries
 

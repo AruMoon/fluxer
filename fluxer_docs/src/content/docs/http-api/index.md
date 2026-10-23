@@ -187,13 +187,13 @@ The paths below are readable from any origin. `/v1/webhooks/{webhook_id}/{token}
 
 ## Error response object
 
-A JSON error response identifies the stable error code and a human-readable message. An operation can add further top-level members with structured detail. [Errors](/http-api/errors/) documents the code registries, the HTTP status fallback mapping, and the localisation behaviour.
+A JSON error response identifies the stable error code and a human-readable message. An operation can add further top-level members with structured detail. [Errors](/http-api/errors/) lists status codes and every error code.
 
 ### Structure
 
 | Field | Type | Description |
 | --- | --- | --- |
-| code<sup>1</sup> | string | Stable machine-readable [API error code](/http-api/errors/#api-error-code-registry) |
+| code<sup>1</sup> | string | Stable machine-readable [API error code](/http-api/errors/#api-error-codes) |
 | message<sup>2</sup> | string | Human-readable description of this failure |
 | errors?<sup>3</sup> | array[[validation error](#validation-error-object) object] | Request fields that failed validation |
 
@@ -214,15 +214,11 @@ A JSON error response identifies the stable error code and a human-readable mess
 
 The body has no request identifier. A client correlates a failure through the `X-Request-ID` response header.
 
-:::note[Structured detail sits at the top level]
-`IP_AUTHORIZATION_REQUIRED` has `ip_authorization_required`, `ticket`, `email`, and `resend_available_in`. `SUDO_MODE_REQUIRED` has `has_mfa` and `methods`.
-:::
-
-`MISSING_OAUTH_SCOPE` has `required_scope`, and `RATE_LIMITED` has `retry_after` and `global`, where `global` is `true` only on a global bucket denial. Each operation that produces one of those members documents it. A client MUST treat any member it does not recognise as absent. Two operations returning the same `code` can have different extra members, so a client MUST read the members its own operation documents.
+Some codes add top-level fields, listed under [Extra fields](/http-api/errors/#extra-fields). A client MUST treat any member it does not recognise as absent. Two operations returning the same `code` can have different extra members, so a client MUST read the members its own operation documents.
 
 ## Validation error object
 
-Each entry identifies one failed input field. A 400 response whose top-level code is `INVALID_FORM_BODY` has the array in `errors`. [Errors](/http-api/errors/#validation-failure-codes) states which failures produce it.
+Each entry identifies one failed input field. A 400 response whose top-level code is `INVALID_FORM_BODY` has the array in `errors`. [Errors](/http-api/errors/#validation-errors) states which failures produce it.
 
 ### Structure
 
@@ -234,7 +230,7 @@ Each entry identifies one failed input field. A 400 response whose top-level cod
 
 <sup>1</sup> A nested field is a dot-joined path such as `embeds.0.title`, and a failure with no field position uses the literal path `root`
 
-<sup>2</sup> Present whenever the failure has an enumerated code from the [validation error code registry](/http-api/errors/#validation-error-code-registry)
+<sup>2</sup> Present whenever the failure has an enumerated code from the [validation error codes](/http-api/errors/#validation-error-codes)
 
 <sup>3</sup> The localised message registered for the `code`, falling back to the code itself, and a fixed English string on a failure that has no code
 

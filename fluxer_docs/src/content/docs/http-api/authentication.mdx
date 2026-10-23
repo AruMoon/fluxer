@@ -127,6 +127,40 @@ The ID of a registration that an administrator has yet to approve. Registration 
 | registration_pending_approval | boolean | Always `true` |
 | user_id | snowflake | The registered account ID awaiting approval |
 
+## Network block response
+
+A request from a blocked network returns 403 `GLOBAL_IP_BANNED` or `GLOBAL_IP_TEMPORARILY_BANNED`. The [error response](/http-api/#error-response) has these extra fields.
+
+- `ip_address` is the normalised client address.
+- `appeal_email` is always `null` on a self-hosted instance, and `message` names no address.
+- `appeals_supported` is always `false` on a self-hosted instance.
+- `ban_kind` is `permanent` or `temporary_24h`. `temporary_24h` covers every ban that records an expiry, whatever its length.
+- `expires_at` is an ISO 8601 timestamp when the ban records an expiry, and `null` otherwise, including on every permanent ban.
+- `reason` is the rule behind the block, as `title` and `url`, or `null`. It is present only when an account decision placed the block and its rule is one Fluxer names on this screen, such as spam or service abuse. Every other block, including a decision whose rule is withheld, returns a response identical to a plain block of the same kind, so `null` says nothing about why the network was blocked. `url` is `null` when the instance has no policy page for the rule.
+- `product_name` is the instance name the server uses in `message`. On a self-hosted instance with no name, or one still named Fluxer, it is the web app host name.
+
+`message` starts with the block and its end date. It then tells someone on a shared network, such as a school, a workplace, public Wi-Fi, a mobile carrier or a VPN, that the block may have nothing to do with them and that switching networks is the quickest fix. `GET /.well-known/fluxer` is never blocked, so a client can still discover the instance and show this screen.
+
+## Enforcement notice object
+
+`ACCOUNT_SUSPENDED_TEMPORARILY` and `ACCOUNT_SUSPENDED_PERMANENTLY` have `notice`, the enforcement notice for the account, in the request locale. It is `null` only for an account its holder deleted.
+
+- `decision_id` is the decision reference, or `null` for a restriction from before decisions.
+- `kind` is what the decision did, `suspension` or `closure` on these codes.
+- `permanent` is `true` for a suspension with no end date.
+- `issued_at`, `ends_at` and `deletion_at` are ISO 8601 timestamps or `null`.
+- `summary` is one sentence saying what happened, and `effects` lists what the decision means for the holder.
+- `rule` is the rule broken, as `title` and `url`, or `null`.
+- `facts` is the finding first, then where and when it happened.
+- `statement` is a note from the team, or `null`.
+- `how_we_decided` lists how the case reached the team and who decided it.
+- `appeal` is `email`, `deadline` and `account_has_email`, or `null` on an instance with no appeal route. `deadline` is already formatted for the reader.
+- `redress` lists other ways to challenge the decision.
+
+A line in `effects`, `facts` or `redress` can hold a link written as a Markdown link, `[text](url)`. A client shows the text as a link to the address.
+
+An account with no email address receives its notice here. The first sign-in that shows it records it as received, and the appeal deadline counts from then.
+
 ## Partial user object
 
 Every authenticated result on this page embeds the public account representation. The [partial user object](/http-api/users/#partial-user-object) on the Users resource defines it, together with its [reply mention preferences](/http-api/users/#reply-mention-preferences).
@@ -911,14 +945,14 @@ When the instance has disabled new-IP authorisation or sends no email, Fluxer au
 
 Account policy can return 403 `REGISTRATION_PENDING_APPROVAL`, 403 `REGISTRATION_REJECTED`, 403 `ACCOUNT_SUSPENDED_TEMPORARILY`, or 403 `ACCOUNT_SUSPENDED_PERMANENTLY`. A bot account returns 403 `BOT_USER_AUTH_ENDPOINT_ACCESS_DENIED`.
 
-A suspended or closed account gets its 403 after the last factor. Without a second factor that is the password, so login returns it. With a second factor, login returns the MFA ticket and the second factor returns the 403. Both suspension codes have the account's [enforcement notice](/http-api/errors/#supplementary-members). A suspension with no end date and a closed account return `ACCOUNT_SUSPENDED_PERMANENTLY`, and a suspension with an end date returns `ACCOUNT_SUSPENDED_TEMPORARILY`. An expired temporary suspension is cleared at the same point.
+A suspended or closed account gets its 403 after the last factor. Without a second factor that is the password, so login returns it. With a second factor, login returns the MFA ticket and the second factor returns the 403. Both suspension codes have the account's [enforcement notice](#enforcement-notice-object). A suspension with no end date and a closed account return `ACCOUNT_SUSPENDED_PERMANENTLY`, and a suspension with an end date returns `ACCOUNT_SUSPENDED_TEMPORARILY`. An expired temporary suspension is cleared at the same point.
 
 :::note[Signing in reactivates the account]
 On an account the user had disabled, signing in clears the disabled state. It also cancels a self-scheduled deletion if erasure has not started. Both happen when the session is created, after any second factor, without a separate confirmation step. Once erasure starts, login returns `ACCOUNT_SUSPENDED_PERMANENTLY`.
 :::
 
 :::note[Signing in from a blocked network]
-A [blocked network](/http-api/errors/#supplementary-members) can still reach this operation, the second factor operations, passkey sign-in and SSO, so the holder of a suspended or closed account sees its notice. Every other outcome returns the same `GLOBAL_IP_BANNED` or `GLOBAL_IP_TEMPORARILY_BANNED` body any other request from that network gets. That covers an unknown account, a wrong password, and an account that is not suspended or closed, with or without a second factor. No session, MFA ticket or IP authorisation message is created, and SSO provisions no new account.
+A [blocked network](#network-block-response) can still reach this operation, the second factor operations, passkey sign-in and SSO, so the holder of a suspended or closed account sees its notice. Every other outcome returns the same `GLOBAL_IP_BANNED` or `GLOBAL_IP_TEMPORARILY_BANNED` body any other request from that network gets. That covers an unknown account, a wrong password, and an account that is not suspended or closed, with or without a second factor. No session, MFA ticket or IP authorisation message is created, and SSO provisions no new account.
 :::
 
 ### Response

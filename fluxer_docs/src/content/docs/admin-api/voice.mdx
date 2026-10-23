@@ -205,12 +205,6 @@ The operation records one [Admin audit entry](/admin-api/#admin-audit-entry-obje
 
 Returns one [Admin voice region](#admin-voice-region-object) object. Requires `voice:region:list`.
 
-### Path parameters
-
-| Field | Type | Description |
-| --- | --- | --- |
-| region_id | string | The ID of the region (1-64 characters) |
-
 ### Query parameters
 
 | Field | Type | Description |
@@ -303,8 +297,6 @@ Applies a partial update to a region and returns the updated record. Requires `v
 | region_id | string | The ID of the region (1-64 characters) |
 
 ### JSON body
-
-Every field is optional and an omitted field is left unchanged. An absent, empty, or whitespace-only body is read as an empty object, which validates and updates nothing but `updated_at`. A body that does not parse as JSON returns 400 `INVALID_FORM_BODY` with one element at path `body` and code `INVALID_FORMAT`, as [Errors](/http-api/errors/#validation-failure-codes) describes.
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -426,13 +418,6 @@ The operation records one [Admin audit entry](/admin-api/#admin-audit-entry-obje
 
 Returns one [Admin voice server](#admin-voice-server-object) object. Requires `voice:server:list`.
 
-### Path parameters
-
-| Field | Type | Description |
-| --- | --- | --- |
-| region_id | string | The ID of the region the server belongs to (1-64 characters) |
-| server_id | string | The ID of the server (1-64 characters) |
-
 ### Response body
 
 | Field | Type | Description |
@@ -532,8 +517,6 @@ Applies a partial update to a voice server and returns the updated record. Requi
 | server_id | string | The ID of the server (1-64 characters) |
 
 ### JSON body
-
-Every field is optional and an omitted field is left unchanged. An absent, empty, or whitespace-only body is read as an empty object, which validates and updates nothing but `updated_at`. A body that does not parse as JSON returns 400 `INVALID_FORM_BODY` with one element at path `body` and code `INVALID_FORMAT`, as [Errors](/http-api/errors/#validation-failure-codes) describes.
 
 | Field | Type | Description |
 | --- | --- | --- |
