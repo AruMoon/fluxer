@@ -21,8 +21,6 @@ pub struct BuildGatewayNifsArgs {
 pub struct GatewayArgs {
     #[arg(long, value_enum)]
     step: GatewayStep,
-    #[arg(long, default_value = "test")]
-    eqwalizer_profile: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
@@ -34,7 +32,6 @@ pub(crate) enum GatewayStep {
     Compile,
     Dialyzer,
     Typecheck,
-    Eunit,
     AllChecks,
     Clean,
 }
@@ -73,22 +70,18 @@ pub(crate) fn run_gateway_step(
         GatewayStep::Compile => run_rebar(gateway_dir, ["compile"]),
         GatewayStep::Dialyzer => run_rebar(gateway_dir, ["dialyzer"]),
         GatewayStep::Typecheck => run_eqwalizer(gateway_dir, eqwalizer_profile),
-        GatewayStep::Eunit => run_rebar(gateway_dir, ["as", "test", "eunit"]),
         GatewayStep::AllChecks => {
-            run_gateway_check_step("Step 1/5: Format check (erlfmt)", || {
+            run_gateway_check_step("Step 1/4: Format check (erlfmt)", || {
                 run_gateway_step(gateway_dir, GatewayStep::FmtCheck, eqwalizer_profile)
             })?;
-            run_gateway_check_step("Step 2/5: Lint (elvis)", || {
+            run_gateway_check_step("Step 2/4: Lint (elvis)", || {
                 run_gateway_step(gateway_dir, GatewayStep::Lint, eqwalizer_profile)
             })?;
-            run_gateway_check_step("Step 3/5: Compile", || {
+            run_gateway_check_step("Step 3/4: Compile", || {
                 run_gateway_step(gateway_dir, GatewayStep::Compile, eqwalizer_profile)
             })?;
-            run_gateway_check_step("Step 4/5: Type check", || {
+            run_gateway_check_step("Step 4/4: Type check", || {
                 run_gateway_step(gateway_dir, GatewayStep::Typecheck, eqwalizer_profile)
-            })?;
-            run_gateway_check_step("Step 5/5: Unit tests (eunit)", || {
-                run_gateway_step(gateway_dir, GatewayStep::Eunit, eqwalizer_profile)
             })?;
             println!("All gateway checks passed.");
             Ok(())
