@@ -623,15 +623,6 @@ func nextState(inst *instance.Instance, set *stack.Set, images stack.ImageSet, t
 	if cur.Release == stack.LegacyRelease {
 		pins = slices.Sorted(maps.Keys(instance.ConvertLegacy(&next, set, next.Images.Refs).Pins))
 	}
-	for _, m := range stack.Pending(next.Migrations) {
-		if err := m.Apply(next.Settings); err != nil {
-			return nil, nil, fmt.Errorf("%s: %w", m.ID, err)
-		}
-	}
-	next.Migrations = next.Migrations[:0]
-	for _, m := range stack.Migrations {
-		next.Migrations = append(next.Migrations, m.ID)
-	}
 	if _, err := secrets.Mint(next.Secrets, true); err != nil {
 		return nil, nil, err
 	}

@@ -132,6 +132,7 @@ func ParseState(data []byte, dir string) (*State, error) {
 var stateFields = map[string]bool{
 	"schema": true, "project": true, "engine": true, "release": true, "previous_release": true, "failed_release": true,
 	"upgrade": true, "pending": true, "images": true, "settings": true, "secrets": true, "admin_import": true,
+	"setup_done": true, "installing": true, "stopped": true, "rendered": true, "mounted": true, "ejected": true,
 	"installed_at": true, "updated_at": true,
 }
 

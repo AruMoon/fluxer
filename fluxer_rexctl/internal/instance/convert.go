@@ -44,10 +44,7 @@ func ConvertLegacy(s *State, next *stack.Set, nextImages map[string]string) *Leg
 		delete(s.Settings, tunnelBindVar)
 		s.Settings[settings.EdgeBind] = v
 	}
-	if len(next.Profiles) > 0 {
-		memoryProfile(next, s.Settings)
-		c.Profile = s.Settings[settings.MemoryProfile]
-	}
+	stack.ConvertLegacySettings(s.Settings)
 	return c
 }
 
