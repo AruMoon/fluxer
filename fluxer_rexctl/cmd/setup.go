@@ -83,6 +83,9 @@ func newSetupCmd(app *App) *cobra.Command {
 		Short: "Create the admin account and finish setup in the terminal",
 		Args:  noArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
+			if err := oneStdinFlag(c); err != nil {
+				return err
+			}
 			ctx := c.Context()
 			inst, err := app.Instance()
 			if err != nil {
@@ -487,6 +490,25 @@ func askSecret(app *App, c *cobra.Command, flag, title, file string, validate fu
 		return "", err
 	}
 	return v, nil
+}
+
+func oneStdinFlag(c *cobra.Command) error {
+	var names []string
+	stdin := 0
+	for _, name := range []string{"storage-secret-key-file", "admin-password-file", "smtp-password-file"} {
+		fl := c.Flags().Lookup(name)
+		if fl == nil {
+			continue
+		}
+		names = append(names, "--"+name)
+		if fl.Value.String() == "-" {
+			stdin++
+		}
+	}
+	if stdin > 1 {
+		return ui.Usage(fmt.Sprintf("Only one of %s can read from stdin.", ui.JoinAnd(names)))
+	}
+	return nil
 }
 
 func readSetupSecret(app *App, file string) (string, error) {

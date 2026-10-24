@@ -118,6 +118,9 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 	if err := f.Storage.validate(c); err != nil {
 		return err
 	}
+	if err := oneStdinFlag(c); err != nil {
+		return err
+	}
 	if names := f.Setup.passedNames(c); f.SetupWhere == "browser" && len(names) > 0 {
 		return &ui.ExitError{Code: ui.ExitUsage, Msg: fmt.Sprintf("--setup browser doesn't take %s.", ui.JoinAnd(names)), Fix: "Pass --setup terminal instead, or leave out the setup options and enter them in the browser."}
 	}
@@ -799,6 +802,9 @@ func (in *installer) findLegacy(ctx context.Context) *instance.Legacy {
 }
 
 func (in *installer) takeOver(ctx context.Context, dir string) error {
+	if in.f.Storage.passed(in.c) {
+		return &ui.ExitError{Code: ui.ExitUsage, Msg: "Taking over an install doesn't use the storage options.", Fix: "Leave them out, then change the object store after the take-over with rexctl config set."}
+	}
 	legacy, err := instance.DetectLegacy(dir)
 	if err != nil {
 		return ui.Wrap(err, fmt.Sprintf("Couldn't read the Fluxer install in %s.", dir), "Run rexctl install --verbose to see why.")
@@ -924,6 +930,9 @@ func (in *installer) resume(ctx context.Context, inst *instance.Instance) error 
 	in.engine = e
 	in.f.BehindProxy = inst.State.Settings[settings.EdgeMode] == settings.EdgeProxy || inst.State.Settings[settings.EdgeMode] == settings.EdgeTunnel
 	if in.f.DryRun {
+		if in.f.Storage.passed(in.c) {
+			return &ui.ExitError{Code: ui.ExitUsage, Msg: "--dry-run doesn't use the storage options when it continues an unfinished install.", Fix: "Leave out --dry-run to check and save them, or leave out the storage options."}
+		}
 		in.app.UI.Info("rexctl would start Fluxer at %s and finish setup.", inst.Origin())
 		return nil
 	}

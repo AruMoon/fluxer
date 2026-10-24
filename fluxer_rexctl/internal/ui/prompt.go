@@ -71,6 +71,9 @@ func (u *UI) Ask(cmd *cobra.Command, fields ...Field) error {
 		if err := u.runForm(u.fieldGroup(f)); err != nil {
 			return err
 		}
+		if *f.Value == "" && !f.Optional {
+			*f.Value = f.Default
+		}
 		u.echo(f.Title, f.answer(*f.Value))
 	}
 	return nil
@@ -190,6 +193,9 @@ func (u *UI) fieldGroup(f Field) *huh.Group {
 		}
 		if v == "" && f.Default == "" {
 			return promptError("Type an answer.")
+		}
+		if v == "" {
+			return nil
 		}
 		if validate != nil {
 			return validate(v)
