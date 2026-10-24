@@ -92,10 +92,15 @@ const POSTGRES_KV_SCHEMA_LOCK_TIMEOUT = '120s';
 const POSTGRES_KV_SCHEMA_MIGRATION_TIMEOUT = '30min';
 export const POSTGRES_KV_MIGRATION_TABLE = '__fluxer_schema_migrations';
 const POSTGRES_KV_MESSAGES_PARTITION_MIGRATION = 'messages_partition_key_v1';
+const POSTGRES_KV_SORT_ID_MIGRATION = 'sort_id_v1';
+const POSTGRES_KV_SORT_ID_TABLES = ['messages', 'message_reactions'];
+const POSTGRES_KV_SORT_ID_BACKFILL_BATCH = 5000;
+const POSTGRES_KV_STORAGE_OPTIONS = ['fillfactor=85'];
+const POSTGRES_KV_ALTER_LOCK_TIMEOUT = '10s';
 const POSTGRES_KV_SCHEMA_ATTEMPTS = 3;
 const KV_WRITE_PARALLELISM = 4;
 const POSTGRES_KV_SCHEMA_RETRY_DELAY_MS = 250;
-const POSTGRES_KV_CONCURRENT_DDL_CODES = new Set(['23505', '42P07', '42710']);
+const POSTGRES_KV_CONCURRENT_DDL_CODES = new Set(['23505', '42P07', '42710', '55P03']);
 const NUMERIC_ROW_KEY_BIGINT_PATTERN = '^\\{"__fluxer_type":"bigint","value":"(-?[0-9]+)"\\}$';
 const NUMERIC_ROW_KEY_NUMBER_PATTERN = '^(-?[0-9]+(?:\\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)$';
 const EXPIRED_STORED_ROW = 'kv.expires_at IS NOT NULL AND kv.expires_at <= now()';
@@ -232,6 +237,12 @@ function valueKey(value: unknown): string {
 
 export function keyFromColumns(columns: ReadonlyArray<string>, row: Row): string {
 	return columns.map((column) => valueKey(row[column])).join(VALUE_SEPARATOR);
+}
+
+function sortId(meta: KvQueryMeta, row: Row): string | null {
+	if (!POSTGRES_KV_SORT_ID_TABLES.includes(meta.table.name)) return null;
+	const messageId = row['message_id'];
+	return typeof messageId === 'bigint' ? messageId.toString() : null;
 }
 
 function paramsRow(params: CassandraParams, columns: ReadonlyArray<string>): Row {
@@ -830,6 +841,18 @@ function parseEqWhere(whereSql: string, cql: string): ReadonlyArray<EqWhereExpr>
 	});
 }
 
+function sortIdIndexName(kvTable: string, tableName: string): string {
+	return `${kvTable}_${tableName}_sort_idx`;
+}
+
+function sortIdIndexNames(kvTable: string): Array<string> {
+	return POSTGRES_KV_SORT_ID_TABLES.map((tableName) => sortIdIndexName(kvTable, tableName));
+}
+
+function retiredIndexNames(kvTable: string): Array<string> {
+	return [`${kvTable}_messages_message_idx`, `${kvTable}_message_reactions_message_idx`];
+}
+
 async function repairInvalidPostgresKvIndexes(db: PostgresQueryable, kvTable: string): Promise<void> {
 	const invalid = await db.query<{index_name: string; index_def: string}>(
 		`SELECT cls.relname AS index_name, pg_get_indexdef(idx.indexrelid) AS index_def
@@ -838,8 +861,9 @@ JOIN pg_class cls ON cls.oid = idx.indexrelid
 WHERE idx.indrelid = to_regclass($1)
 	AND NOT idx.indisvalid
 	AND NOT idx.indisprimary
-	AND NOT idx.indisunique`,
-		[kvTable],
+	AND NOT idx.indisunique
+	AND cls.relname <> ALL($2::text[])`,
+		[kvTable, sortIdIndexNames(kvTable)],
 	);
 	for (const row of invalid.rows) {
 		logError({table: kvTable, index: row.index_name}, 'Postgres KV index is invalid, rebuilding it');
@@ -861,6 +885,23 @@ WHERE att.attrelid = to_regclass($1)
 	return result.rows[0]?.c_collated === true;
 }
 
+async function postgresKvHasSortId(db: PostgresQueryable, kvTable: string): Promise<boolean> {
+	const result = await db.query(
+		`SELECT 1 FROM pg_attribute WHERE attrelid = to_regclass($1) AND attname = 'sort_id' AND NOT attisdropped`,
+		[kvTable],
+	);
+	return result.rows.length > 0;
+}
+
+async function missingPostgresKvStorageOptions(db: PostgresQueryable, kvTable: string): Promise<Array<string>> {
+	const result = await db.query<{options: Array<string> | null}>(
+		'SELECT reloptions AS options FROM pg_class WHERE oid = to_regclass($1)',
+		[kvTable],
+	);
+	const current = new Set(result.rows[0]?.options ?? []);
+	return POSTGRES_KV_STORAGE_OPTIONS.filter((option) => !current.has(option));
+}
+
 async function ensurePostgresKvSchemaOnce(client: IPostgresClient): Promise<void> {
 	const kvTable = client.kvTable();
 	const table = quoteIdentifier(kvTable);
@@ -876,11 +917,17 @@ CREATE TABLE IF NOT EXISTS ${table} (
 	row_data jsonb NOT NULL,
 	expires_at timestamptz,
 	updated_at timestamptz NOT NULL DEFAULT now(),
+	sort_id bigint,
 	PRIMARY KEY (table_name, row_key)
 )`);
-		await db.query(
-			`CREATE INDEX IF NOT EXISTS ${quoteIdentifier(`${kvTable}_partition_row_idx`)} ON ${table} (table_name, partition_key, row_key)`,
-		);
+		const addSortId = !(await postgresKvHasSortId(db, kvTable));
+		const missingOptions = await missingPostgresKvStorageOptions(db, kvTable);
+		if (addSortId || missingOptions.length > 0) {
+			await db.query("SELECT set_config('lock_timeout', $1, true)", [POSTGRES_KV_ALTER_LOCK_TIMEOUT]);
+			if (addSortId) await db.query(`ALTER TABLE ${table} ADD COLUMN sort_id bigint`);
+			if (missingOptions.length > 0) await db.query(`ALTER TABLE ${table} SET (${missingOptions.join(', ')})`);
+			await db.query("SELECT set_config('lock_timeout', '0', true)");
+		}
 		if (!(await postgresKvRowKeyIsCCollated(db, kvTable))) {
 			await db.query(
 				`CREATE INDEX IF NOT EXISTS ${quoteIdentifier(`${kvTable}_row_key_c_idx`)} ON ${table} (table_name, row_key COLLATE "C")`,
@@ -937,12 +984,106 @@ export async function ensurePostgresKvSchema(client: IPostgresClient): Promise<v
 	for (let attempt = 1; attempt <= POSTGRES_KV_SCHEMA_ATTEMPTS; attempt += 1) {
 		try {
 			await ensurePostgresKvSchemaOnce(client);
-			return;
+			break;
 		} catch (error) {
 			if (attempt === POSTGRES_KV_SCHEMA_ATTEMPTS || !isConcurrentDdlConflict(error)) throw error;
 			logWarn({table: client.kvTable(), attempt}, 'Postgres KV schema hit a concurrent DDL conflict, retrying');
 			await new Promise((resolve) => setTimeout(resolve, POSTGRES_KV_SCHEMA_RETRY_DELAY_MS));
 		}
+	}
+	if (await postgresKvIndexesPending(client)) {
+		await client.session((db) => migratePostgresKvIndexes(db, client.kvTable()));
+	}
+}
+
+async function postgresKvIndexesPending(client: IPostgresClient): Promise<boolean> {
+	const kvTable = client.kvTable();
+	const result = await client.query<{marked: boolean; valid: number; retired: number}>(
+		`SELECT
+	EXISTS (SELECT 1 FROM ${quoteIdentifier(kvTable)} WHERE table_name = $1 AND row_key = $2) AS marked,
+	(SELECT count(*)::int FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
+		WHERE idx.indrelid = to_regclass($3) AND idx.indisvalid AND cls.relname = ANY($4::text[])) AS valid,
+	(SELECT count(*)::int FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
+		WHERE idx.indrelid = to_regclass($3) AND cls.relname = ANY($5::text[])) AS retired`,
+		[
+			POSTGRES_KV_MIGRATION_TABLE,
+			POSTGRES_KV_SORT_ID_MIGRATION,
+			kvTable,
+			sortIdIndexNames(kvTable),
+			retiredIndexNames(kvTable),
+		],
+	);
+	const row = result.rows[0];
+	return !row?.marked || row.valid !== POSTGRES_KV_SORT_ID_TABLES.length || row.retired > 0;
+}
+
+async function migratePostgresKvIndexes(db: PostgresQueryable, kvTable: string): Promise<void> {
+	const table = quoteIdentifier(kvTable);
+	const locked = await db.query<{locked: boolean}>('SELECT pg_try_advisory_lock($1, hashtext($2)) AS locked', [
+		POSTGRES_KV_SCHEMA_LOCK_NAMESPACE,
+		`${kvTable}_${POSTGRES_KV_SORT_ID_MIGRATION}`,
+	]);
+	if (locked.rows[0]?.locked !== true) return;
+	await db.query("SELECT set_config('statement_timeout', '0', false)");
+	const retired = await db.query<{index_name: string}>(
+		`SELECT cls.relname AS index_name FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
+WHERE idx.indrelid = to_regclass($1) AND cls.relname = ANY($2::text[])`,
+		[kvTable, retiredIndexNames(kvTable)],
+	);
+	const marked = await db.query(`SELECT 1 FROM ${table} WHERE table_name = $1 AND row_key = $2`, [
+		POSTGRES_KV_MIGRATION_TABLE,
+		POSTGRES_KV_SORT_ID_MIGRATION,
+	]);
+	if (marked.rows.length === 0 || retired.rows.length > 0) {
+		for (const tableName of POSTGRES_KV_SORT_ID_TABLES) {
+			await backfillPostgresKvSortIds(db, table, tableName);
+		}
+	}
+	for (const tableName of POSTGRES_KV_SORT_ID_TABLES) {
+		const name = sortIdIndexName(kvTable, tableName);
+		const existing = await db.query<{valid: boolean}>(
+			`SELECT idx.indisvalid AS valid FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
+WHERE idx.indrelid = to_regclass($1) AND cls.relname = $2`,
+			[kvTable, name],
+		);
+		if (existing.rows[0]?.valid === true) continue;
+		if (existing.rows.length > 0) await db.query(`DROP INDEX CONCURRENTLY IF EXISTS ${quoteIdentifier(name)}`);
+		await db.query(
+			`CREATE INDEX CONCURRENTLY IF NOT EXISTS ${quoteIdentifier(name)} ON ${table} (partition_key, sort_id) WHERE table_name = '${tableName}'`,
+		);
+	}
+	await db.query(
+		`INSERT INTO ${table} (table_name, partition_key, row_key, row_data)
+VALUES ($1, $2, $2, jsonb_build_object('applied_at', now()))
+ON CONFLICT (table_name, row_key) DO UPDATE SET row_data = EXCLUDED.row_data, updated_at = now()`,
+		[POSTGRES_KV_MIGRATION_TABLE, POSTGRES_KV_SORT_ID_MIGRATION],
+	);
+	for (const {index_name} of retired.rows) {
+		await db.query(`DROP INDEX CONCURRENTLY IF EXISTS ${quoteIdentifier(index_name)}`);
+	}
+}
+
+async function backfillPostgresKvSortIds(db: PostgresQueryable, table: string, tableName: string): Promise<void> {
+	let after = '';
+	for (;;) {
+		const result = await db.query<{filled: number; last: string | null}>(
+			`WITH batch AS (
+	SELECT row_key FROM ${table}
+	WHERE table_name = $1 AND row_key COLLATE "C" > $2 AND sort_id IS NULL
+	ORDER BY row_key COLLATE "C"
+	LIMIT $3
+), filled AS (
+	UPDATE ${table} kv
+	SET sort_id = CASE WHEN kv.row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN (kv.row_data -> 'message_id' ->> 'value')::bigint END
+	FROM batch
+	WHERE kv.table_name = $1 AND kv.row_key = batch.row_key
+)
+SELECT count(*)::int AS filled, max(row_key COLLATE "C") AS last FROM filled`,
+			[tableName, after, POSTGRES_KV_SORT_ID_BACKFILL_BATCH],
+		);
+		const row = result.rows[0];
+		if (!row?.last || row.filled < POSTGRES_KV_SORT_ID_BACKFILL_BATCH) return;
+		after = row.last;
 	}
 }
 
@@ -1450,13 +1591,14 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXP
 			rowKey(meta, incoming),
 			JSON.stringify(encodeRow(incoming)),
 			expiresAt,
+			sortId(meta, incoming),
 		];
 		if (meta.ifNotExists) {
 			const result = await db.query(
-				`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
-VALUES ($1, $2, $3, $4::jsonb, $5, now())
+				`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, sort_id, updated_at)
+VALUES ($1, $2, $3, $4::jsonb, $5, $6::bigint, now())
 ON CONFLICT (table_name, row_key)
-DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = EXCLUDED.row_data, expires_at = EXCLUDED.expires_at, updated_at = now()
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = EXCLUDED.row_data, expires_at = EXCLUDED.expires_at, sort_id = EXCLUDED.sort_id, updated_at = now()
 WHERE ${EXPIRED_STORED_ROW}`,
 				values,
 				'kv_insert_absent',
@@ -1464,10 +1606,10 @@ WHERE ${EXPIRED_STORED_ROW}`,
 			return [{'[applied]': result.rowCount === 1}];
 		}
 		await db.query(
-			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
-VALUES ($1, $2, $3, $4::jsonb, $5, now())
+			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, sort_id, updated_at)
+VALUES ($1, $2, $3, $4::jsonb, $5, $6::bigint, now())
 ON CONFLICT (table_name, row_key)
-DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = EXCLUDED.expires_at, updated_at = now()`,
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = EXCLUDED.expires_at, sort_id = EXCLUDED.sort_id, updated_at = now()`,
 			values,
 			'kv_upsert',
 		);
@@ -1622,16 +1764,17 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DA
 		}
 		const [expiresAtExpr, statementName] = patchExpiration;
 		await db.query(
-			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
-VALUES ($1, $2, $3, $4::jsonb, $5, now())
+			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, sort_id, updated_at)
+VALUES ($1, $2, $3, $4::jsonb, $5, $6::bigint, now())
 ON CONFLICT (table_name, row_key)
-DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = ${expiresAtExpr}, updated_at = now()`,
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = ${expiresAtExpr}, sort_id = EXCLUDED.sort_id, updated_at = now()`,
 			[
 				meta.table.name,
 				partitionKey(meta, incoming),
 				key,
 				JSON.stringify(encodeRow(incoming)),
 				explicit ?? fallback ?? null,
+				sortId(meta, incoming),
 			],
 			statementName,
 		);

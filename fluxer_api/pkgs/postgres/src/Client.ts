@@ -49,6 +49,7 @@ export interface IPostgresClient extends PostgresQueryable {
 	connect(): Promise<void>;
 	shutdown(): Promise<void>;
 	transaction<T>(fn: (client: PostgresQueryable) => Promise<T>): Promise<T>;
+	session<T>(fn: (client: PostgresQueryable) => Promise<T>): Promise<T>;
 	kvTable(): string;
 }
 
@@ -249,7 +250,7 @@ class PostgresClient implements IPostgresClient {
 			if (acquired.error) throw acquired.error;
 			await client.query('BEGIN');
 			if (acquired.error) throw acquired.error;
-			const result = await runTransactionCallback(client, acquired, this.config.preparedStatements !== false, fn);
+			const result = await runConnectionCallback(client, acquired, this.config.preparedStatements !== false, fn);
 			if (acquired.error) throw acquired.error;
 			await client.query('COMMIT');
 			return result;
@@ -270,6 +271,19 @@ class PostgresClient implements IPostgresClient {
 		} finally {
 			client.release(discardClient || acquired === null || acquired.error !== null);
 		}
+	}
+
+	async session<T>(fn: (client: PostgresQueryable) => Promise<T>): Promise<T> {
+		return this.withPool(async (pool) => {
+			const client = await pool.connect();
+			try {
+				const acquired = this.getAcquiredConnection(client);
+				if (acquired.error) throw acquired.error;
+				return await runConnectionCallback(client, acquired, this.config.preparedStatements !== false, fn);
+			} finally {
+				client.release(true);
+			}
+		});
 	}
 
 	kvTable(): string {
@@ -301,7 +315,7 @@ class PostgresClient implements IPostgresClient {
 	}
 }
 
-async function runTransactionCallback<T>(
+async function runConnectionCallback<T>(
 	client: PoolClient,
 	acquired: AcquiredPostgresConnection,
 	preparedStatements: boolean,
@@ -314,7 +328,7 @@ async function runTransactionCallback<T>(
 			values: Array<unknown> = [],
 			name?: string,
 		) => {
-			if (!active) throw new Error('Postgres transaction callback has already completed');
+			if (!active) throw new Error('Postgres connection callback has already completed');
 			if (acquired.error) throw acquired.error;
 			return client.query<TRow>({text, values, name: preparedStatements ? name : undefined});
 		},
