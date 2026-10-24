@@ -534,6 +534,7 @@ services:
       FLUXER_API_WORKER_MODE: all_lanes
       FLUXER_API_WORKER_ENABLE_CRON_SCHEDULER: "true"
       FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS:-25}"
+      PGOPTIONS: -c synchronous_commit=off
     healthcheck:
       test: ["CMD-SHELL", "node -e \"const age=Date.now()-require('node:fs').statSync('/tmp/fluxer-worker-heartbeat').mtimeMs;if(age>30000){console.error('worker heartbeat is '+Math.round(age)+'ms old');process.exit(1)}\""]
       <<: *fluxer-app-healthcheck

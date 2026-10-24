@@ -16,7 +16,7 @@
 {{- $heartbeat := dict "exec" (dict "command" (list "node" "-e" "const age=Date.now()-require('node:fs').statSync('/tmp/fluxer-worker-heartbeat').mtimeMs;if(age>30000){console.error('worker heartbeat is '+Math.round(age)+'ms old');process.exit(1)}")) "initialDelaySeconds" 90 "periodSeconds" 10 "timeoutSeconds" 5 "failureThreshold" 3 }}
 {{- include "fluxer.app" (dict "root" . "name" "worker" "component" "worker" "w" $v.worker "image" "fluxer-api" "port" 8080 "noService" true
   "command" (list "node" "dist/WorkerEntrypoint.js")
-  "env" (concat (list (dict "name" "FLUXER_API_WORKER_MODE" "value" "all_lanes") (dict "name" "FLUXER_API_WORKER_ENABLE_CRON_SCHEDULER" "value" "true")) $nodeEnv)
+  "env" (concat (list (dict "name" "FLUXER_API_WORKER_MODE" "value" "all_lanes") (dict "name" "FLUXER_API_WORKER_ENABLE_CRON_SCHEDULER" "value" "true") (dict "name" "PGOPTIONS" "value" "-c synchronous_commit=off")) $nodeEnv)
   "probes" (dict "liveness" $heartbeat)
   "strategy" (dict "type" "Recreate")
   "waitFor" (include "fluxer.appWaitFor" (dict "root" . "usesNats" true "usesPostgres" true "usesS3" true "usesKv" true "usesSvc" true) | fromJsonArray)) }}
