@@ -1,43 +1,41 @@
 ---
 # SPDX-License-Identifier: AGPL-3.0-or-later
 title: Sign-in methods
-description: Usernames or email addresses, single sign-on, recovery kits and reset links on a self-hosted instance.
+description: How people sign in to a self-hosted instance and how to help them back into their account.
 ---
 
 People sign in to your instance with a username or with an email address. You choose one during setup, and it can't change once the first account exists.
 
 ## Usernames
 
-People create an account with a username and a password. The instance never asks for an email address and doesn't need to send email. Features that send email are off, such as email verification and password resets by email.
+People create an account with a username and a password. The instance never asks for an email address, and features that send email, such as address verification and password resets, are off.
 
-When someone forgets their password, they use their recovery kit. The app shows the kit right after the account is created, ready to download or print, and people can make a new one in their account settings. Using the kit sets a new password, signs the account out everywhere and gives the person a new kit to keep.
+When someone forgets their password, they use their recovery kit. The app shows the kit when the account is created, and people can make a new one in their account settings. Using the kit sets a new password, signs the account out everywhere and gives the person a new kit.
 
 ## Email addresses
 
-People create an account with an email address, a username and a password. The instance sends email to verify addresses and to reset forgotten passwords, and rexctl asks for your email server during setup. To change it later, run `rexctl email set`.
-
-Until email is set up, the instance can't check addresses, and nobody can reset a forgotten password by email.
+People create an account with an email address, a username and a password. The instance sends email to verify addresses and reset forgotten passwords. rexctl asks for your email server during setup, and `rexctl email set` changes it later. Until email is set up, nobody can reset a forgotten password by email, and you can [create a reset link](#lost-passwords) for them.
 
 ## Single sign-on
 
-People can sign in through your own identity provider, such as Authentik or Keycloak, over OpenID Connect. Set it up in the admin panel on the "Instance Config" page, in the "Single Sign-On (SSO)" card. The card shows the redirect URI to give your provider.
+People can sign in through your own identity provider, such as Authentik or Keycloak, over OpenID Connect. Set it up in the admin panel on the "Instance Config" page, in the "Single Sign-On (SSO)" card. Fill in the details from your provider, turn on "Enable SSO" and register the "Redirect URI" that the card shows with your provider.
 
-With "Automatically provision users on first SSO login" on, the first sign-in from someone new creates their account. In single-community mode, "Community Roles From Groups" gives people roles in the community from their groups at your provider.
+With "Automatically provision users on first SSO login" on, the first sign-in from someone new creates their account. In single-community mode, "Community Roles From Groups" maps groups at your provider to roles in the community, and each SSO sign-in adds or removes those roles.
 
-"Require SSO" turns off passwords, passkeys and registration for everyone. Before you turn it on, make sure at least one admin can sign in through your provider.
+"Require SSO" turns off password and passkey sign-in and local registration for everyone. Before you turn it on, make sure at least one admin can sign in through your provider.
 
 ## Lost passwords
 
-When someone has lost their password and can't reset it themselves, create a reset link for them:
+On a username instance, or an email instance that doesn't send email, you can create a reset link for someone who has lost their password. The "Create Password Reset Link" button on the account's page in the admin panel does the same.
 
 ```sh
 rexctl users reset-link alex
 ```
 
-Anyone with the link can set a new password for the account until the link expires. Send it to the person over a channel you trust. The admin panel has the same action as "Create Password Reset Link" on the account's page.
+The link works once and expires after an hour, and anyone who has it can set a new password for the account. Send it to the person over a channel you trust. Creating the link deletes their recovery kit, and they can make a new one in their account settings.
 
-Keep the recovery kit for your own admin account somewhere safe, and add a passkey or a second admin account. If you still lose access, `rexctl users reset-link` works on the machine without signing in.
+If you lose access to your own admin account on such an instance, `rexctl users reset-link` works on the machine without signing in. On an email instance that sends email, reset your password from the sign-in page.
 
 ## More settings
 
-The "Sign-in & new accounts" card on the "Instance Config" page has the other settings for new accounts, such as instant accounts and when unused accounts are deleted.
+The "Sign-in & new accounts" card on the "Instance Config" page has the other settings for new accounts, such as letting people start with just a display name and deleting accounts that have no way to sign back in.

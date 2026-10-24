@@ -6,16 +6,16 @@ sidebar:
   label: Install
 ---
 
-rexctl installs Fluxer on one machine and keeps it running. It checks the machine, gets a certificate for your domain and helps you create your admin account. To run Fluxer on a Kubernetes cluster, use the [Helm chart](/operator/kubernetes/).
+rexctl installs Fluxer on one machine and keeps it running. To run Fluxer on a Kubernetes cluster, use the [Helm chart](/operator/kubernetes/).
 
 ## What you need
 
-- A 64-bit Linux, macOS or Windows machine with at least 4 GB of memory. On Linux, rexctl installs Docker for you if it's missing. On macOS and Windows, install [Docker Desktop](https://docs.docker.com/desktop/) first.
+- A 64-bit Linux, macOS or Windows machine with at least 4 GB of memory.
+- On macOS and Windows, [Docker Desktop](https://docs.docker.com/desktop/). On Linux, rexctl installs Docker for you if it's missing.
 - A domain or subdomain for your instance, such as `chat.example.com`.
+- An `A` record for that domain pointing to the machine's public IP address. rexctl checks it before it asks for a certificate.
 
-Add an `A` record for the domain that points to the machine's public IP address. rexctl checks the record before it asks for a certificate.
-
-Your hosting provider or home router may have a firewall of its own. Open TCP ports 80, 443 and 7881 and UDP ports 443 and 7882 there, and forward them to the machine. rexctl can open these ports in the machine's own firewall, but it can't change a firewall outside the machine.
+Open TCP ports 80, 443 and 7881 and UDP ports 443 and 7882 in any firewall outside the machine, such as your hosting provider's firewall. On a home network, forward the same ports from your router to the machine. rexctl can open them in the machine's own firewall for you.
 
 ## Install
 
@@ -31,14 +31,18 @@ On Windows, run this in PowerShell:
 irm https://fluxer.dev/install.ps1 | iex
 ```
 
-The script downloads rexctl and starts it. Answer Rex's questions, and when he's done, rexctl prints your instance's address.
+The script downloads rexctl and starts it. Answer its questions, and when it's done, rexctl prints your instance's address.
 
-rexctl asks where you want to create your admin account. If you choose "In my browser", it prints a setup token at the end, and your instance asks for that token the first time you open it.
+rexctl asks where you want to create your admin account. "Here in the terminal" creates it during the install. "In my browser" prints a setup token at the end, and your instance asks for that token the first time you open it. If you lose the token, run `rexctl setup token` to show it again.
 
-People can then open your instance's address in a browser, or enter it in the desktop and mobile apps.
+Once you've created the admin account, people can open your instance's address in a browser or enter it in the desktop and mobile apps.
 
 ## After you install
 
-Once your instance is running, rexctl also [upgrades it, backs it up and manages accounts](/operator/running/). If another web server on the machine already uses ports 80 and 443, you can [put Fluxer behind your own proxy](/operator/reverse-proxy/). The [command reference](/operator/rexctl/) lists every rexctl command and flag.
+Once your instance is running, these pages help you look after it.
+
+- [Run your instance](/operator/running/) to upgrade, back up and manage people.
+- [Put Fluxer behind your own proxy](/operator/reverse-proxy/) if another web server on the machine already uses ports 80 and 443.
+- The [rexctl reference](/operator/rexctl/) lists every command and flag.
 
 If you get stuck, ask in [Fluxer Developers](https://fluxer.gg/fluxer-developers) or open an issue on [GitHub](https://github.com/fluxerapp/fluxer).

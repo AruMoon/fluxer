@@ -4,42 +4,56 @@ title: Kubernetes
 description: Run a Fluxer instance on a Kubernetes cluster with the Helm chart.
 ---
 
-The Helm chart in `deploy/helm/fluxer` runs the same Fluxer services as rexctl does on one machine, and it generates its own secrets. rexctl doesn't manage a Kubernetes install. You install and upgrade with Helm, and run the instance from the admin panel.
+The Helm chart in `deploy/helm/fluxer` runs the same Fluxer services that rexctl runs on one machine. You install and upgrade it with Helm, because rexctl doesn't manage a Kubernetes install.
 
 ## What you need
 
-- Kubernetes 1.29 or newer, and Helm 3 or Helm 4.
-- About 2 CPUs and 8 GB of memory free for the release.
-- A default StorageClass with `ReadWriteOnce` volumes.
-- An ingress controller and cert-manager. With `edge.expose: loadBalancer` you need neither, and Fluxer gets its own certificate.
-- An `A` record for your domain that points to the ingress controller or the load balancer.
-- TCP port 7881 and UDP port 7882 open on the node that runs LiveKit, for voice and video calls.
+| Requirement | Details |
+| --- | --- |
+| Kubernetes | Version 1.29 or newer |
+| Helm | Helm 3 or Helm 4 |
+| Resources | The pods request about 1 CPU and 4.5 GB of memory, and their limits add up to about 19 GB |
+| Storage | A default StorageClass with `ReadWriteOnce` volumes |
+| Web traffic | An ingress controller and cert-manager, or a Gateway API gateway |
+| Visitor addresses | The ingress controller sees each visitor's address, through `externalTrafficPolicy: Local` or the PROXY protocol |
+| DNS | An `A` record for your domain that points to the ingress controller or the load balancer |
+| Voice | TCP port 7881 and UDP port 7882 open to LiveKit |
+
+With `edge.expose: loadBalancer` you need neither an ingress controller nor cert-manager, and Fluxer gets its own certificate.
+
+If the ingress controller doesn't see each visitor's address, every visitor shares one address and hits the same sign-in limits.
 
 The install stops with a message when the cluster is missing something it needs.
 
 ## Install
 
-Get the chart and write a values file with your domain:
+Get the chart and write a values file with your domain.
 
-```bash
+```sh
 git clone --depth 1 https://github.com/fluxerapp/fluxer.git
 printf 'domain: chat.example.com\n' > fluxer-values.yaml
 ```
 
-Install it into its own namespace:
+Install it into its own namespace.
 
-```bash
+```sh
 helm install fluxer ./fluxer/deploy/helm/fluxer \
   --namespace fluxer --create-namespace \
   -f fluxer-values.yaml --wait --timeout 15m
 ```
 
-Keep `fluxer-values.yaml` for upgrades. When the install is done, `helm test fluxer -n fluxer` checks that your instance answers on your domain.
+Keep `fluxer-values.yaml` for upgrades. When the install is done, `helm test fluxer -n fluxer` checks that the instance answers for your domain.
 
-Open your domain in a browser to create your admin account. The setup page asks for the setup token, which is in the chart's Secret:
+Open your domain in a browser to create your admin account. The setup page asks for the setup token in the `fluxer-env` Secret.
 
-```bash
+```sh
 kubectl -n fluxer get secret fluxer-env -o jsonpath='{.data.FLUXER_SETUP_TOKEN}' | base64 -d
+```
+
+If the Secret has no setup token, the API wrote one to its log when it first started.
+
+```sh
+kubectl -n fluxer logs deployment/api | grep -i 'setup token'
 ```
 
 ## Values
@@ -51,19 +65,34 @@ The chart's `values.yaml` explains every value. These are the ones most installs
 | `domain` | The address people use for your instance |
 | `email` | The contact address for Let's Encrypt and web push |
 | `edge.expose` | `ingress`, `gateway`, `loadBalancer` or `none` for a proxy of your own |
-| `livekit.expose` | `hostNetwork`, `loadBalancer` or `nodePort` for the voice ports |
+| `livekit.expose` | `hostNetwork` (the default, needs a privileged namespace), `loadBalancer` or `nodePort` |
 | `env` | Fluxer settings as `NAME: value` |
-| `secrets.extra` | Settings that hold a password or a key |
+| `secrets.extra` | Settings that have a password or a key |
 
-The ingress controller in front of Fluxer must see the real address of each visitor. Set `externalTrafficPolicy: Local` on its Service, or turn on the PROXY protocol between the load balancer and the controller. Otherwise every visitor shares one address and hits the same sign-in limits.
+Under Argo CD or `helm template`, set `secrets.generate: false` and give every key in `secrets.values`, or put a Secret you manage in `secrets.existingSecret`.
 
-Under Argo CD, set `secrets.generate: false` and give every secret in `secrets.values`, or name a Secret you manage in `secrets.existingSecret`.
+## External services
+
+To use a service you already run, turn off the bundled one and say where yours is.
+
+| Service | Values to set |
+| --- | --- |
+| Postgres | `postgres.enabled: false` and `postgres.external.host`, or a URL in `secrets.extra.FLUXER_POSTGRES_URL` |
+| Valkey | `valkey.enabled: false` and `valkey.external.url`, or a URL with a password in `secrets.extra.FLUXER_KV_URL` |
+| NATS | `nats.enabled: false` and `nats.external.url` |
+| Meilisearch | `meilisearch.enabled: false` and `meilisearch.external.url` |
+| S3 storage | `seaweedfs.enabled: false` and `s3.endpoint` |
+| LiveKit | `livekit.enabled: false`, `livekit.external.url` and `livekit.external.publicUrl` |
+
+The Postgres database and role, and the S3 buckets in `s3.buckets`, must exist before you install. Put passwords and keys in `secrets.values` under the key `values.yaml` gives for each service.
+
+Point your LiveKit server's webhook at `https://<your domain>/api/webhooks/livekit`, signed with the key in `FLUXER_LIVEKIT_API_KEY`.
 
 ## Upgrade
 
-Pull the chart and upgrade with the same values file. A new `image.revision` makes every pod pull the latest images:
+Pull the chart and upgrade with the same values file. A new `image.revision` restarts every Fluxer pod, which pulls the newest Fluxer images.
 
-```bash
+```sh
 git -C fluxer pull
 helm upgrade fluxer ./fluxer/deploy/helm/fluxer -n fluxer -f fluxer-values.yaml \
   --set-string image.revision=$(date +%s) --wait --timeout 15m
@@ -71,48 +100,51 @@ helm upgrade fluxer ./fluxer/deploy/helm/fluxer -n fluxer -f fluxer-values.yaml 
 
 `helm rollback` goes back to the previous values and images, but it doesn't undo changes to the database.
 
-## Back up
+## Back up and restore
 
-Back up the Secret and the database:
+Back up the Secret and the database.
 
-```bash
-kubectl -n fluxer get secret fluxer-env -o yaml > fluxer-env.yaml
+```sh
+kubectl -n fluxer get secret fluxer-env -o yaml \
+  | grep -v -E '^  (resourceVersion|uid|creationTimestamp):' > fluxer-env.yaml
 kubectl -n fluxer exec postgres-0 -- sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom' > fluxer.dump
 ```
 
-Keep `fluxer-env.yaml` as safe as the database. A restored database needs the same Secret to work.
+A restored database only works with the same Secret. Keep `fluxer-env.yaml` as safe as the dump.
 
 Uploads are on the volume `data-seaweedfs-0`. Back it up with a snapshot from your storage provider.
 
-## Restore
+To restore, put the Secret back before you install, and the new release uses the same secrets.
 
-Put the Secret back before you install, and the new release uses the same secrets:
-
-```bash
+```sh
 kubectl create namespace fluxer
 kubectl apply -f fluxer-env.yaml
 helm install fluxer ./fluxer/deploy/helm/fluxer -n fluxer -f fluxer-values.yaml --wait --timeout 15m
 ```
 
-Stop everything except Postgres, restore the database and restore the uploads volume from its snapshot:
+Stop everything except Postgres and restore the database.
 
-```bash
+```sh
 kubectl -n fluxer scale deployment,statefulset --replicas=0 \
   -l 'app.kubernetes.io/part-of=fluxer,app.kubernetes.io/name notin (postgres)'
 kubectl -n fluxer exec -i postgres-0 -- sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists' < fluxer.dump
 ```
 
-Then run the same `helm upgrade` without `image.revision` to start everything again.
+Restore the `data-seaweedfs-0` volume from its snapshot with your storage provider. Then start everything again.
+
+```sh
+helm upgrade fluxer ./fluxer/deploy/helm/fluxer -n fluxer -f fluxer-values.yaml --wait --timeout 15m
+```
 
 ## Uninstall
 
-```bash
+```sh
 helm uninstall fluxer -n fluxer
 ```
 
-The Secret and the volumes stay, and a new install with the same release name and namespace uses them again. To delete everything, delete them too:
+The Secret and the volumes stay, and a new install with the same release name and namespace uses them again. To delete everything, delete them too.
 
-```bash
+```sh
 kubectl -n fluxer delete secret fluxer-env
 kubectl -n fluxer delete pvc -l app.kubernetes.io/instance=fluxer
 kubectl delete namespace fluxer
