@@ -37,7 +37,7 @@ func Promised(set *stack.Set, custom []byte, k settings.Key) []string {
 	case settings.EdgeMode, settings.IPv6, settings.ImagesRegistry, settings.StorageEndpoint:
 		return slices.Clone(stack.Services)
 	case settings.MemoryProfile:
-		return settings.Services(set, custom, stack.ProfileKeys(set))
+		return settings.Services(set, custom, append(stack.ProfileKeys(set), stack.SizingKeys()...))
 	}
 	return settings.Services(set, custom, append(slices.Clone(k.Vars), derivedVars[k.Name]...))
 }

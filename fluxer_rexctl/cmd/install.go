@@ -88,7 +88,7 @@ func newInstallCmd(app *App) *cobra.Command {
 	fl.BoolVar(&f.BehindProxy, "behind-proxy", false, "serve plain HTTP for your own reverse proxy")
 	fl.StringVar(&f.Bind, "bind", "127.0.0.1:8080", "address your proxy connects to, with --behind-proxy")
 	fl.StringVar(&f.VoiceIP, "voice-ip", "", "public IP address for voice and video (found automatically)")
-	fl.StringVar(&f.MemoryProfile, "memory-profile", "", "small, medium or large (picked from this machine's memory)")
+	fl.StringVar(&f.MemoryProfile, "memory-profile", "", "pin small, medium or large instead of sizing Fluxer to this machine on every start")
 	fl.BoolVar(&f.InstallDocker, "install-docker", true, "install Docker if it's missing")
 	fl.BoolVar(&f.OpenFirewall, "open-firewall", true, "open the ports Fluxer needs in ufw or firewalld")
 	fl.BoolVar(&f.SetupPodman, "setup-podman", true, "start Podman's API socket and start Fluxer with the machine")
@@ -856,8 +856,6 @@ func (in *installer) write(ctx context.Context, inst *instance.Instance, deleteO
 	}
 	if f.MemoryProfile != "" {
 		st.Settings[settings.MemoryProfile] = f.MemoryProfile
-	} else if in.host != nil && in.host.MemoryBytes > 0 {
-		st.Settings[settings.MemoryProfile] = string(stack.ProfileFor(in.host.MemoryBytes))
 	}
 	if _, err := secrets.Mint(st.Secrets, false); err != nil {
 		return ui.Wrap(err, "Couldn't create your instance's secrets.", "Run rexctl install again.")

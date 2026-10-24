@@ -128,7 +128,7 @@ func buildNamed() []Key {
 		{Name: ImagesRegistry, Type: "registry", Validate: validRegistry,
 			Help: "A registry mirror for the database, cache, search, storage, voice and edge images"},
 		{Name: MemoryProfile, Type: "choice", Options: []string{"small", "medium", "large"}, Validate: oneOf("small", "medium", "large"),
-			Help: "How much memory Fluxer's services may use"},
+			Help: "A fixed amount of memory for Fluxer's services, instead of sizing them to this machine on every start"},
 		{Name: EngineHost, Type: "endpoint", Validate: validEndpoint,
 			Help: "The Docker or Podman engine that runs Fluxer"},
 	}

@@ -107,6 +107,8 @@ This lists every setting with its value and a line of help, and says which setti
 rexctl config set <key> <value>
 ```
 
+Each time rexctl starts Fluxer, it sizes memory limits, database connections and thread counts to the machine's memory and CPUs, so a resized machine needs no changes. The `memory.profile` setting pins a fixed size instead. An instance installed by an older rexctl keeps the size it picked at install. Run `rexctl config unset memory.profile` to let rexctl size it.
+
 ## When something is wrong
 
 ```sh

@@ -8,7 +8,9 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/host"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
 )
 
@@ -18,6 +20,12 @@ func Effective(set *stack.Set, chosen, secrets, adminImport map[string]string) (
 	put := func(v, value string) {
 		if reads(v) {
 			env[v] = value
+		}
+	}
+
+	if len(set.Profiles) > 0 {
+		for v, value := range stack.Sizing(Hardware(), chosen[MemoryProfile] == "", fixed) {
+			put(v, value)
 		}
 	}
 
@@ -77,6 +85,11 @@ func Effective(set *stack.Set, chosen, secrets, adminImport map[string]string) (
 	}
 	return env, nil
 }
+
+var Hardware = sync.OnceValue(func() stack.Hardware {
+	memory, cpus := host.Hardware()
+	return stack.Hardware{MemoryBytes: memory, CPUs: cpus}
+})
 
 func namedVars(k Key, value string) map[string]string {
 	switch k.Name {
