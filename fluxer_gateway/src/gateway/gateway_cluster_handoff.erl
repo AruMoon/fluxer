@@ -4,7 +4,7 @@
 -typing([eqwalizer]).
 -behaviour(gen_server).
 
--export([start_link/0, drain_async/0, undrain/0, diagnostic_info/0]).
+-export([start_link/0, drain_async/0, drain_notify_role/0, undrain/0, diagnostic_info/0]).
 -export([
     init/1,
     handle_call/3,

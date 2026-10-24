@@ -17,10 +17,7 @@ run() ->
 -spec drain() -> ok.
 drain() ->
     persistent_term:put({fluxer_gateway, draining}, true),
-    Result = shard_utils:safe_apply(
-        fun session_manager:reconnect_drain/0,
-        {error, unavailable}
-    ),
-    logger:info("Gateway shutdown drain: ~p", [Result]),
+    ok = gateway_cluster_handoff:drain_notify_role(),
+    logger:info("Gateway shutdown drain: notified clients"),
     timer:sleep(?FRAME_FLUSH_MS),
     ok.
