@@ -8,7 +8,7 @@
 -export([start_link/1, update_counts/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
--define(HIBERNATE_TIMEOUT, 60000).
+-define(HIBERNATE_AFTER_MS, 15000).
 -define(FULLSWEEP_AFTER, 100).
 
 -type guild_state() :: map().
@@ -22,12 +22,13 @@
     | {stop, term(), guild_state()}.
 
 -spec start_link(map()) -> gen_server:start_ret().
-start_link(GuildState) -> gen_server:start_link(?MODULE, GuildState, []).
+start_link(GuildState) ->
+    gen_server:start_link(?MODULE, GuildState, [{hibernate_after, ?HIBERNATE_AFTER_MS}]).
 
 -spec update_counts(guild_state()) -> guild_state().
 update_counts(State) -> guild_maintenance:update_counts(State).
 
--spec init(map()) -> {ok, guild_state(), timeout()}.
+-spec init(map()) -> {ok, guild_state()}.
 init(GuildState) ->
     process_flag(trap_exit, true),
     erlang:process_flag(fullsweep_after, ?FULLSWEEP_AFTER),
@@ -39,7 +40,7 @@ init(GuildState) ->
     erlang:garbage_collect(),
     State5 = guild_health:register_guild(State4),
     ok = guild_read_model:put_state(State5),
-    {ok, State5, ?HIBERNATE_TIMEOUT}.
+    {ok, State5}.
 
 -spec handle_call(term(), gen_server:from(), guild_state()) -> call_reply().
 handle_call(Msg, From, State) ->
