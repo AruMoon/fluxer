@@ -7,7 +7,8 @@
     handle_identify/3,
     handle_resume/2,
     handle_rollout_config_changed/1,
-    handle_pending_identify_retry/2
+    handle_pending_identify_retry/2,
+    handle_session_start_message/2
 ]).
 
 -type state() :: gateway_handler:state().
@@ -282,8 +283,47 @@ start_session(Request, SocketPid, State) ->
 start_session_with_drain_guard(true, Request, SocketPid, State) ->
     hold_session_start(Request, SocketPid, <<"Gateway draining">>, State);
 start_session_with_drain_guard(false, Request, SocketPid, State) ->
-    StartResult = session_manager:start(Request, SocketPid),
-    handle_session_start_result(StartResult, Request, SocketPid, State).
+    case session_manager:send_start(Request, SocketPid) of
+        {ok, StartRequest} ->
+            {ok, await_session_start(StartRequest, Request, SocketPid, State)};
+        {error, Reason} ->
+            handle_session_start_result({error, Reason}, Request, SocketPid, State)
+    end.
+
+-spec await_session_start(session_manager:start_request(), map(), pid(), state()) -> state().
+await_session_start(StartRequest, Request, SocketPid, State) ->
+    Token = make_ref(),
+    TimerRef = erlang:send_after(
+        session_manager:start_timeout(StartRequest), self(), {session_start_timeout, Token}
+    ),
+    State#{session_start => {StartRequest, Request, SocketPid, {TimerRef, Token}}}.
+
+-spec handle_session_start_message(term(), state()) -> no_reply | ws_result().
+handle_session_start_message(
+    {session_start_timeout, Token},
+    #{session_start := {StartRequest, Request, SocketPid, {_TimerRef, Token}}} = State
+) ->
+    Reply = session_manager:abandon_start(StartRequest),
+    complete_session_start(Reply, Request, SocketPid, State);
+handle_session_start_message(
+    Msg, #{session_start := {StartRequest, Request, SocketPid, Timer}} = State
+) ->
+    case session_manager:check_start_response(Msg, StartRequest, Request, SocketPid) of
+        no_reply ->
+            no_reply;
+        {reply, Reply} ->
+            cancel_timer_value(Timer),
+            complete_session_start(Reply, Request, SocketPid, State);
+        {pending, NextRequest} ->
+            cancel_timer_value(Timer),
+            {ok, await_session_start(NextRequest, Request, SocketPid, State)}
+    end;
+handle_session_start_message(_Msg, _State) ->
+    no_reply.
+
+-spec complete_session_start(term(), map(), pid(), state()) -> ws_result().
+complete_session_start(Reply, Request, SocketPid, State) ->
+    handle_session_start_result(Reply, Request, SocketPid, State#{session_start => undefined}).
 
 -spec handle_session_start_result(term(), map() | undefined, pid() | undefined, state()) ->
     ws_result().
@@ -360,7 +400,7 @@ handle_rollout_config_changed(State) ->
 handle_pending_identify_retry(Token, State) ->
     case maps:get(pending_identify_retry_timer, State, undefined) of
         {TimerRef, Token} ->
-            cancel_pending_identify_retry_value({TimerRef, Token}),
+            cancel_timer_value({TimerRef, Token}),
             retry_pending_identify(State#{pending_identify_retry_timer => undefined});
         _ ->
             {ok, State}
@@ -429,10 +469,10 @@ clear_pending_identify(State) ->
 maybe_cancel_pending_identify_retry(undefined) ->
     ok;
 maybe_cancel_pending_identify_retry({TimerRef, Token}) when is_reference(TimerRef) ->
-    cancel_pending_identify_retry_value({TimerRef, Token}).
+    cancel_timer_value({TimerRef, Token}).
 
--spec cancel_pending_identify_retry_value({reference(), reference()}) -> ok.
-cancel_pending_identify_retry_value({TimerRef, _Token}) ->
+-spec cancel_timer_value({reference(), reference()}) -> ok.
+cancel_timer_value({TimerRef, _Token}) ->
     _ = erlang:cancel_timer(TimerRef, [{async, true}, {info, false}]),
     ok.
 
