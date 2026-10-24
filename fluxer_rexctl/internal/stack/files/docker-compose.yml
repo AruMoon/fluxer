@@ -217,9 +217,16 @@ x-fluxer-env: &fluxer-env
   FLUXER_MEDIA_PROXY_UPLOAD_RELAY_TOKEN_TTL_SECS: ${FLUXER_MEDIA_PROXY_UPLOAD_RELAY_TOKEN_TTL_SECS:-}
   FLUXER_MEDIA_PROXY_UPLOAD_RELAY_KEEP_DIRECT_COUNTRIES: ${FLUXER_MEDIA_PROXY_UPLOAD_RELAY_KEEP_DIRECT_COUNTRIES:-}
 
+x-fluxer-logging: &fluxer-logging
+  driver: json-file
+  options:
+    max-size: ${FLUXER_LOG_MAX_SIZE:-10m}
+    max-file: "${FLUXER_LOG_MAX_FILE:-3}"
+
 x-fluxer-service: &fluxer-service
   restart: ${FLUXER_RESTART_POLICY:-unless-stopped}
   networks: [fluxer]
+  logging: *fluxer-logging
 
 x-fluxer-app-healthcheck: &fluxer-app-healthcheck
   interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
@@ -395,6 +402,7 @@ services:
         limits:
           memory: ${FLUXER_SEAWEEDFS_INIT_MEMORY_LIMIT:-128mb}
     networks: [fluxer]
+    logging: *fluxer-logging
     depends_on:
       seaweedfs: {condition: service_healthy, restart: true}
     restart: "no"
