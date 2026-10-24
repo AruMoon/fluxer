@@ -334,6 +334,7 @@ services:
         limits:
           memory: ${FLUXER_VALKEY_MEMORY_LIMIT:-256mb}
     command: ["valkey-server", "--appendonly", "yes", "--appendfsync", "${FLUXER_VALKEY_APPENDFSYNC:-everysec}", "--dir", "/data",
+              "--save", "${FLUXER_VALKEY_SAVE:-}",
               "--maxmemory", "${FLUXER_VALKEY_MAXMEMORY:-192mb}",
               "--maxmemory-policy", "${FLUXER_VALKEY_MAXMEMORY_POLICY:-noeviction}"]
     volumes:
