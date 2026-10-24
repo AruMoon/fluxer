@@ -69,6 +69,14 @@ describe('Postgres KV schema parity between the API and fluxer_svc', () => {
 		}
 	});
 
+	it('sets the same table storage options', () => {
+		const typescript = /POSTGRES_KV_STORAGE_OPTIONS = \[([^\]]*)\]/.exec(TYPESCRIPT_SOURCE)?.[1] ?? '';
+		const rust = /POSTGRES_KV_STORAGE_OPTIONS: &\[&str\] = &\[([^\]]*)\]/.exec(RUST_SOURCE)?.[1] ?? '';
+		const options = (list: string) => [...list.matchAll(/['"]([a-z_]+=[0-9.]+)['"]/g)].map((match) => match[1]);
+		expect(options(typescript).length).toBeGreaterThan(0);
+		expect(options(rust)).toEqual(options(typescript));
+	});
+
 	it('fills and reads sort ids for the same tables', () => {
 		expect(TYPESCRIPT_SOURCE).toContain("POSTGRES_KV_SORT_ID_TABLES = ['messages', 'message_reactions']");
 		expect(RUST_SOURCE).toContain('POSTGRES_KV_SORT_ID_TABLES: &[&str] = &["messages", "message_reactions"]');

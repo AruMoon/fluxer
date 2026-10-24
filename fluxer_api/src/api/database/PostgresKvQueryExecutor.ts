@@ -95,7 +95,13 @@ const POSTGRES_KV_MESSAGES_PARTITION_MIGRATION = 'messages_partition_key_v1';
 const POSTGRES_KV_SORT_ID_MIGRATION = 'sort_id_v1';
 const POSTGRES_KV_SORT_ID_TABLES = ['messages', 'message_reactions'];
 const POSTGRES_KV_SORT_ID_BACKFILL_BATCH = 5000;
-const POSTGRES_KV_STORAGE_OPTIONS = ['fillfactor=85'];
+const POSTGRES_KV_STORAGE_OPTIONS = [
+	'fillfactor=85',
+	'autovacuum_vacuum_scale_factor=0',
+	'autovacuum_vacuum_threshold=20000',
+	'autovacuum_vacuum_insert_scale_factor=0.05',
+	'autovacuum_analyze_scale_factor=0.01',
+];
 const POSTGRES_KV_ALTER_LOCK_TIMEOUT = '10s';
 const POSTGRES_KV_SCHEMA_ATTEMPTS = 3;
 const KV_WRITE_PARALLELISM = 4;

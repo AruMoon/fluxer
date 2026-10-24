@@ -29,7 +29,13 @@ const POSTGRES_KV_MESSAGES_PARTITION_MIGRATION: &str = "messages_partition_key_v
 const POSTGRES_KV_SORT_ID_MIGRATION: &str = "sort_id_v1";
 const POSTGRES_KV_SORT_ID_TABLES: &[&str] = &["messages", "message_reactions"];
 const POSTGRES_KV_SORT_ID_RECHECK: Duration = Duration::from_secs(30);
-const POSTGRES_KV_STORAGE_OPTIONS: &[&str] = &["fillfactor=85"];
+const POSTGRES_KV_STORAGE_OPTIONS: &[&str] = &[
+    "fillfactor=85",
+    "autovacuum_vacuum_scale_factor=0",
+    "autovacuum_vacuum_threshold=20000",
+    "autovacuum_vacuum_insert_scale_factor=0.05",
+    "autovacuum_analyze_scale_factor=0.01",
+];
 const POSTGRES_KV_ALTER_LOCK_TIMEOUT: &str = "10s";
 const POSTGRES_KV_SCHEMA_ATTEMPTS: u32 = 3;
 const POSTGRES_KV_SCHEMA_RETRY_DELAY: Duration = Duration::from_millis(250);
