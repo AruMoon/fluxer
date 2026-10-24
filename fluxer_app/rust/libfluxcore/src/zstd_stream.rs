@@ -5,6 +5,8 @@ use zstd::zstd_safe::{CCtx, CParameter, DCtx, InBuffer, OutBuffer};
 
 const READ_BUFFER_BYTES: usize = 16 * 1024;
 const MAX_DECOMPRESSED_BYTES: usize = 64 * 1024 * 1024;
+const ENCODER_WINDOW_LOG: u32 = 17;
+const ENCODER_TABLE_LOG: u32 = 15;
 
 #[derive(Debug)]
 pub enum ZstdError {
@@ -32,9 +34,16 @@ pub struct ZstdStreamEncoder {
 impl ZstdStreamEncoder {
     pub fn new(level: i32) -> Result<Self, ZstdError> {
         let mut context = CCtx::try_create().ok_or(ZstdError::OutOfMemory)?;
-        context
-            .set_parameter(CParameter::CompressionLevel(level))
-            .map_err(|_| ZstdError::Encode)?;
+        for parameter in [
+            CParameter::CompressionLevel(level),
+            CParameter::WindowLog(ENCODER_WINDOW_LOG),
+            CParameter::HashLog(ENCODER_TABLE_LOG),
+            CParameter::ChainLog(ENCODER_TABLE_LOG),
+        ] {
+            context
+                .set_parameter(parameter)
+                .map_err(|_| ZstdError::Encode)?;
+        }
         Ok(Self { context })
     }
 
