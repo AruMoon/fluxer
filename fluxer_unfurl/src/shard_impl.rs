@@ -284,6 +284,16 @@ impl ShardService for UnfurlShard {
                 self.cache.insert(cache_key, result.clone()).await;
                 Ok(UnfurlResponse::Resolved(result))
             }
+            UnfurlRequest::VerifyDomain { domain, token } => {
+                match crate::domain_verification::verify_domain(&self.http_client, &domain, &token)
+                    .await
+                {
+                    Ok(verified) => Ok(UnfurlResponse::Verified(verified)),
+                    Err(err) => Ok(UnfurlResponse::Failed {
+                        message: err.to_string(),
+                    }),
+                }
+            }
         }
     }
 }

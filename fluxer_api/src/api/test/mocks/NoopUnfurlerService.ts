@@ -11,4 +11,8 @@ export class NoopUnfurlerService extends IUnfurlerService {
 	): Promise<UnfurlResult> {
 		return {embeds: [], cacheTtlSeconds: null};
 	}
+
+	override async verifyDomain(_domain: string, _token: string): Promise<boolean> {
+		return false;
+	}
 }

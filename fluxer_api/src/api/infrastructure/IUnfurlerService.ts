@@ -28,4 +28,6 @@ export abstract class IUnfurlerService {
 		nsfwMode?: MediaProxyNsfwMode,
 		options?: UnfurlOptions,
 	): Promise<UnfurlResult>;
+
+	abstract verifyDomain(domain: string, token: string): Promise<boolean>;
 }

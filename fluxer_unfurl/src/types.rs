@@ -18,6 +18,10 @@ pub enum UnfurlRequest {
         #[serde(default)]
         klipy_api_key: Option<String>,
     },
+    VerifyDomain {
+        domain: String,
+        token: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -32,6 +36,7 @@ pub enum NsfwMode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum UnfurlResponse {
     Resolved(Arc<UnfurlResult>),
+    Verified(bool),
     Failed { message: String },
 }
 
@@ -204,6 +209,7 @@ mod tests {
                 assert!(youtube_api_key.is_none());
                 assert!(klipy_api_key.is_none());
             }
+            UnfurlRequest::VerifyDomain { .. } => panic!("expected an unfurl request"),
         }
     }
 }

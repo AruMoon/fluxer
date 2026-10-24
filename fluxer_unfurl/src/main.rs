@@ -4,6 +4,7 @@ mod activity_pub;
 mod cache_policy;
 mod charset;
 mod direct_media;
+mod domain_verification;
 mod embed_normalizer;
 mod html_markdown;
 mod html_parser;

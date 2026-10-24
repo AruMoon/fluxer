@@ -636,7 +636,11 @@ class RequestServices implements RequestScopedServices {
 	}
 
 	get connectionService(): ConnectionService {
-		this.cachedConnectionService ??= new ConnectionService(getConnectionRepository(), this.gatewayService);
+		this.cachedConnectionService ??= new ConnectionService(
+			getConnectionRepository(),
+			this.gatewayService,
+			getUnfurlerService(),
+		);
 		return this.cachedConnectionService;
 	}
 

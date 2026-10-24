@@ -43,6 +43,7 @@ impl RouterService for UnfurlRouter {
     fn route_key(req: &UnfurlRequest) -> String {
         match req {
             UnfurlRequest::Unfurl { url, .. } => url.clone(),
+            UnfurlRequest::VerifyDomain { domain, .. } => domain.clone(),
         }
     }
 
@@ -69,6 +70,7 @@ impl RouterService for UnfurlRouter {
                     )
                 ))
             }
+            UnfurlRequest::VerifyDomain { .. } => None,
         }
     }
 
@@ -93,6 +95,7 @@ impl RouterService for UnfurlRouter {
                     self.l1.get(&key)
                 }
             }
+            UnfurlRequest::VerifyDomain { .. } => None,
         }
     }
 
@@ -119,6 +122,7 @@ impl RouterService for UnfurlRouter {
                     );
                 }
             }
+            UnfurlRequest::VerifyDomain { .. } => {}
         }
     }
 }

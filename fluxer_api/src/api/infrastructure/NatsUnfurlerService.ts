@@ -16,6 +16,7 @@ import type {INatsConnectionManager} from '@pkgs/nats/src/INatsConnectionManager
 const NATS_UNFURL_SUBJECT = 'svc.unfurl';
 const NATS_UNFURL_TIMEOUT_MS = 12000;
 const NATS_UNFURL_CACHE_ONLY_TIMEOUT_MS = 1000;
+const NATS_VERIFY_DOMAIN_TIMEOUT_MS = 8000;
 
 interface NatsUnfurlRequest {
 	op: 'Unfurl';
@@ -43,6 +44,26 @@ function isNatsUnfurlResponse(value: unknown): value is NatsUnfurlResponse {
 			Array.isArray(resolved.embeds) &&
 			(resolved.cache_ttl_seconds === null || typeof resolved.cache_ttl_seconds === 'number')
 		);
+	}
+	if ('Failed' in value) {
+		const failed = value.Failed;
+		return isJsonRecord(failed) && typeof failed.message === 'string';
+	}
+	return false;
+}
+
+interface NatsVerifyDomainRequest {
+	op: 'VerifyDomain';
+	domain: string;
+	token: string;
+}
+
+type NatsVerifyDomainResponse = {Verified: boolean} | {Failed: {message: string}};
+
+function isNatsVerifyDomainResponse(value: unknown): value is NatsVerifyDomainResponse {
+	if (!isJsonRecord(value)) return false;
+	if ('Verified' in value) {
+		return typeof value.Verified === 'boolean';
 	}
 	if ('Failed' in value) {
 		const failed = value.Failed;
@@ -113,6 +134,26 @@ export class NatsUnfurlerService extends IUnfurlerService {
 			} else {
 				Logger.error({error, url}, '[nats-unfurl] failed to unfurl URL');
 			}
+			throw mapUnfurlTransportError(error);
+		}
+	}
+
+	async verifyDomain(domain: string, token: string): Promise<boolean> {
+		try {
+			const request: NatsVerifyDomainRequest = {op: 'VerifyDomain', domain, token};
+			const response = await requestSvcJson(this.connectionManager, NATS_UNFURL_SUBJECT, request, {
+				timeoutMs: NATS_VERIFY_DOMAIN_TIMEOUT_MS,
+				guard: isNatsVerifyDomainResponse,
+				service: 'nats-unfurl',
+				invalidPayloadError: () => new BadGatewayError({message: '[nats-unfurl] invalid response payload'}),
+			});
+			if ('Verified' in response) {
+				return response.Verified;
+			}
+			Logger.warn({domain, message: response.Failed.message}, '[nats-unfurl] domain verification rejected');
+			return false;
+		} catch (error) {
+			Logger.error({error, domain}, '[nats-unfurl] failed to verify domain');
 			throw mapUnfurlTransportError(error);
 		}
 	}
