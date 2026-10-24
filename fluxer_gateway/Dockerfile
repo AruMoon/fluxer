@@ -30,7 +30,7 @@ RUN rebar3 compile --deps_only
 RUN cp config/sys.config.template config/sys.config && \
 	rebar3 as prod release
 
-FROM debian:trixie-slim
+FROM erlang:28.5.0.8-slim
 
 ARG BUILD_VERSION=""
 ARG SOURCE_SHA=""
