@@ -276,7 +276,7 @@ services:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:2019/config/"]
       <<: *fluxer-healthcheck
     depends_on:
-      api: {condition: service_started}
+      api: {condition: service_healthy}
       gateway: {condition: service_healthy}
 
   postgres:
