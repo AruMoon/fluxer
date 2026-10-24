@@ -19,10 +19,10 @@ use tracing::{debug, info, warn};
 
 pub const SHARD_REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
 const MAX_BROADCAST_CONCURRENCY: usize = 32;
-const MAX_ROUTER_REQUEST_BYTES: usize = 2 * 1024 * 1024;
+pub(crate) const MAX_ROUTER_REQUEST_BYTES: usize = 2 * 1024 * 1024;
 type InflightKey = (String, String);
-type InflightCall = Shared<BoxFuture<'static, Result<Vec<u8>, Arc<anyhow::Error>>>>;
-type Inflight = Arc<Mutex<HashMap<InflightKey, InflightCall>>>;
+type InflightCall<V, E> = Shared<BoxFuture<'static, Result<V, Arc<E>>>>;
+pub(crate) type Inflight<V, E> = Arc<Mutex<HashMap<InflightKey, InflightCall<V, E>>>>;
 
 pub trait RouterService: Send + Sync + 'static {
     type Request: serde::Serialize + serde::de::DeserializeOwned + Send + Sync + 'static;
@@ -157,9 +157,15 @@ async fn forward_to_all_shards<S: RouterService>(
     }
 }
 
-async fn coalesce<F>(inflight: &Inflight, key: InflightKey, call: F) -> anyhow::Result<Vec<u8>>
+pub(crate) async fn coalesce<V, E, F>(
+    inflight: &Inflight<V, E>,
+    key: InflightKey,
+    call: F,
+) -> Result<V, Arc<E>>
 where
-    F: Future<Output = anyhow::Result<Vec<u8>>> + Send + 'static,
+    V: Clone + Send + Sync + 'static,
+    E: Send + Sync + 'static,
+    F: Future<Output = Result<V, E>> + Send + 'static,
 {
     let shared = {
         let mut calls = inflight.lock().unwrap();
@@ -177,7 +183,7 @@ where
             })
             .clone()
     };
-    shared.await.map_err(|err| anyhow::anyhow!("{err}"))
+    shared.await
 }
 
 async fn reply_json_response(
@@ -204,7 +210,7 @@ async fn handle_router_request<S, T>(
     transport: T,
     service: Arc<S>,
     ring: Arc<HashRing>,
-    inflight: Inflight,
+    inflight: Inflight<Vec<u8>, anyhow::Error>,
     metrics: Arc<ServiceMetrics>,
 ) where
     S: RouterService,
@@ -272,6 +278,7 @@ async fn handle_router_request<S, T>(
             .await
         })
         .await
+        .map_err(|err| anyhow::anyhow!("{err}"))
     } else {
         dispatch_to_shard::<S>(
             &transport,
@@ -337,7 +344,7 @@ where
     let metrics = Arc::new(ServiceMetrics::default());
     metrics.init();
 
-    let inflight = Inflight::default();
+    let inflight = Inflight::<Vec<u8>, anyhow::Error>::default();
 
     let mut tasks = JoinSet::new();
 
