@@ -48,13 +48,7 @@ WORKDIR /usr/src/app/fluxer_api
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		ca-certificates \
 		ffmpeg \
-		libimage-exiftool-perl \
-		libwebp7 \
-		libwebpmux3 \
-		libheif1 \
-		libheif-plugin-libde265 \
-		libheif-plugin-dav1d \
-		libvips42t64 && \
+		libimage-exiftool-perl && \
 	rm -rf /var/lib/apt/lists/*
 
 COPY --from=deploy --chown=65532:65532 /out ./
