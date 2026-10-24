@@ -141,7 +141,13 @@ func (p *Project) Services() []string {
 	if p.Model == nil {
 		return nil
 	}
-	names := p.Model.ServiceNames()
+	all := p.Model.ServiceNames()
+	names := make([]string, 0, len(all))
+	for _, name := range all {
+		if svc := p.Model.Services[name]; svc.GetScale() > 0 {
+			names = append(names, name)
+		}
+	}
 	slices.Sort(names)
 	return names
 }

@@ -64,7 +64,7 @@ func (p *Project) Plan(ctx context.Context) (*Plan, error) {
 		}
 	}
 	for service := range byService {
-		if _, ok := p.Model.Services[service]; !ok {
+		if svc, ok := p.Model.Services[service]; !ok || svc.GetScale() == 0 {
 			plan.Remove = append(plan.Remove, service)
 		}
 	}
