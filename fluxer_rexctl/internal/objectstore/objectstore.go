@@ -8,6 +8,8 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
 	"encoding/xml"
 	"errors"
@@ -15,6 +17,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 )
@@ -31,6 +34,8 @@ type Problem int
 
 const (
 	Unreachable Problem = iota
+	Untrusted
+	WrongName
 	Credentials
 	WrongRegion
 	MissingBuckets
@@ -50,6 +55,8 @@ func (e *Error) Error() string {
 	switch {
 	case e.Err != nil:
 		return e.Err.Error()
+	case e.Problem == MissingBuckets && e.Code == "":
+		return "missing buckets: " + strings.Join(e.Buckets, ", ")
 	case e.Message != "":
 		return e.Code + ": " + e.Message
 	}
@@ -84,6 +91,11 @@ func (s Store) probe(ctx context.Context, bucket string) error {
 	if err := s.do(ctx, http.MethodPut, bucket, key, []byte("ok")); err != nil {
 		return err
 	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cancel()
+		_ = s.do(ctx, http.MethodDelete, bucket, key, nil)
+	}()
 	if err := s.do(ctx, http.MethodGet, bucket, key, nil); err != nil {
 		return err
 	}
@@ -106,7 +118,7 @@ func (s Store) do(ctx context.Context, method, bucket, key string, body []byte) 
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return &Error{Problem: Unreachable, Err: err}
+		return &Error{Problem: transportProblem(err), Err: err}
 	}
 	defer resp.Body.Close()
 	data, _ := io.ReadAll(io.LimitReader(resp.Body, 64*1024))
@@ -118,21 +130,48 @@ func (s Store) do(ctx context.Context, method, bucket, key string, body []byte) 
 	if eb.Code == "" {
 		eb.Code = resp.Status
 	}
-	e := &Error{Problem: Other, Buckets: []string{bucket}, Code: eb.Code, Message: eb.Message}
+	return &Error{Problem: classify(resp.StatusCode, eb.Code, eb.Message), Buckets: []string{bucket}, Code: eb.Code, Message: eb.Message}
+}
+
+var credentialCodes = []string{"InvalidAccessKeyId", "SignatureDoesNotMatch", "InvalidToken", "InvalidSecurity", "ExpiredToken", "TokenRefreshRequired", "Unauthorized", "InvalidSignature"}
+
+var credentialMessages = []string{"invalid signature", "no such key", "access key", "signature does not match", "signature we calculated", "unauthorized"}
+
+var regionCodes = []string{"AuthorizationHeaderMalformed", "PermanentRedirect", "IllegalLocationConstraintException", "InvalidRegion"}
+
+func classify(status int, code, message string) Problem {
+	msg := strings.ToLower(message)
+	credentialText := slices.ContainsFunc(credentialMessages, func(m string) bool { return strings.Contains(msg, m) })
 	switch {
-	case eb.Code == "NoSuchBucket":
-		e.Problem = MissingBuckets
-	case eb.Code == "InvalidAccessKeyId", eb.Code == "SignatureDoesNotMatch", eb.Code == "InvalidToken", eb.Code == "InvalidSecurity":
-		e.Problem = Credentials
-	case eb.Code == "AuthorizationHeaderMalformed", eb.Code == "PermanentRedirect", eb.Code == "IllegalLocationConstraintException",
-		resp.StatusCode == http.StatusMovedPermanently, resp.StatusCode == http.StatusTemporaryRedirect:
-		e.Problem = WrongRegion
-	case eb.Code == "AccessDenied", resp.StatusCode == http.StatusForbidden:
-		e.Problem = Denied
-	case resp.StatusCode == http.StatusNotFound && eb.Message == "":
-		e.Problem = MissingBuckets
+	case code == "NoSuchBucket":
+		return MissingBuckets
+	case slices.Contains(credentialCodes, code), status == http.StatusUnauthorized, code == "InvalidArgument" && credentialText:
+		return Credentials
+	case slices.Contains(regionCodes, code), status == http.StatusMovedPermanently, status == http.StatusTemporaryRedirect:
+		return WrongRegion
+	case code == "AccessDenied" || status == http.StatusForbidden:
+		if credentialText {
+			return Credentials
+		}
+		return Denied
+	case status == http.StatusNotFound && message == "":
+		return MissingBuckets
 	}
-	return e
+	return Other
+}
+
+func transportProblem(err error) Problem {
+	var unknown x509.UnknownAuthorityError
+	var invalid x509.CertificateInvalidError
+	var host x509.HostnameError
+	var verify *tls.CertificateVerificationError
+	switch {
+	case errors.As(err, &host):
+		return WrongName
+	case errors.As(err, &unknown), errors.As(err, &invalid), errors.As(err, &verify):
+		return Untrusted
+	}
+	return Unreachable
 }
 
 func (s Store) request(ctx context.Context, method, bucket, key string, body []byte) (*http.Request, error) {
