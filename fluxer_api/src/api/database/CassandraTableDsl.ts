@@ -84,6 +84,9 @@ export function defineTable<Row extends object, PK extends ColumnName<Row>, Part
 	for (const c of columns) assertCqlIdentifier(c as string);
 	for (const k of pk) assertCqlIdentifier(k as string);
 	for (const k of partitionKey) assertCqlIdentifier(k as string);
+	if (partitionKey.some((k, index) => (pk[index] as string) !== k)) {
+		throw new Error(`Table "${def.name}" partitionKey must be a prefix of its primaryKey`);
+	}
 	if (def.defaultTtlSeconds !== undefined && validateTtlSeconds(def.defaultTtlSeconds) === 0) {
 		throw new Error(`Table "${def.name}" needs a positive default TTL`);
 	}

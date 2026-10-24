@@ -2,7 +2,6 @@
 
 import type {CassandraParams, KvQueryMeta, KvTableSpec, WhereExpr} from '@app/api/database/CassandraTypes';
 import {buildCandidatePlan, keyFromColumns, matchesWhere} from '@app/api/database/PostgresKvQueryExecutor';
-import cassandra from 'cassandra-driver';
 import {describe, expect, it} from 'vitest';
 
 type Row = Record<string, unknown>;
@@ -70,8 +69,6 @@ function rowKeyMatchesPlan(plan: ReturnType<typeof buildCandidatePlan>, rowKey: 
 						Buffer.compare(buf, Buffer.from(group.upperBounds[i]!, 'utf8')) < 0,
 				),
 			);
-		case 'partitionKeys':
-			return c.partitionKeys.includes(rowKey);
 	}
 }
 
