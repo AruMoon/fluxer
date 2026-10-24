@@ -32,11 +32,17 @@ handle_presence_connect(Attempt, State) ->
         #{remote => LookupRemote},
         gateway_timings:from_state(State)
     ),
-    State1 = gateway_timings:put_state(GwTimings, State),
+    State1 = put_timings(GwTimings, State),
     case Result of
         {ok, Pid} -> do_session_connect(Pid, Attempt, State1);
         _Error -> schedule_presence_retry(Attempt, State1)
     end.
+
+-spec put_timings(gateway_timings:recorder(), session_state()) -> session_state().
+put_timings(_GwTimings, #{ready := undefined} = State) ->
+    State;
+put_timings(GwTimings, State) ->
+    gateway_timings:put_state(GwTimings, State).
 
 -spec presence_lookup_remote(term()) -> map() | undefined.
 presence_lookup_remote({ok, PresencePid}) when is_pid(PresencePid) ->
@@ -91,7 +97,7 @@ do_session_connect(Pid, Attempt, State) when is_map(State) ->
         #{remote => Remote},
         gateway_timings:from_state(State)
     ),
-    State1 = gateway_timings:put_state(GwTimings, State),
+    State1 = put_timings(GwTimings, State),
     case Result of
         {ok, Sessions} ->
             gen_server:cast(Pid, {sync_friends, FriendIds}),

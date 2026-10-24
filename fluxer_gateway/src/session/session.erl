@@ -270,6 +270,8 @@ handle_info_message({call_reconnect, ChannelId, Attempt}, State) when
     is_integer(ChannelId), is_integer(Attempt), Attempt >= 0
 ->
     session_connection_retry:handle_call_reconnect(ChannelId, Attempt, State);
+handle_info_message({gateway_timing_update, _Timings}, #{ready := undefined} = State) ->
+    {noreply, State};
 handle_info_message({gateway_timing_update, Timings}, State) ->
     {noreply, gateway_timings:merge_state(Timings, State)};
 handle_info_message({thread_user_flip, _Version}, State) ->
