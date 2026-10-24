@@ -60,6 +60,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=deploy --chown=65532:65532 /out ./
 COPY --from=deploy --chown=65532:65532 /usr/src/app/fluxer_api/dist ./dist
 COPY --from=deploy --chown=65532:65532 /usr/src/app/fluxer_api/bin ./bin
+COPY --from=deploy --chown=65532:65532 /usr/src/app/tsconfigs /usr/src/app/tsconfigs
 
 RUN mkdir -p /run/fluxer && \
 	chmod 700 /run/fluxer && \
