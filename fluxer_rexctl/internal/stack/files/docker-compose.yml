@@ -228,11 +228,19 @@ x-fluxer-service: &fluxer-service
   networks: [fluxer]
   logging: *fluxer-logging
 
+x-fluxer-healthcheck: &fluxer-healthcheck
+  interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
+  timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
+  retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+  start_period: ${FLUXER_HEALTHCHECK_START_PERIOD:-60s}
+  start_interval: ${FLUXER_HEALTHCHECK_START_INTERVAL:-1s}
+
 x-fluxer-app-healthcheck: &fluxer-app-healthcheck
   interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
   timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
   retries: ${FLUXER_APP_HEALTHCHECK_RETRIES:-30}
   start_period: ${FLUXER_APP_HEALTHCHECK_START_PERIOD:-90s}
+  start_interval: ${FLUXER_HEALTHCHECK_START_INTERVAL:-1s}
 
 x-fluxer-svc-healthcheck: &fluxer-svc-healthcheck
   <<: *fluxer-app-healthcheck
@@ -266,9 +274,7 @@ services:
       - edge-config:/config
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:2019/config/"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
     depends_on:
       api: {condition: service_started}
       gateway: {condition: service_healthy}
@@ -315,9 +321,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   valkey:
     <<: *fluxer-service
@@ -333,9 +337,7 @@ services:
       - valkey-data:/data
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   nats:
     <<: *fluxer-service
@@ -349,9 +351,7 @@ services:
       - nats-data:/data
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8222/healthz"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   meilisearch:
     <<: *fluxer-service
@@ -371,9 +371,7 @@ services:
       - meilisearch-data:/meili_data
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:7700/health"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   seaweedfs:
     <<: *fluxer-service
@@ -390,8 +388,7 @@ services:
       - seaweedfs-data:/data
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8333/healthz"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
+      <<: *fluxer-healthcheck
       retries: ${FLUXER_SEAWEEDFS_HEALTHCHECK_RETRIES:-20}
       start_period: ${FLUXER_SEAWEEDFS_HEALTHCHECK_START_PERIOD:-60s}
 
@@ -490,9 +487,7 @@ services:
       - "${FLUXER_LIVEKIT_UDP_PORT:-7882}:${FLUXER_LIVEKIT_UDP_PORT:-7882}/udp"
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:7880/"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   api:
     <<: *fluxer-service
@@ -599,10 +594,7 @@ services:
       FLUXER_ERLANG_DIRTY_IO_SCHEDULERS: ${FLUXER_ERLANG_DIRTY_IO_SCHEDULERS:-}
     healthcheck:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/_health/ready"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_APP_HEALTHCHECK_RETRIES:-30}
-      start_period: ${FLUXER_APP_HEALTHCHECK_START_PERIOD:-90s}
+      <<: *fluxer-app-healthcheck
     depends_on:
       nats: {condition: service_healthy}
       valkey: {condition: service_healthy}
@@ -646,6 +638,10 @@ services:
       FLUXER_S3_READ_BUCKET: ${FLUXER_S3_READ_BUCKET:-}
       FLUXER_S3_READ_BUCKET_STYLE: ${FLUXER_S3_READ_BUCKET_STYLE:-}
       FLUXER_S3_READ_SIGNED: "${FLUXER_S3_READ_SIGNED:-true}"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/fluxer-media-proxy", "healthcheck"]
+      <<: *fluxer-healthcheck
+      interval: ${FLUXER_MEDIA_PROXY_HEALTHCHECK_INTERVAL:-30s}
     depends_on:
       seaweedfs-init: {condition: service_completed_successfully}
       nats: {condition: service_healthy}
@@ -693,9 +689,7 @@ services:
           memory: ${FLUXER_STATIC_PROXY_MEMORY_LIMIT:-256mb}
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/avatars/0.png"]
-      interval: ${FLUXER_HEALTHCHECK_INTERVAL:-10s}
-      timeout: ${FLUXER_HEALTHCHECK_TIMEOUT:-5s}
-      retries: ${FLUXER_HEALTHCHECK_RETRIES:-10}
+      <<: *fluxer-healthcheck
 
   app-proxy:
     <<: *fluxer-service
@@ -737,6 +731,10 @@ services:
       FLUXER_CSP_EXTRA_WORKER_SRC: ${FLUXER_CSP_EXTRA_WORKER_SRC:-}
       FLUXER_CSP_EXTRA_MANIFEST_SRC: ${FLUXER_CSP_EXTRA_MANIFEST_SRC:-}
       FLUXER_CSP_REPORT_URI: ${FLUXER_CSP_REPORT_URI:-}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8080/_ready"]
+      <<: *fluxer-healthcheck
+      interval: ${FLUXER_APP_PROXY_HEALTHCHECK_INTERVAL:-30s}
     depends_on:
       api: {condition: service_healthy}
       edge: {condition: service_healthy}
