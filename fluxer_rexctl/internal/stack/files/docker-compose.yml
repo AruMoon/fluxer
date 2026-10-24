@@ -528,6 +528,7 @@ services:
       NODE_EXTRA_CA_CERTS: ${FLUXER_NODE_EXTRA_CA_CERTS:-/etc/ssl/certs/ca-certificates.crt}
       FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_API_POSTGRES_MAX_CONNECTIONS:-25}"
       FLUXER_API_PRESIGNED_ATTACHMENT_UPLOADS_ENABLED: "${FLUXER_API_PRESIGNED_ATTACHMENT_UPLOADS_ENABLED:-true}"
+      FLUXER_API_EMBEDDED_WORKER: "${FLUXER_API_EMBEDDED_WORKER:-false}"
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /_health HTTP/1.0\\r\\nHost: 127.0.0.1\\r\\n\\r\\n\" >&3 && head -n 1 <&3 | grep -q \" 200 \"'"]
       <<: *fluxer-app-healthcheck
@@ -546,6 +547,7 @@ services:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-api:${FLUXER_IMAGE_TAG:-v1}
     deploy:
+      replicas: ${FLUXER_WORKER_REPLICAS:-1}
       resources:
         limits:
           memory: ${FLUXER_WORKER_MEMORY_LIMIT:-2560mb}

@@ -55,12 +55,20 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 	setInt(out, "FLUXER_TOKIO_WORKER_THREADS", small)
 	setInt(out, "FLUXER_MEDIA_PROXY_TOKIO_WORKER_THREADS", min(c, clamp((c+1)/2, 2, 8)))
 	setInt(out, "FLUXER_MALLOC_ARENA_MAX", max(2, small))
-	setInt(out, "FLUXER_API_POSTGRES_MAX_CONNECTIONS", clamp(2*c, 4, 25))
+	embedded := embeddedWorker(hw, fixed)
+	if embedded {
+		setInt(out, "FLUXER_API_POSTGRES_MAX_CONNECTIONS", clamp(3*c, 4, 25))
+	} else {
+		setInt(out, "FLUXER_API_POSTGRES_MAX_CONNECTIONS", clamp(2*c, 4, 25))
+	}
 	setInt(out, "FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 25))
 	setInt(out, "FLUXER_USERS_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
 	setInt(out, "FLUXER_MESSAGES_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
-	clients := num("FLUXER_API_POSTGRES_MAX_CONNECTIONS", 25) + num("FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS", 25) +
+	clients := num("FLUXER_API_POSTGRES_MAX_CONNECTIONS", 25) +
 		num("FLUXER_USERS_POSTGRES_MAX_CONNECTIONS", 20) + num("FLUXER_MESSAGES_POSTGRES_MAX_CONNECTIONS", 20)
+	if !embedded {
+		clients += num("FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS", 25)
+	}
 	setInt(out, "FLUXER_POSTGRES_SERVER_MAX_CONNECTIONS", clients+10)
 	setInt(out, "FLUXER_POSTGRES_AUTOVACUUM_MAX_WORKERS", clamp(c, 1, 3))
 	gather := 0
@@ -120,6 +128,37 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 	if m < defaultWriterMiB {
 		out["FLUXER_POSTGRES_BGWRITER_DELAY"] = "200ms"
 		out["FLUXER_POSTGRES_BGWRITER_LRU_MAXPAGES"] = "100"
+	}
+	return out
+}
+
+const EmbeddedWorkerVar = "FLUXER_API_EMBEDDED_WORKER"
+
+func embeddedWorker(hw Hardware, fixed map[string]string) bool {
+	if on, err := strconv.ParseBool(strings.TrimSpace(fixed[EmbeddedWorkerVar])); err == nil {
+		return on
+	}
+	return false
+}
+
+func FoldWorker(hw Hardware, env, fixed map[string]string) map[string]string {
+	if !embeddedWorker(hw, fixed) {
+		return nil
+	}
+	out := map[string]string{EmbeddedWorkerVar: "true", "FLUXER_WORKER_REPLICAS": "0"}
+	size := func(k string) int {
+		if n := parseMiB(fixed[k]); n > 0 {
+			return n
+		}
+		return parseMiB(env[k])
+	}
+	for api, worker := range map[string]string{
+		"FLUXER_API_MEMORY_LIMIT":       "FLUXER_WORKER_MEMORY_LIMIT",
+		"FLUXER_API_MEMORY_RESERVATION": "FLUXER_WORKER_MEMORY_RESERVATION",
+	} {
+		if a, w := size(api), size(worker); a > 0 && w > 0 {
+			out[api] = strconv.Itoa(a+w/2) + "mb"
+		}
 	}
 	return out
 }

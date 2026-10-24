@@ -23,6 +23,12 @@ func Effective(set *stack.Set, chosen, secrets, adminImport map[string]string) (
 		}
 	}
 
+	fixed := map[string]string{}
+	for name, value := range chosen {
+		if isRawName(name) {
+			fixed[name] = value
+		}
+	}
 	if len(set.Profiles) > 0 {
 		for v, value := range stack.Sizing(Hardware(), chosen[MemoryProfile] == "", fixed) {
 			put(v, value)
@@ -36,6 +42,12 @@ func Effective(set *stack.Set, chosen, secrets, adminImport map[string]string) (
 				Fix: "Run rexctl config unset memory.profile."}
 		}
 		for v, value := range values {
+			put(v, value)
+		}
+	}
+
+	if reads(stack.EmbeddedWorkerVar) {
+		for v, value := range stack.FoldWorker(Hardware(), env, fixed) {
 			put(v, value)
 		}
 	}

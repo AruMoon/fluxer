@@ -28,6 +28,7 @@ var derivedVars = map[string][]string{
 	settings.Domain:         {"FLUXER_PUBLIC_ORIGIN", "FLUXER_EDGE_SITE_ADDRESS"},
 	settings.EdgeHTTPSPort:  {"FLUXER_PUBLIC_PORT", "FLUXER_PUBLIC_ORIGIN"},
 	settings.EdgePublicPort: {"FLUXER_PUBLIC_ORIGIN"},
+	stack.EmbeddedWorkerVar: {"FLUXER_WORKER_REPLICAS"},
 }
 
 func Promised(set *stack.Set, custom []byte, k settings.Key) []string {
