@@ -109,6 +109,8 @@ rexctl config set <key> <value>
 
 Each time rexctl starts Fluxer, it sizes memory limits, database connections and thread counts to the machine's memory and CPUs, so a resized machine needs no changes. The `memory.profile` setting pins a fixed size instead. An instance installed by an older rexctl keeps the size it picked at install. Run `rexctl config unset memory.profile` to let rexctl size it.
 
+On a machine with little memory, `rexctl config set FLUXER_API_EMBEDDED_WORKER true` runs background jobs inside the api service instead of a separate worker service. rexctl then removes the worker and adds half of its memory limit to the api.
+
 ## When something is wrong
 
 ```sh
