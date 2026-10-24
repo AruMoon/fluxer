@@ -9,7 +9,10 @@ import {
 	ZOOM_OUT_DESCRIPTOR,
 } from '@app/features/i18n/utils/CommonMessageDescriptors';
 import styles from '@app/features/messaging/components/modals/MediaModal.module.css';
-import {ControlButton} from '@app/features/messaging/components/modals/media_modal/MediaControls';
+import {
+	ControlButton,
+	type MediaOverlayActionsProps,
+} from '@app/features/messaging/components/modals/media_modal/MediaControls';
 import {
 	CLOSE_MODAL_DESCRIPTOR,
 	COPY_MEDIA_TO_CLIPBOARD_DESCRIPTOR,
@@ -45,7 +48,9 @@ import {
 	XIcon,
 } from '@phosphor-icons/react';
 import {observer} from 'mobx-react-lite';
-import {type FC, type ReactNode, type Ref, useCallback, useMemo, useState} from 'react';
+import {type FC, type ReactNode, useCallback, useMemo, useState} from 'react';
+
+type MobileMediaActionsProps = Omit<MediaOverlayActionsProps, 'onDeleteAttachment'>;
 
 const iconSize = remFromPx(20);
 

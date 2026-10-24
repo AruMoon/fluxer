@@ -206,12 +206,7 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 			sawNonModifier = true;
 			commit(combo);
 		};
-		const handleKeyUp = (event: KeyboardEvent) => {
-			if (!isKeybindModifierKey(event.key)) return;
-			if (sawNonModifier) return;
-			heldModifierCodes.delete(event.code);
-			if (heldModifierCodes.size > 0) return;
-			const combo = lastModifierCombo ?? modifierOnlyCombo(event);
+		const commitModifierRelease = (combo: KeyCombo) => {
 			if (!combo.key && !combo.code) return;
 			const modifierFlagCount =
 				(combo.shift ? 1 : 0) +
@@ -228,6 +223,13 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 				}
 			}
 			commit(combo);
+		};
+		const handleKeyUp = (event: KeyboardEvent) => {
+			if (!isKeybindModifierKey(event.key)) return;
+			if (sawNonModifier) return;
+			heldModifierCodes.delete(event.code);
+			if (heldModifierCodes.size > 0) return;
+			commitModifierRelease(lastModifierCombo ?? modifierOnlyCombo(event));
 		};
 		const handleGlobalKey = (type: 'keydown' | 'keyup', baseCombo: KeyCombo) => {
 			if (committed) return;
@@ -259,23 +261,7 @@ const KeybindEditorPopout: React.FC<KeybindEditorPopoutProps> = ({
 			if (sawNonModifier) return;
 			heldModifierCodes.delete(comboCode);
 			if (heldModifierCodes.size > 0) return;
-			const combo = lastModifierCombo ?? {...baseCombo, modifierOnly: true};
-			if (!combo.key && !combo.code) return;
-			const modifierFlagCount =
-				(combo.shift ? 1 : 0) +
-				(combo.ctrl ? 1 : 0) +
-				(combo.alt ? 1 : 0) +
-				(combo.meta ? 1 : 0) +
-				(combo.ctrlOrMeta ? 1 : 0);
-			if (modifierFlagCount === 1) {
-				for (const [leftCode, rightCode] of MODIFIER_BOTH_SIDES_PAIRS) {
-					if (seenModifierCodes.has(leftCode) && seenModifierCodes.has(rightCode)) {
-						commit({...combo, code: leftCode, bothSides: true});
-						return;
-					}
-				}
-			}
-			commit(combo);
+			commitModifierRelease(lastModifierCombo ?? {...baseCombo, modifierOnly: true});
 		};
 		const handleGlobalKeyEvent = (event: GlobalKeyEvent) => {
 			const baseCombo = globalKeyEventToCombo(event);

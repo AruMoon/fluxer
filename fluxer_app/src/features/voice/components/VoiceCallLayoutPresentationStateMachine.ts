@@ -140,6 +140,11 @@ const voiceCallLayoutPresentationStateMachine = setup({
 	id: 'voiceCallLayoutPresentation',
 	context: ({input}) => createVoiceCallLayoutPresentationContext(input),
 	initial: 'routing',
+	on: {
+		'presentation.update': {target: '.routing', actions: 'applyInput'},
+		'participants.toggle': {target: '.routing', actions: 'toggleParticipantsGrid'},
+		'participants.collapse': {target: '.routing', actions: 'collapseParticipantsGrid'},
+	},
 	states: {
 		routing: {
 			always: [
@@ -149,34 +154,10 @@ const voiceCallLayoutPresentationStateMachine = setup({
 				{target: 'focusLayout'},
 			],
 		},
-		gridLayout: {
-			on: {
-				'presentation.update': {target: 'routing', actions: 'applyInput'},
-				'participants.toggle': {target: 'routing', actions: 'toggleParticipantsGrid'},
-				'participants.collapse': {target: 'routing', actions: 'collapseParticipantsGrid'},
-			},
-		},
-		focusFallbackGrid: {
-			on: {
-				'presentation.update': {target: 'routing', actions: 'applyInput'},
-				'participants.toggle': {target: 'routing', actions: 'toggleParticipantsGrid'},
-				'participants.collapse': {target: 'routing', actions: 'collapseParticipantsGrid'},
-			},
-		},
-		focusLayout: {
-			on: {
-				'presentation.update': {target: 'routing', actions: 'applyInput'},
-				'participants.toggle': {target: 'routing', actions: 'toggleParticipantsGrid'},
-				'participants.collapse': {target: 'routing', actions: 'collapseParticipantsGrid'},
-			},
-		},
-		focusParticipantsExpanded: {
-			on: {
-				'presentation.update': {target: 'routing', actions: 'applyInput'},
-				'participants.toggle': {target: 'routing', actions: 'toggleParticipantsGrid'},
-				'participants.collapse': {target: 'routing', actions: 'collapseParticipantsGrid'},
-			},
-		},
+		gridLayout: {},
+		focusFallbackGrid: {},
+		focusLayout: {},
+		focusParticipantsExpanded: {},
 	},
 });
 

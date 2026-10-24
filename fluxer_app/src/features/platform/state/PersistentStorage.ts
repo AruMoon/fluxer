@@ -245,7 +245,7 @@ function readThroughLegacyValue(key: string): string | null {
 }
 
 function readValue(key: string): string | null {
-	if (!scopedStorageActive()) {
+	if (!scopedStorageEngaged) {
 		return readRawStorageItem(key);
 	}
 	if (RAW_ONLY_APP_STORAGE_KEYS.has(key)) {
@@ -289,7 +289,7 @@ function forgetDeletedKey(scope: string, key: string): void {
 }
 
 function writeValue(key: string, value: string | null): void {
-	if (!scopedStorageActive() || RAW_ONLY_APP_STORAGE_KEYS.has(key)) {
+	if (!scopedStorageEngaged || RAW_ONLY_APP_STORAGE_KEYS.has(key)) {
 		writeRawStorageItem(key, value);
 		return;
 	}
@@ -308,14 +308,14 @@ function writeValue(key: string, value: string | null): void {
 }
 
 function hasUnsettledWriteFailure(key: string): boolean {
-	if (!scopedStorageActive() || RAW_ONLY_APP_STORAGE_KEYS.has(key)) {
+	if (!scopedStorageEngaged || RAW_ONLY_APP_STORAGE_KEYS.has(key)) {
 		return false;
 	}
 	return writeQueue.hasFailure(storageScopeForKey(key), key);
 }
 
 function allKeys(): Array<string> {
-	if (!scopedStorageActive()) {
+	if (!scopedStorageEngaged) {
 		return rawStorageKeys();
 	}
 	const keys = [...scopedCache.keys()];
@@ -551,7 +551,7 @@ async function adoptRemoteDeletedKeys(scope: string): Promise<void> {
 }
 
 async function applyRemoteCommit(scope: string, key: string): Promise<void> {
-	if (!scopedStorageActive() || (scope !== GLOBAL_APP_STORAGE_SCOPE && scope !== activeScope)) {
+	if (!scopedStorageEngaged || (scope !== GLOBAL_APP_STORAGE_SCOPE && scope !== activeScope)) {
 		return;
 	}
 	if (key === AppStorageKey.ACCOUNT_RESET_KEPT_KEYS) {
@@ -591,7 +591,7 @@ async function applyRemoteCommit(scope: string, key: string): Promise<void> {
 }
 
 async function applyRemoteScopeReload(scope: string): Promise<void> {
-	if (!scopedStorageActive() || (scope !== GLOBAL_APP_STORAGE_SCOPE && scope !== activeScope)) {
+	if (!scopedStorageEngaged || (scope !== GLOBAL_APP_STORAGE_SCOPE && scope !== activeScope)) {
 		return;
 	}
 	const reloadScope = activeScope;
@@ -622,7 +622,7 @@ async function applyRemoteScopeReload(scope: string): Promise<void> {
 
 if (typeof window !== 'undefined' && rawStorageKind() !== 'memory') {
 	window.addEventListener('storage', (event: StorageEvent) => {
-		if (scopedStorageActive() || !isRawStorageArea(event.storageArea)) {
+		if (scopedStorageEngaged || !isRawStorageArea(event.storageArea)) {
 			return;
 		}
 		notifyListeners({
@@ -656,7 +656,7 @@ export function subscribeAppStorageScope(listener: AppStorageScopeListener): () 
 	};
 }
 
-export async function initializeAppStorage(options?: {readonly scoped?: boolean}): Promise<void> {
+export async function initializeAppStorage(): Promise<void> {
 	if (storageInitialized) {
 		await flushAppStorageWrites();
 		return;
@@ -723,7 +723,7 @@ export async function activateAppStorageScope(scope: string | null): Promise<voi
 	const nextScope = normalizeAppStorageScope(scope);
 	await runTransition(async () => {
 		const previousScope = activeScope;
-		if (!scopedStorageActive()) {
+		if (!scopedStorageEngaged) {
 			activeScope = nextScope;
 			return;
 		}
@@ -739,7 +739,7 @@ export async function activateAppStorageScope(scope: string | null): Promise<voi
 export async function deleteAppStorageScope(scope: string): Promise<void> {
 	const normalizedScope = normalizeAppStorageScope(scope);
 	await runTransition(async () => {
-		if (!scopedStorageActive()) {
+		if (!scopedStorageEngaged) {
 			removeEntries(collectEntries(() => true));
 			return;
 		}
@@ -770,7 +770,7 @@ export async function deleteAppStorageScope(scope: string): Promise<void> {
 export async function resetActiveAccountScope(keysToKeep: ReadonlyArray<string>): Promise<void> {
 	const keepSet = new Set(keysToKeep);
 	await runTransition(async () => {
-		if (!scopedStorageActive()) {
+		if (!scopedStorageEngaged) {
 			removeEntries(collectEntries((key) => !keepSet.has(key)));
 			return;
 		}
@@ -798,7 +798,7 @@ export async function resetActiveAccountScope(keysToKeep: ReadonlyArray<string>)
 export async function resetAppStorage(keysToKeep: ReadonlyArray<string>): Promise<void> {
 	const keepSet = new Set(keysToKeep);
 	await runTransition(async () => {
-		if (!scopedStorageActive()) {
+		if (!scopedStorageEngaged) {
 			removeEntries(collectEntries((key) => !keepSet.has(key)));
 			return;
 		}

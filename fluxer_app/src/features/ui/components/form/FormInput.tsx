@@ -453,72 +453,29 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 		const labelRight = useMemo(
 			() => (
 				<div className={styles.labelContainerWithGap} data-flx="ui.form.input.label-right.label-container-with-gap">
-					{!innerActionButton && characterCounter}
+					{characterCounter}
 					{actionButton}
 				</div>
 			),
-			[innerActionButton, characterCounter, actionButton],
+			[characterCounter, actionButton],
 		);
-		const textareaWithActions = useMemo(
-			() =>
-				innerActionButton ? (
-					<div
-						ref={textareaWrapperRef}
-						className={clsx(styles.textareaWrapper, surfaceStyles.surface, error ? styles.error : styles.focusable)}
-						data-flx="ui.form.input.textarea-with-actions.textarea-wrapper"
-					>
-						<TextareaAutosize
-							data-flx="ui.form.input.textarea-with-actions.textarea"
-							{...textareaProps}
-							className={clsx(scrollerStyles.scroller, scrollerStyles.scrollerTextarea, styles.textarea)}
-							ref={setTextareaRefs}
-						/>
-						<div className={styles.textareaActions} data-flx="ui.form.input.textarea-with-actions.textarea-actions">
-							{innerActionButton}
-							{showCharacterCount && maxLength && (
-								<div
-									className={styles.characterCountContainer}
-									data-flx="ui.form.input.textarea-with-actions.character-count-container"
-								>
-									{characterCountTooltip ? (
-										characterCountTooltip(maxLength - currentLength, maxLength, currentLength)
-									) : (
-										<>
-											<span
-												className={styles.characterCount}
-												aria-hidden="true"
-												data-flx="ui.form.input.textarea-with-actions.character-count"
-											>
-												{numberFormat.format(currentLength)}/{numberFormat.format(maxLength)}
-											</span>
-											<CharacterCountAnnouncer
-												currentLength={currentLength}
-												maxLength={maxLength}
-												data-flx="ui.form.form-input.textarea-with-actions.character-count-announcer"
-											/>
-										</>
-									)}
-								</div>
-							)}
-						</div>
-					</div>
-				) : null,
-			[
-				innerActionButton,
-				textareaWrapperRef,
-				error,
-				textareaProps,
-				setTextareaRefs,
-				showCharacterCount,
-				maxLength,
-				characterCountTooltip,
-				currentLength,
-				numberFormat,
-			],
-		);
-		const simpleTextarea = useMemo(
-			() =>
-				!innerActionButton ? (
+		return (
+			<FieldSet
+				error={error}
+				errorId={errorId}
+				footer={footer}
+				label={label}
+				labelRight={labelRight}
+				htmlFor={textareaId}
+				data-flx="ui.form.input.textarea.field-set"
+			>
+				<FocusRing
+					focusTarget={textareaRef}
+					ringTarget={textareaRef}
+					offset={-2}
+					enabled={!disabled}
+					data-flx="ui.form.input.textarea.focus-ring"
+				>
 					<BaseTextarea
 						data-flx="ui.form.input.simple-textarea.error"
 						{...textareaProps}

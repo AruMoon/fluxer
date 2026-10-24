@@ -129,7 +129,7 @@ class SavedMessages {
 		this.savedMessages = [new Message(message, {missingReactions: 'preserve'}), ...this.savedMessages];
 	}
 
-	private touchMessage(messageId: string): void {
+	handleMessageReactionChange(messageId: string): void {
 		const index = this.savedMessages.findIndex((m) => m.id === messageId);
 		if (index === -1) return;
 		this.savedMessages = [

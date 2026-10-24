@@ -52,6 +52,7 @@ import * as ToastCommands from '@app/features/ui/commands/ToastCommands';
 import {isDesktop} from '@app/features/ui/utils/NativeUtils';
 import {msg} from '@lingui/core/macro';
 import {useLingui} from '@lingui/react/macro';
+import {browserSupportsWebAuthn} from '@simplewebauthn/browser';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 const logger = Logger.create('useLoginFlow');
@@ -72,7 +73,7 @@ export const PasskeyLoginCapability = Object.freeze({
 export type PasskeyLoginCapability = (typeof PasskeyLoginCapability)[keyof typeof PasskeyLoginCapability];
 
 export function resolveInitialPasskeyLoginCapability(): PasskeyLoginCapability {
-	if (isDesktop() || WebAuthnUtils.isBrowserWebAuthnSupported()) {
+	if (isDesktop() || browserSupportsWebAuthn()) {
 		return PasskeyLoginCapability.AVAILABLE;
 	}
 	return PasskeyLoginCapability.UNAVAILABLE;

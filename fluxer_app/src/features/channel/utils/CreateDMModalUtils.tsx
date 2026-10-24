@@ -15,7 +15,7 @@ import * as ModalCommands from '@app/features/ui/commands/ModalCommands';
 import {modal} from '@app/features/ui/commands/ModalCommands';
 import type {User} from '@app/features/user/models/User';
 import Users from '@app/features/user/state/Users';
-import {AccountGateSlate, accountGateReason} from '@app/features/user/utils/AccountGatePresentation';
+import {AccountGateSlate} from '@app/features/user/utils/AccountGatePresentation';
 import {canPerform} from '@app/features/user/utils/AccountGates';
 import {blockIfAccountLimited} from '@app/features/user/utils/AccountLimitUtils';
 import {TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';

@@ -162,7 +162,7 @@ export function useMediaKeyboard(options: UseMediaKeyboardOptions): UseMediaKeyb
 				return true;
 			} else if (keyMatches(key, SEEK_BACKWARD_KEYS)) {
 				event.preventDefault();
-				onSeekBackward?.(seekAmount);
+				onSeekBackward?.(SEEK_STEP);
 				return true;
 			} else if (key === 'ArrowLeft') {
 				event.preventDefault();
@@ -170,7 +170,7 @@ export function useMediaKeyboard(options: UseMediaKeyboardOptions): UseMediaKeyb
 				return true;
 			} else if (keyMatches(key, SEEK_FORWARD_KEYS)) {
 				event.preventDefault();
-				onSeekForward?.(seekAmount);
+				onSeekForward?.(SEEK_STEP);
 				return true;
 			} else if (key === 'ArrowRight') {
 				event.preventDefault();
@@ -178,11 +178,11 @@ export function useMediaKeyboard(options: UseMediaKeyboardOptions): UseMediaKeyb
 				return true;
 			} else if (keyMatches(key, VOLUME_UP_KEYS)) {
 				event.preventDefault();
-				onVolumeUp?.(volumeStep);
+				onVolumeUp?.(VOLUME_STEP);
 				return true;
 			} else if (keyMatches(key, VOLUME_DOWN_KEYS)) {
 				event.preventDefault();
-				onVolumeDown?.(volumeStep);
+				onVolumeDown?.(VOLUME_STEP);
 				return true;
 			} else if (keyMatches(key, MUTE_KEYS)) {
 				event.preventDefault();

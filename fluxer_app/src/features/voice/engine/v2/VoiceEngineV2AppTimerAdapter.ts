@@ -22,7 +22,7 @@ export interface VoiceEngineV2AppTimerAdapterOptions {
 }
 
 interface RegistryEntry {
-	handle: VoiceEngineV2AppTimerHandle;
+	handle: ReturnType<typeof setTimeout>;
 	scheduledAtMs: number;
 }
 
@@ -75,11 +75,7 @@ export function createVoiceEngineV2AppTimerAdapter(options: VoiceEngineV2AppTime
 		'voice-engine-v2 timer adapter requires a clock',
 	);
 	const clock = options.clock;
-	const scheduler = options.scheduler ?? defaultScheduler();
-	assert.equal(typeof scheduler.setTimeout, 'function', 'timer adapter scheduler must expose setTimeout');
-	assert.equal(typeof scheduler.clearTimeout, 'function', 'timer adapter scheduler must expose clearTimeout');
-	const cap = options.registryCap ?? VOICE_ENGINE_V2_TIMER_REGISTRY_CAP;
-	assert.ok(Number.isInteger(cap) && cap > 0, 'voice-engine-v2 timer adapter registryCap must be a positive integer');
+	const cap = VOICE_ENGINE_V2_TIMER_REGISTRY_CAP;
 	const registry = new Map<string, RegistryEntry>();
 	const onFire = options.onFire;
 	const onError = options.onError;
@@ -88,7 +84,7 @@ export function createVoiceEngineV2AppTimerAdapter(options: VoiceEngineV2AppTime
 			assertOptions(timerOptions);
 			const existing = registry.get(timerOptions.timerId);
 			if (existing !== undefined) {
-				scheduler.clearTimeout(existing.handle);
+				clearTimeout(existing.handle);
 				registry.delete(timerOptions.timerId);
 			}
 			if (registry.size >= cap) {
@@ -96,7 +92,7 @@ export function createVoiceEngineV2AppTimerAdapter(options: VoiceEngineV2AppTime
 			}
 			const scheduledAtMs = readClockMs(clock);
 			const timerId = timerOptions.timerId;
-			const handle = scheduler.setTimeout(() => {
+			const handle = setTimeout(() => {
 				const entry = registry.get(timerId);
 				if (entry === undefined) return;
 				registry.delete(timerId);
@@ -115,7 +111,7 @@ export function createVoiceEngineV2AppTimerAdapter(options: VoiceEngineV2AppTime
 			assert.ok(timerId.length > 0, 'voice-engine-v2 timer cancel timerId must not be empty');
 			const entry = registry.get(timerId);
 			if (entry === undefined) return;
-			scheduler.clearTimeout(entry.handle);
+			clearTimeout(entry.handle);
 			registry.delete(timerId);
 			assert.ok(!registry.has(timerId), 'voice-engine-v2 timer registry must not retain cancelled entries');
 		},

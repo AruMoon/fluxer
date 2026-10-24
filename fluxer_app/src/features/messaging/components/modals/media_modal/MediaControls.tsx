@@ -113,7 +113,7 @@ const OverlayTooltipButton: FC<OverlayTooltipButtonProps> = ({
 	</Tooltip>
 );
 
-interface MediaOverlayActionsProps {
+export interface MediaOverlayActionsProps {
 	isFavorited?: boolean;
 	onFavorite?: () => void;
 	onDownload?: () => void;

@@ -394,7 +394,7 @@ const CameraEffectStrengthSlider = ({label, value, onChange, resetLabel, dataFlx
 const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 	const {i18n} = useLingui();
 	useMediaEngineVersion();
-	const {localParticipant, onEnabled, onEnableCamera, isCameraEnabled, showEnableCameraButton = true} = props;
+	const {localParticipant, onEnableCamera, isCameraEnabled, showEnableCameraButton = true} = props;
 	const cameraAlreadyOn = isCameraEnabled === true;
 	const voiceBackgroundsAvailable = areVoiceBackgroundsAvailable();
 	const channelId = MediaEngine.channelId;
@@ -597,7 +597,7 @@ const CameraPreviewModalContent = observer((props: CameraPreviewModalProps) => {
 				dataFlx: 'voice.camera-preview-modal.enable-camera-error-modal',
 			});
 		}
-	}, [i18n, localParticipant, onEnabled, onEnableCamera, videoDevices]);
+	}, [i18n, localParticipant, onEnableCamera, videoDevices]);
 	useEffect(() => {
 		isMountedRef.current = true;
 		const unsubscribeDevices = VoiceDevicePermissionState.subscribe(handleDeviceUpdate);

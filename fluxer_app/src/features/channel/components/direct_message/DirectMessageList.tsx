@@ -15,7 +15,7 @@ import {getDmRouteChannelId} from '@app/features/channel/components/direct_messa
 import {DMListItem} from '@app/features/channel/components/direct_message/DMListItem';
 import {CreateDMModal} from '@app/features/channel/components/modals/CreateDMModal';
 import Channels from '@app/features/channel/state/Channels';
-import {getCreateDMRestrictionMessage, getCreateDmRestriction} from '@app/features/channel/utils/CreateDMModalUtils';
+import {getCreateDmRestriction} from '@app/features/channel/utils/CreateDMModalUtils';
 import {PERSONAL_NOTES_DESCRIPTOR} from '@app/features/i18n/utils/CommonMessageDescriptors';
 import {isKeyboardActivationKey} from '@app/features/input/utils/KeyboardUtils';
 import * as MessageCommands from '@app/features/messaging/commands/MessageCommands';
@@ -47,6 +47,7 @@ import MobileLayout from '@app/features/ui/state/MobileLayout';
 import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
 import * as UserCommands from '@app/features/user/commands/UserCommands';
 import Users from '@app/features/user/state/Users';
+import {accountGateReason} from '@app/features/user/utils/AccountGatePresentation';
 import {ME} from '@fluxer/constants/src/AppConstants';
 import {RelationshipTypes} from '@fluxer/constants/src/UserConstants';
 import {msg} from '@lingui/core/macro';
@@ -144,7 +145,7 @@ export const DMList = observer(() => {
 	const dmPickerAvailable = RuntimeConfig.dmPickerAvailable;
 	const currentUser = Users.currentUser;
 	const createDmRestriction = getCreateDmRestriction(currentUser);
-	const createDmTooltipText = createDmRestriction ? getCreateDMRestrictionMessage(i18n, createDmRestriction) : null;
+	const createDmTooltipText = createDmRestriction ? accountGateReason(i18n, createDmRestriction) : null;
 	const isMobile = MobileLayout.isMobileLayout();
 	const relationships = Relationships.getRelationships();
 	const pendingCount = relationships.filter((relation) => relation.type === RelationshipTypes.INCOMING_REQUEST).length;

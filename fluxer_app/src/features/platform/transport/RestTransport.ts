@@ -324,8 +324,7 @@ async function runWithSudoEscalation<T>(
 			if (sudoApplied) sudo?.onFailure(err);
 			throw err;
 		}
-		if (sudoVerificationFailed) {
-			sudo.onFailure(err);
+		const reprompt = async (nextPhase: SudoPhase): Promise<RestResponse<T>> => {
 			const merged = await awaitAccountScopedInteraction(ticket, sudo.prompt(method, path, err));
 			if (!merged) throw err;
 			return runWithSudoEscalation<T>(
@@ -335,40 +334,22 @@ async function runWithSudoEscalation<T>(
 				method,
 				path,
 				options,
-				'reissued',
+				nextPhase,
 				mergeBody(options, merged),
 			);
+		};
+		if (sudoVerificationFailed) {
+			sudo.onFailure(err);
+			return reprompt('reissued');
 		}
 		switch (phase) {
 			case 'fresh': {
 				sudo.invalidate();
-				const merged = await awaitAccountScopedInteraction(ticket, sudo.prompt(method, path, err));
-				if (!merged) throw err;
-				return runWithSudoEscalation<T>(
-					state,
-					routing,
-					ticket,
-					method,
-					path,
-					options,
-					'reissued',
-					mergeBody(options, merged),
-				);
+				return reprompt('reissued');
 			}
 			case 'reissued': {
 				sudo.onFailure(err);
-				const second = await awaitAccountScopedInteraction(ticket, sudo.prompt(method, path, err));
-				if (!second) throw err;
-				return runWithSudoEscalation<T>(
-					state,
-					routing,
-					ticket,
-					method,
-					path,
-					options,
-					'reissued-twice',
-					mergeBody(options, second),
-				);
+				return reprompt('reissued-twice');
 			}
 			case 'reissued-twice': {
 				sudo.onFailure(err);

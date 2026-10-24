@@ -70,7 +70,7 @@ export function resolveMessageFetchPreflightDecision(input: MessageFetchPrefligh
 }
 
 export function resolveMessageFetchExecutionDecision(input: MessageFetchExecutionInput): MessageFetchExecutionDecision {
-	return buildExecutionDecision(input);
+	return input.forceFailure ? {type: 'simulateFailure'} : {type: 'requestNetwork'};
 }
 
 export interface MessageFetchWindowTrustInput {

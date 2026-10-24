@@ -45,7 +45,7 @@ import {
 	type GuildDropPosition,
 	type GuildDropResult,
 } from '@app/features/app/components/layout/types/DndTypes';
-import {UserArea} from '@app/features/app/components/layout/UserArea';
+import {getResizeObserverEntryBlockSize, UserArea} from '@app/features/app/components/layout/UserArea';
 import {getChannelUnreadState} from '@app/features/app/components/layout/utils/ChannelUnreadState';
 import {
 	getRememberedSkeletonGuildRailScrollTopPx,

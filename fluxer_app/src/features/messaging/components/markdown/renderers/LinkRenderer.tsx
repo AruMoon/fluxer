@@ -208,6 +208,23 @@ function useJumpLinkAuxClick(url: string, interactive: boolean) {
 	);
 }
 
+function useLinkContextMenu(Menu: React.FC<LinkContextMenuProps>, url: string, interactive: boolean, i18n: I18n) {
+	return useCallback(
+		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
+			if (!interactive) return;
+			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
+				<Menu
+					url={url}
+					i18n={i18n}
+					onClose={onClose}
+					data-flx="messaging.markdown.renderers.link-renderer.use-link-context-menu.menu"
+				/>
+			));
+		},
+		[Menu, interactive, i18n, url],
+	);
+}
+
 type CompactGuildMentionIconStyle = React.CSSProperties & {
 	'--jump-link-guild-icon-image'?: string;
 };
@@ -246,13 +263,13 @@ interface JumpLinkMentionProps {
 	interactive?: boolean;
 }
 
-interface JumpLinkContextMenuProps {
+interface LinkContextMenuProps {
 	url: string;
 	i18n: I18n;
 	onClose: () => void;
 }
 
-function JumpLinkContextMenu({url, i18n, onClose}: JumpLinkContextMenuProps) {
+function JumpLinkContextMenu({url, i18n, onClose}: LinkContextMenuProps) {
 	const handleOpenLink = useCallback(() => {
 		void openExternalUrl(url);
 		onClose();
@@ -325,20 +342,7 @@ const JumpLinkMention = observer(function JumpLinkMention({
 		[channel, guild?.id, interactive, navigateToJumpTarget],
 	);
 	const handleAuxClick = useJumpLinkAuxClick(url, interactive);
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
-			if (!interactive) return;
-			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
-				<JumpLinkContextMenu
-					url={url}
-					i18n={i18n}
-					onClose={onClose}
-					data-flx="messaging.markdown.renderers.link-renderer.handle-context-menu.jump-link-context-menu"
-				/>
-			));
-		},
-		[interactive, i18n, url],
-	);
+	const handleContextMenu = useLinkContextMenu(JumpLinkContextMenu, url, interactive, i18n);
 	const displayName = channel.isPrivate() ? getDMDisplayName(channel) : (channel.name ?? channel.id);
 	const labelText = guild ? guild.name : displayName;
 	const shouldShowChannelInfo = !messageId && Boolean(channel.guildId);
@@ -475,20 +479,7 @@ function InaccessibleJumpLinkMention({url, i18n, interactive = true}: Inaccessib
 		[i18n, interactive],
 	);
 	const handleAuxClick = useJumpLinkAuxClick(url, interactive);
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
-			if (!interactive) return;
-			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
-				<JumpLinkContextMenu
-					url={url}
-					i18n={i18n}
-					onClose={onClose}
-					data-flx="messaging.markdown.renderers.link-renderer.handle-context-menu.jump-link-context-menu--2"
-				/>
-			));
-		},
-		[interactive, i18n, url],
-	);
+	const handleContextMenu = useLinkContextMenu(JumpLinkContextMenu, url, interactive, i18n);
 	const noAccessText = i18n._(NO_ACCESS_DESCRIPTOR);
 	const Component = interactive ? 'button' : 'span';
 	return (
@@ -552,20 +543,7 @@ const DiscoverableJumpLinkMention = observer(function DiscoverableJumpLinkMentio
 		[channelId, guildId, interactive, joining, messageId],
 	);
 	const handleAuxClick = useJumpLinkAuxClick(url, interactive);
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
-			if (!interactive) return;
-			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
-				<JumpLinkContextMenu
-					url={url}
-					i18n={i18n}
-					onClose={onClose}
-					data-flx="messaging.markdown.renderers.link-renderer.discoverable-jump-link-mention.context-menu"
-				/>
-			));
-		},
-		[interactive, i18n, url],
-	);
+	const handleContextMenu = useLinkContextMenu(JumpLinkContextMenu, url, interactive, i18n);
 	const entry = DiscoveryChannelPreviews.get(guildId, channelId);
 	if (entry?.status !== 'ready') {
 		return (
@@ -653,13 +631,7 @@ interface SettingsJumpLinkMentionProps {
 	interactive?: boolean;
 }
 
-interface SettingsLinkContextMenuProps {
-	url: string;
-	i18n: I18n;
-	onClose: () => void;
-}
-
-function SettingsLinkContextMenu({url, i18n, onClose}: SettingsLinkContextMenuProps) {
+function SettingsLinkContextMenu({url, i18n, onClose}: LinkContextMenuProps) {
 	const handleCopyLink = useCallback(async () => {
 		await TextCopyCommands.copy(i18n, url);
 		onClose();
@@ -693,20 +665,7 @@ function SettingsJumpLinkMention({target, url, i18n, interactive = true}: Settin
 		[interactive, url],
 	);
 	const handleAuxClick = useJumpLinkAuxClick(url, interactive);
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
-			if (!interactive) return;
-			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
-				<SettingsLinkContextMenu
-					url={url}
-					i18n={i18n}
-					onClose={onClose}
-					data-flx="messaging.markdown.renderers.link-renderer.handle-context-menu.settings-link-context-menu"
-				/>
-			));
-		},
-		[interactive, i18n, url],
-	);
+	const handleContextMenu = useLinkContextMenu(SettingsLinkContextMenu, url, interactive, i18n);
 	const tabLabel = getUserSettingsTabLabel(i18n, target.tab);
 	const sectionLabel = target.section ? getUserSettingsSectionLabel(i18n, target.section, target.tab) : '';
 	const tabIcon = getUserSettingsTabIconDescriptor(target.tab);
@@ -787,20 +746,7 @@ function AppPageJumpLinkMention({page, url, i18n, interactive = true}: AppPageJu
 		[interactive, page],
 	);
 	const handleAuxClick = useJumpLinkAuxClick(url, interactive);
-	const handleContextMenu = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement | HTMLSpanElement>) => {
-			if (!interactive) return;
-			ContextMenuCommands.openFromEvent(event, ({onClose}) => (
-				<SettingsLinkContextMenu
-					url={url}
-					i18n={i18n}
-					onClose={onClose}
-					data-flx="messaging.markdown.renderers.link-renderer.app-page-jump-link-mention.context-menu"
-				/>
-			));
-		},
-		[interactive, i18n, url],
-	);
+	const handleContextMenu = useLinkContextMenu(SettingsLinkContextMenu, url, interactive, i18n);
 	const label = getAppPageLabel(i18n, page);
 	const PageIcon = getAppPageIcon(page);
 	const Component = interactive ? 'button' : 'span';

@@ -200,20 +200,17 @@ function applyReactionFetchResult(
 	nextAfter?: string | null,
 ): void {
 	const {limit, after, totalCount} = options;
-	if (after !== undefined) {
-		MessageReactions.handleFetchAppend(
-			messageId,
-			data,
-			emoji,
-			limit,
-			responseHasMore,
-			totalCount,
-			requestId,
-			nextAfter,
-		);
-		return;
-	}
-	MessageReactions.handleFetchSuccess(messageId, data, emoji, limit, responseHasMore, totalCount, requestId, nextAfter);
+	MessageReactions.handleFetchSuccess(
+		after !== undefined ? 'append' : 'replace',
+		messageId,
+		data,
+		emoji,
+		limit,
+		responseHasMore,
+		totalCount,
+		requestId,
+		nextAfter,
+	);
 }
 
 function addReactionRequest(channelId: string, messageId: string, emoji: ReactionEmoji): Promise<unknown> {

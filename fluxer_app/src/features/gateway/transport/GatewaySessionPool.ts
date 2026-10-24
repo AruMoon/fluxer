@@ -6,10 +6,7 @@ import {
 	type ForegroundDemotionOutcome,
 } from '@app/features/account_engine/state/EngineForegroundHandoff';
 import Initialization from '@app/features/app/state/Initialization';
-import {
-	captureForegroundMentionCounts,
-	hydrateStoresFromSnapshotScope,
-} from '@app/features/gateway/snapshot/SnapshotHydration';
+import {hydrateStoresFromSnapshotScope} from '@app/features/gateway/snapshot/SnapshotHydration';
 import SnapshotSync from '@app/features/gateway/snapshot/SnapshotSync';
 import {installDeferredReaction} from '@app/features/gateway/transport/DeferredReaction';
 import {
@@ -26,6 +23,7 @@ import {AccountScopedWorkTransitionReason} from '@app/features/platform/state/Ac
 import SessionManager from '@app/features/platform/state/AuthSession';
 import {Logger} from '@app/features/platform/utils/AppLogger';
 import LocalPresence from '@app/features/presence/state/LocalPresence';
+import ReadStates from '@app/features/read_state/state/ReadStates';
 import {reaction} from 'mobx';
 
 const logger = new Logger('GatewaySessionPool');
@@ -76,7 +74,7 @@ class GatewaySessionPool {
 					: {userId: account.userId, gatewayEndpoint: account.instance?.gatewayEndpoint ?? null};
 			},
 			isCurrentAccount: (accountKey) => SessionManager.currentAccountKey === accountKey,
-			captureMentionCounts: () => captureForegroundMentionCounts(),
+			captureMentionCounts: () => ReadStates.captureMentionCounts(),
 			hydrate: (accountKey, mentionCounts) => hydrateStoresFromSnapshotScope(accountKey, mentionCounts),
 			whenForegroundLive: (accountKey) => this.whenForegroundLive(accountKey),
 			whenEngineConfigured: () => AccountEngine.whenConfigured(),

@@ -2265,11 +2265,7 @@ class MediaEngineFacade extends Store {
 	async ensureLinuxScreenShareAudioPublication(
 		linuxRule?: NonNullable<NativeAudioStartOptions['linuxRule']>,
 	): Promise<boolean> {
-		return voiceEngineV2AppScreenShareExecutionAdapter.ensureLinuxScreenShareAudioPublication(
-			this.room,
-			linuxRule,
-			options,
-		);
+		return voiceEngineV2AppScreenShareExecutionAdapter.ensureLinuxScreenShareAudioPublication(this.room, linuxRule);
 	}
 
 	async ensureWindowScreenShareAudioPublication(sourceId: string): Promise<boolean> {

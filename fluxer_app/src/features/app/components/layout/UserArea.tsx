@@ -76,7 +76,7 @@ const OPEN_USER_MENU_FOR_DESCRIPTOR = msg({
 });
 const VOICE_CONNECTION_HEIGHT_VARIABLE = '--layout-voice-connection-height';
 
-function getResizeObserverEntryBlockSize(entry: ResizeObserverEntry): number {
+export function getResizeObserverEntryBlockSize(entry: ResizeObserverEntry): number {
 	const borderBoxSize = entry.borderBoxSize;
 	const firstBorderBoxSize = Array.isArray(borderBoxSize) ? borderBoxSize[0] : borderBoxSize;
 	return firstBorderBoxSize?.blockSize ?? entry.contentRect.height;

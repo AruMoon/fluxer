@@ -861,14 +861,12 @@ class VoiceEngineV2AppScreenShareExecutionAdapter extends Store {
 		const participant = room?.localParticipant;
 		if (!participant?.isScreenShareEnabled) return false;
 		if (!linuxRule) return false;
-		if (options.replaceExisting !== true) {
-			const reconfigured = await reconfigureLinuxNativeAudioRouting(linuxRule, options);
-			if (reconfigured !== 'unsupported') {
-				this.syncPersistedScreenShareAudioPreferenceInternal(participant);
-				return true;
-			}
+		const reconfigured = await reconfigureLinuxNativeAudioRouting(linuxRule);
+		if (reconfigured !== 'unsupported') {
+			this.syncPersistedScreenShareAudioPreferenceInternal(participant);
+			return true;
 		}
-		const capturedTrack = await captureNativeAudioTrackForLinuxRouting(linuxRule, options);
+		const capturedTrack = await captureNativeAudioTrackForLinuxRouting(linuxRule);
 		if (!capturedTrack) return false;
 		let adopted = false;
 		try {

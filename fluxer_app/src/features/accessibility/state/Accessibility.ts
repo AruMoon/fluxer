@@ -480,7 +480,7 @@ function readAccessibilityStartupSettings(
 	) {
 		return null;
 	}
-	const preserveLegacyZoomLevel = options.preserveLegacyZoomLevel ?? shouldPreserveLegacyZoomLevel();
+	const preserveLegacyZoomLevel = shouldPreserveLegacyZoomLevel();
 	return {
 		zoomLevel: localZoomLevel ?? (preserveLegacyZoomLevel ? (legacySettings?.zoomLevel ?? 1.0) : 1.0),
 		syncReducedMotionWithSystem:

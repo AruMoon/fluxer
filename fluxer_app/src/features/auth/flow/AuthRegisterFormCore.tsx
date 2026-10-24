@@ -447,6 +447,13 @@ export const AuthRegisterFormCore = observer(function AuthRegisterFormCore({
 			</div>
 		);
 	}
+	const reducedMotion = Accessibility.useReducedMotion;
+	const helperMotionProps = {
+		initial: reducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: -5},
+		animate: {opacity: 1, y: 0},
+		exit: reducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 5},
+		transition: {duration: reducedMotion ? 0 : 0.2},
+	};
 	return (
 		<form id={formId} className={styles.form} onSubmit={form.handleSubmit} data-flx={`${flx}.form.submit`}>
 			{formError ? (
@@ -511,10 +518,7 @@ export const AuthRegisterFormCore = observer(function AuthRegisterFormCore({
 								<motion.span
 									key="error"
 									className={styles.usernameError}
-									initial={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: -5}}
-									animate={{opacity: 1, y: 0}}
-									exit={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 5}}
-									transition={{duration: Accessibility.useReducedMotion ? 0 : 0.2}}
+									{...helperMotionProps}
 									data-flx="auth.flow.auth-register-form-core.username-error"
 								>
 									{helperTextState.message}
@@ -524,10 +528,7 @@ export const AuthRegisterFormCore = observer(function AuthRegisterFormCore({
 								<motion.span
 									key={`hint-${helperTextState.message}`}
 									className={styles.usernameHint}
-									initial={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: -5}}
-									animate={{opacity: 1, y: 0}}
-									exit={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 5}}
-									transition={{duration: Accessibility.useReducedMotion ? 0 : 0.2}}
+									{...helperMotionProps}
 									data-flx="auth.flow.auth-register-form-core.username-sign-in-hint"
 								>
 									{helperTextState.message}
@@ -537,10 +538,7 @@ export const AuthRegisterFormCore = observer(function AuthRegisterFormCore({
 								<motion.span
 									key="suggestion"
 									className={styles.usernameHint}
-									initial={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: -5}}
-									animate={{opacity: 1, y: 0}}
-									exit={Accessibility.useReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 5}}
-									transition={{duration: Accessibility.useReducedMotion ? 0 : 0.2}}
+									{...helperMotionProps}
 									data-flx="auth.flow.auth-register-form-core.username-hint"
 								>
 									<Trans>How about:</Trans>{' '}

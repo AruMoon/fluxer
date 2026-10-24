@@ -498,7 +498,7 @@ function trimTrailingWhitespaceBeforeLineBreaks(value: string, preserveMarkdown:
 	return lines.join('\n');
 }
 
-function renderToPlaintext(nodes: Array<Node>, options: PlaintextRenderOptions): string {
+export function renderAstToPlaintext(nodes: Array<Node>, options: PlaintextRenderOptions): string {
 	const result = renderNodesToPlaintext(nodes, options);
 	return trimTrailingWhitespaceBeforeLineBreaks(result, options.preserveMarkdown)
 		.replace(/\n{3,}/g, '\n\n')
@@ -513,7 +513,7 @@ export function parseAndRenderToPlaintext(
 	try {
 		const parser = new WasmParser(content, parserFlags);
 		const {nodes} = parser.parse();
-		return renderToPlaintext(nodes, options);
+		return renderAstToPlaintext(nodes, options);
 	} catch (error) {
 		logger.error('Error parsing content for plaintext rendering:', error);
 		return content;

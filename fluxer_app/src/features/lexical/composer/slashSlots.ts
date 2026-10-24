@@ -45,6 +45,7 @@ import {mergeRegister} from '@lexical/utils';
 import {
 	$createParagraphNode,
 	$createTextNode,
+	$findMatchingParent,
 	$getAdjacentNode,
 	$getNodeByKey,
 	$getRoot,
@@ -134,7 +135,7 @@ function $isPointAtSlotBoundary(slot: SlashSlotNode, point: PointType, boundary:
 	if (point.type === 'element') {
 		return node.is(slot) && point.offset === (boundary === 'start' ? 0 : slot.getChildrenSize());
 	}
-	const enclosing = $enclosingSlot(node);
+	const enclosing = $findMatchingParent(node, $isSlashSlotNode);
 	if (enclosing == null || !enclosing.is(slot)) {
 		return false;
 	}
@@ -153,7 +154,7 @@ function $advanceToNextSlot(includeOptionalAnchor: boolean): boolean {
 	if (slots.length === 0) {
 		return false;
 	}
-	const currentSlot = $enclosingSlot(selection.anchor.getNode());
+	const currentSlot = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
 	if (currentSlot == null) {
 		return false;
 	}
@@ -179,7 +180,7 @@ function $focusPreviousSlot(): boolean {
 	if (slots.length === 0) {
 		return false;
 	}
-	const currentSlot = $enclosingSlot(selection.anchor.getNode());
+	const currentSlot = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
 	if (currentSlot != null) {
 		const currentIndex = slots.findIndex((slot) => slot.is(currentSlot));
 		const previousSlot = slots[currentIndex - 1];
@@ -319,7 +320,7 @@ function $findTypeTargetSlot(): SlashSlotNode | null {
 		return null;
 	}
 	const {anchor} = selection;
-	const enclosing = $enclosingSlot(anchor.getNode());
+	const enclosing = $findMatchingParent(anchor.getNode(), $isSlashSlotNode);
 	if (enclosing != null) {
 		return enclosing.getTextContentSize() === 0 ? enclosing : null;
 	}
@@ -432,8 +433,8 @@ function $handleSlashStructuralDelete(event: KeyboardEvent, isBackward: boolean)
 		return false;
 	}
 	if (!selection.isCollapsed()) {
-		const anchorSlot = $enclosingSlot(selection.anchor.getNode());
-		const focusSlot = $enclosingSlot(selection.focus.getNode());
+		const anchorSlot = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
+		const focusSlot = $findMatchingParent(selection.focus.getNode(), $isSlashSlotNode);
 		if (anchorSlot != null) {
 			if (anchorSlot.is(focusSlot)) {
 				return false;
@@ -460,7 +461,7 @@ function $handleSlashStructuralDelete(event: KeyboardEvent, isBackward: boolean)
 		return true;
 	}
 	const anchorNode = selection.anchor.getNode();
-	const slot = $enclosingSlot(anchorNode);
+	const slot = $findMatchingParent(anchorNode, $isSlashSlotNode);
 	if (slot != null) {
 		const hasValue = slot.getTextContentSize() > 0;
 		const boundary = isBackward ? 'start' : 'end';
@@ -525,6 +526,21 @@ function $handleSlashStructuralDelete(event: KeyboardEvent, isBackward: boolean)
 		return true;
 	}
 	return false;
+}
+
+function $collapsedSlotAtBoundary(event: KeyboardEvent | null, boundary: 'start' | 'end'): SlashSlotNode | null {
+	if (event != null && (isIMEComposing(event) || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey)) {
+		return null;
+	}
+	const selection = $getSelection();
+	if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+		return null;
+	}
+	const slot = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
+	if (slot == null || !$isPointAtSlotBoundary(slot, selection.anchor, boundary)) {
+		return null;
+	}
+	return slot;
 }
 
 export function registerSlashSlotPlugin(
@@ -613,21 +629,7 @@ export function registerSlashSlotPlugin(
 		editor.registerCommand(
 			KEY_ARROW_RIGHT_COMMAND,
 			(event: KeyboardEvent) => {
-				if (
-					event != null &&
-					(isIMEComposing(event) || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey)
-				) {
-					return false;
-				}
-				const selection = $getSelection();
-				if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-					return false;
-				}
-				const slot = $enclosingSlot(selection.anchor.getNode());
-				if (slot == null) {
-					return false;
-				}
-				if (!$isPointAtSlotBoundary(slot, selection.anchor, 'end')) {
+				if ($collapsedSlotAtBoundary(event, 'end') == null) {
 					return false;
 				}
 				if ($focusNextSlot()) {
@@ -643,21 +645,7 @@ export function registerSlashSlotPlugin(
 		editor.registerCommand(
 			KEY_ARROW_LEFT_COMMAND,
 			(event: KeyboardEvent) => {
-				if (
-					event != null &&
-					(isIMEComposing(event) || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey)
-				) {
-					return false;
-				}
-				const selection = $getSelection();
-				if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-					return false;
-				}
-				const slot = $enclosingSlot(selection.anchor.getNode());
-				if (slot == null) {
-					return false;
-				}
-				if (!$isPointAtSlotBoundary(slot, selection.anchor, 'start')) {
+				if ($collapsedSlotAtBoundary(event, 'start') == null) {
 					return false;
 				}
 				if (event != null) {
@@ -695,8 +683,8 @@ export function registerSlashSlotPlugin(
 				if (paragraph == null) {
 					return false;
 				}
-				const anchorSlot = $enclosingSlot(selection.anchor.getNode());
-				const focusSlot = $enclosingSlot(selection.focus.getNode());
+				const anchorSlot = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
+				const focusSlot = $findMatchingParent(selection.focus.getNode(), $isSlashSlotNode);
 				if (anchorSlot != null) {
 					if (anchorSlot.is(focusSlot)) {
 						return false;
@@ -741,7 +729,7 @@ export function registerSlashSlotPlugin(
 				if (paragraph == null) {
 					return;
 				}
-				if ($enclosingSlot(anchorNode) != null) {
+				if ($findMatchingParent(anchorNode, $isSlashSlotNode) != null) {
 					return;
 				}
 				if ($activeOptionalHint() != null) {
@@ -763,7 +751,11 @@ export function registerSlashSlotPlugin(
 						}
 						const anchorNode = selection.anchor.getNode();
 						const paragraph = $slashCommandParagraph(anchorNode);
-						if (paragraph == null || $enclosingSlot(anchorNode) != null || $activeOptionalHint() != null) {
+						if (
+							paragraph == null ||
+							$findMatchingParent(anchorNode, $isSlashSlotNode) != null ||
+							$activeOptionalHint() != null
+						) {
 							return;
 						}
 						const node = $nearestSlotForCaret(paragraph);
@@ -799,7 +791,7 @@ function $getActiveSlot(): SlashSlotNode | null {
 	if (!$isRangeSelection(selection)) {
 		return null;
 	}
-	const enclosing = $enclosingSlot(selection.anchor.getNode());
+	const enclosing = $findMatchingParent(selection.anchor.getNode(), $isSlashSlotNode);
 	if (enclosing != null) {
 		return enclosing;
 	}

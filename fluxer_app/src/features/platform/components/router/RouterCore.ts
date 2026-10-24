@@ -415,20 +415,7 @@ class RouterImpl implements Router {
 
 	private async handleNotFound(url: URL, historyState: unknown): Promise<void> {
 		const notFoundRouteId = this.options.notFoundRouteId;
-		if (!notFoundRouteId) {
-			this.state = {
-				...this.state,
-				location: url,
-				matches: [],
-				navigating: false,
-				pending: null,
-				error: new NotFound(),
-				historyState,
-			};
-			this.notify();
-			return;
-		}
-		const nf = this.routeById.get(notFoundRouteId);
+		const nf = notFoundRouteId ? this.routeById.get(notFoundRouteId) : undefined;
 		if (!nf) {
 			this.state = {
 				...this.state,

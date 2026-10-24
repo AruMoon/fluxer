@@ -352,13 +352,7 @@ class MemberSearch {
 	}
 
 	handleMemberUpdate(guildId: string, memberId: string): void {
-		if (!worker) return;
-		const member = GuildMembers.getMember(guildId, memberId);
-		if (!member) return;
-		const transformedMember = getTransformedMember(member, guildId);
-		if (transformedMember) {
-			updateMembers([transformedMember]);
-		}
+		this.handleMemberAdd(guildId, memberId);
 	}
 
 	handleMemberRemove(guildId: string, memberId: string): void {

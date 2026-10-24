@@ -79,7 +79,7 @@ export function hasVisibleContent(text: string): boolean {
 	return text.replace(INVISIBLE_RE, '') !== '';
 }
 
-function hasOpenInlineCode(text: string): boolean {
+export function hasOpenInlineCode(text: string): boolean {
 	let open = 0;
 	for (const [run] of text.matchAll(/`+/g)) {
 		if (open === 0) {

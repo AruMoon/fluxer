@@ -438,10 +438,33 @@ export const MediaModal: FC<MediaModalProps> = observer(
 				children: wrappedChildren,
 			});
 		}
+		const actionProps = {
+			isFavorited,
+			onFavorite,
+			onDownload,
+			onOpenInBrowser,
+			onCopyLink,
+			onCopyMedia,
+			onReset: handleResetMedia,
+			onZoomIn: handleZoomIn,
+			onZoomOut: handleZoomOut,
+			onRotateCW: handleRotateCW,
+			onRotateCCW: handleRotateCCW,
+			onReply,
+			onForward,
+			onClose: handleClose,
+			canReset: !panZoomInfo.isDefault || hasCustomRotation,
+			canZoomIn: panZoomInfo.canZoomIn,
+			canZoomOut: panZoomInfo.canZoomOut,
+			enableZoomControls: enablePanZoom,
+			onPointerEnter: handleHudPointerEnter,
+			onPointerLeave: handleHudPointerLeave,
+		};
 		let mediaActions: ReactNode = null;
 		if (isMobile && !isMobileVideo) {
 			mediaActions = (
 				<MobileMediaActions
+					{...actionProps}
 					rootRef={topActionBarRef}
 					data-flx="messaging.media-modal.mobile-media-actions"
 				/>
@@ -449,6 +472,7 @@ export const MediaModal: FC<MediaModalProps> = observer(
 		} else if (!isMobile) {
 			mediaActions = (
 				<MediaOverlayActions
+					{...actionProps}
 					rootRef={bottomActionBarRef}
 					onDeleteAttachment={onDeleteAttachment}
 					data-flx="messaging.media-modal.media-overlay-actions"
