@@ -181,6 +181,7 @@ async function createBlueskyOAuthService(
 		return null;
 	}
 	try {
+		const {BlueskyOAuthService} = await import('@app/api/bluesky/BlueskyOAuthService');
 		return await BlueskyOAuthService.create(config, getKVClient(), unfurler, Config.endpoints.apiPublic);
 	} catch (error) {
 		Logger.error({error}, 'Bluesky OAuth initialization failed; disabling Bluesky OAuth for this configuration.');
