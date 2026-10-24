@@ -32,14 +32,7 @@ import {
 import {ThreadSearchIndex} from '@app/api/search/thread/ThreadSearchIndex';
 import {DEFAULT_SEARCH_CLIENT_TIMEOUT_MS} from '@fluxer/constants/src/Timeouts';
 import type {ElasticsearchDistributedLock} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchIndexAdapter';
-import {ElasticsearchMessageAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchMessageAdapter';
-import {ElasticsearchReportAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchReportAdapter';
-import {ElasticsearchThreadAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchThreadAdapter';
-import {ElasticsearchUserAdapter} from '@pkgs/elasticsearch_search/src/adapters/ElasticsearchUserAdapter';
-import {
-	createElasticsearchClient,
-	type ElasticsearchClientConfig,
-} from '@pkgs/elasticsearch_search/src/ElasticsearchClient';
+import type {ElasticsearchClientConfig} from '@pkgs/elasticsearch_search/src/ElasticsearchClient';
 
 let searchProvider: ISearchProvider | null = null;
 let injectedSearchProvider: ISearchProvider | undefined;
@@ -60,19 +53,10 @@ function createElasticsearchSearchProvider(lock?: ElasticsearchDistributedLock):
 	};
 	return new SearchProvider(
 		async () => {
-			const {GuildDiscoveryRepository} = await import('@app/api/guild/repositories/GuildDiscoveryRepository');
-			const client = createElasticsearchClient(config);
-			const message = new MessageSearchService(new ElasticsearchMessageAdapter({client, lock}));
-			const guild = new GuildSearchService(
-				new ElasticsearchGuildAdapter({client, lock}),
-				new GuildDiscoveryRepository(),
+			const {createElasticsearchSearchServices} = await import(
+				'@app/api/search/elasticsearch/ElasticsearchSearchServices'
 			);
-			const user = new UserSearchService(new ElasticsearchUserAdapter({client, lock}));
-			const report = new ReportSearchService(new ElasticsearchReportAdapter({client, lock}));
-			const auditLog = new AuditLogSearchService(new ElasticsearchAuditLogAdapter({client, lock}));
-			const guildMember = new GuildMemberSearchService(new ElasticsearchGuildMemberAdapter({client, lock}));
-			const thread = new ThreadSearchIndex(new ElasticsearchThreadAdapter({client, lock}));
-			return {message, guild, user, report, auditLog, guildMember, thread};
+			return createElasticsearchSearchServices(config, lock);
 		},
 		() => Logger.info({node: config.node}, 'ElasticsearchSearchProvider initialised'),
 	);
