@@ -120,6 +120,7 @@ class PostgresClient implements IPostgresClient {
 	private activeOperations = 0;
 	private resolveOperationsDrained: (() => void) | null = null;
 	private readonly acquiredConnections = new WeakMap<PoolClient, AcquiredPostgresConnection>();
+	private readonly sessions = new Set<PoolClient>();
 
 	constructor(
 		config: PostgresConfig,
@@ -214,6 +215,7 @@ class PostgresClient implements IPostgresClient {
 
 	private async closePool(): Promise<void> {
 		await this.connection;
+		for (const client of this.sessions) void client.end().catch(() => {});
 		if (this.activeOperations > 0) {
 			await new Promise<void>((resolve) => {
 				this.resolveOperationsDrained = resolve;
@@ -276,11 +278,13 @@ class PostgresClient implements IPostgresClient {
 	async session<T>(fn: (client: PostgresQueryable) => Promise<T>): Promise<T> {
 		return this.withPool(async (pool) => {
 			const client = await pool.connect();
+			this.sessions.add(client);
 			try {
 				const acquired = this.getAcquiredConnection(client);
 				if (acquired.error) throw acquired.error;
 				return await runConnectionCallback(client, acquired, this.config.preparedStatements !== false, fn);
 			} finally {
+				this.sessions.delete(client);
 				client.release(true);
 			}
 		});

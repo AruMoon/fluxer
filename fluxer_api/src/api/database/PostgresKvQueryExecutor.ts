@@ -1047,6 +1047,11 @@ export async function ensurePostgresKvSchema(client: IPostgresClient): Promise<v
 		}
 	}
 	await enableStatementStats(client);
+	if (await postgresKvIndexesPending(client)) {
+		void client
+			.session((db) => migratePostgresKvIndexes(db, client.kvTable()))
+			.catch((error: unknown) => logError({error, table: client.kvTable()}, 'Postgres KV sort_id migration failed'));
+	}
 }
 
 async function enableStatementStats(client: IPostgresClient): Promise<void> {
