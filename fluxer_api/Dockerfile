@@ -46,9 +46,7 @@ LABEL app.fluxer.build-version="${BUILD_VERSION}"
 WORKDIR /usr/src/app/fluxer_api
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates \
-		ffmpeg \
-		libimage-exiftool-perl && \
+		ca-certificates && \
 	rm -rf /var/lib/apt/lists/*
 
 COPY --from=deploy --chown=65532:65532 /out ./
