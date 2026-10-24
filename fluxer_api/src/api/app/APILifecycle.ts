@@ -54,6 +54,7 @@ import {JetStreamConnectionManager} from '@pkgs/nats/src/JetStreamConnectionMana
 import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/postgres/src/Client';
 
 let jsConnectionManager: JetStreamConnectionManager | null = null;
+let jobQueue: ApiJobQueue | null = null;
 let searchInitRetryTimer: ReturnType<typeof setTimeout> | null = null;
 let searchInitStopped = false;
 let searchInitInFlight: Promise<void> | null = null;
@@ -99,6 +100,17 @@ async function shutdownRefreshCaches(logger: LoggerInterface): Promise<void> {
 	} finally {
 		if (refreshCacheShutdownPromise === shutdown) refreshCacheShutdownPromise = null;
 	}
+}
+
+interface ApiJobQueue {
+	jsConnectionManager: JetStreamConnectionManager;
+	queue: JetStreamWorkerQueue;
+	workerService: WorkerService;
+	jobLedger: JobLedgerRepository;
+}
+
+export function getApiJobQueue(): ApiJobQueue | null {
+	return jobQueue;
 }
 
 function unsupportedDatabaseBackend(backend: never): never {
@@ -253,9 +265,12 @@ export function createInitializer(
 					name: 'api-worker',
 				});
 				await jsConnectionManager.connect();
-				const workerQueue = new JetStreamWorkerQueue(jsConnectionManager);
-				await workerQueue.ensureStream();
-				setInjectedWorkerService(new WorkerService(workerQueue, getSnowflakeService(), new JobLedgerRepository()));
+				const queue = new JetStreamWorkerQueue(jsConnectionManager);
+				await queue.ensureStream();
+				const jobLedger = new JobLedgerRepository();
+				const workerService = new WorkerService(queue, getSnowflakeService(), jobLedger);
+				setInjectedWorkerService(workerService);
+				jobQueue = {jsConnectionManager, queue, workerService, jobLedger};
 				logger.info('JetStream worker service initialized');
 				const connection = jsConnectionManager;
 				await startActivityEvents({
@@ -328,6 +343,7 @@ export function createShutdown(config: APIConfig, logger: LoggerInterface): () =
 		stopSharedListWatch();
 		for (const unregister of unregisterMetricsSections.splice(0)) unregister();
 		await shutdownActivityEvents();
+		jobQueue = null;
 		if (jsConnectionManager) {
 			try {
 				await jsConnectionManager.drain();

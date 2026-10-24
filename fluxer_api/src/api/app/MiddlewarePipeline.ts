@@ -18,6 +18,7 @@ import {TrustedClientIpHeaderMiddleware} from '@app/api/middleware/TrustedClient
 import {UserMiddleware} from '@app/api/middleware/UserMiddleware';
 import type {HonoApp} from '@app/api/types/HonoEnv';
 import {PeerAddressMiddleware} from '@app/api/utils/RequestClientIp';
+import {embeddedWorkerStalledComponents} from '@app/api/worker/EmbeddedWorker';
 import {Headers as HttpHeaders} from '@fluxer/constants/src/Headers';
 import {InvalidApiOriginError} from '@fluxer/errors/src/domains/core/InvalidApiOriginError';
 import {cors} from '@fluxer/hono/src/middleware/Cors';
@@ -79,7 +80,9 @@ export function configureMiddleware(routes: HonoApp, options: MiddlewarePipeline
 		},
 	});
 	routes.use(ConcurrencyLimitMiddleware({maxInflightRequests}));
-	routes.get('/_health', async (ctx) => ctx.text('OK'));
+	routes.get('/_health', async (ctx) =>
+		embeddedWorkerStalledComponents().length > 0 ? ctx.text('Worker stalled', 503) : ctx.text('OK'),
+	);
 	routes.use(IpBanMiddleware);
 	routes.use(
 		requestLogger({

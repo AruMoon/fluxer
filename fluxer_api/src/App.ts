@@ -6,6 +6,7 @@ import {listenOperatorSocket} from '@app/api/admin/operator/OperatorSocket';
 import {buildAPIServerOptions, initializeConfig} from '@app/api/Config';
 import {sizeProcessForHost} from '@app/api/infrastructure/HostResources';
 import {initializeLogger} from '@app/api/Logger';
+import {startEmbeddedWorker, stopEmbeddedWorker} from '@app/api/worker/EmbeddedWorker';
 import {Config} from '@app/Config';
 import {Logger} from '@app/Logger';
 import {createServer, setupGracefulShutdown} from '@fluxer/hono/src/Server';
@@ -25,7 +26,7 @@ async function closeHttpServer(server: {close: (callback: (error?: Error) => voi
 async function main(): Promise<void> {
 	initializeConfig(Config);
 	initializeLogger(Logger);
-	sizeProcessForHost(Logger);
+	const host = sizeProcessForHost(Logger);
 	const {app, initialize, shutdown} = await createAPIApp({
 		config: Config,
 		logger: Logger,
@@ -40,16 +41,28 @@ async function main(): Promise<void> {
 	const server = createServer(app, buildAPIServerOptions(Config));
 	Logger.info({port: Config.port}, `Starting Fluxer API on port ${Config.port}`);
 	const operatorServer = await listenOperatorSocket(app, OPERATOR_SOCKET_PATH, Logger);
-	setupGracefulShutdown(
-		async () => {
-			await closeHttpServer(server);
-			if (operatorServer) {
-				await closeHttpServer(operatorServer);
-			}
-			await shutdown();
-		},
-		{logger: Logger, timeoutMs: 30000},
-	);
+	const stop = async (): Promise<void> => {
+		await Promise.all([
+			(async () => {
+				await closeHttpServer(server);
+				if (operatorServer) {
+					await closeHttpServer(operatorServer);
+				}
+			})(),
+			stopEmbeddedWorker(),
+		]);
+		await shutdown();
+	};
+	setupGracefulShutdown(stop, {logger: Logger, timeoutMs: 30000});
+	if (Config.worker.embedded) {
+		try {
+			await startEmbeddedWorker(host.cores);
+		} catch (error) {
+			Logger.fatal({error}, 'Failed to start the embedded worker');
+			await stop();
+			process.exit(1);
+		}
+	}
 }
 
 main().catch((err) => {
