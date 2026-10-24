@@ -51,6 +51,7 @@ render_gateway_gauges() ->
     PushActive = safe_apply_int(fun push_worker_pool:active_count/0),
     ConcurrentSessions = safe_apply_int(fun gateway_concurrency:session_start_count/0),
     ConcurrentGuilds = safe_apply_int(fun gateway_concurrency:guild_start_count/0),
+    QueuedSessions = safe_apply_int(fun gateway_concurrency:session_queue_length/0),
     [
         format_integer_metrics([
             {<<"fluxer_gateway_sessions_total">>, <<"gauge">>,
@@ -74,6 +75,8 @@ render_gateway_gauges() ->
                 <<"Active push notification workers">>, PushActive},
             {<<"fluxer_gateway_concurrent_session_starts">>, <<"gauge">>,
                 <<"In-flight session start operations">>, ConcurrentSessions},
+            {<<"fluxer_gateway_queued_session_starts">>, <<"gauge">>,
+                <<"Session starts waiting for admission">>, QueuedSessions},
             {<<"fluxer_gateway_concurrent_guild_starts">>, <<"gauge">>,
                 <<"In-flight guild start operations">>, ConcurrentGuilds}
         ])

@@ -9,6 +9,7 @@
     request_session_start/1,
     cancel_session_start/1,
     release_session_start/0,
+    session_queue_length/0,
     try_acquire_guild_start/0,
     release_guild_start/0,
     session_start_count/0,
@@ -47,6 +48,10 @@ cancel_session_start(Tag) ->
 -spec release_session_start() -> ok.
 release_session_start() ->
     gen_server:cast(?MODULE, {release_session_start, self()}).
+
+-spec session_queue_length() -> non_neg_integer().
+session_queue_length() ->
+    gen_server:call(?MODULE, session_queue_length, 1000).
 
 -spec try_acquire_guild_start() -> ok | {error, at_capacity}.
 try_acquire_guild_start() ->
@@ -120,6 +125,8 @@ handle_call({acquire, Idx, Limit}, _From, #{counters := Ref} = State) when
     is_integer(Idx), is_integer(Limit)
 ->
     {reply, do_acquire(Idx, Limit, Ref), State};
+handle_call(session_queue_length, _From, State) ->
+    {reply, maps:get(session_queued, State, 0), State};
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
