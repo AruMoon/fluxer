@@ -22,7 +22,8 @@ COPY . .
 
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter fluxer_api run build
-RUN pnpm deploy --legacy --filter=fluxer_api --prod --config.allow-unused-patches=true /out
+RUN pnpm deploy --legacy --filter=fluxer_api --prod --config.allow-unused-patches=true /out && \
+	rm -rf /out/pkgs
 
 FROM node:26-trixie-slim
 
@@ -56,17 +57,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		libvips42t64 && \
 	rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm@11.27.0
+COPY --from=deploy --chown=65532:65532 /out ./
+COPY --from=deploy --chown=65532:65532 /usr/src/app/fluxer_api/dist ./dist
+COPY --from=deploy --chown=65532:65532 /usr/src/app/fluxer_api/bin ./bin
 
-COPY --from=deploy /out ./
-COPY --from=deploy /usr/src/app/fluxer_api/dist ./dist
-COPY --from=deploy /usr/src/app/fluxer_api/bin ./bin
-COPY --from=deploy /usr/src/app/tsconfigs /usr/src/app/tsconfigs
-
-RUN rm -rf pkgs && \
-	mkdir -p /run/fluxer && \
+RUN mkdir -p /run/fluxer && \
 	chmod 700 /run/fluxer && \
-	chown -R 65532:65532 /usr/src/app /run/fluxer
+	chown 65532:65532 /usr/src/app /usr/src/app/fluxer_api /run/fluxer
 
 ENV HOME=/usr/src/app
 ENV NODE_ENV=production
