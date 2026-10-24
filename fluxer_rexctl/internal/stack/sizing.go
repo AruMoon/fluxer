@@ -93,9 +93,9 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 		out[k] = strconv.Itoa(limit*2/5) + "mb"
 	}
 
-	reserve("FLUXER_API_MEMORY_RESERVATION", share("FLUXER_API_MEMORY_LIMIT", 20, 768, 2560))
-	reserve("FLUXER_WORKER_MEMORY_RESERVATION", share("FLUXER_WORKER_MEMORY_LIMIT", 17, 640, 2560))
-	reserve("FLUXER_GATEWAY_MEMORY_RESERVATION", share("FLUXER_GATEWAY_MEMORY_LIMIT", 12, 384, 4096))
+	reserve("FLUXER_API_MEMORY_RESERVATION", share("FLUXER_API_MEMORY_LIMIT", 14, 512, 2560))
+	reserve("FLUXER_WORKER_MEMORY_RESERVATION", share("FLUXER_WORKER_MEMORY_LIMIT", 12, 448, 2560))
+	reserve("FLUXER_GATEWAY_MEMORY_RESERVATION", share("FLUXER_GATEWAY_MEMORY_LIMIT", 22, 512, 4096))
 	share("FLUXER_CADDY_MEMORY_LIMIT", 4, 256, 1024)
 	if hw.MemoryBytes < smallHostBytes {
 		out["FLUXER_EDGE_PROTOCOLS"] = "h1 h2"
