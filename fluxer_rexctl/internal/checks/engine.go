@@ -53,11 +53,8 @@ func runEngine(ctx context.Context, e *Env) Result {
 		}
 		return fail(name+" isn't running.", "Start "+name+", then run rexctl doctor.")
 	}
-	minimum := engine.MinDocker
-	if e.Engine.Kind == engine.Podman {
-		minimum = engine.MinPodman
-	}
-	if e.Engine.TooOld || versionLess(e.Engine.Version, minimum) {
+	minimum := e.Engine.MinVersion()
+	if e.Engine.TooOld || !engine.AtLeast(e.Engine.Version, minimum) {
 		if e.Engine.Kind == engine.Podman && e.installed() {
 			return fail(fmt.Sprintf("Podman %s is too old for Fluxer.", e.Engine.Version),
 				fmt.Sprintf("Update Podman to %s or newer, or move to Docker with rexctl backup and then rexctl restore <file> --engine docker.", minimum))

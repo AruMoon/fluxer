@@ -5,8 +5,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -137,12 +138,7 @@ func (g *gen) walk(s *schema, path []string) {
 		return
 	}
 	if r.Type == "object" && len(r.Properties) > 0 && len(r.Required) == 0 && len(path) > 0 || r.Type == "object" && len(path) == 0 {
-		names := make([]string, 0, len(r.Properties))
-		for n := range r.Properties {
-			names = append(names, n)
-		}
-		sort.Strings(names)
-		for _, n := range names {
+		for _, n := range slices.Sorted(maps.Keys(r.Properties)) {
 			g.walk(r.Properties[n], append(append([]string{}, path...), n))
 		}
 		return

@@ -113,7 +113,7 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 		return err
 	}
 	if names := f.Setup.passedNames(c); f.SetupWhere == "browser" && len(names) > 0 {
-		return &ui.ExitError{Code: ui.ExitUsage, Msg: fmt.Sprintf("--setup browser doesn't take %s.", joinAnd(names)), Fix: "Pass --setup terminal instead, or leave out the setup options and enter them in the browser."}
+		return &ui.ExitError{Code: ui.ExitUsage, Msg: fmt.Sprintf("--setup browser doesn't take %s.", ui.JoinAnd(names)), Fix: "Pass --setup terminal instead, or leave out the setup options and enter them in the browser."}
 	}
 	dir, err := app.Dir()
 	if err != nil {
@@ -238,7 +238,7 @@ func (in *installer) missingFlags() error {
 	if len(missing) == 0 {
 		return nil
 	}
-	return ui.Usage("Pass " + joinAnd(missing) + ".")
+	return ui.Usage("Pass " + ui.JoinAnd(missing) + ".")
 }
 
 func notReady() error {
@@ -800,7 +800,7 @@ func (in *installer) takeOver(ctx context.Context, dir string) error {
 			return ui.Refused("Stopped without changing anything.", "")
 		}
 	}
-	inst, _, err := runTakeover(ctx, in.app, legacy, takeoverOptions{DryRun: in.f.DryRun})
+	inst, _, err := takeoverDir(ctx, in.app, legacy.Dir, takeoverOptions{DryRun: in.f.DryRun})
 	if err != nil || in.f.DryRun || inst == nil {
 		return err
 	}

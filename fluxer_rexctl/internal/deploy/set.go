@@ -62,7 +62,7 @@ func keyError(err error) error {
 	return err
 }
 
-func set(ctx context.Context, inst *instance.Instance, e *engine.Engine, changes map[string]*string, o ApplyOptions) (*Change, error) {
+func Set(ctx context.Context, inst *instance.Instance, e *engine.Engine, changes map[string]*string, o ApplyOptions) (*Change, error) {
 	keys := slices.Sorted(maps.Keys(changes))
 	if err := refuseEjected(inst); err != nil {
 		return nil, err

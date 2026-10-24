@@ -63,10 +63,10 @@ func fixEnvFile(ctx context.Context, e *Env) error {
 	for k, v := range r.Env.Settings() {
 		e.stage(k, v)
 	}
-	for k, v := range r.Env.Secrets() {
+	for k, v := range r.Env.Values(instance.ChangeSecret) {
 		e.stageSecret(k, v)
 	}
-	for k, v := range r.Env.Admin() {
+	for k, v := range r.Env.Values(instance.ChangeAdmin) {
 		e.stageAdmin(k, v)
 	}
 	e.importEnv = true

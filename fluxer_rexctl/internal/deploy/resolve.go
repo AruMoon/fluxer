@@ -27,7 +27,7 @@ func Interrupted(inst *instance.Instance) string {
 		strings.Join(p.Keys[:len(p.Keys)-1], ", "), p.Keys[len(p.Keys)-1])
 }
 
-func resolve(ctx context.Context, inst *instance.Instance, e *engine.Engine) error {
+func Resolve(ctx context.Context, inst *instance.Instance, e *engine.Engine) error {
 	p := inst.State.Pending
 	if p == nil {
 		return nil

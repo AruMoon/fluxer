@@ -14,6 +14,7 @@ import (
 
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/envfile"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/ui"
 )
 
 type DriftReport struct {
@@ -97,7 +98,7 @@ func (r *DriftReport) Err() error {
 		name := r.Changed[0]
 		msg := fmt.Sprintf("%s was changed by hand. rexctl writes this file and would undo your change.", name)
 		if len(r.Changed) > 1 {
-			msg = fmt.Sprintf("%s were changed by hand. rexctl writes these files and would undo your changes.", joinAnd(r.Changed))
+			msg = fmt.Sprintf("%s were changed by hand. rexctl writes these files and would undo your changes.", ui.JoinAnd(r.Changed))
 		}
 		return &DriftError{Msg: msg, Fix: "Run rexctl doctor --fix to put rexctl's version back, or rexctl eject to manage the files yourself."}
 	}
@@ -119,7 +120,7 @@ func (r *EnvDrift) Fix() string {
 	if len(r.Unused) == 0 {
 		return "Run rexctl doctor --fix to keep these values and remove the file, or change them with these commands. rexctl removes the file once you've set each of them:"
 	}
-	unused := fmt.Sprintf("Fluxer doesn't use %s. Run rexctl config list to find the setting you meant and change it with rexctl config set.", joinAnd(r.Unused))
+	unused := fmt.Sprintf("Fluxer doesn't use %s. Run rexctl config list to find the setting you meant and change it with rexctl config set.", ui.JoinAnd(r.Unused))
 	if len(r.Changes) == 0 {
 		return unused + " Then delete " + r.Path + "."
 	}
@@ -137,20 +138,10 @@ func (r *EnvDrift) Settings() map[string]*string {
 	return out
 }
 
-func (r *EnvDrift) Admin() map[string]string {
+func (r *EnvDrift) Values(kind ChangeKind) map[string]string {
 	out := map[string]string{}
 	for _, c := range r.Changes {
-		if c.Kind == ChangeAdmin {
-			out[c.Key] = c.Value
-		}
-	}
-	return out
-}
-
-func (r *EnvDrift) Secrets() map[string]string {
-	out := map[string]string{}
-	for _, c := range r.Changes {
-		if c.Kind == ChangeSecret {
+		if c.Kind == kind {
 			out[c.Key] = c.Value
 		}
 	}

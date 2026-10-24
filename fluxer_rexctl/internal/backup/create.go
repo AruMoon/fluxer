@@ -10,9 +10,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -140,7 +142,7 @@ func Create(ctx context.Context, inst *instance.Instance, p *engine.Project, opt
 
 	if bundledDB {
 		progress(StageDatabase)
-		if !contains(running, postgresService) {
+		if !slices.Contains(running, postgresService) {
 			if len(volumes) == 0 {
 				defer p.Stop(context.WithoutCancel(ctx), postgresService)
 			}
@@ -456,16 +458,7 @@ func runningServices(ctx context.Context, p *engine.Project) ([]string, error) {
 			seen[c.Service] = true
 		}
 	}
-	return sortedKeys(seen), nil
-}
-
-func contains(list []string, s string) bool {
-	for _, v := range list {
-		if v == s {
-			return true
-		}
-	}
-	return false
+	return slices.Sorted(maps.Keys(seen)), nil
 }
 
 func addDump(ctx context.Context, w *archiveWriter, p *engine.Project, spool string) error {

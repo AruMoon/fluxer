@@ -77,7 +77,7 @@ func servicesForName(name string) ([]string, error) {
 	return nil, &ui.ExitError{
 		Code: ui.ExitUsage,
 		Msg:  fmt.Sprintf("There's no service called %s.", name),
-		Fix:  "Pick " + joinOr(logServiceNames()) + ".",
+		Fix:  "Pick " + ui.JoinOr(logServiceNames()) + ".",
 	}
 }
 
@@ -145,7 +145,7 @@ func engineFailureFor(kind engine.Kind, err error) error {
 		}
 		msg := registry + " is limiting downloads from this machine."
 		if e != nil && len(e.Images) > 0 {
-			msg = fmt.Sprintf("%s is limiting downloads from this machine and %s didn't download. Images already on this machine weren't downloaded again.", registry, joinAnd(imageNames(e.Images)))
+			msg = fmt.Sprintf("%s is limiting downloads from this machine and %s didn't download. Images already on this machine weren't downloaded again.", registry, ui.JoinAnd(imageNames(e.Images)))
 		}
 		if registry == "Docker Hub" {
 			return failed(msg, "Wait for Docker Hub's limit to reset, which takes up to 6 hours, then try again.")
@@ -279,7 +279,7 @@ func waitingFor(names []string) string {
 	if len(names) > 3 {
 		return fmt.Sprintf("%s and %d more", strings.Join(names[:3], ", "), len(names)-3)
 	}
-	return joinAnd(names)
+	return ui.JoinAnd(names)
 }
 
 type progress struct {
@@ -360,7 +360,7 @@ func newLogsCmd(app *App) *cobra.Command {
 	c := &cobra.Command{
 		Use:   "logs [service]",
 		Short: "Show logs from your instance",
-		Long: "Show logs from your instance.\n\nThe services are " + joinAnd(logServiceNames()) +
+		Long: "Show logs from your instance.\n\nThe services are " + ui.JoinAnd(logServiceNames()) +
 			".\nWithout a service, rexctl shows every service.",
 		Args: maxArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
@@ -399,16 +399,20 @@ func newLogsCmd(app *App) *cobra.Command {
 }
 
 func newStartCmd(app *App) *cobra.Command {
+	return newBootableCmd(app, "start", "Start your instance", runStart, runBootStart)
+}
+
+func newBootableCmd(app *App, use, short string, run, bootRun func(context.Context, *App) error) *cobra.Command {
 	var boot bool
 	c := &cobra.Command{
-		Use:   "start",
-		Short: "Start your instance",
+		Use:   use,
+		Short: short,
 		Args:  noArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
 			if boot {
-				return runBootStart(c.Context(), app)
+				return bootRun(c.Context(), app)
 			}
-			return runStart(c.Context(), app)
+			return run(c.Context(), app)
 		},
 	}
 	c.Flags().BoolVar(&boot, "boot", false, "")
@@ -584,21 +588,7 @@ func defaultRoute() bool {
 }
 
 func newStopCmd(app *App) *cobra.Command {
-	var boot bool
-	c := &cobra.Command{
-		Use:   "stop",
-		Short: "Stop your instance",
-		Args:  noArgs,
-		RunE: func(c *cobra.Command, _ []string) error {
-			if boot {
-				return runBootStop(c.Context(), app)
-			}
-			return runStop(c.Context(), app)
-		},
-	}
-	c.Flags().BoolVar(&boot, "boot", false, "")
-	_ = c.Flags().MarkHidden("boot")
-	return c
+	return newBootableCmd(app, "stop", "Stop your instance", runStop, runBootStop)
 }
 
 func runStop(ctx context.Context, app *App) error {

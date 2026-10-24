@@ -452,7 +452,7 @@ func restoreData(ctx context.Context, path string, p *engine.Project, image stri
 		if !ok {
 			return closeSink(nil)
 		}
-		if !contains(m.Volumes, short) {
+		if !slices.Contains(m.Volumes, short) {
 			return fmt.Errorf("%w: %s isn't in the manifest", ErrDamaged, short)
 		}
 		if !volumesStarted {

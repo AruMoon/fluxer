@@ -49,7 +49,7 @@ func describeType(k adminapi.ConfigKey) string {
 		return "true or false"
 	}
 	if len(k.Options) > 0 {
-		return adminapi.JoinOr(k.Options)
+		return ui.JoinOr(k.Options)
 	}
 	switch k.Type {
 	case "number":
@@ -74,7 +74,7 @@ var deploymentTypes = map[string]string{
 
 func describeDeployType(k settings.Key) string {
 	if len(k.Options) > 0 {
-		return adminapi.JoinOr(k.Options)
+		return ui.JoinOr(k.Options)
 	}
 	if k.Secret {
 		return deploymentTypes["secret"]
@@ -204,7 +204,7 @@ func extraRestartText(p deploy.Preview) string {
 	case len(extra) == 0:
 		return "This also restarts other Fluxer services."
 	}
-	return "This also restarts " + joinAnd(extra) + "."
+	return "This also restarts " + ui.JoinAnd(extra) + "."
 }
 
 func restartText(services []string) string {
@@ -215,7 +215,7 @@ func restartText(services []string) string {
 	case len(parts) > 2:
 		return "Restarts Fluxer"
 	}
-	return "Restarts " + joinAnd(parts)
+	return "Restarts " + ui.JoinAnd(parts)
 }
 
 type configRow struct {
@@ -610,7 +610,7 @@ func parseAdminChange(schema []adminapi.ConfigKey, name string, raw *string) (ad
 		mode := strings.ToLower(strings.TrimSpace(*raw))
 		patch, err := adminapi.RegistrationPatch(mode)
 		if err != nil {
-			return adminChange{}, ui.Usage(fmt.Sprintf("%s needs one of %s.", k.Key, adminapi.JoinOr(adminapi.RegistrationModes)))
+			return adminChange{}, ui.Usage(fmt.Sprintf("%s needs one of %s.", k.Key, ui.JoinOr(adminapi.RegistrationModes)))
 		}
 		return adminChange{key: k, value: mode, patch: patch, mode: mode}, nil
 	}

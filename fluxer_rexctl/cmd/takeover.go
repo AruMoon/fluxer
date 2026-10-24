@@ -164,13 +164,13 @@ func describeTakeover(u *ui.UI, r *instance.ImportReport) {
 		u.Info("Settings that appear twice in .env keep their last value.")
 	}
 	if len(r.Placeholders) > 0 {
-		u.Info("These settings still have the example value from the old installer: %s. rexctl keeps them. Run rexctl config list to check them.", joinAnd(r.Placeholders))
+		u.Info("These settings still have the example value from the old installer: %s. rexctl keeps them. Run rexctl config list to check them.", ui.JoinAnd(r.Placeholders))
 	}
 	if n := len(r.AdminKeys); n > 0 {
 		u.Info("%s move into Fluxer's own settings, where rexctl config set changes them.", countWord(n, "One email, branding or billing setting", "email, branding and billing settings"))
 	}
 	if len(r.Changed) > 0 {
-		u.Info("rexctl keeps the changes you made: %s.", joinAnd(r.Changed))
+		u.Info("rexctl keeps the changes you made: %s.", ui.JoinAnd(r.Changed))
 	}
 	if r.PodmanCompose {
 		u.Info("The first time rexctl starts or changes Fluxer, it replaces the containers podman-compose made. Fluxer restarts once and your data stays.")
@@ -267,7 +267,7 @@ func confirmKeptCopies(app *App, inst *instance.Instance) (bool, error) {
 		warnKeptCopy(app.UI, k.Name, k.Copy, true)
 		names = append(names, k.Copy)
 	}
-	msg := fmt.Sprintf("Your changes in %s stop working after the upgrade.", joinAnd(names))
+	msg := fmt.Sprintf("Your changes in %s stop working after the upgrade.", ui.JoinAnd(names))
 	if !app.UI.Interactive() || app.UI.Yes() {
 		return false, ui.Refused(msg, "Move them, then delete the copies and run rexctl upgrade again.")
 	}

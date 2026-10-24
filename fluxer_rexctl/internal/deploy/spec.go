@@ -79,7 +79,7 @@ func specFor(inst *instance.Instance, set *stack.Set, chosen map[string]string) 
 	return engine.Spec{Name: inst.Project(), Dir: inst.Dir, Files: composeFiles(inst, chosen), Env: env}, nil
 }
 
-func spec(inst *instance.Instance) (engine.Spec, error) {
+func Spec(inst *instance.Instance) (engine.Spec, error) {
 	set, err := ReleaseSet(inst)
 	if err != nil {
 		return engine.Spec{}, err
@@ -87,8 +87,8 @@ func spec(inst *instance.Instance) (engine.Spec, error) {
 	return specFor(inst, set, inst.State.Settings)
 }
 
-func load(ctx context.Context, inst *instance.Instance, e *engine.Engine) (*engine.Project, error) {
-	s, err := spec(inst)
+func Load(ctx context.Context, inst *instance.Instance, e *engine.Engine) (*engine.Project, error) {
+	s, err := Spec(inst)
 	if err != nil {
 		return nil, err
 	}

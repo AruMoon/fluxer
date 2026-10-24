@@ -306,7 +306,7 @@ func upgradeInstance(ctx context.Context, app *App, dryRun bool) (*instance.Inst
 		if err != nil {
 			return nil, false, err
 		}
-		inst, kept, err := runTakeover(ctx, app, legacy, takeoverOptions{DryRun: dryRun, Then: "Then rexctl upgrades it to the latest Fluxer release."})
+		inst, kept, err := takeoverDir(ctx, app, legacy.Dir, takeoverOptions{DryRun: dryRun, Then: "Then rexctl upgrades it to the latest Fluxer release."})
 		if err != nil || inst == nil {
 			return nil, false, err
 		}

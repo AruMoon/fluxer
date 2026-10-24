@@ -243,7 +243,7 @@ func newUsersCmd(app *App) *cobra.Command {
 	var reason string
 	var deleteMessages bool
 	ban := &cobra.Command{Use: "ban <user>", Short: "Ban an account", Args: exactArgs(userArg)}
-	ban.Flags().StringVar(&reason, "reason", "", "why you're banning them, one of "+joinOr(adminapi.BanReasonNames()))
+	ban.Flags().StringVar(&reason, "reason", "", "why you're banning them, one of "+ui.JoinOr(adminapi.BanReasonNames()))
 	ban.Flags().BoolVar(&deleteMessages, "delete-messages", false, "also delete their messages")
 	ban.RunE = func(c *cobra.Command, args []string) error {
 		if r, ok := adminapi.FindBanReason(reason); ok {
@@ -260,7 +260,7 @@ func newUsersCmd(app *App) *cobra.Command {
 			Options: options,
 			Validate: func(s string) error {
 				if _, ok := adminapi.FindBanReason(s); !ok {
-					return ui.Usage(fmt.Sprintf("Pass --reason with %s.", joinOr(adminapi.BanReasonNames())))
+					return ui.Usage(fmt.Sprintf("Pass --reason with %s.", ui.JoinOr(adminapi.BanReasonNames())))
 				}
 				return nil
 			},
@@ -270,7 +270,7 @@ func newUsersCmd(app *App) *cobra.Command {
 		}
 		why, ok := adminapi.FindBanReason(reason)
 		if !ok {
-			return ui.Usage(fmt.Sprintf("Pass --reason with %s.", joinOr(adminapi.BanReasonNames())))
+			return ui.Usage(fmt.Sprintf("Pass --reason with %s.", ui.JoinOr(adminapi.BanReasonNames())))
 		}
 		return adminWrite(c, app, func(ctx context.Context, api *adminapi.Client, _ *instance.Instance) error {
 			u, err := api.ResolveUser(ctx, args[0])

@@ -10,6 +10,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/ui"
 )
 
 //go:embed configschema.json
@@ -174,7 +176,7 @@ func ParseConfigValue(k ConfigKey, value string) (any, error) {
 		return v, nil
 	}
 	if len(k.Options) > 0 && !slices.Contains(k.Options, value) {
-		return nil, &InvalidValueError{Key: k, Want: "one of " + JoinOr(k.Options)}
+		return nil, &InvalidValueError{Key: k, Want: "one of " + ui.JoinOr(k.Options)}
 	}
 	return value, nil
 }

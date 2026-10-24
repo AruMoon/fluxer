@@ -167,22 +167,13 @@ func unitExists(ctx context.Context, rootless bool, name string) bool {
 	return err == nil && strings.Contains(string(out), name)
 }
 
-func unitEnabled(ctx context.Context, rootless bool, name string) bool {
-	args := []string{"is-enabled", name}
+func unitIs(ctx context.Context, rootless bool, name, state string) bool {
+	args := []string{"is-" + state, name}
 	if rootless {
 		args = append([]string{"--user"}, args...)
 	}
 	out, _ := exec.CommandContext(ctx, "systemctl", args...).Output()
-	return strings.TrimSpace(string(out)) == "enabled"
-}
-
-func unitActive(ctx context.Context, rootless bool, name string) bool {
-	args := []string{"is-active", name}
-	if rootless {
-		args = append([]string{"--user"}, args...)
-	}
-	out, _ := exec.CommandContext(ctx, "systemctl", args...).Output()
-	return strings.TrimSpace(string(out)) == "active"
+	return strings.TrimSpace(string(out)) == state
 }
 
 func CheckBootUnit(ctx context.Context, u BootUnit) (BootUnitState, error) {
@@ -202,7 +193,7 @@ func CheckBootUnit(ctx context.Context, u BootUnit) (BootUnitState, error) {
 		return s, err
 	default:
 		s.Stale = string(data) != u.content(ctx)
-		s.Disabled = !unitEnabled(ctx, u.Rootless, u.Name())
+		s.Disabled = !unitIs(ctx, u.Rootless, u.Name(), "enabled")
 	}
 	if !u.Rootless {
 		s.CopyStale = !sameFile(u.Binary, LibexecBinary)
@@ -228,7 +219,7 @@ func InstallBootUnit(ctx context.Context, u BootUnit) error {
 			return err
 		}
 	}
-	if !unitActive(ctx, u.Rootless, u.Name()) {
+	if !unitIs(ctx, u.Rootless, u.Name(), "active") {
 		return systemctlRun(ctx, u.Rootless, "start", "--no-block", u.Name())
 	}
 	return nil
@@ -259,7 +250,7 @@ func RemoveBootUnit(ctx context.Context, u BootUnit) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil
 	}
-	if unitEnabled(ctx, u.Rootless, u.Name()) {
+	if unitIs(ctx, u.Rootless, u.Name(), "enabled") {
 		if err := systemctlRun(ctx, u.Rootless, "disable", u.Name()); err != nil {
 			return err
 		}

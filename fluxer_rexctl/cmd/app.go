@@ -113,7 +113,7 @@ func (a *App) warnUnknown(inst *instance.Instance) {
 		return
 	}
 	a.warned = true
-	a.UI.Warn("This instance has settings this rexctl doesn't know: "+joinAnd(inst.State.Unknown)+".", "rexctl keeps them. Run rexctl upgrade if a newer rexctl wrote them.")
+	a.UI.Warn("This instance has settings this rexctl doesn't know: "+ui.JoinAnd(inst.State.Unknown)+".", "rexctl keeps them. Run rexctl upgrade if a newer rexctl wrote them.")
 }
 
 func rootlessGuard(inst *instance.Instance) error {

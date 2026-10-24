@@ -2,12 +2,7 @@
 
 package deploy
 
-import (
-	"context"
-
-	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/engine"
-	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/instance"
-)
+import "github.com/fluxerapp/fluxer/fluxer_rexctl/internal/engine"
 
 type ApplyOptions struct {
 	Pull    bool

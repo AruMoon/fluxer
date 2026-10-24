@@ -164,7 +164,7 @@ func runRollback(ctx context.Context, app *App, f *rollbackFlags) error {
 			return ui.Wrap(err, "Couldn't save your instance's state.", "Run rexctl doctor to see what's wrong.")
 		}
 		if len(put) > 0 {
-			app.UI.Info("rexctl put back the settings Fluxer %s had: %s.", prevShort, joinAnd(put))
+			app.UI.Info("rexctl put back the settings Fluxer %s had: %s.", prevShort, ui.JoinAnd(put))
 		}
 		return nil
 	})

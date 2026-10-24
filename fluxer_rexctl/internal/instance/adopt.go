@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -269,7 +270,7 @@ func adoptFiles(ctx context.Context, p *AdoptPlan) error {
 	if err := p.snapshot(); err != nil {
 		return err
 	}
-	for _, src := range sortedKeys(p.Mine) {
+	for _, src := range slices.Sorted(maps.Keys(p.Mine)) {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
@@ -320,7 +321,7 @@ func (p *AdoptPlan) keepRunning() error {
 	if l.existed(stack.Caddyfile) {
 		want[stack.Caddyfile] = filepath.Join(p.Dir, stack.Caddyfile)
 	}
-	for _, name := range sortedKeys(want) {
+	for _, name := range slices.Sorted(maps.Keys(want)) {
 		dst := filepath.Join(p.Dir, name)
 		if fi, err := os.Stat(dst); err == nil && fi.Mode().IsRegular() {
 			if perm := fi.Mode().Perm(); perm&0o022 != 0 {
@@ -392,7 +393,7 @@ func (p *AdoptPlan) snapshot() error {
 		names = append(names, f)
 	}
 	names = append(names, p.DeleteFiles...)
-	names = append(names, sortedKeys(p.Mine)...)
+	names = append(names, slices.Sorted(maps.Keys(p.Mine))...)
 	slices.Sort(names)
 	names = slices.Compact(names)
 	for _, name := range names {

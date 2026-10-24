@@ -14,7 +14,7 @@ import (
 
 const edgeService = "edge"
 
-func apply(ctx context.Context, inst *instance.Instance, e *engine.Engine, o ApplyOptions) (*Change, error) {
+func Apply(ctx context.Context, inst *instance.Instance, e *engine.Engine, o ApplyOptions) (*Change, error) {
 	if err := refuseEjected(inst); err != nil {
 		return nil, err
 	}

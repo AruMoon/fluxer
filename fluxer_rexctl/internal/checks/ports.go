@@ -12,6 +12,7 @@ import (
 
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/host"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/ui"
 )
 
 func init() {
@@ -59,18 +60,18 @@ func runPorts(ctx context.Context, e *Env) Result {
 	}
 	switch {
 	case first == nil:
-		return pass(fmt.Sprintf("Ports %s are free.", joinAnd(numbers)))
+		return pass(fmt.Sprintf("Ports %s are free.", ui.JoinAnd(numbers)))
 	case len(busy) == 1:
 		return e.portBusy(*first, firstOwner)
 	}
-	msg := fmt.Sprintf("Ports %s are already in use.", joinAnd(busy))
+	msg := fmt.Sprintf("Ports %s are already in use.", ui.JoinAnd(busy))
 	fix := "Stop the programs that use them, then run rexctl doctor."
 	switch {
 	case sameOwner && containerOwners[firstOwner]:
-		msg = fmt.Sprintf("Ports %s are already in use by containers.", joinAnd(busy))
+		msg = fmt.Sprintf("Ports %s are already in use by containers.", ui.JoinAnd(busy))
 		fix = "Stop the containers that use them, then run rexctl doctor."
 	case sameOwner && firstOwner != "":
-		msg = fmt.Sprintf("Ports %s are already in use by %s.", joinAnd(busy), firstOwner)
+		msg = fmt.Sprintf("Ports %s are already in use by %s.", ui.JoinAnd(busy), firstOwner)
 		fix = fmt.Sprintf("Stop %s, then run rexctl doctor.", firstOwner)
 	}
 	if e.mode() == modeBundled && !slices.ContainsFunc(busy, func(n string) bool { return n != "80" && n != "443" }) {

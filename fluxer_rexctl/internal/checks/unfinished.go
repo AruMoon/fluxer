@@ -8,6 +8,7 @@ import (
 
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/deploy"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/release"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/ui"
 )
 
 func init() {
@@ -22,7 +23,7 @@ func runPendingChange(ctx context.Context, e *Env) Result {
 	}
 	msg := "A settings change didn't finish."
 	if len(st.Pending.Keys) > 0 {
-		msg = fmt.Sprintf("The change to %s didn't finish.", joinAnd(st.Pending.Keys))
+		msg = fmt.Sprintf("The change to %s didn't finish.", ui.JoinAnd(st.Pending.Keys))
 	}
 	r := fixable(fail(msg, "Run rexctl doctor --fix to put the old settings back."))
 	r.Details = st.Pending.Keys

@@ -43,7 +43,7 @@ func Explain(err error) error {
 		for _, m := range ambiguous.Matches {
 			ids = append(ids, m.ID)
 		}
-		return ui.Failed(fmt.Sprintf("%d accounts are called %s.", len(ambiguous.Matches), ambiguous.Ref), fmt.Sprintf("Pass a user ID. Theirs are %s.", joinAnd(ids)))
+		return ui.Failed(fmt.Sprintf("%d accounts are called %s.", len(ambiguous.Matches), ambiguous.Ref), fmt.Sprintf("Pass a user ID. Theirs are %s.", ui.JoinAnd(ids)))
 	case errors.As(err, &banBlocks):
 		return ui.Refused(fmt.Sprintf("%s is banned for a reason that doesn't allow closing the account.", banBlocks.Username), fmt.Sprintf("Run rexctl users unban %s, then delete the account.", banBlocks.Username))
 	case errors.As(err, &invite):
@@ -53,7 +53,7 @@ func Explain(err error) error {
 	case errors.As(err, &unknown):
 		fix := "Run rexctl config list to see every setting."
 		if len(unknown.Similar) > 0 && len(unknown.Similar) <= 3 {
-			fix = "Did you mean " + JoinOr(unknown.Similar) + "?"
+			fix = "Did you mean " + ui.JoinOr(unknown.Similar) + "?"
 		}
 		return &ui.ExitError{Code: ui.ExitUsage, Msg: fmt.Sprintf("There's no setting called %s.", unknown.Key), Fix: fix}
 	case errors.As(err, &invalid):

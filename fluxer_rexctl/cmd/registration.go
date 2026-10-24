@@ -31,7 +31,7 @@ func newRegistrationCmd(app *App) *cobra.Command {
 	set.RunE = func(c *cobra.Command, args []string) error {
 		patch, err := adminapi.RegistrationPatch(args[0])
 		if err != nil {
-			return ui.Usage(fmt.Sprintf("Pass %s.", adminapi.JoinOr(adminapi.RegistrationModes)))
+			return ui.Usage(fmt.Sprintf("Pass %s.", ui.JoinOr(adminapi.RegistrationModes)))
 		}
 		return adminWrite(c, app, func(ctx context.Context, api *adminapi.Client, _ *instance.Instance) error {
 			if err := api.PatchConfig(ctx, patch); err != nil {

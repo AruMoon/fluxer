@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -65,12 +66,7 @@ type Manifest struct {
 }
 
 func (m *Manifest) HasSkipped(what string) bool {
-	for _, s := range m.Skipped {
-		if s == what {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(m.Skipped, what)
 }
 
 type Info struct {

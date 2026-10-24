@@ -361,3 +361,14 @@ func QuietTerminal() func() {
 		_ = r.Close()
 	}
 }
+
+func JoinAnd(items []string) string { return joinLast(items, " and ") }
+
+func JoinOr(items []string) string { return joinLast(items, " or ") }
+
+func joinLast(items []string, last string) string {
+	if len(items) < 2 {
+		return strings.Join(items, "")
+	}
+	return strings.Join(items[:len(items)-1], ", ") + last + items[len(items)-1]
+}
