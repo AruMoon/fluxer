@@ -20,10 +20,10 @@ x-fluxer-env: &fluxer-env
   RUST_LOG: ${RUST_LOG:-}
   HTTP_PROXY: ${HTTP_PROXY:-}
   HTTPS_PROXY: ${HTTPS_PROXY:-}
-  NO_PROXY: localhost,127.0.0.1,::1,edge,postgres,valkey,nats,meilisearch,seaweedfs,livekit,api,worker,gateway,media-proxy,push,static-proxy,app-proxy,snowflakes,snowflakes-shard,users,users-shard,gifs,gifs-shard,messages,messages-shard,unfurl,unfurl-shard,admin${NO_PROXY:+,${NO_PROXY:-}}
+  NO_PROXY: localhost,127.0.0.1,::1,edge,postgres,valkey,nats,meilisearch,seaweedfs,livekit,api,worker,gateway,media-proxy,push,static-proxy,app-proxy,snowflakes,users,gifs,messages,unfurl,admin${NO_PROXY:+,${NO_PROXY:-}}
   http_proxy: ${HTTP_PROXY:-}
   https_proxy: ${HTTPS_PROXY:-}
-  no_proxy: localhost,127.0.0.1,::1,edge,postgres,valkey,nats,meilisearch,seaweedfs,livekit,api,worker,gateway,media-proxy,push,static-proxy,app-proxy,snowflakes,snowflakes-shard,users,users-shard,gifs,gifs-shard,messages,messages-shard,unfurl,unfurl-shard,admin${NO_PROXY:+,${NO_PROXY:-}}
+  no_proxy: localhost,127.0.0.1,::1,edge,postgres,valkey,nats,meilisearch,seaweedfs,livekit,api,worker,gateway,media-proxy,push,static-proxy,app-proxy,snowflakes,users,gifs,messages,unfurl,admin${NO_PROXY:+,${NO_PROXY:-}}
   FLUXER_SELF_HOSTED: "true"
   FLUXER_BASE_DOMAIN: ${FLUXER_DOMAIN:?rexctl manages this instance. Use rexctl, docker compose -p fluxer ps or logs, or run rexctl eject to use docker compose here}
   FLUXER_PUBLIC_SCHEME: ${FLUXER_PUBLIC_SCHEME:-https}
@@ -569,9 +569,9 @@ services:
       valkey: {condition: service_healthy}
       nats: {condition: service_healthy}
       seaweedfs-init: {condition: service_completed_successfully}
-      snowflakes-shard: {condition: service_healthy}
-      messages-shard: {condition: service_healthy}
-      users-shard: {condition: service_healthy}
+      snowflakes: {condition: service_healthy}
+      messages: {condition: service_healthy}
+      users: {condition: service_healthy}
 
   gateway:
     <<: *fluxer-service
@@ -771,27 +771,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${FLUXER_SNOWFLAKES_MEMORY_LIMIT:-128mb}
+          memory: ${FLUXER_SNOWFLAKES_MEMORY_LIMIT:-256mb}
     environment:
       <<: *fluxer-rust-env
       FLUXER_SVC_NAME: snowflakes
-      FLUXER_SVC_MODE: router
-    healthcheck: *fluxer-svc-healthcheck
-    depends_on:
-      nats: {condition: service_healthy}
-
-  snowflakes-shard:
-    <<: *fluxer-service
-    image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-snowflakes:${FLUXER_IMAGE_TAG:-v1}
-    deploy:
-      resources:
-        limits:
-          memory: ${FLUXER_SNOWFLAKES_SHARD_MEMORY_LIMIT:-256mb}
-    environment:
-      <<: *fluxer-rust-env
-      FLUXER_SVC_NAME: snowflakes
-      FLUXER_SVC_MODE: shard
-      FLUXER_SVC_SHARD_ID: "0"
+      FLUXER_SVC_MODE: combined
     healthcheck: *fluxer-svc-healthcheck
     depends_on:
       nats: {condition: service_healthy}
@@ -802,28 +786,12 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${FLUXER_USERS_MEMORY_LIMIT:-128mb}
+          memory: ${FLUXER_USERS_MEMORY_LIMIT:-256mb}
     environment:
       <<: *fluxer-rust-env
       FLUXER_SVC_NAME: users
-      FLUXER_SVC_MODE: router
-    healthcheck: *fluxer-svc-healthcheck
-    depends_on:
-      nats: {condition: service_healthy}
-
-  users-shard:
-    <<: *fluxer-service
-    image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-users:${FLUXER_IMAGE_TAG:-v1}
-    deploy:
-      resources:
-        limits:
-          memory: ${FLUXER_USERS_SHARD_MEMORY_LIMIT:-256mb}
-    environment:
-      <<: *fluxer-rust-env
-      FLUXER_SVC_NAME: users
-      FLUXER_SVC_MODE: shard
-      FLUXER_SVC_SHARD_ID: "0"
-      FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_USERS_SHARD_POSTGRES_MAX_CONNECTIONS:-20}"
+      FLUXER_SVC_MODE: combined
+      FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_USERS_POSTGRES_MAX_CONNECTIONS:-20}"
     healthcheck: *fluxer-svc-healthcheck
     depends_on:
       nats: {condition: service_healthy}
@@ -835,27 +803,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${FLUXER_GIFS_MEMORY_LIMIT:-128mb}
+          memory: ${FLUXER_GIFS_MEMORY_LIMIT:-256mb}
     environment:
       <<: *fluxer-rust-env
       FLUXER_SVC_NAME: gifs
-      FLUXER_SVC_MODE: router
-    healthcheck: *fluxer-svc-healthcheck
-    depends_on:
-      nats: {condition: service_healthy}
-
-  gifs-shard:
-    <<: *fluxer-service
-    image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-gifs:${FLUXER_IMAGE_TAG:-v1}
-    deploy:
-      resources:
-        limits:
-          memory: ${FLUXER_GIFS_SHARD_MEMORY_LIMIT:-256mb}
-    environment:
-      <<: *fluxer-rust-env
-      FLUXER_SVC_NAME: gifs
-      FLUXER_SVC_MODE: shard
-      FLUXER_SVC_SHARD_ID: "0"
+      FLUXER_SVC_MODE: combined
       FLUXER_GIFS_SHARD_CACHE_MAX_BYTES: ${FLUXER_GIFS_SHARD_CACHE_MAX_BYTES:-134217728}
     healthcheck: *fluxer-svc-healthcheck
     depends_on:
@@ -867,28 +819,12 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${FLUXER_MESSAGES_MEMORY_LIMIT:-128mb}
+          memory: ${FLUXER_MESSAGES_MEMORY_LIMIT:-256mb}
     environment:
       <<: *fluxer-rust-env
       FLUXER_SVC_NAME: messages
-      FLUXER_SVC_MODE: router
-    healthcheck: *fluxer-svc-healthcheck
-    depends_on:
-      nats: {condition: service_healthy}
-
-  messages-shard:
-    <<: *fluxer-service
-    image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-messages:${FLUXER_IMAGE_TAG:-v1}
-    deploy:
-      resources:
-        limits:
-          memory: ${FLUXER_MESSAGES_SHARD_MEMORY_LIMIT:-256mb}
-    environment:
-      <<: *fluxer-rust-env
-      FLUXER_SVC_NAME: messages
-      FLUXER_SVC_MODE: shard
-      FLUXER_SVC_SHARD_ID: "0"
-      FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_MESSAGES_SHARD_POSTGRES_MAX_CONNECTIONS:-20}"
+      FLUXER_SVC_MODE: combined
+      FLUXER_POSTGRES_MAX_CONNECTIONS: "${FLUXER_MESSAGES_POSTGRES_MAX_CONNECTIONS:-20}"
     healthcheck: *fluxer-svc-healthcheck
     depends_on:
       nats: {condition: service_healthy}
@@ -900,27 +836,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${FLUXER_UNFURL_MEMORY_LIMIT:-128mb}
+          memory: ${FLUXER_UNFURL_MEMORY_LIMIT:-256mb}
     environment:
       <<: *fluxer-rust-env
       FLUXER_SVC_NAME: unfurl
-      FLUXER_SVC_MODE: router
-    healthcheck: *fluxer-svc-healthcheck
-    depends_on:
-      nats: {condition: service_healthy}
-
-  unfurl-shard:
-    <<: *fluxer-service
-    image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-unfurl:${FLUXER_IMAGE_TAG:-v1}
-    deploy:
-      resources:
-        limits:
-          memory: ${FLUXER_UNFURL_SHARD_MEMORY_LIMIT:-256mb}
-    environment:
-      <<: *fluxer-rust-env
-      FLUXER_SVC_NAME: unfurl
-      FLUXER_SVC_MODE: shard
-      FLUXER_SVC_SHARD_ID: "0"
+      FLUXER_SVC_MODE: combined
       FLUXER_MEDIA_PROXY_ENDPOINT: http://media-proxy:8080
     healthcheck: *fluxer-svc-healthcheck
     depends_on:

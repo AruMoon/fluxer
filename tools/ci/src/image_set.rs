@@ -58,7 +58,7 @@ const COMPONENTS: &[Component] = &[
     },
     Component {
         image: "fluxer-gifs",
-        services: &["gifs", "gifs-shard"],
+        services: &["gifs"],
     },
     Component {
         image: "fluxer-media-proxy",
@@ -66,7 +66,7 @@ const COMPONENTS: &[Component] = &[
     },
     Component {
         image: "fluxer-messages",
-        services: &["messages", "messages-shard"],
+        services: &["messages"],
     },
     Component {
         image: "fluxer-push",
@@ -74,7 +74,7 @@ const COMPONENTS: &[Component] = &[
     },
     Component {
         image: "fluxer-snowflakes",
-        services: &["snowflakes", "snowflakes-shard"],
+        services: &["snowflakes"],
     },
     Component {
         image: "fluxer-static",
@@ -82,11 +82,11 @@ const COMPONENTS: &[Component] = &[
     },
     Component {
         image: "fluxer-unfurl",
-        services: &["unfurl", "unfurl-shard"],
+        services: &["unfurl"],
     },
     Component {
         image: "fluxer-users",
-        services: &["users", "users-shard"],
+        services: &["users"],
     },
 ];
 
@@ -981,7 +981,7 @@ mod tests {
                 .lines()
                 .filter(|line| line.starts_with("    image: "))
                 .count(),
-            18
+            13
         );
 
         let api = manifest

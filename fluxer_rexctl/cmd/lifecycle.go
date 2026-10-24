@@ -50,10 +50,7 @@ var logParts = []logPart{
 	{"storage", []string{"seaweedfs", "seaweedfs-init"}},
 	{"cache", []string{"valkey"}},
 	{"queue", []string{"nats"}},
-	{"internal", []string{
-		"snowflakes", "snowflakes-shard", "users", "users-shard", "gifs", "gifs-shard",
-		"messages", "messages-shard", "unfurl", "unfurl-shard",
-	}},
+	{"internal", []string{"snowflakes", "users", "gifs", "messages", "unfurl"}},
 }
 
 func logServiceNames() []string {

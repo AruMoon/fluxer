@@ -57,10 +57,10 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 	setInt(out, "FLUXER_MALLOC_ARENA_MAX", max(2, small))
 	setInt(out, "FLUXER_API_POSTGRES_MAX_CONNECTIONS", clamp(2*c, 4, 25))
 	setInt(out, "FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 25))
-	setInt(out, "FLUXER_USERS_SHARD_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
-	setInt(out, "FLUXER_MESSAGES_SHARD_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
+	setInt(out, "FLUXER_USERS_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
+	setInt(out, "FLUXER_MESSAGES_POSTGRES_MAX_CONNECTIONS", clamp(c, 2, 20))
 	clients := num("FLUXER_API_POSTGRES_MAX_CONNECTIONS", 25) + num("FLUXER_WORKER_POSTGRES_MAX_CONNECTIONS", 25) +
-		num("FLUXER_USERS_SHARD_POSTGRES_MAX_CONNECTIONS", 20) + num("FLUXER_MESSAGES_SHARD_POSTGRES_MAX_CONNECTIONS", 20)
+		num("FLUXER_USERS_POSTGRES_MAX_CONNECTIONS", 20) + num("FLUXER_MESSAGES_POSTGRES_MAX_CONNECTIONS", 20)
 	setInt(out, "FLUXER_POSTGRES_SERVER_MAX_CONNECTIONS", clients+10)
 	setInt(out, "FLUXER_POSTGRES_AUTOVACUUM_MAX_WORKERS", clamp(c, 1, 3))
 	gather := 0
@@ -96,7 +96,7 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 	media := share("FLUXER_MEDIA_PROXY_MEMORY_LIMIT", 8, 320, 1024)
 	setBytes(out, "FLUXER_MEDIA_PROXY_TRANSFORM_CACHE_BYTES", media/8)
 	setBytes(out, "FLUXER_MEDIA_PROXY_UPLOAD_RELAY_BUFFERED_RETRY_TOTAL_BYTES", media/4)
-	setBytes(out, "FLUXER_GIFS_SHARD_CACHE_MAX_BYTES", min(clamp(m/64, 64, 128), size("FLUXER_GIFS_SHARD_MEMORY_LIMIT", 256)/2))
+	setBytes(out, "FLUXER_GIFS_SHARD_CACHE_MAX_BYTES", min(clamp(m/64, 64, 128), size("FLUXER_GIFS_MEMORY_LIMIT", 256)/2))
 
 	out["FLUXER_LIVEKIT_GOMEMLIMIT"] = strconv.Itoa(share("FLUXER_LIVEKIT_MEMORY_LIMIT", 6, 320, 2048)*85/100) + "MiB"
 	out["FLUXER_NATS_GOMEMLIMIT"] = strconv.Itoa(share("FLUXER_NATS_MEMORY_LIMIT", 3, 192, 1024)*4/5) + "MiB"

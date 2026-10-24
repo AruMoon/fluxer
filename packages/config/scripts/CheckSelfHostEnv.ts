@@ -95,7 +95,7 @@ const INPUT_NAMES: Record<string, string> = {
 	https_proxy: 'HTTPS_PROXY',
 };
 
-const OWN_POOL_SIZES = new Set(['api', 'worker', 'users-shard', 'messages-shard']);
+const OWN_POOL_SIZES = new Set(['api', 'worker', 'users', 'messages']);
 const OBJECT_STORE_CREDENTIALS = ['FLUXER_S3_ACCESS_KEY', 'FLUXER_S3_SECRET_KEY'];
 const OBJECT_STORE_CLIENTS = ['api', 'worker', 'media-proxy'];
 
