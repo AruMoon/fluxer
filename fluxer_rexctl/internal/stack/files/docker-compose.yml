@@ -350,7 +350,17 @@ services:
       resources:
         limits:
           memory: ${FLUXER_NATS_MEMORY_LIMIT:-256mb}
-    command: ["-js", "-sd", "/data", "-m", "8222"]
+    environment:
+      GOMEMLIMIT: ${FLUXER_NATS_GOMEMLIMIT:-200MiB}
+      FLUXER_NATS_MAX_MEMORY_STORE: ${FLUXER_NATS_MAX_MEMORY_STORE:-64MB}
+      FLUXER_NATS_MAX_FILE_STORE: ${FLUXER_NATS_MAX_FILE_STORE:-10GB}
+    command:
+      - sh
+      - -c
+      - >
+        printf 'http_port: 8222\njetstream {\n  store_dir: /data\n  max_memory_store: %s\n  max_file_store: %s\n}\n'
+        "$$FLUXER_NATS_MAX_MEMORY_STORE" "$$FLUXER_NATS_MAX_FILE_STORE" > /tmp/nats.conf
+        && exec nats-server -c /tmp/nats.conf
     volumes:
       - nats-data:/data
     healthcheck:
