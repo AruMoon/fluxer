@@ -57,7 +57,8 @@ new_state() ->
         pending_identify_retry_timer => undefined
     }.
 
--spec init(cowboy_req:req(), term()) -> {cowboy_websocket, cowboy_req:req(), state()}.
+-spec init(cowboy_req:req(), term()) ->
+    {cowboy_websocket, cowboy_req:req(), state(), cowboy_websocket:opts()}.
 init(Req, _Opts) ->
     QS = cowboy_req:parse_qs(Req),
     Version = parse_version(proplists:get_value(<<"v">>, QS)),
@@ -70,13 +71,19 @@ init(Req, _Opts) ->
     PeerIPBinary = extract_client_ip(Req),
     State = new_state(),
     ReqWithVersion = gateway_build_info:set_version_header(Req),
-    {cowboy_websocket, ReqWithVersion, State#{
-        version => Version,
-        encoding => Encoding,
-        compress_ctx => CompressCtx,
-        socket_pid => self(),
-        peer_ip => PeerIPBinary
-    }}.
+    {cowboy_websocket, ReqWithVersion,
+        State#{
+            version => Version,
+            encoding => Encoding,
+            compress_ctx => CompressCtx,
+            socket_pid => self(),
+            peer_ip => PeerIPBinary
+        },
+        #{idle_timeout => infinity, active_n => 16, req_filter => fun drop_req/1}}.
+
+-spec drop_req(cowboy_req:req()) -> map().
+drop_req(_Req) ->
+    #{}.
 
 -spec websocket_init(state()) -> ws_result().
 websocket_init(#{version := 1} = State) ->
