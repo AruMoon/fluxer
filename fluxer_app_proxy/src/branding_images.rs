@@ -312,14 +312,8 @@ impl InstanceBranding {
         Ok(())
     }
 
-    pub async fn refresh_if_due(
-        &self,
-        client: &reqwest::Client,
-        upstream_url: &str,
-        interval: Duration,
-    ) {
-        let Ok(mut gate) = tokio::time::timeout(DISCOVERY_FETCH_TIMEOUT, self.gate.lock()).await
-        else {
+    pub fn refresh_if_due(&self, client: &reqwest::Client, upstream_url: &str, interval: Duration) {
+        let Ok(mut gate) = self.gate.clone().try_lock_owned() else {
             return;
         };
         if gate
@@ -328,27 +322,32 @@ impl InstanceBranding {
         {
             return;
         }
+        let branding = self.clone();
+        let client = client.clone();
+        let upstream_url = upstream_url.to_owned();
         let interval = interval.max(REFRESH_INTERVAL_MIN);
-        let wait = match self.refresh(client, upstream_url).await {
-            Ok(()) => {
-                gate.consecutive_failures = 0;
-                interval
-            }
-            Err(error) => {
-                let backoff = interval
-                    .saturating_mul(1 << gate.consecutive_failures.min(5))
-                    .min(REFRESH_BACKOFF_MAX);
-                gate.consecutive_failures = gate.consecutive_failures.saturating_add(1);
-                tracing::warn!(
-                    %error,
-                    url = %upstream_url,
-                    consecutive_failures = gate.consecutive_failures,
-                    backoff_ms = backoff.as_millis() as u64,
-                    "instance branding refresh failed, keeping the previous branding"
-                );
-                backoff
-            }
-        };
-        gate.next_attempt = Some(Instant::now() + wait);
+        tokio::spawn(async move {
+            let wait = match branding.refresh(&client, &upstream_url).await {
+                Ok(()) => {
+                    gate.consecutive_failures = 0;
+                    interval
+                }
+                Err(error) => {
+                    let backoff = interval
+                        .saturating_mul(1 << gate.consecutive_failures.min(5))
+                        .min(REFRESH_BACKOFF_MAX);
+                    gate.consecutive_failures = gate.consecutive_failures.saturating_add(1);
+                    tracing::warn!(
+                        %error,
+                        url = %upstream_url,
+                        consecutive_failures = gate.consecutive_failures,
+                        backoff_ms = backoff.as_millis() as u64,
+                        "instance branding refresh failed, keeping the previous branding"
+                    );
+                    backoff
+                }
+            };
+            gate.next_attempt = Some(Instant::now() + wait);
+        });
     }
 }

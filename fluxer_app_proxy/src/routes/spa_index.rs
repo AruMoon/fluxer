@@ -201,7 +201,7 @@ async fn serve_spa_index(state: &AppState, headers: &HeaderMap, request_path: &s
         Ok(content) => content,
         Err(response) => return response,
     };
-    let branding = state.branding_snapshot().await;
+    let branding = state.branding_snapshot();
     let raw_html = if state.config.self_hosted {
         apply_instance_branding(strip_link_preview_metadata(&raw_html), &branding)
     } else {

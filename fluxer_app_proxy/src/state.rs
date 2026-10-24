@@ -111,15 +111,13 @@ impl AppState {
         })
     }
 
-    pub async fn branding_snapshot(&self) -> Arc<BrandingSnapshot> {
+    pub fn branding_snapshot(&self) -> Arc<BrandingSnapshot> {
         if self.config.self_hosted {
-            self.branding
-                .refresh_if_due(
-                    &self.http_client,
-                    &self.config.discovery_upstream_url,
-                    Duration::from_millis(self.config.discovery_refresh_interval_ms),
-                )
-                .await;
+            self.branding.refresh_if_due(
+                &self.http_client,
+                &self.config.discovery_upstream_url,
+                Duration::from_millis(self.config.discovery_refresh_interval_ms),
+            );
         }
         self.branding.snapshot()
     }
