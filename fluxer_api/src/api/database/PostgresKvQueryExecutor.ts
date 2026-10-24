@@ -1111,7 +1111,7 @@ ON CONFLICT (table_name, row_key) DO UPDATE SET row_data = EXCLUDED.row_data, up
 async function backfillPostgresKvSortIds(db: PostgresQueryable, table: string, tableName: string): Promise<void> {
 	let after = '';
 	for (;;) {
-		const result = await db.query<{filled: number; last: string | null}>(
+		const result = await db.query<{picked: number; last: string | null}>(
 			`WITH batch AS (
 	SELECT row_key FROM ${table}
 	WHERE table_name = $1 AND row_key COLLATE "C" > $2 AND sort_id IS NULL
@@ -1123,11 +1123,11 @@ async function backfillPostgresKvSortIds(db: PostgresQueryable, table: string, t
 	FROM batch
 	WHERE kv.table_name = $1 AND kv.row_key = batch.row_key
 )
-SELECT count(*)::int AS filled, max(row_key COLLATE "C") AS last FROM filled`,
+SELECT count(*)::int AS picked, max(row_key COLLATE "C") AS last FROM batch`,
 			[tableName, after, POSTGRES_KV_SORT_ID_BACKFILL_BATCH],
 		);
 		const row = result.rows[0];
-		if (!row?.last || row.filled < POSTGRES_KV_SORT_ID_BACKFILL_BATCH) return;
+		if (!row?.last || row.picked < POSTGRES_KV_SORT_ID_BACKFILL_BATCH) return;
 		after = row.last;
 	}
 }
