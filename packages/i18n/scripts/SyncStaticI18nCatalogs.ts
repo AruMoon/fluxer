@@ -5,6 +5,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {parseArgs} from 'node:util';
+import {STATIC_I18N_LOCALES, type StaticI18nLocale} from '@fluxer/i18n/src/runtime/StaticLocaleFiles';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,7 +59,7 @@ function ensureDir(dir: string): void {
 	fs.mkdirSync(dir, {recursive: true});
 }
 
-function jsonPath(config: StaticCatalogConfig, locale?: StaticLocale): string {
+function jsonPath(config: StaticCatalogConfig, locale?: StaticI18nLocale): string {
 	if (!locale) {
 		return path.join(config.weblateDir, 'messages.json');
 	}
