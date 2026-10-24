@@ -166,21 +166,18 @@ impl LocalFileStore {
         request_headers: &HeaderMap,
         max_bytes: usize,
     ) -> Result<NegotiatedLocalFile, LocalFileReadError> {
-        for &(encoding, extension) in PRECOMPRESSED_SIBLINGS {
-            if !accepts_content_encoding(request_headers, encoding) {
-                continue;
-            }
-            let sibling_path = format!("{relative_path}.{extension}");
+        if accepts_content_encoding(request_headers, "br") {
+            let sibling_path = format!("{relative_path}.br");
             match self.resolve_checked(&sibling_path, max_bytes).await {
                 Ok(resolved) => {
-                    return self.with_stream_budget(resolved, Some(encoding), &sibling_path);
+                    return self.with_stream_budget(resolved, Some("br"), &sibling_path);
                 }
                 Err(
                     LocalFileReadError::NotFound(_)
                     | LocalFileReadError::InvalidPath(_)
                     | LocalFileReadError::TooLarge { .. }
                     | LocalFileReadError::Io { .. },
-                ) => continue,
+                ) => {}
                 Err(error) => return Err(error),
             }
         }
