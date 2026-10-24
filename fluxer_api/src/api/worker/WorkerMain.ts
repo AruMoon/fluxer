@@ -267,6 +267,9 @@ export async function startWorkerMain(): Promise<void> {
 			Logger.info('Postgres KV client initialised for worker backend');
 		}
 		if (Config.database.backend === 'cassandra') {
+			const {ensureCassandraSchema, logMissingCassandraKeyspace} = await import(
+				'@app/api/database/CassandraSchemaStartup'
+			);
 			await initCassandra({
 				hosts: Config.cassandra.hosts.split(',').filter(Boolean),
 				port: Config.cassandra.port,

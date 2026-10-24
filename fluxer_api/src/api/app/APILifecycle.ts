@@ -138,6 +138,9 @@ export function createInitializer(
 				logger.info('Using injected database query executor for tests');
 			}
 			if (config.database.backend === 'cassandra' && !hasDatabaseQueryExecutor()) {
+				const {ensureCassandraSchema, logMissingCassandraKeyspace} = await import(
+					'@app/api/database/CassandraSchemaStartup'
+				);
 				await initCassandra({
 					hosts: config.cassandra.hosts.split(',').filter(Boolean),
 					port: config.cassandra.port,
