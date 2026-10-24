@@ -107,6 +107,7 @@ export class ElasticsearchMessageAdapter extends ElasticsearchIndexAdapter<Messa
 			client: options.client,
 			index: ELASTICSEARCH_INDEX_DEFINITIONS.messages,
 			searchableFields: ['content', 'embedContent'],
+			operator: 'and',
 			buildFilters: buildMessageFilters,
 			buildSort: buildMessageSort,
 			lock: options.lock,
@@ -138,10 +139,9 @@ export class ElasticsearchMessageAdapter extends ElasticsearchIndexAdapter<Messa
 		const filterClauses = compactFilters(
 			buildMessageFilters({...originalFilters, contents: undefined, exactPhrases: undefined}),
 		);
-		const should: Array<Record<string, unknown>> = contents.map((term) => ({
-			multi_match: {query: term, fields: ['content', 'embedContent'], type: 'best_fields'},
+		const must: Array<Record<string, unknown>> = contents.map((term) => ({
+			multi_match: {query: term, fields: ['content', 'embedContent'], type: 'best_fields', operator: 'and'},
 		}));
-		const must: Array<Record<string, unknown>> = [{bool: {should, minimum_should_match: 1}}];
 		for (const phrase of exactPhrases) {
 			must.push({
 				bool: {
@@ -162,7 +162,7 @@ export class ElasticsearchMessageAdapter extends ElasticsearchIndexAdapter<Messa
 		const filterClauses = compactFilters(buildMessageFilters({...originalFilters, exactPhrases: undefined}));
 		const must: Array<Record<string, unknown>> = [];
 		if (query) {
-			must.push({multi_match: {query, fields: ['content'], type: 'best_fields'}});
+			must.push({multi_match: {query, fields: ['content', 'embedContent'], type: 'best_fields', operator: 'and'}});
 		}
 		for (const phrase of exactPhrases) {
 			must.push({

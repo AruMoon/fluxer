@@ -123,6 +123,7 @@ describe('MeilisearchMessageAdapter', () => {
 				sort: ['createdAt:asc', 'id:asc'],
 				attributesToSearchOn: ['content', 'embedContent'],
 				showRankingScore: false,
+				matchingStrategy: 'all',
 			},
 		});
 	});

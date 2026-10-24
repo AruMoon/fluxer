@@ -8,7 +8,7 @@ import RouteHeader from '@/components/RouteHeader.astro';
 
 Message search finds indexed messages that match a text query and filters. One request can search a channel, a guild, your direct messages or several of these.
 
-How the text query matches words and typos depends on the instance's search backend (Elasticsearch or Meilisearch), but filters always match exactly.
+A message matches the text query only when it has every word of it. How words and typos match depends on the instance's search backend (Elasticsearch or Meilisearch), but filters always match exactly.
 
 ## Message search result object
 

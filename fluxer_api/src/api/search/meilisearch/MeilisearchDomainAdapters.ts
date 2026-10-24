@@ -210,6 +210,7 @@ export class MeilisearchMessageAdapter extends MeilisearchIndexAdapter<MessageSe
 			buildFilters: buildMessageFilters,
 			buildSort: buildTimestampSort,
 			buildQuery: buildMessageQuery,
+			matchingStrategy: 'all',
 		});
 	}
 }

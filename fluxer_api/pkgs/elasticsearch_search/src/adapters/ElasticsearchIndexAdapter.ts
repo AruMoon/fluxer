@@ -57,6 +57,7 @@ interface ElasticsearchIndexAdapterOptions<TFilters> {
 	searchType?: 'best_fields' | 'bool_prefix';
 	fuzziness?: string;
 	minimumShouldMatch?: string;
+	operator?: 'and' | 'or';
 	buildFilters: (filters: TFilters) => Array<ElasticsearchFilter | undefined>;
 	buildSort?: (filters: TFilters) => Array<SortCombinations> | undefined;
 	lock?: ElasticsearchDistributedLock;
@@ -75,6 +76,7 @@ export class ElasticsearchIndexAdapter<
 	protected readonly searchType: 'best_fields' | 'bool_prefix';
 	protected readonly fuzziness: string | undefined;
 	protected readonly minimumShouldMatch: string | undefined;
+	protected readonly operator: 'and' | 'or';
 	protected readonly buildFilters: (filters: TFilters) => Array<ElasticsearchFilter | undefined>;
 	protected readonly buildSort: ((filters: TFilters) => Array<SortCombinations> | undefined) | undefined;
 	private readonly lock: ElasticsearchDistributedLock | undefined;
@@ -87,6 +89,7 @@ export class ElasticsearchIndexAdapter<
 		this.searchType = options.searchType ?? 'best_fields';
 		this.fuzziness = options.fuzziness;
 		this.minimumShouldMatch = options.minimumShouldMatch;
+		this.operator = options.operator ?? 'or';
 		this.buildFilters = options.buildFilters;
 		this.buildSort = options.buildSort;
 		this.lock = options.lock;
@@ -277,7 +280,7 @@ export class ElasticsearchIndexAdapter<
 						query,
 						fields: this.searchableFields,
 						type: this.searchType,
-						operator: 'or',
+						operator: this.operator,
 						...(this.fuzziness != null ? {fuzziness: this.fuzziness} : {}),
 						...(this.minimumShouldMatch != null ? {minimum_should_match: this.minimumShouldMatch} : {}),
 					},

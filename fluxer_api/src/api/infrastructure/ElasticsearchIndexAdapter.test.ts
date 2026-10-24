@@ -24,6 +24,7 @@ interface SearchConfiguration {
 	fuzziness?: string;
 	minimumShouldMatch?: string;
 	searchType?: 'best_fields' | 'bool_prefix';
+	operator?: 'and' | 'or';
 }
 
 interface RecordedRequest {
@@ -220,6 +221,12 @@ const queryCases: Array<QueryCase> = [
 		name: 'text query, fuzziness omitted, minimum omitted',
 		query: 'needle',
 		must: [{multi_match: {query: 'needle', fields: ['content^2', 'id'], type: 'best_fields', operator: 'or'}}],
+	},
+	{
+		name: 'text query with every word required',
+		query: 'good idea',
+		operator: 'and',
+		must: [{multi_match: {query: 'good idea', fields: ['content^2', 'id'], type: 'best_fields', operator: 'and'}}],
 	},
 	{
 		name: "text query, fuzziness omitted, minimum '2'",

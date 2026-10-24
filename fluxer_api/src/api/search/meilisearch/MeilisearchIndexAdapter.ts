@@ -21,6 +21,7 @@ interface MeilisearchIndexAdapterOptions<TFilters> {
 	buildFilters: (filters: TFilters) => Array<MeilisearchFilter | undefined>;
 	buildSort?: (filters: TFilters) => Array<string> | undefined;
 	buildQuery?: (query: string, filters: TFilters) => string;
+	matchingStrategy?: 'all' | 'last';
 }
 
 interface MeilisearchIndexSettings {
@@ -58,6 +59,7 @@ export class MeilisearchIndexAdapter<
 	protected readonly buildFilters: (filters: TFilters) => Array<MeilisearchFilter | undefined>;
 	protected readonly buildSort: ((filters: TFilters) => Array<string> | undefined) | undefined;
 	protected readonly buildQuery: ((query: string, filters: TFilters) => string) | undefined;
+	protected readonly matchingStrategy: 'all' | 'last' | undefined;
 	private readonly pendingBulkTaskIds = new Set<number>();
 	private initialized = false;
 
@@ -67,6 +69,7 @@ export class MeilisearchIndexAdapter<
 		this.buildFilters = options.buildFilters;
 		this.buildSort = options.buildSort;
 		this.buildQuery = options.buildQuery;
+		this.matchingStrategy = options.matchingStrategy;
 	}
 
 	async initialize(): Promise<void> {
@@ -197,6 +200,7 @@ export class MeilisearchIndexAdapter<
 				sort: this.buildSort?.(filters),
 				attributesToSearchOn: this.indexDefinition.searchableAttributes,
 				showRankingScore: false,
+				...(this.matchingStrategy ? {matchingStrategy: this.matchingStrategy} : {}),
 				...(facets && facets.length > 0 ? {facets} : {}),
 			},
 		);
