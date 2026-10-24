@@ -76,7 +76,7 @@ interface BlueskyClientSession {
 	sessionStore: NodeSavedSessionStore;
 }
 
-async function loadSigningKey(config: BlueskyOAuthKeyConfig, index: number): Promise<JoseKey> {
+export async function loadSigningKey(config: BlueskyOAuthKeyConfig, index: number): Promise<JoseKey> {
 	const field = `Bluesky OAuth keys[${index}]`;
 	let keyData = config.private_key;
 	if (keyData == null) {

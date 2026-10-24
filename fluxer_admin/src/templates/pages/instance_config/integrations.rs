@@ -40,6 +40,22 @@ fn password_input(name: &str, label: &str, helper: Option<&str>) -> Markup {
     )
 }
 
+const PEM_PLACEHOLDER: &str = "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg...\n-----END PRIVATE KEY-----";
+
+fn private_key_input(name: &str, label: &str, helper: &str) -> Markup {
+    form_field_group(
+        label,
+        name,
+        false,
+        None,
+        Some(helper),
+        html! {
+            textarea id=(name) name=(name) rows="5" placeholder=(PEM_PLACEHOLDER) class={(FORM_INPUT_CLASS) " font-mono text-xs"}
+                autocomplete="off" spellcheck="false" {}
+        },
+    )
+}
+
 fn smtp_tls_mode_summary(mode: &str) -> &str {
     match mode {
         "implicit" => "implicit TLS",
@@ -259,7 +275,7 @@ pub(super) fn integrations_config_section(
                                 "https://example.com/privacy",
                             ))
                             (text_input("integration_bluesky_key_id", "New signing key ID", "", "atproto-key-1"))
-                            (password_input("integration_bluesky_private_key", "New private key", Some("Provide this only when adding or replacing runtime Bluesky keys.")))
+                            (private_key_input("integration_bluesky_private_key", "New private key", "Paste the whole PEM file, including the BEGIN and END lines. Provide this only when adding or replacing runtime Bluesky keys."))
                         }
                     }
 

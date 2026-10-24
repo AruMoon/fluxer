@@ -7,6 +7,7 @@ import {startAttachmentDecayReconcile} from '@app/api/attachment/AttachmentDecay
 import {maybeAutoJoinInvite} from '@app/api/auth/AuthRegistration';
 import {ssoDiscoveryCacheKey} from '@app/api/auth/services/SsoService';
 import {createGuildID, createInviteCode, createUserID} from '@app/api/BrandedTypes';
+import {loadSigningKey} from '@app/api/bluesky/BlueskyOAuthService';
 import {Config} from '@app/api/Config';
 import {enqueueEndUnassignedGuildVisits} from '@app/api/guild/visits/GuildVisitLifecycle';
 import {brandingAssetStorageKey, resolveBrandingAsset} from '@app/api/instance/BrandingAssetReferences';
@@ -423,6 +424,20 @@ function emailDeliveryPatchField(patch: InstanceIntegrationsConfigPatch['email']
 	if (patch?.delivery === EmailDeliveryModes.SMTP) return 'integrations.email.delivery';
 	if (patch?.delivery === undefined && patch?.enabled === true) return 'integrations.email.enabled';
 	return null;
+}
+
+async function assertValidBlueskyKeys(patch: InstanceIntegrationsConfigPatch | null): Promise<void> {
+	for (const [index, key] of (patch?.bluesky?.keys ?? []).entries()) {
+		if (!key.kid || !key.private_key) continue;
+		try {
+			await loadSigningKey({kid: key.kid, private_key: key.private_key}, index);
+		} catch {
+			throw InputValidationError.create(
+				`integrations.bluesky.keys.${index}.private_key`,
+				'The private key must be the whole PEM file, from the BEGIN PRIVATE KEY line to the END PRIVATE KEY line',
+			);
+		}
+	}
 }
 
 async function assertConsistentInstanceConfig(
@@ -880,6 +895,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 			await assertBillingCompatibleWithPremiumMode(data);
 			const integrationsPatch = toIntegrationsPatch(data.integrations, await readSavedSmtpConfig());
 			await assertConsistentInstanceConfig(data, integrationsPatch);
+			await assertValidBlueskyKeys(integrationsPatch);
 			const updateContext = {ctx, data, instanceConfigRepository, integrationsPatch};
 			for (const applySection of Object.values(INSTANCE_CONFIG_SECTION_APPLIERS)) {
 				const pendingUpdate = applySection(updateContext);
