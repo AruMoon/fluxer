@@ -50,6 +50,7 @@ const GATEWAY_TIMEOUTS = {
 	MaxReconnectWhileDispatchesFail: 60000,
 	ReconnectFloor: 500,
 	ReconnectSpread: 2000,
+	InvalidSessionIdentifySpread: 1000,
 	Hello: 20000,
 } as const;
 
@@ -424,6 +425,10 @@ export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 		if (this.reconnectTimeoutId != null) {
 			clearTimeout(this.reconnectTimeoutId);
 			this.reconnectTimeoutId = null;
+		}
+		if (this.invalidSessionTimeoutId != null) {
+			clearTimeout(this.invalidSessionTimeoutId);
+			this.invalidSessionTimeoutId = null;
 		}
 		this.stopHeartbeat();
 		this.clearSession();
@@ -1072,6 +1077,10 @@ export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 			clearTimeout(this.invalidSessionTimeoutId);
 			this.invalidSessionTimeoutId = null;
 		}
+		if (!isResumable && this.resumeTimeoutId != null) {
+			this.identifyAfterRejectedResume();
+			return;
+		}
 		const delay = 2500 + Math.random() * 1000;
 		this.invalidSessionTimeoutId = window.setTimeout(() => {
 			this.invalidSessionTimeoutId = null;
@@ -1080,6 +1089,17 @@ export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 			}
 			this.shouldReconnectImmediately = true;
 			this.disconnect(4000, `Invalid session (resumable=${isResumable})`, true);
+		}, delay);
+	}
+
+	private identifyAfterRejectedResume(): void {
+		this.clearResumeTimeout();
+		this.clearSession();
+		const delay = Math.floor(Math.random() * GATEWAY_TIMEOUTS.InvalidSessionIdentifySpread);
+		this.log.info(`Resume rejected, identifying on the same connection in ${delay}ms`);
+		this.invalidSessionTimeoutId = window.setTimeout(() => {
+			this.invalidSessionTimeoutId = null;
+			this.sendIdentify();
 		}, delay);
 	}
 
