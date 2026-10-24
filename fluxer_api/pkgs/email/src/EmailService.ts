@@ -794,6 +794,9 @@ export class EmailService implements IEmailService {
 	private async renderTermsAttachment(locale: string | null): Promise<EmailAttachment | null> {
 		const language = resolveOperatorPassTermsLanguage(locale);
 		try {
+			const {getOperatorPassTermsPdfFilename, renderOperatorPassTermsPdf} = await import(
+				'@pkgs/email/src/operator_pass_terms/OperatorPassTermsPdf'
+			);
 			return {
 				filename: getOperatorPassTermsPdfFilename(language),
 				content: await renderOperatorPassTermsPdf(language, this.config.marketingBaseUrl),
