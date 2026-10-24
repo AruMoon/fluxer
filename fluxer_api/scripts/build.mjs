@@ -44,6 +44,7 @@ await build({
 	bundle: true,
 	platform: 'node',
 	format: 'esm',
+	splitting: true,
 	target: 'node26',
 	charset: 'ascii',
 	sourcemap: true,
