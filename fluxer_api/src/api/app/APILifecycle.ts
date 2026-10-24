@@ -56,6 +56,7 @@ import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/po
 let jsConnectionManager: JetStreamConnectionManager | null = null;
 let searchInitRetryTimer: ReturnType<typeof setTimeout> | null = null;
 let searchInitStopped = false;
+let searchInitInFlight: Promise<void> | null = null;
 const SEARCH_INIT_RETRY_MIN_MS = 5_000;
 const SEARCH_INIT_RETRY_MAX_MS = 60_000;
 const unregisterMetricsSections: Array<() => void> = [];
@@ -109,6 +110,7 @@ async function initializeSearchAndWarmup(
 	logger: LoggerInterface,
 ): Promise<void> {
 	await initializeSearch(getCacheService());
+	if (searchInitStopped) return;
 	logger.info('Search initialized');
 	const warmupLockKey = 'fluxer:search:warmup:admin';
 	const warmupLockToken = randomUUID();
@@ -145,10 +147,14 @@ function scheduleSearchInitRetry(
 	const delay = Math.min(SEARCH_INIT_RETRY_MIN_MS * 2 ** attempt, SEARCH_INIT_RETRY_MAX_MS);
 	searchInitRetryTimer = setTimeout(() => {
 		searchInitRetryTimer = null;
-		initializeSearchAndWarmup(kvClient, logger).catch((error) => {
-			logger.error({error, attempt: attempt + 1}, 'Search initialisation failed, retrying in the background');
-			scheduleSearchInitRetry(kvClient, logger, attempt + 1);
-		});
+		searchInitInFlight = initializeSearchAndWarmup(kvClient, logger)
+			.catch((error) => {
+				logger.error({error, attempt: attempt + 1}, 'Search initialisation failed, retrying in the background');
+				scheduleSearchInitRetry(kvClient, logger, attempt + 1);
+			})
+			.finally(() => {
+				searchInitInFlight = null;
+			});
 	}, delay);
 }
 
@@ -337,6 +343,7 @@ export function createShutdown(config: APIConfig, logger: LoggerInterface): () =
 			clearTimeout(searchInitRetryTimer);
 			searchInitRetryTimer = null;
 		}
+		await searchInitInFlight;
 		try {
 			await shutdownSearch();
 			logger.info('Search service shut down');
