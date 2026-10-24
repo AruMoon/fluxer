@@ -348,21 +348,21 @@ function desktopEntryResolves(): boolean {
 	return findSystemDesktopEntry() !== null || readExistingDesktopFile(getDesktopFilePath()) !== null;
 }
 
-export function ensureLinuxDesktopEntry(): boolean {
-	if (process.platform !== 'linux') return false;
+export function ensureLinuxDesktopEntry(): void {
+	if (process.platform !== 'linux') return;
 	if (!app.isPackaged) {
 		logger.debug('Skipping .desktop entry management for an unpackaged run');
-		return false;
+		return;
 	}
 	if (isFlatpakRuntime()) {
 		logger.debug('Skipping .desktop entry creation in Flatpak; package export owns launcher/protocol integration');
 		registerProtocolClient();
-		return false;
+		return;
 	}
 	if (process.env.FLUXER_DISABLE_DESKTOP_FILE === '1') {
 		logger.debug('Skipping .desktop entry management; FLUXER_DISABLE_DESKTOP_FILE=1');
 		if (findSystemDesktopEntry() !== null) registerProtocolClient();
-		return desktopEntryResolves();
+		return;
 	}
 	let changed = removeLegacyGeneratedDesktopEntry();
 	try {
@@ -378,7 +378,5 @@ export function ensureLinuxDesktopEntry(): boolean {
 		actionRefreshSubscribed = true;
 		onDirectMessagesAvailabilityChange(refreshDesktopEntryActions);
 	}
-	const resolves = desktopEntryResolves();
-	if (resolves) registerProtocolClient();
-	return resolves;
+	if (desktopEntryResolves()) registerProtocolClient();
 }

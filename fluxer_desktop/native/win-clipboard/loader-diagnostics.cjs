@@ -472,10 +472,10 @@ function createNativeLoadError({
 	return error;
 }
 
-function resolveProbeTimeoutMs(explicitTimeoutMs) {
+function resolveProbeTimeoutMs() {
 	const configured = Number.parseInt(process.env[PROBE_TIMEOUT_ENV] ?? '', 10);
 	if (Number.isFinite(configured) && configured > 0) return configured;
-	return explicitTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS;
+	return DEFAULT_PROBE_TIMEOUT_MS;
 }
 
 function probeReachedRequire(result) {
@@ -562,7 +562,7 @@ function recordProbePass(nativePath) {
 	}
 }
 
-function probeNativeBinary({moduleName, nativePath, nativeRoot, packageDir, skipNativeProbeEnv, timeoutMs}) {
+function probeNativeBinary({moduleName, nativePath, nativeRoot, packageDir, skipNativeProbeEnv}) {
 	if (!skipNativeProbeEnv || process.env[skipNativeProbeEnv] === '1') {
 		return null;
 	}
@@ -576,7 +576,7 @@ function probeNativeBinary({moduleName, nativePath, nativeRoot, packageDir, skip
 		env: {...process.env, ELECTRON_RUN_AS_NODE: '1', [skipNativeProbeEnv]: '1'},
 		encoding: 'utf8',
 		stdio: ['ignore', 'pipe', 'pipe'],
-		timeout: resolveProbeTimeoutMs(timeoutMs),
+		timeout: resolveProbeTimeoutMs(),
 	});
 	if (result.status === 0) {
 		recordProbePass(nativePath);
@@ -646,11 +646,4 @@ function loadNativeBinding({moduleName, nativePath, nativeRoot, packageDir, skip
 	}
 }
 
-module.exports = {
-	collectNativeDiagnostics,
-	createNativeLoadError,
-	formatNativeDiagnostics,
-	isNativeLoadError,
-	loadNativeBinding,
-	probeNativeBinary,
-};
+module.exports = {createNativeLoadError, loadNativeBinding};

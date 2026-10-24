@@ -417,11 +417,7 @@ if (launchConfigurationError) {
 				}
 				stopStartupIfQuitting();
 				try {
-					runStartupPhase('linux-desktop-entry', () => {
-						if (ensureLinuxDesktopEntry()) {
-							process.env.FLUXER_LINUX_PORTAL_APP_ID = LINUX_DESKTOP_ENTRY_ID;
-						}
-					});
+					runStartupPhase('linux-desktop-entry', ensureLinuxDesktopEntry);
 				} catch (error) {
 					log.error('[Init] Failed to ensure the Linux desktop entry:', error);
 				}
