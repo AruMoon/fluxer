@@ -881,7 +881,7 @@ WHERE idx.indrelid = to_regclass($1)
 	AND NOT idx.indisprimary
 	AND NOT idx.indisunique
 	AND cls.relname <> ALL($2::text[])`,
-		[kvTable, sortIdIndexNames(kvTable)],
+		[kvTable, [...sortIdIndexNames(kvTable), ...retiredIndexNames(kvTable)]],
 	);
 	for (const row of invalid.rows) {
 		logError({table: kvTable, index: row.index_name}, 'Postgres KV index is invalid, rebuilding it');
@@ -1099,8 +1099,8 @@ async function migratePostgresKvIndexes(db: PostgresQueryable, kvTable: string):
 	]);
 	if (locked.rows[0]?.locked !== true) return;
 	await db.query("SELECT set_config('statement_timeout', '0', false)");
-	const retired = await db.query<{index_name: string}>(
-		`SELECT cls.relname AS index_name FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
+	const retired = await db.query<{index_name: string; valid: boolean}>(
+		`SELECT cls.relname AS index_name, idx.indisvalid AS valid FROM pg_index idx JOIN pg_class cls ON cls.oid = idx.indexrelid
 WHERE idx.indrelid = to_regclass($1) AND cls.relname = ANY($2::text[])`,
 		[kvTable, retiredIndexNames(kvTable)],
 	);
@@ -1109,7 +1109,10 @@ WHERE idx.indrelid = to_regclass($1) AND cls.relname = ANY($2::text[])`,
 		POSTGRES_KV_SORT_ID_MIGRATION,
 	]);
 	const jsonbSortIndexes = jsonbSortIndexNames(kvTable);
-	if (marked.rows.length === 0 || retired.rows.some(({index_name}) => jsonbSortIndexes.includes(index_name))) {
+	if (
+		marked.rows.length === 0 ||
+		retired.rows.some(({index_name, valid}) => valid && jsonbSortIndexes.includes(index_name))
+	) {
 		for (const tableName of POSTGRES_KV_SORT_ID_TABLES) {
 			await backfillPostgresKvSortIds(db, table, tableName);
 		}
