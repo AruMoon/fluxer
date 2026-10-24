@@ -7,6 +7,7 @@
 -export([
     start_link/0,
     request_session_start/1,
+    cancel_session_start/1,
     release_session_start/0,
     try_acquire_guild_start/0,
     release_guild_start/0,
@@ -20,9 +21,11 @@
 
 -type state() :: #{
     counters := counters:counters_ref(),
-    session_queue := queue:queue({pid(), term()}),
-    session_holders := #{pid() => non_neg_integer()},
-    monitors := #{pid() => reference()}
+    session_queue => queue:queue({pid(), term()}),
+    session_queued => non_neg_integer(),
+    session_holders => #{pid() => pos_integer()},
+    session_held => non_neg_integer(),
+    monitors => #{pid() => reference()}
 }.
 
 -spec start_link() -> {ok, pid()} | {error, term()}.
@@ -36,6 +39,10 @@ start_link() ->
 -spec request_session_start(term()) -> ok.
 request_session_start(Tag) ->
     gen_server:cast(?MODULE, {request_session_start, self(), Tag}).
+
+-spec cancel_session_start(term()) -> ok.
+cancel_session_start(Tag) ->
+    gen_server:cast(?MODULE, {cancel_session_start, self(), Tag}).
 
 -spec release_session_start() -> ok.
 release_session_start() ->
@@ -102,7 +109,9 @@ init([]) ->
     {ok, #{
         counters => Ref,
         session_queue => queue:new(),
+        session_queued => 0,
         session_holders => #{},
+        session_held => 0,
         monitors => #{}
     }}.
 
@@ -115,35 +124,33 @@ handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 -spec handle_cast(term(), state()) -> {noreply, state()}.
-handle_cast({request_session_start, Pid, Tag}, #{session_queue := Queue} = State) when
-    is_pid(Pid)
-->
+handle_cast({request_session_start, Pid, Tag}, State) when is_pid(Pid) ->
     Monitored = ensure_monitor(Pid, State),
-    {noreply, admit_session_starts(Monitored#{session_queue := queue:in({Pid, Tag}, Queue)})};
-handle_cast({release_session_start, Pid}, #{session_holders := Holders} = State) when
-    is_pid(Pid)
-->
-    case maps:get(Pid, Holders, 0) of
-        Held when Held > 0 ->
-            Released = release_held(Pid, 1, State),
-            {noreply, admit_session_starts(Released)};
-        _ ->
-            {noreply, State}
+    Queue = maps:get(session_queue, Monitored, queue:new()),
+    Queued = Monitored#{
+        session_queue => queue:in({Pid, Tag}, Queue),
+        session_queued => maps:get(session_queued, Monitored, 0) + 1
+    },
+    {noreply, admit_session_starts(Queued)};
+handle_cast({cancel_session_start, Pid, Tag}, State) when is_pid(Pid) ->
+    {noreply, drop_queued(fun(Entry) -> Entry =/= {Pid, Tag} end, State)};
+handle_cast({release_session_start, Pid}, State) when is_pid(Pid) ->
+    case maps:is_key(Pid, maps:get(session_holders, State, #{})) of
+        true -> {noreply, admit_session_starts(release_held(Pid, 1, State))};
+        false -> {noreply, State}
     end;
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
 -spec handle_info(term(), state()) -> {noreply, state()}.
 handle_info({'DOWN', MonitorRef, process, Pid, _Reason}, State) when is_pid(Pid) ->
-    #{session_holders := Holders, session_queue := Queue, monitors := Monitors} = State,
+    Monitors = maps:get(monitors, State, #{}),
     case maps:get(Pid, Monitors, undefined) of
         MonitorRef ->
-            Released = release_held(Pid, maps:get(Pid, Holders, 0), State),
-            Remaining = queue:filter(fun({QueuedPid, _Tag}) -> QueuedPid =/= Pid end, Queue),
-            {noreply,
-                admit_session_starts(Released#{
-                    session_queue := Remaining, monitors := maps:remove(Pid, Monitors)
-                })};
+            Held = maps:get(Pid, maps:get(session_holders, State, #{}), 0),
+            Released = release_held(Pid, Held, State#{monitors => maps:remove(Pid, Monitors)}),
+            Dropped = drop_queued(fun({QueuedPid, _Tag}) -> QueuedPid =/= Pid end, Released),
+            {noreply, admit_session_starts(Dropped)};
         _ ->
             {noreply, State}
     end;
@@ -151,38 +158,54 @@ handle_info(_Info, State) ->
     {noreply, State}.
 
 -spec ensure_monitor(pid(), state()) -> state().
-ensure_monitor(Pid, #{monitors := Monitors} = State) ->
+ensure_monitor(Pid, State) ->
+    Monitors = maps:get(monitors, State, #{}),
     case maps:is_key(Pid, Monitors) of
         true -> State;
-        false -> State#{monitors := Monitors#{Pid => erlang:monitor(process, Pid)}}
+        false -> State#{monitors => Monitors#{Pid => erlang:monitor(process, Pid)}}
     end.
+
+-spec drop_queued(fun(({pid(), term()}) -> boolean()), state()) -> state().
+drop_queued(Keep, State) ->
+    Remaining = queue:filter(Keep, maps:get(session_queue, State, queue:new())),
+    State#{session_queue => Remaining, session_queued => queue:len(Remaining)}.
 
 -spec release_held(pid(), non_neg_integer(), state()) -> state().
 release_held(_Pid, 0, State) ->
     State;
-release_held(Pid, Count, #{counters := Ref, session_holders := Holders} = State) ->
-    counters:sub(Ref, ?SESSION_START_IDX, Count),
-    case maps:get(Pid, Holders, 0) - Count of
-        Left when Left > 0 -> State#{session_holders := Holders#{Pid => Left}};
-        _ -> State#{session_holders := maps:remove(Pid, Holders)}
-    end.
+release_held(Pid, Count, State) ->
+    Holders = maps:get(session_holders, State, #{}),
+    NewHolders =
+        case maps:get(Pid, Holders, 0) - Count of
+            Left when Left > 0 -> Holders#{Pid => Left};
+            _ -> maps:remove(Pid, Holders)
+        end,
+    set_held(max(0, maps:get(session_held, State, 0) - Count), State#{
+        session_holders => NewHolders
+    }).
+
+-spec set_held(non_neg_integer(), state()) -> state().
+set_held(Held, #{counters := Ref} = State) ->
+    counters:put(Ref, ?SESSION_START_IDX, Held),
+    State#{session_held => Held}.
 
 -spec admit_session_starts(state()) -> state().
 admit_session_starts(State) ->
     admit_session_starts(gateway_rollout_config:max_concurrent_session_starts(), State).
 
 -spec admit_session_starts(integer(), state()) -> state().
-admit_session_starts(Limit, #{counters := Ref, session_queue := Queue} = State) ->
-    case counters:get(Ref, ?SESSION_START_IDX) < Limit andalso queue:out(Queue) of
+admit_session_starts(Limit, State) ->
+    Held = maps:get(session_held, State, 0),
+    case Held < Limit andalso queue:out(maps:get(session_queue, State, queue:new())) of
         {{value, {Pid, Tag}}, Rest} ->
             Pid ! {session_start_admitted, Tag},
-            counters:add(Ref, ?SESSION_START_IDX, 1),
-            Holders = maps:get(session_holders, State),
+            Holders = maps:get(session_holders, State, #{}),
             Admitted = State#{
-                session_queue := Rest,
-                session_holders := Holders#{Pid => maps:get(Pid, Holders, 0) + 1}
+                session_queue => Rest,
+                session_queued => max(0, maps:get(session_queued, State, 0) - 1),
+                session_holders => Holders#{Pid => maps:get(Pid, Holders, 0) + 1}
             },
-            admit_session_starts(Limit, Admitted);
+            admit_session_starts(Limit, set_held(Held + 1, Admitted));
         _ ->
             State
     end.

@@ -8,6 +8,9 @@
     start_session_process/4,
     start_identify_fetch/5,
     admit_identify_fetch/3,
+    handle_identify_queue_timeout/3,
+    handle_other_down/3,
+    resubmit_session_starts/1,
     complete_identify_fetch/3, complete_identify_fetch/4,
     handle_identify_fetch_timeout/3,
     maybe_fail_pending_identify/4,
@@ -18,7 +21,9 @@
 
 -export_type([session_id/0, session_ref/0, state/0, pending_identify/0, start_reply/0]).
 
--define(IDENTIFY_FETCH_TIMEOUT_MS, 130000).
+-define(IDENTIFY_QUEUE_TIMEOUT_MS, 60000).
+-define(IDENTIFY_FETCH_TIMEOUT_MS, 70000).
+-define(RESUBMIT_RETRY_MS, 100).
 
 -type session_id() :: binary().
 -type session_ref() :: {pid(), reference()}.
@@ -37,6 +42,7 @@
     worker_token := reference(),
     timeout_ref := reference(),
     queued_at := integer(),
+    socket_ref => reference(),
     slot_held => boolean()
 }.
 -type start_reply() ::
@@ -132,12 +138,15 @@ handle_existing_pending(
 ) ->
     case maps:get(request, PendingIdentify) =:= Request of
         true ->
-            UpdatedPending = PendingIdentify#{
+            {Watched, WatchedState} = rewatch_socket(
+                SessionId, SocketPid, PendingIdentify, State
+            ),
+            UpdatedPending = Watched#{
                 request => Request,
                 froms => [From | maps:get(froms, PendingIdentify, [])]
             },
             NewPending = PendingIdentifies#{SessionId := UpdatedPending},
-            {noreply, State#{pending_identifies := NewPending}};
+            {noreply, WatchedState#{pending_identifies := NewPending}};
         false ->
             supersede_identify_fetch(
                 Request, SocketPid, From, State, SessionId, PendingIdentify
@@ -241,19 +250,9 @@ start_identify_fetch(Request, SocketPid, SessionId, From, State) ->
     pending_identify()
 ) -> {noreply, state()}.
 supersede_identify_fetch(Request, SocketPid, From, State, SessionId, PendingIdentify) ->
-    cancel_identify_timeout(PendingIdentify),
-    State1 = kill_identify_worker(
-        maps:get(worker_ref, PendingIdentify), PendingIdentify, State
-    ),
-    RemainingPending = maps:remove(SessionId, maps:get(pending_identifies, State1)),
+    State1 = drop_pending(SessionId, PendingIdentify, State),
     Waiters = [From | maps:get(froms, PendingIdentify, [])],
-    start_identify_fetch_with_waiters(
-        Request,
-        SocketPid,
-        SessionId,
-        Waiters,
-        State1#{pending_identifies := RemainingPending}
-    ).
+    start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Waiters, State1).
 
 -spec start_identify_fetch_with_waiters(
     map(),
@@ -262,17 +261,20 @@ supersede_identify_fetch(Request, SocketPid, From, State, SessionId, PendingIden
     [gen_server:from()],
     state()
 ) -> {noreply, state()}.
-start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Froms, State) ->
+start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Froms, State0) ->
     WorkerToken = make_ref(),
+    State = ensure_concurrency_monitor(State0),
     ok = gateway_concurrency:request_session_start({SessionId, WorkerToken}),
     TimeoutRef = erlang:send_after(
-        ?IDENTIFY_FETCH_TIMEOUT_MS, self(), {identify_fetch_timeout, SessionId, WorkerToken}
+        ?IDENTIFY_QUEUE_TIMEOUT_MS, self(), {identify_queue_timeout, SessionId, WorkerToken}
     ),
+    SocketRef = erlang:monitor(process, SocketPid),
     PendingIdentifies = maps:get(pending_identifies, State),
     NewPending = PendingIdentifies#{
         SessionId => #{
             request => Request,
             socket_pid => SocketPid,
+            socket_ref => SocketRef,
             froms => Froms,
             worker_ref => undefined,
             worker_token => WorkerToken,
@@ -281,28 +283,142 @@ start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Froms, State) -
             slot_held => false
         }
     },
-    {noreply, State#{pending_identifies := NewPending}}.
+    Monitors = maps:get(socket_monitors, State, #{}),
+    {noreply, State#{
+        pending_identifies := NewPending,
+        socket_monitors => Monitors#{SocketRef => SessionId}
+    }}.
+
+-spec rewatch_socket(session_id(), pid(), pending_identify(), state()) ->
+    {pending_identify(), state()}.
+rewatch_socket(SessionId, SocketPid, PendingIdentify, State) ->
+    case PendingIdentify of
+        #{socket_pid := SocketPid, socket_ref := _} ->
+            {PendingIdentify, State};
+        _ ->
+            watch_socket(SessionId, SocketPid, PendingIdentify, State)
+    end.
+
+-spec watch_socket(session_id(), pid(), pending_identify(), state()) ->
+    {pending_identify(), state()}.
+watch_socket(SessionId, SocketPid, PendingIdentify, State) ->
+    Forgotten = forget_socket(PendingIdentify, State),
+    SocketRef = erlang:monitor(process, SocketPid),
+    Monitors = maps:get(socket_monitors, Forgotten, #{}),
+    {PendingIdentify#{socket_pid => SocketPid, socket_ref => SocketRef}, Forgotten#{
+        socket_monitors => Monitors#{SocketRef => SessionId}
+    }}.
+
+-spec forget_socket(pending_identify(), state()) -> state().
+forget_socket(#{socket_ref := SocketRef}, State) ->
+    demonitor(SocketRef, [flush]),
+    State#{socket_monitors => maps:remove(SocketRef, maps:get(socket_monitors, State, #{}))};
+forget_socket(_PendingIdentify, State) ->
+    State.
+
+-spec drop_pending(session_id(), pending_identify(), state()) -> state().
+drop_pending(SessionId, PendingIdentify, State) ->
+    cancel_identify_timeout(PendingIdentify),
+    Forgotten = forget_socket(PendingIdentify, State),
+    Stopped =
+        case maps:get(worker_ref, PendingIdentify, undefined) of
+            undefined ->
+                Tag = {SessionId, maps:get(worker_token, PendingIdentify)},
+                gateway_concurrency:cancel_session_start(Tag),
+                Forgotten;
+            WorkerRef ->
+                kill_identify_worker(WorkerRef, PendingIdentify, Forgotten)
+        end,
+    Stopped#{
+        pending_identifies := maps:remove(SessionId, maps:get(pending_identifies, Stopped))
+    }.
+
+-spec ensure_concurrency_monitor(state()) -> state().
+ensure_concurrency_monitor(State) ->
+    case {maps:get(concurrency_monitor, State, undefined), whereis(gateway_concurrency)} of
+        {{_Ref, Pid}, Pid} ->
+            State;
+        {_Monitor, undefined} ->
+            State;
+        {_Monitor, Pid} ->
+            State#{concurrency_monitor => {erlang:monitor(process, Pid), Pid}}
+    end.
+
+-spec handle_identify_queue_timeout(session_id(), reference(), state()) -> {noreply, state()}.
+handle_identify_queue_timeout(SessionId, WorkerToken, State) ->
+    PendingIdentifies = maps:get(pending_identifies, State),
+    case maps:get(SessionId, PendingIdentifies, undefined) of
+        #{worker_token := WorkerToken, worker_ref := undefined} = PendingIdentify ->
+            reply_to_waiters(maps:get(froms, PendingIdentify, []), {error, at_capacity}),
+            {noreply, drop_pending(SessionId, PendingIdentify, State)};
+        _ ->
+            {noreply, State}
+    end.
+
+-spec handle_other_down(reference(), pid(), state()) -> {noreply, state()}.
+handle_other_down(Ref, Pid, State) ->
+    case maps:get(Ref, maps:get(socket_monitors, State, #{}), undefined) of
+        SessionId when is_binary(SessionId) ->
+            handle_socket_down(SessionId, Ref, State);
+        undefined ->
+            handle_non_socket_down(Ref, Pid, State)
+    end.
+
+-spec handle_socket_down(session_id(), reference(), state()) -> {noreply, state()}.
+handle_socket_down(SessionId, Ref, State) ->
+    Monitors = maps:remove(Ref, maps:get(socket_monitors, State, #{})),
+    Cleared = State#{socket_monitors => Monitors},
+    case maps:get(SessionId, maps:get(pending_identifies, Cleared), undefined) of
+        #{socket_ref := Ref} = PendingIdentify ->
+            reply_to_waiters(maps:get(froms, PendingIdentify, []), {error, socket_closed}),
+            {noreply, drop_pending(SessionId, PendingIdentify, Cleared)};
+        _ ->
+            {noreply, Cleared}
+    end.
+
+-spec handle_non_socket_down(reference(), pid(), state()) -> {noreply, state()}.
+handle_non_socket_down(Ref, Pid, State) ->
+    case maps:get(concurrency_monitor, State, undefined) of
+        {Ref, Pid} ->
+            erlang:send_after(?RESUBMIT_RETRY_MS, self(), resubmit_session_starts),
+            {noreply, State#{concurrency_monitor => undefined}};
+        _ ->
+            {noreply, session_manager_shard_session_index:cleanup_down(Ref, Pid, State)}
+    end.
+
+-spec resubmit_session_starts(state()) -> {noreply, state()}.
+resubmit_session_starts(State) ->
+    case ensure_concurrency_monitor(State) of
+        #{concurrency_monitor := {_Ref, _Pid}} = Monitored ->
+            Queued = lists:keysort(1, [
+                {QueuedAt, {SessionId, Token}}
+             || SessionId := #{
+                    worker_ref := undefined, worker_token := Token, queued_at := QueuedAt
+                } <- maps:get(pending_identifies, Monitored)
+            ]),
+            lists:foreach(
+                fun({_QueuedAt, Tag}) -> gateway_concurrency:request_session_start(Tag) end,
+                Queued
+            ),
+            {noreply, Monitored};
+        Unmonitored ->
+            erlang:send_after(?RESUBMIT_RETRY_MS, self(), resubmit_session_starts),
+            {noreply, Unmonitored}
+    end.
 
 -spec admit_identify_fetch(session_id(), reference(), state()) -> {noreply, state()}.
 admit_identify_fetch(SessionId, WorkerToken, State) ->
     PendingIdentifies = maps:get(pending_identifies, State),
     case maps:get(SessionId, PendingIdentifies, undefined) of
         #{worker_token := WorkerToken, worker_ref := undefined} = PendingIdentify ->
-            admit_pending_identify(
-                socket_alive(maps:get(socket_pid, PendingIdentify)),
-                SessionId,
-                PendingIdentify,
-                State
-            );
+            admit_pending_identify(SessionId, PendingIdentify, State);
         _ ->
             gateway_concurrency:release_session_start(),
             {noreply, State}
     end.
 
--spec admit_pending_identify(boolean(), session_id(), pending_identify(), state()) ->
-    {noreply, state()}.
-admit_pending_identify(false, SessionId, PendingIdentify, State) ->
-    gateway_concurrency:release_session_start(),
+-spec admit_pending_identify(session_id(), pending_identify(), state()) -> {noreply, state()}.
+admit_pending_identify(SessionId, PendingIdentify, State) ->
     cancel_identify_timeout(PendingIdentify),
     ManagerPid = self(),
     Request = maps:get(request, PendingIdentify),
@@ -313,7 +429,12 @@ admit_pending_identify(false, SessionId, PendingIdentify, State) ->
         run_identify_fetch(ManagerPid, SessionId, WorkerToken, Request, QueuedAt)
     end),
     PendingIdentifies = maps:get(pending_identifies, State),
-    Admitted = PendingIdentify#{worker_ref => WorkerRef, slot_held => true},
+    TimeoutRef = erlang:send_after(
+        ?IDENTIFY_FETCH_TIMEOUT_MS, self(), {identify_fetch_timeout, SessionId, WorkerToken}
+    ),
+    Admitted = PendingIdentify#{
+        worker_ref => WorkerRef, slot_held => true, timeout_ref => TimeoutRef
+    },
     IdentifyWorkers = maps:get(identify_workers, State),
     {noreply, State#{
         pending_identifies := PendingIdentifies#{SessionId := Admitted},
@@ -383,7 +504,9 @@ do_complete_identify(
         true ->
             cancel_identify_timeout(PendingIdentify),
             release_identify_slot(PendingIdentify),
-            State1 = State#{pending_identifies := RemainingPending},
+            State1 = forget_socket(PendingIdentify, State#{
+                pending_identifies := RemainingPending
+            }),
             State2 = cleanup_identify_worker(SessionId, State1),
             {Reply, NewState} = resolve_identify_result(
                 FetchResult, PendingIdentify, SessionId, State2
@@ -406,13 +529,11 @@ release_identify_slot(PendingIdentify) ->
 handle_identify_fetch_timeout(SessionId, WorkerToken, State) ->
     PendingIdentifies = maps:get(pending_identifies, State),
     case maps:get(SessionId, PendingIdentifies, undefined) of
-        #{worker_token := WorkerToken} = PendingIdentify ->
+        #{worker_token := WorkerToken, worker_ref := WorkerRef} = PendingIdentify when
+            is_reference(WorkerRef)
+        ->
             reply_to_waiters(maps:get(froms, PendingIdentify, []), {error, timeout}),
-            State1 = kill_identify_worker(
-                maps:get(worker_ref, PendingIdentify), PendingIdentify, State
-            ),
-            RemainingPending = maps:remove(SessionId, maps:get(pending_identifies, State1)),
-            {noreply, State1#{pending_identifies := RemainingPending}};
+            {noreply, drop_pending(SessionId, PendingIdentify, State)};
         _Other ->
             {noreply, State}
     end.
@@ -442,7 +563,8 @@ do_fail_pending(WorkerRef, Reason, PendingIdentify, RemainingPending, State) ->
             reply_to_waiters(
                 maps:get(froms, PendingIdentify, []), {error, {network_error, Reason}}
             ),
-            {noreply, State#{pending_identifies := RemainingPending}};
+            {noreply,
+                forget_socket(PendingIdentify, State#{pending_identifies := RemainingPending})};
         false ->
             {noreply, State}
     end.
