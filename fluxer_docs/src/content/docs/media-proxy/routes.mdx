@@ -222,5 +222,7 @@ These paths are for the instance itself and aren't published by instance discove
 | `/_sniff` | POST | Returns the media type of a staged upload for the HTTP API |
 | `/_thumbnail` | POST | Makes a WebP thumbnail of a staged upload for the HTTP API |
 | `/_frames` | POST | Extracts one JPEG video frame for the HTTP API |
+| `/_strip` | POST | Removes metadata from an uploaded image, video or audio file for the HTTP API |
+| `/_audio_duration` | POST | Returns the length of an uploaded audio file for the HTTP API |
 
-The four `POST` endpoints need `Authorization: Bearer {FLUXER_MEDIA_PROXY_SECRET_KEY}` and return 401 without it.
+The six `POST` endpoints need `Authorization: Bearer {FLUXER_MEDIA_PROXY_SECRET_KEY}` and return 401 without it.
