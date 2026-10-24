@@ -5,6 +5,7 @@ import {createApiContext} from '@app/api/CreateApiContext';
 import {setDatabaseQueryExecutor} from '@app/api/database/CassandraQueryExecution';
 import {ensurePostgresKvSchema, PostgresKvQueryExecutor} from '@app/api/database/PostgresKvQueryExecutor';
 import {
+	activityEventsPublishing,
 	jetStreamActivityPublisher,
 	shutdownActivityEvents,
 	startActivityEvents,
@@ -34,6 +35,7 @@ import {
 	getLimitConfigService,
 } from '@app/api/middleware/ServiceSingletons';
 import {initializeSearch, shutdownSearch} from '@app/api/SearchFactory';
+import {getStripeClient} from '@app/api/stripe/StripeClient';
 import {accountStateDepsFromContext} from '@app/api/user/services/AccountStateApplier';
 import {awaitAll} from '@app/api/utils/ConcurrencyUtils';
 import {readOptionalEnv} from '@app/api/utils/IntegerOptions';
@@ -43,6 +45,7 @@ import {CronScheduler} from '@app/api/worker/CronScheduler';
 import {JetStreamWorkerQueue, JOBS_STREAM_MAX_AGE_MS} from '@app/api/worker/JetStreamWorkerQueue';
 import {queuePasskeyTraitBackfill} from '@app/api/worker/tasks/BackfillPasskeyTrait';
 import {queueUserAclIndexBackfill} from '@app/api/worker/tasks/BackfillUserAclIndex';
+import {singleCommunityJoinPending} from '@app/api/worker/tasks/JoinSingleCommunityMembers';
 import {clearWorkerDependencies, setWorkerDependencies} from '@app/api/worker/WorkerContext';
 import {
 	guildInvitePauseDeps,
@@ -63,6 +66,7 @@ import {createRegisteredMetricsHandler} from '@fluxer/hono/src/middleware/Metric
 import {createServer, setupGracefulShutdown} from '@fluxer/hono/src/Server';
 import type {ServerType} from '@hono/node-server';
 import {BACKGROUND_READ_TIMEOUT_MS, getClient, initCassandra, shutdownCassandra} from '@pkgs/cassandra/src/Client';
+import type {IKVProvider} from '@pkgs/kv_client/src/IKVProvider';
 import {JetStreamConnectionManager} from '@pkgs/nats/src/JetStreamConnectionManager';
 import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/postgres/src/Client';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
@@ -75,7 +79,7 @@ function startWorkerMetricsServer(port: number): ServerType {
 	return createServer(app, {port, onListen: (info) => Logger.info({port: info.port}, 'Worker metrics listening')});
 }
 
-function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number): void {
+function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number, kvClient: IKVProvider): void {
 	cron.upsert('processAssetDeletionQueue', 'processAssetDeletionQueue', {}, '0 */5 * * * *', {ledger: false});
 	if (Config.cachePurge.adapter !== 'none') {
 		cron.upsert('processCachePurgeQueue', 'processCachePurgeQueue', {}, '*/10 * * * * *', {ledger: false});
@@ -86,6 +90,7 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number): void
 	cron.upsert('userProcessPendingDeletions', 'userProcessPendingDeletions', {}, '0 * * * * *', {ledger: false});
 	cron.upsert('processPremiumStateReconciliationQueue', 'processPremiumStateReconciliationQueue', {}, '0 * * * * *', {
 		ledger: false,
+		enabled: () => getStripeClient() !== null,
 	});
 	cron.upsert('processExpiredPremiumSweep', 'processExpiredPremiumSweep', {}, '0 0 * * * *', {ledger: false});
 	cron.upsert('closePaymentDisputeAccounts', 'closePaymentDisputeAccounts', {}, '0 40 * * * *', {ledger: false});
@@ -121,8 +126,14 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number): void
 		cron.upsert('syncFileShaBlocklists', 'syncFileShaBlocklists', {}, '0 0 */12 * * *', {ledger: true});
 	}
 	cron.upsert('flushUserActivityBuffer', 'flushUserActivityBuffer', {}, '*/10 * * * * *', {ledger: false});
-	cron.upsert('drainActivitySpool', 'drainActivitySpool', {}, '*/5 * * * * *', {ledger: false});
-	cron.upsert('joinSingleCommunityMembers', 'joinSingleCommunityMembers', {}, '0 * * * * *', {ledger: false});
+	cron.upsert('drainActivitySpool', 'drainActivitySpool', {}, '*/5 * * * * *', {
+		ledger: false,
+		enabled: activityEventsPublishing,
+	});
+	cron.upsert('joinSingleCommunityMembers', 'joinSingleCommunityMembers', {}, '0 * * * * *', {
+		ledger: false,
+		enabled: () => singleCommunityJoinPending(kvClient),
+	});
 	cron.upsert('liftExpiredGuildInvitePauses', 'liftExpiredGuildInvitePauses', {}, '0 * * * * *', {ledger: false});
 	cron.upsert('archiveInactiveThreads', 'archiveInactiveThreads', {}, '0 * * * * *', {
 		ledger: false,
@@ -335,7 +346,7 @@ export async function startWorkerMain(): Promise<void> {
 			Logger.info('Account action consumer started');
 		}
 		cron = new CronScheduler(workerService, Logger, dependencies.kvClient, heartbeat);
-		registerCronJobs(cron, queue.getJobsStreamMaxAgeMs());
+		registerCronJobs(cron, queue.getJobsStreamMaxAgeMs(), dependencies.kvClient);
 		for (const lane of activeWorkerLanes) {
 			const laneTasks: Record<string, WorkerTaskHandler> = {};
 			for (const taskType of lane.taskTypes) {

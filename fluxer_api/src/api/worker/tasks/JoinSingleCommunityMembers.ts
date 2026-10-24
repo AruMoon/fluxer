@@ -63,6 +63,10 @@ async function readRun(kvClient: IKVProvider): Promise<JoinRun | null> {
 	}
 }
 
+export async function singleCommunityJoinPending(kvClient: IKVProvider): Promise<boolean> {
+	return (await kvClient.get(RUN_KEY)) !== null;
+}
+
 async function finishRun(kvClient: IKVProvider, runId: string): Promise<void> {
 	await kvClient.del(progressKey(runId));
 	await kvClient.releaseLock(RUN_KEY, runId);
