@@ -77,11 +77,7 @@ fn render_user_detail(
         .filter(|n| !n.trim().is_empty())
         .unwrap_or(&user.username);
     let base = &config.base_path;
-    let admin_acls = auth
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.acls();
     let effective_tab = if user_tab_visible(config, active_tab, admin_acls) {
         active_tab
     } else {

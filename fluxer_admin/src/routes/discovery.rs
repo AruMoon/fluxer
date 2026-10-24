@@ -177,18 +177,18 @@ async fn discovery_form(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "{log_label}");
-            return Err(Box::new(flash::redirect_with_flash(
+            return Err(Box::new(flash::redirect_error(
+                config,
                 &target,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
+                "Invalid form data",
             )));
         }
     };
     let Some(guild_id) = clean_string(form.guild_id.as_deref().unwrap_or("")) else {
-        return Err(Box::new(flash::redirect_with_flash(
+        return Err(Box::new(flash::redirect_error(
+            config,
             &target,
-            FlashData::error("Guild ID is required"),
-            config.secure_cookies(),
+            "Guild ID is required",
         )));
     };
     Ok((form, guild_id))

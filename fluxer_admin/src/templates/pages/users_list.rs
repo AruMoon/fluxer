@@ -170,6 +170,22 @@ fn parse_ids_query(ids_query: &str) -> Vec<String> {
     ids
 }
 
+fn search_input(name: &str, value: &str, placeholder: &str, action: &str) -> Markup {
+    html! {
+        div class="flex-1" {
+            input id={"search-" (name)} type="text" name=(name) value=(value)
+                placeholder=(placeholder)
+                class={(FORM_CONTROL_CLASS) " " (FORM_SEARCH_INPUT_SIZE_CLASS)}
+                hx-get=(action)
+                hx-trigger="input changed delay:300ms, search"
+                hx-target="#users-results"
+                hx-push-url="true"
+                hx-include="closest form"
+                hx-swap="outerHTML";
+        }
+    }
+}
+
 fn search_form(base: &str, params: &UserListParams, email: UserEmailAccess) -> Markup {
     let action = format!("{base}/users");
     let placeholder = if unique_usernames() {
@@ -181,41 +197,11 @@ fn search_form(base: &str, params: &UserListParams, email: UserEmailAccess) -> M
         form method="get" action=(&action)
             class="flex flex-col gap-3 sm:flex-row sm:items-center" {
             div class="flex flex-1 flex-col gap-2 sm:flex-row" {
-                div class="flex-1" {
-                    input id="search-q" type="text" name="q" value=(params.q)
-                        placeholder=(placeholder)
-                        class={(FORM_CONTROL_CLASS) " " (FORM_SEARCH_INPUT_SIZE_CLASS)}
-                        hx-get=(&action)
-                        hx-trigger="input changed delay:300ms, search"
-                        hx-target="#users-results"
-                        hx-push-url="true"
-                        hx-include="closest form"
-                        hx-swap="outerHTML";
-                }
+                (search_input("q", &params.q, placeholder, &action))
                 @if !matches!(email, UserEmailAccess::Hidden) {
-                    div class="flex-1" {
-                        input id="search-email" type="text" name="email" value=(params.email)
-                            placeholder="Exact email address..."
-                            class={(FORM_CONTROL_CLASS) " " (FORM_SEARCH_INPUT_SIZE_CLASS)}
-                            hx-get=(&action)
-                            hx-trigger="input changed delay:300ms, search"
-                            hx-target="#users-results"
-                            hx-push-url="true"
-                            hx-include="closest form"
-                            hx-swap="outerHTML";
-                    }
+                    (search_input("email", &params.email, "Exact email address...", &action))
                 }
-                div class="flex-1" {
-                    input id="search-ip" type="text" name="ip" value=(params.ip)
-                        placeholder="Last active IP address..."
-                        class={(FORM_CONTROL_CLASS) " " (FORM_SEARCH_INPUT_SIZE_CLASS)}
-                        hx-get=(&action)
-                        hx-trigger="input changed delay:300ms, search"
-                        hx-target="#users-results"
-                        hx-push-url="true"
-                        hx-include="closest form"
-                        hx-swap="outerHTML";
-                }
+                (search_input("ip", &params.ip, "Last active IP address...", &action))
                 div class="flex-1" {
                     div class="relative" {
                         select id="search-limit" name="limit"

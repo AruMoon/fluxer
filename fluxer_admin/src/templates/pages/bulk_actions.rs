@@ -34,11 +34,7 @@ fn guild_feature_label(feature: &str) -> String {
 
 pub fn bulk_actions_page(config: &AdminConfig, auth: &AuthContext, csrf_token: &str) -> Markup {
     let base = &config.base_path;
-    let admin_acls = auth
-        .admin_user
-        .as_ref()
-        .map(|u| u.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.acls();
 
     let content = html! {
         (page_header("Bulk Actions", Some("Perform bulk operations on users and guilds")))

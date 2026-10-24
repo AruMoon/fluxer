@@ -92,11 +92,7 @@ async fn payment_dispute_decision(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "failed to parse payment dispute decision form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let note = form
@@ -138,20 +134,12 @@ async fn payment_dispute_reversal(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "failed to parse payment dispute reversal form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let note = form.note.trim();
     if note.is_empty() {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Say what the appeal showed before reversing"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Say what the appeal showed before reversing");
     }
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let flash = match client

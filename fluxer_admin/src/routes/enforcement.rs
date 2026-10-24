@@ -57,12 +57,7 @@ async fn decisions(
         return Redirect::to(&format!("{}/decisions/{id}", config.base_path)).into_response();
     }
     let error = lookup.map(|_| "A decision ID is a number.");
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or_default();
+    let admin_acls = auth.0.acls();
     let review_queue = if acl::has_permission(admin_acls, acl::ENFORCEMENT_VIEW) {
         let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
         let result = client.list_review_queue().await;

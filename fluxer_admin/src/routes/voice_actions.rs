@@ -26,32 +26,32 @@ fn flash_from_level(level: &str, msg: &str) -> FlashData {
 
 pub(crate) fn build_region_body(form: &MultiValueForm) -> serde_json::Value {
     let mut body = serde_json::Map::new();
-    if let Some(id) = form.clean("id") {
-        body.insert("id".into(), id.into());
-    }
-    if let Some(name) = form.clean("name") {
-        body.insert("name".into(), name.into());
-    }
-    if let Some(emoji) = form.clean("emoji") {
-        body.insert("emoji".into(), emoji.into());
-    }
-    if let Some(lat) = form
-        .clean("latitude")
-        .and_then(|value| value.parse::<f64>().ok())
-    {
-        body.insert("latitude".into(), lat.into());
-    }
-    if let Some(lng) = form
-        .clean("longitude")
-        .and_then(|value| value.parse::<f64>().ok())
-    {
-        body.insert("longitude".into(), lng.into());
-    }
+    insert_cleaned_fields(&mut body, form, &["id", "name", "emoji"]);
     body.insert("is_default".into(), form.bool_value("is_default").into());
     body.insert("vip_only".into(), form.bool_value("vip_only").into());
     insert_submitted_list(&mut body, form, "required_guild_features");
     insert_submitted_list(&mut body, form, "allowed_guild_ids");
     serde_json::Value::Object(body)
+}
+
+fn insert_cleaned_fields(
+    body: &mut serde_json::Map<String, serde_json::Value>,
+    form: &MultiValueForm,
+    fields: &[&str],
+) {
+    for &field in fields {
+        if let Some(value) = form.clean(field) {
+            body.insert(field.to_owned(), value.into());
+        }
+    }
+    for field in ["latitude", "longitude"] {
+        if let Some(value) = form
+            .clean(field)
+            .and_then(|value| value.parse::<f64>().ok())
+        {
+            body.insert(field.to_owned(), value.into());
+        }
+    }
 }
 
 fn insert_submitted_list(
@@ -71,33 +71,17 @@ fn insert_submitted_list(
 
 pub(crate) fn build_server_body(form: &MultiValueForm) -> serde_json::Value {
     let mut body = serde_json::Map::new();
-    if let Some(v) = form.clean("region_id") {
-        body.insert("region_id".into(), v.into());
-    }
-    if let Some(v) = form.clean("server_id") {
-        body.insert("server_id".into(), v.into());
-    }
-    if let Some(v) = form.clean("endpoint") {
-        body.insert("endpoint".into(), v.into());
-    }
-    if let Some(v) = form.clean("api_key") {
-        body.insert("api_key".into(), v.into());
-    }
-    if let Some(v) = form.clean("api_secret") {
-        body.insert("api_secret".into(), v.into());
-    }
-    if let Some(lat) = form
-        .clean("latitude")
-        .and_then(|value| value.parse::<f64>().ok())
-    {
-        body.insert("latitude".into(), lat.into());
-    }
-    if let Some(lng) = form
-        .clean("longitude")
-        .and_then(|value| value.parse::<f64>().ok())
-    {
-        body.insert("longitude".into(), lng.into());
-    }
+    insert_cleaned_fields(
+        &mut body,
+        form,
+        &[
+            "region_id",
+            "server_id",
+            "endpoint",
+            "api_key",
+            "api_secret",
+        ],
+    );
     body.insert("is_active".into(), form.bool_value("is_active").into());
     if let Some(raw) = form.first("soft_connection_limit") {
         let trimmed = raw.trim();

@@ -20,6 +20,7 @@ use crate::{
             table::{data_table, table_cell, table_row},
         },
         layout::admin_layout,
+        pages::operator_pass_wall::format_time,
     },
 };
 use chrono::{DateTime, Utc};

@@ -81,10 +81,10 @@ async fn gift_codes_post(
         Ok(Form(f)) => f,
         Err(error) => {
             tracing::warn!(%error, "failed to parse gift codes form");
-            return flash::redirect_with_flash(
+            return flash::redirect_error(
+                config,
                 &format!("{base}/gift-codes"),
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
+                "Invalid form data",
             );
         }
     };
@@ -105,15 +105,15 @@ async fn gift_codes_post(
             flash::redirect_with_flash(
                 &format!("{base}/gift-codes?codes={codes}"),
                 FlashData::success(format!("{} gift code(s) generated", result.codes.len())),
-                secure_cookies,
+                config.secure_cookies(),
             )
         }
         Err(error) => {
             tracing::warn!(%error, "admin API request failed: generate gift codes");
-            flash::redirect_with_flash(
+            flash::redirect_error(
+                config,
                 &format!("{base}/gift-codes"),
-                FlashData::error("Failed to generate gift codes"),
-                secure_cookies,
+                "Failed to generate gift codes",
             )
         }
     }

@@ -377,10 +377,10 @@ async fn operator_pass_wall_lookup(
     let config = state.config();
     let user_id = query.user_id.trim();
     if !is_snowflake(user_id) {
-        return flash::redirect_with_flash(
+        return flash::redirect_error(
+            config,
             &format!("{}{WALL_PATH}", config.base_path),
-            FlashData::error("Enter a numeric user ID"),
-            config.secure_cookies(),
+            "Enter a numeric user ID",
         );
     }
     axum::response::Redirect::to(&format!("{}{WALL_PATH}/users/{user_id}", config.base_path))
@@ -436,11 +436,7 @@ async fn operator_pass_wall_action(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "failed to parse Operators' wall form");
-            return flash::redirect_with_flash(
-                &queue,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &queue, "Invalid form data");
         }
     };
     let back = if form.back == "user" && is_snowflake(&user_id) {
@@ -449,11 +445,7 @@ async fn operator_pass_wall_action(
         queue
     };
     if !is_snowflake(&user_id) {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Invalid user ID"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Invalid user ID");
     }
     let note = form.note.trim();
     let revision_id = form.revision_id.trim();
@@ -559,18 +551,10 @@ async fn operator_pass_wall_action(
         | Ok(WallAction::RemovalNotice)
         | Ok(WallAction::Remove)
         | Ok(WallAction::Withdraw) => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Fill in every required field"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Fill in every required field");
         }
         Err(()) => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Unknown action"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Unknown action");
         }
     };
     let flash = match result {
@@ -642,21 +626,17 @@ async fn operator_pass_wall_business(
 ) -> Response {
     let config = state.config();
     if !is_snowflake(&user_id) {
-        return flash::redirect_with_flash(
+        return flash::redirect_error(
+            config,
             &format!("{}{WALL_PATH}", config.base_path),
-            FlashData::error("Invalid user ID"),
-            config.secure_cookies(),
+            "Invalid user ID",
         );
     }
     let back = format!("{}{WALL_PATH}/users/{user_id}", config.base_path);
     let form = match read_business_listing_form(multipart).await {
         Ok(form) => form,
         Err(message) => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error(message),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, message);
         }
     };
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
@@ -719,11 +699,7 @@ async fn operator_pass_wall_bulk(
         Ok(bytes) => bytes,
         Err(error) => {
             tracing::warn!(%error, "failed to read Operators' wall bulk form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let mut action = String::new();
@@ -741,11 +717,7 @@ async fn operator_pass_wall_bulk(
     }
     let revisions = parse_selected(&selected);
     if revisions.is_empty() {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Select at least one change"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Select at least one change");
     }
     let bulk_action = match WallAction::try_from(action.as_str()) {
         Ok(WallAction::Approve) => WallBulkAction::Approve,
@@ -759,18 +731,10 @@ async fn operator_pass_wall_bulk(
             }
         }
         Ok(WallAction::Decline) => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Declining needs a reason and the facts"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Declining needs a reason and the facts");
         }
         _ => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Unknown action"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Unknown action");
         }
     };
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
@@ -839,11 +803,7 @@ async fn operator_pass_wall_tools_action(
         .await
         .is_err()
     {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Invalid form data"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Invalid form data");
     }
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let result = match action.as_str() {
@@ -857,22 +817,16 @@ async fn operator_pass_wall_tools_action(
             .map(|state| format!("Publishing again at version {}", state.version)),
         "republish" => match client.republish_operator_pass_wall().await {
             Ok(state) if state.frozen => {
-                return flash::redirect_with_flash(
+                return flash::redirect_error(
+                    config,
                     &back,
-                    FlashData::error(
-                        "Publishing is frozen, so nothing was published. Unfreeze to publish again.",
-                    ),
-                    config.secure_cookies(),
+                    "Publishing is frozen, so nothing was published. Unfreeze to publish again.",
                 );
             }
             result => result.map(|state| format!("Re-published as version {}", state.version)),
         },
         _ => {
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Unknown action"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Unknown action");
         }
     };
     let flash = match result {
@@ -957,21 +911,13 @@ async fn operator_pass_release_publish(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "failed to parse release publish form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let tag = form.tag.trim();
     let Some(released_at) = parse_release_date(&form.released_on).filter(|_| !tag.is_empty())
     else {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Enter the release tag and the release date"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Enter the release tag and the release date");
     };
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     match client
@@ -984,11 +930,7 @@ async fn operator_pass_release_publish(
         }
         Err(error) => {
             tracing::warn!(%error, year, "admin API request failed: publish release list");
-            flash::redirect_with_flash(
-                &back,
-                FlashData::error(error.refusal_message("Publishing failed")),
-                config.secure_cookies(),
-            )
+            flash::redirect_error(config, &back, error.refusal_message("Publishing failed"))
         }
     }
 }
@@ -1006,20 +948,12 @@ async fn operator_pass_release_erase(
         Ok(Form(form)) => form,
         Err(error) => {
             tracing::warn!(%error, "failed to parse release erase form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let user_id = form.user_id.trim();
     if !is_snowflake(user_id) {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Enter a numeric user ID"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Enter a numeric user ID");
     }
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     match client.erase_operator_pass_release_name(year, user_id).await {
@@ -1029,11 +963,7 @@ async fn operator_pass_release_erase(
         }
         Err(error) => {
             tracing::warn!(%error, year, user_id, "admin API request failed: erase release name");
-            flash::redirect_with_flash(
-                &back,
-                FlashData::error(error.refusal_message("Erasing failed")),
-                config.secure_cookies(),
-            )
+            flash::redirect_error(config, &back, error.refusal_message("Erasing failed"))
         }
     }
 }

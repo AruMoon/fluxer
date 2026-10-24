@@ -97,11 +97,7 @@ pub fn admin_layout_ext(
     content: Markup,
     options: LayoutOptions<'_>,
 ) -> Markup {
-    let admin_acls = auth
-        .admin_user
-        .as_ref()
-        .map(|u| u.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.acls();
     let base = &config.base_path;
     let asset_version = &config.build_version;
     let csrf_token = options.csrf_token;

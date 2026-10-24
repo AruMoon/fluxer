@@ -344,21 +344,13 @@ async fn report_resolve(
         Ok(Form(f)) => f,
         Err(error) => {
             tracing::warn!(%error, report_id, "failed to parse report resolve form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let Some((resolution, label)) =
         templates::pages::report_detail::resolution_choice(form.resolution.as_deref())
     else {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error(RESOLUTION_REQUIRED),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, RESOLUTION_REQUIRED);
     };
     let outcome = match resolution {
         UpdateReportRequestResolution::NoViolation => Some(UpdateReportRequestOutcome::NoViolation),
@@ -383,11 +375,7 @@ async fn report_resolve(
         _ => None,
     };
     if let Some(message) = missing {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error(message),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, message);
     }
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let public_comment = clean_string(form.public_comment.as_deref().unwrap_or(""));
@@ -425,19 +413,11 @@ async fn report_note(
         Ok(Form(f)) => f,
         Err(error) => {
             tracing::warn!(%error, report_id, "failed to parse report note form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let Some(body) = clean_string(form.body.as_deref().unwrap_or("")) else {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error("Write a note first"),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, "Write a note first");
     };
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let flash = match client.annotate_report(&report_id, body).await {
@@ -467,11 +447,7 @@ async fn report_legal_hold(
         Ok(Form(f)) => f,
         Err(error) => {
             tracing::warn!(%error, report_id, "failed to parse report legal hold form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     let clearing = form.clear.is_some();
@@ -480,29 +456,17 @@ async fn report_legal_hold(
     } else {
         match form.legal_hold_until.as_deref().and_then(legal_hold_date) {
             Some(date) if date < time::OffsetDateTime::now_utc().date() => {
-                return flash::redirect_with_flash(
-                    &back,
-                    FlashData::error(LEGAL_HOLD_IN_PAST),
-                    config.secure_cookies(),
-                );
+                return flash::redirect_error(config, &back, LEGAL_HOLD_IN_PAST);
             }
             Some(date) => Some(legal_hold_end_of_day(date)),
             None => {
-                return flash::redirect_with_flash(
-                    &back,
-                    FlashData::error("Choose the date the hold ends"),
-                    config.secure_cookies(),
-                );
+                return flash::redirect_error(config, &back, "Choose the date the hold ends");
             }
         }
     };
     let reason = clean_string(form.legal_hold_reason.as_deref().unwrap_or(""));
     if until.is_some() && reason.is_none() {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error(LEGAL_HOLD_NEEDS_REASON),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, LEGAL_HOLD_NEEDS_REASON);
     }
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let result = client
@@ -542,19 +506,11 @@ async fn report_delete(
         Ok(Form(f)) => f,
         Err(error) => {
             tracing::warn!(%error, report_id, "failed to parse report delete form");
-            return flash::redirect_with_flash(
-                &back,
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
-            );
+            return flash::redirect_error(config, &back, "Invalid form data");
         }
     };
     if form.confirm.as_deref() != Some("true") {
-        return flash::redirect_with_flash(
-            &back,
-            FlashData::error(DELETE_NEEDS_CONFIRMATION),
-            config.secure_cookies(),
-        );
+        return flash::redirect_error(config, &back, DELETE_NEEDS_CONFIRMATION);
     }
     let audit_log_reason = clean_string(form.audit_log_reason.as_deref().unwrap_or(""));
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
@@ -578,7 +534,7 @@ async fn report_delete(
                 ApiError::Http { status: 404, .. } => "The report no longer exists",
                 _ => "Failed to delete the report",
             };
-            flash::redirect_with_flash(&back, FlashData::error(message), config.secure_cookies())
+            flash::redirect_error(config, &back, message)
         }
     }
 }

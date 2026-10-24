@@ -86,12 +86,7 @@ async fn users_list(
         query.page,
     );
     let is_results_fragment = htmx::targets(&headers, "users-results");
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let username_sign_in = state.account_identity(&client).await.is_username();
     let can_view_email = acl::has_permission(admin_acls, acl::USER_VIEW_EMAIL) && !username_sign_in;
@@ -170,12 +165,7 @@ async fn user_detail(
         .await
         .log_error("load user detail");
     let tq = to_tab_query(&query);
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
     let tab_body = if user.is_some() {
         let account_identity = state.account_identity_settings(&client).await;
         user_tabs::render(
@@ -279,11 +269,7 @@ async fn create_password_reset_link(
     if htmx::is_htmx_request(headers) && htmx::targets(headers, PASSWORD_RESET_LINK_RESULT_ID) {
         return Html(password_reset_link_result(Some(&link)).into_string()).into_response();
     }
-    let admin_acls = auth
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.acls();
     let (user, account_identity) = tokio::join!(
         async {
             client
@@ -345,12 +331,7 @@ async fn user_tab(
         report_id: None,
         message: None,
     };
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
     let account_identity = state.account_identity_settings(&client).await;
     let markup = match user {
         Some(ref u) => user_tabs::render(
@@ -383,12 +364,7 @@ async fn user_peek(
         .get_user_by_id(&user_id)
         .await
         .log_error("load user peek");
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
     let markup = match user {
         Some(ref u) => templates::pages::user_peek::user_peek_fragment(config, u, admin_acls),
         None => maud::html! {

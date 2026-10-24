@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::api::types::{FlashLevel, FlashMessage};
+use crate::config::AdminConfig;
 use axum::{
     extract::Request,
     http::{HeaderValue, header},
@@ -115,6 +116,10 @@ pub fn redirect_with_flash(url: &str, flash: FlashData, secure: bool) -> Respons
     let mut response = Redirect::to(url).into_response();
     set_flash_cookie(&mut response, &flash, secure);
     response
+}
+
+pub fn redirect_error(config: &AdminConfig, url: &str, message: impl Into<String>) -> Response {
+    redirect_with_flash(url, FlashData::error(message), config.secure_cookies())
 }
 
 pub fn set_flash_cookie(response: &mut Response, flash: &FlashData, secure: bool) {
