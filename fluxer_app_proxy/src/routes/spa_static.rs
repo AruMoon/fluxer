@@ -29,7 +29,11 @@ pub async fn version_json(State(state): State<AppState>, headers: HeaderMap) -> 
 }
 
 pub async fn manifest_json(State(state): State<AppState>, headers: HeaderMap) -> Response {
-    let branding = state.config.self_hosted.then(|| state.branding.snapshot());
+    let branding = if state.config.self_hosted {
+        Some(state.branding_snapshot().await)
+    } else {
+        None
+    };
     serve_static_text_file_with_substitutions(
         &state,
         &headers,
@@ -110,7 +114,7 @@ pub async fn browserconfig_xml(State(state): State<AppState>, headers: HeaderMap
 }
 
 pub async fn favicon_ico(State(state): State<AppState>) -> Response {
-    let location = match state.branding.snapshot().favicon_url.as_deref() {
+    let location = match state.branding_snapshot().await.favicon_url.as_deref() {
         Some(favicon_url) => favicon_url.to_owned(),
         None => format!(
             "{}/web/favicon.ico",

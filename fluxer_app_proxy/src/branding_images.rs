@@ -6,8 +6,8 @@ use axum::http::header;
 use reqwest::Url;
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::watch;
-use tokio::task::JoinHandle;
+use tokio::sync::{Mutex, watch};
+use tokio::time::Instant;
 
 const BRANDING_IMAGES: [(&str, &str); 7] = [
     ("icon_url", "FLUXER_APP_ICON_URL"),
@@ -39,7 +39,7 @@ const FAVICON_URL: (&str, &str) = ("favicon_url", "FLUXER_APP_FAVICON_URL");
 const FAVICON_DARK_URL: (&str, &str) = ("favicon_dark_url", "FLUXER_APP_FAVICON_DARK_URL");
 const THEME_COLOR: (&str, &str) = ("theme_color", "FLUXER_APP_THEME_COLOR");
 const STATUS_PAGE_URL: &str = "FLUXER_APP_STATUS_PAGE_URL";
-const DISCOVERY_FETCH_TIMEOUT: Duration = Duration::from_secs(5);
+const DISCOVERY_FETCH_TIMEOUT: Duration = Duration::from_secs(2);
 const DISCOVERY_BODY_BYTES_MAX: usize = 1024 * 1024;
 const REFRESH_INTERVAL_MIN: Duration = Duration::from_secs(1);
 const REFRESH_BACKOFF_MAX: Duration = Duration::from_secs(300);
@@ -243,12 +243,24 @@ pub struct BrandingSnapshot {
     pub custom_css: Option<Arc<str>>,
 }
 
+#[derive(Debug, Default)]
+struct RefreshGate {
+    next_attempt: Option<Instant>,
+    consecutive_failures: u32,
+}
+
 #[derive(Clone, Debug)]
-pub struct InstanceBranding(watch::Sender<Arc<BrandingSnapshot>>);
+pub struct InstanceBranding {
+    current: watch::Sender<Arc<BrandingSnapshot>>,
+    gate: Arc<Mutex<RefreshGate>>,
+}
 
 impl InstanceBranding {
     pub fn new(snapshot: BrandingSnapshot) -> Self {
-        Self(watch::Sender::new(Arc::new(snapshot)))
+        Self {
+            current: watch::Sender::new(Arc::new(snapshot)),
+            gate: Arc::default(),
+        }
     }
 
     pub fn from_config(config: &AppProxyConfig) -> Self {
@@ -260,7 +272,7 @@ impl InstanceBranding {
     }
 
     pub fn snapshot(&self) -> Arc<BrandingSnapshot> {
-        self.0.borrow().clone()
+        self.current.borrow().clone()
     }
 
     pub async fn refresh(
@@ -272,7 +284,7 @@ impl InstanceBranding {
         let Some(snapshot) = snapshot_from_discovery(&discovery) else {
             anyhow::bail!("upstream discovery has no app_public.branding object");
         };
-        let changed = self.0.send_if_modified(|current| {
+        let changed = self.current.send_if_modified(|current| {
             if **current == snapshot {
                 return false;
             }
@@ -300,47 +312,43 @@ impl InstanceBranding {
         Ok(())
     }
 
-    pub fn start_background_refresh(
+    pub async fn refresh_if_due(
         &self,
-        client: reqwest::Client,
-        upstream_url: String,
+        client: &reqwest::Client,
+        upstream_url: &str,
         interval: Duration,
-    ) -> JoinHandle<()> {
-        self.spawn_refresh_loop(client, upstream_url, interval.max(REFRESH_INTERVAL_MIN))
-    }
-
-    fn spawn_refresh_loop(
-        &self,
-        client: reqwest::Client,
-        upstream_url: String,
-        interval: Duration,
-    ) -> JoinHandle<()> {
-        let branding = self.clone();
-        tokio::spawn(async move {
-            let mut consecutive_failures: u32 = 0;
-            loop {
-                let wait = match branding.refresh(&client, &upstream_url).await {
-                    Ok(()) => {
-                        consecutive_failures = 0;
-                        interval
-                    }
-                    Err(error) => {
-                        let backoff = interval
-                            .saturating_mul(1 << consecutive_failures.min(5))
-                            .min(REFRESH_BACKOFF_MAX);
-                        consecutive_failures = consecutive_failures.saturating_add(1);
-                        tracing::warn!(
-                            %error,
-                            url = %upstream_url,
-                            consecutive_failures,
-                            backoff_ms = backoff.as_millis() as u64,
-                            "instance branding refresh failed, keeping the previous branding"
-                        );
-                        backoff
-                    }
-                };
-                tokio::time::sleep(wait).await;
+    ) {
+        let Ok(mut gate) = tokio::time::timeout(DISCOVERY_FETCH_TIMEOUT, self.gate.lock()).await
+        else {
+            return;
+        };
+        if gate
+            .next_attempt
+            .is_some_and(|next_attempt| Instant::now() < next_attempt)
+        {
+            return;
+        }
+        let interval = interval.max(REFRESH_INTERVAL_MIN);
+        let wait = match self.refresh(client, upstream_url).await {
+            Ok(()) => {
+                gate.consecutive_failures = 0;
+                interval
             }
-        })
+            Err(error) => {
+                let backoff = interval
+                    .saturating_mul(1 << gate.consecutive_failures.min(5))
+                    .min(REFRESH_BACKOFF_MAX);
+                gate.consecutive_failures = gate.consecutive_failures.saturating_add(1);
+                tracing::warn!(
+                    %error,
+                    url = %upstream_url,
+                    consecutive_failures = gate.consecutive_failures,
+                    backoff_ms = backoff.as_millis() as u64,
+                    "instance branding refresh failed, keeping the previous branding"
+                );
+                backoff
+            }
+        };
+        gate.next_attempt = Some(Instant::now() + wait);
     }
 }

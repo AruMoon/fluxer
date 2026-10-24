@@ -201,11 +201,9 @@ async fn serve_spa_index(state: &AppState, headers: &HeaderMap, request_path: &s
         Ok(content) => content,
         Err(response) => return response,
     };
+    let branding = state.branding_snapshot().await;
     let raw_html = if state.config.self_hosted {
-        apply_instance_branding(
-            strip_link_preview_metadata(&raw_html),
-            &state.branding.snapshot(),
-        )
+        apply_instance_branding(strip_link_preview_metadata(&raw_html), &branding)
     } else {
         raw_html
     };
@@ -242,8 +240,8 @@ async fn serve_spa_index(state: &AppState, headers: &HeaderMap, request_path: &s
     };
     let csp = state.csp.spa_headers(
         &inline_script_hashes(&html),
-        &state.branding.image_origins(),
-        &state.branding.instance_sources(),
+        &branding.image_origins,
+        &branding.instance_sources,
     );
     build_spa_response(html.into_boxed_str(), &csp, should_bust_dev_assets)
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::branding_images::InstanceBranding;
+use crate::branding_images::{BrandingSnapshot, InstanceBranding};
 use crate::config::{AppProxyConfig, HttpUrl};
 use crate::csp::CompiledCspPolicy;
 use crate::local_files::LocalFileStore;
@@ -109,6 +109,19 @@ impl AppState {
             budgets,
             local_files,
         })
+    }
+
+    pub async fn branding_snapshot(&self) -> Arc<BrandingSnapshot> {
+        if self.config.self_hosted {
+            self.branding
+                .refresh_if_due(
+                    &self.http_client,
+                    &self.config.discovery_upstream_url,
+                    Duration::from_millis(self.config.discovery_refresh_interval_ms),
+                )
+                .await;
+        }
+        self.branding.snapshot()
     }
 }
 
