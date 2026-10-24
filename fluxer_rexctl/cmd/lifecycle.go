@@ -653,7 +653,7 @@ func newRestartCmd(app *App) *cobra.Command {
 			}
 			return app.Change(ctx, inst, func(e *engine.Engine) error {
 				return app.UI.Step(ctx, "Restarting Fluxer", func(ctx context.Context, s *ui.Step) error {
-					if _, err := deploy.Apply(ctx, inst, e, deploy.ApplyOptions{Pull: true, OnEvent: app.progress(s, "Restarting")}); err != nil {
+					if _, err := deploy.Apply(ctx, inst, e, deploy.ApplyOptions{Pull: true, OnEvent: app.progress(s, "Restarting")}); err != nil && engine.ClassOf(err) != engine.ClassDependencyFailed {
 						return readyFailure(ctx, inst, e.Named(inst.Project(), inst.Dir), err)
 					}
 					p, err := deploy.Load(ctx, inst, e)
