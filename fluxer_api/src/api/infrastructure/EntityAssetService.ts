@@ -153,12 +153,17 @@ export class EntityAssetService {
 			contentType,
 		};
 		if (newHash === previousHash) return prepared;
-		let uploadBuffer = imageBuffer;
+		let uploadBuffer: Uint8Array = imageBuffer;
 		try {
 			const isJpeg = format === 'jpg' || format === 'jpeg';
-			uploadBuffer = isJpeg
+			const stripped = isJpeg
 				? await sharp(imageBuffer).jpeg({quality: 100}).toBuffer()
-				: await stripNonJpegImageMetadata(imageBuffer);
+				: await this.mediaService.stripImageMetadata(imageBuffer);
+			if (stripped) {
+				uploadBuffer = stripped;
+			} else {
+				Logger.error({assetType, entityType}, 'Failed to strip metadata from entity asset, uploading original');
+			}
 		} catch (error) {
 			Logger.error({error, assetType, entityType}, 'Failed to strip metadata from entity asset, uploading original');
 		}
