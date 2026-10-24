@@ -44,6 +44,8 @@ impl RouterService for UnfurlRouter {
         match req {
             UnfurlRequest::Unfurl { url, .. } => url.clone(),
             UnfurlRequest::VerifyDomain { domain, .. } => domain.clone(),
+            UnfurlRequest::Fetch { url, .. } => url.clone(),
+            UnfurlRequest::ResolveTxt { name } => name.clone(),
         }
     }
 
@@ -70,7 +72,9 @@ impl RouterService for UnfurlRouter {
                     )
                 ))
             }
-            UnfurlRequest::VerifyDomain { .. } => None,
+            UnfurlRequest::VerifyDomain { .. }
+            | UnfurlRequest::Fetch { .. }
+            | UnfurlRequest::ResolveTxt { .. } => None,
         }
     }
 
@@ -95,7 +99,9 @@ impl RouterService for UnfurlRouter {
                     self.l1.get(&key)
                 }
             }
-            UnfurlRequest::VerifyDomain { .. } => None,
+            UnfurlRequest::VerifyDomain { .. }
+            | UnfurlRequest::Fetch { .. }
+            | UnfurlRequest::ResolveTxt { .. } => None,
         }
     }
 
@@ -122,7 +128,9 @@ impl RouterService for UnfurlRouter {
                     );
                 }
             }
-            UnfurlRequest::VerifyDomain { .. } => {}
+            UnfurlRequest::VerifyDomain { .. }
+            | UnfurlRequest::Fetch { .. }
+            | UnfurlRequest::ResolveTxt { .. } => {}
         }
     }
 }

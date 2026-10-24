@@ -989,7 +989,7 @@ export const ServiceMiddleware = createMiddleware<HonoEnv>(async (ctx, next) => 
 	ctx.set('sudoModeValid', false);
 	getVirusScanServiceInstance();
 	await ensureVoiceResourcesInitialized();
-	const blueskyOAuthService = await resolveBlueskyOAuthService(getInstanceConfigRepository());
+	const blueskyOAuthService = await resolveBlueskyOAuthService(getUnfurlerService(), getInstanceConfigRepository());
 	installLazyServices(ctx, new RequestServices(apiContext, blueskyOAuthService, ctx.get('requestCache')));
 	await next();
 });

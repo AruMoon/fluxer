@@ -7,6 +7,7 @@ mod direct_media;
 mod dns_txt;
 mod domain_verification;
 mod embed_normalizer;
+mod external_fetch;
 mod html_markdown;
 mod html_parser;
 mod http_fetch;

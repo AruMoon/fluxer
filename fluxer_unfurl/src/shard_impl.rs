@@ -211,6 +211,10 @@ fn base_http_client_builder() -> reqwest::ClientBuilder {
         .user_agent("Mozilla/5.0 (compatible; Fluxerbot/1.0; +https://fluxer.app)")
         .timeout(Duration::from_secs(10))
         .redirect(reqwest::redirect::Policy::none())
+        .no_gzip()
+        .no_brotli()
+        .no_deflate()
+        .no_zstd()
 }
 
 fn external_http_client() -> reqwest::Client {
@@ -293,6 +297,32 @@ impl ShardService for UnfurlShard {
                         message: err.to_string(),
                     }),
                 }
+            }
+            UnfurlRequest::Fetch {
+                method,
+                url,
+                headers,
+                body,
+            } => {
+                match crate::external_fetch::fetch(&self.http_client, &method, &url, &headers, body)
+                    .await
+                {
+                    Ok(response) => Ok(UnfurlResponse::Fetched(response)),
+                    Err(err) => Ok(UnfurlResponse::Failed {
+                        message: err.to_string(),
+                    }),
+                }
+            }
+            UnfurlRequest::ResolveTxt { name } => {
+                if let Err(err) = crate::dns_txt::validate_record_name(&name) {
+                    return Ok(UnfurlResponse::Failed {
+                        message: err.to_string(),
+                    });
+                }
+                let records = crate::dns_txt::first_answer(&name, |records| !records.is_empty())
+                    .await
+                    .unwrap_or_default();
+                Ok(UnfurlResponse::Txt(records))
             }
         }
     }

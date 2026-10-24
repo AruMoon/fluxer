@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use crate::external_fetch::FetchedResponse;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -22,6 +23,17 @@ pub enum UnfurlRequest {
         domain: String,
         token: String,
     },
+    Fetch {
+        method: String,
+        url: String,
+        #[serde(default)]
+        headers: Vec<(String, String)>,
+        #[serde(default)]
+        body: Option<String>,
+    },
+    ResolveTxt {
+        name: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -37,6 +49,8 @@ pub enum NsfwMode {
 pub enum UnfurlResponse {
     Resolved(Arc<UnfurlResult>),
     Verified(bool),
+    Fetched(FetchedResponse),
+    Txt(Vec<String>),
     Failed { message: String },
 }
 
@@ -209,7 +223,7 @@ mod tests {
                 assert!(youtube_api_key.is_none());
                 assert!(klipy_api_key.is_none());
             }
-            UnfurlRequest::VerifyDomain { .. } => panic!("expected an unfurl request"),
+            _ => panic!("expected an unfurl request"),
         }
     }
 }
