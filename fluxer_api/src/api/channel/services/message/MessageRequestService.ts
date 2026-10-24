@@ -79,6 +79,7 @@ export class MessageRequestService {
 			viewer: params.viewer,
 			userId: params.userId,
 			authChannel,
+			access,
 			responses,
 			requestCache: params.requestCache,
 			query: params.query,
@@ -141,6 +142,7 @@ export class MessageRequestService {
 			viewer: params.viewer,
 			userId: params.userId,
 			authChannel,
+			access,
 			messageId: params.messageId,
 			requestCache: params.requestCache,
 		});
@@ -162,6 +164,7 @@ export class MessageRequestService {
 			viewer: params.viewer,
 			userId: params.userId,
 			authChannel,
+			access,
 			responses: [response],
 			requestCache: params.requestCache,
 		});
@@ -241,6 +244,7 @@ export class MessageRequestService {
 			viewer: params.viewer,
 			userId: params.userId,
 			authChannel,
+			access,
 			responses: [response],
 			requestCache: params.requestCache,
 		});

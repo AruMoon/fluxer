@@ -147,6 +147,7 @@ export class UserAccountRequestService {
 			const response = mapUserToPrivateResponse(bearerUser);
 			if (!includeEmail) {
 				response.email = null;
+				response.verified = false;
 			}
 			this.stripBearerSensitiveFields(response);
 			return response;
@@ -475,9 +476,26 @@ export class UserAccountRequestService {
 	}
 
 	private stripBearerSensitiveFields(response: UserPrivateResponse): void {
+		response.is_staff = false;
 		response.acls = [];
 		response.traits = [];
 		response.email_bounced = undefined;
+		response.timezone = undefined;
+		response.timezone_privacy_flags = undefined;
+		response.account_limited = undefined;
+		response.premium_type = null;
+		response.premium_grace_ends_at = null;
+		response.premium_discriminator = false;
+		response.last_voice_activity_sharing_change_at = null;
+		response.age_verified_adult = undefined;
+		response.terms_agreed_at = null;
+		response.privacy_agreed_at = null;
+		response.claimed = undefined;
+		response.account_tier = undefined;
+		response.verification_need = undefined;
+		response.has_password = undefined;
+		response.date_of_birth_required = undefined;
+		response.profile_restricted = undefined;
 		response.mfa_enabled = false;
 		response.authenticator_types = undefined;
 		response.password_last_changed_at = null;

@@ -476,7 +476,7 @@ pub(crate) async fn upload_s3_plan_append_only(
         let bucket = bucket.clone();
         tasks.spawn(async move {
             let _permit = permit;
-            let disposition = put_file_to_s3_if_absent(&client, &bucket, &item)
+            let disposition = put_file_to_s3(&client, &bucket, &item, true)
                 .await
                 .with_context(|| {
                     format!("Failed append-only upload for s3://{}/{}", bucket, item.key)
@@ -495,12 +495,11 @@ pub(crate) async fn upload_s3_plan_append_only(
             let bucket = bucket.clone();
             tasks.spawn(async move {
                 let _permit = permit;
-                repair_existing_s3_object_metadata(&client, &bucket, &item)
+                put_file_to_s3(&client, &bucket, &item, false)
                     .await
                     .with_context(|| {
                         format!("Failed to repair metadata for s3://{}/{}", bucket, item.key)
-                    })?;
-                Ok::<_, anyhow::Error>(S3UploadDisposition::MetadataRepaired)
+                    })
             });
         } else {
             println!("Skipping existing s3://{bucket}/{}", item.key);
@@ -689,13 +688,29 @@ fn ensure_unique_s3_keys(plan: &[S3UploadPlanItem]) -> Result<()> {
     Ok(())
 }
 
-async fn put_file_to_s3_if_absent(
+async fn put_file_to_s3(
     client: &S3Client,
     bucket: &str,
     item: &S3UploadPlanItem,
+    if_absent: bool,
 ) -> Result<S3UploadDisposition> {
+    let (action, operation, failure, done) = if if_absent {
+        (
+            "Uploading",
+            "upload",
+            "upload",
+            S3UploadDisposition::Uploaded,
+        )
+    } else {
+        (
+            "Repairing metadata for",
+            "metadata repair",
+            "repair metadata for",
+            S3UploadDisposition::MetadataRepaired,
+        )
+    };
     println!(
-        "Uploading {} -> s3://{bucket}/{}",
+        "{action} {} -> s3://{bucket}/{}",
         item.path.display(),
         item.key
     );
@@ -709,7 +724,7 @@ async fn put_file_to_s3_if_absent(
             .put_object()
             .bucket(bucket)
             .key(&item.key)
-            .if_none_match("*")
+            .set_if_none_match(if_absent.then(|| "*".to_string()))
             .content_md5(identity.md5_base64.clone())
             .body(body);
         if let Some(content_type) = &item.content_type {
@@ -719,7 +734,7 @@ async fn put_file_to_s3_if_absent(
             request = request.cache_control(cache_control);
         }
         match request.send().await {
-            Ok(_) => return Ok(S3UploadDisposition::Uploaded),
+            Ok(_) => return Ok(done),
             Err(error) => {
                 let code = error
                     .as_service_error()
@@ -728,13 +743,13 @@ async fn put_file_to_s3_if_absent(
                 let status = error
                     .raw_response()
                     .map(|response| response.status().as_u16());
-                if is_existing_object_error(code.as_deref(), status) {
+                if if_absent && is_existing_object_error(code.as_deref(), status) {
                     println!("Skipping existing s3://{bucket}/{}", item.key);
                     return Ok(S3UploadDisposition::SkippedExisting);
                 }
                 if is_retryable_s3_error(code.as_deref(), status) && attempt < attempts {
                     sleep_before_s3_retry(
-                        "upload",
+                        operation,
                         &format!("s3://{bucket}/{}", item.key),
                         attempt,
                         attempts,
@@ -746,70 +761,7 @@ async fn put_file_to_s3_if_absent(
                 }
                 let summary = s3_error_summary(code.as_deref(), status);
                 return Err(error).with_context(|| {
-                    format!("Failed to upload s3://{bucket}/{}{summary}", item.key)
-                });
-            }
-        }
-    }
-    unreachable!("S3 retry attempts are always greater than zero")
-}
-
-async fn repair_existing_s3_object_metadata(
-    client: &S3Client,
-    bucket: &str,
-    item: &S3UploadPlanItem,
-) -> Result<()> {
-    println!(
-        "Repairing metadata for {} -> s3://{bucket}/{}",
-        item.path.display(),
-        item.key
-    );
-    let identity = s3_file_identity(&item.path)?;
-    let attempts = s3_retry_attempts();
-    for attempt in 1..=attempts {
-        let body = ByteStream::from_path(&item.path)
-            .await
-            .with_context(|| format!("Failed to read {}", item.path.display()))?;
-        let mut request = client
-            .put_object()
-            .bucket(bucket)
-            .key(&item.key)
-            .content_md5(identity.md5_base64.clone())
-            .body(body);
-        if let Some(content_type) = &item.content_type {
-            request = request.content_type(content_type);
-        }
-        if let Some(cache_control) = &item.cache_control {
-            request = request.cache_control(cache_control);
-        }
-        match request.send().await {
-            Ok(_) => return Ok(()),
-            Err(error) => {
-                let code = error
-                    .as_service_error()
-                    .and_then(|error| error.code())
-                    .map(ToOwned::to_owned);
-                let status = error
-                    .raw_response()
-                    .map(|response| response.status().as_u16());
-                if is_retryable_s3_error(code.as_deref(), status) && attempt < attempts {
-                    sleep_before_s3_retry(
-                        "metadata repair",
-                        &format!("s3://{bucket}/{}", item.key),
-                        attempt,
-                        attempts,
-                        code.as_deref(),
-                        status,
-                    )
-                    .await;
-                    continue;
-                }
-                let summary = s3_error_summary(code.as_deref(), status);
-                return Err(error).with_context(|| {
-                    format!(
-                        "Failed to repair metadata for s3://{bucket}/{}{summary}",
-                        item.key
-                    )
+                    format!("Failed to {failure} s3://{bucket}/{}{summary}", item.key)
                 });
             }
         }

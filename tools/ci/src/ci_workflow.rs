@@ -69,14 +69,12 @@ pub async fn run_ci(args: CiArgs) -> Result<()> {
                     .current_dir(root),
             )
         }
-        CiStep::GatewayFmt => {
-            run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::FmtCheck, "test")
-        }
+        CiStep::GatewayFmt => run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::FmtCheck),
         CiStep::GatewayCompile => {
-            run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::Compile, "test")
+            run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::Compile)
         }
         CiStep::GatewayDialyzer => {
-            run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::Dialyzer, "test")
+            run_gateway_step(&root.join("fluxer_gateway"), GatewayStep::Dialyzer)
         }
     }
 }

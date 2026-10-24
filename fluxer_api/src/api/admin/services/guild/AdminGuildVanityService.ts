@@ -38,16 +38,16 @@ export class AdminGuildVanityService {
 		const oldVanity = guild.vanityUrlCode;
 		if (data.vanity_url_code) {
 			const inviteCode = createInviteCode(data.vanity_url_code);
-			const existingInvite = await inviteRepository.findUnique(inviteCode);
-			if (existingInvite) {
+			const claimed = await inviteRepository.claimVanityInvite(inviteCode, guildId);
+			if (!claimed) {
 				throw InputValidationError.fromCode('vanity_url_code', ValidationErrorCodes.THIS_VANITY_URL_IS_ALREADY_TAKEN);
 			}
 			if (oldVanity) {
-				await inviteRepository.delete(vanityCodeToInviteCode(oldVanity));
+				await inviteRepository.releaseVanityInvite(vanityCodeToInviteCode(oldVanity), guildId);
 				await enqueueEndGuildVisitsForCode(guildId, vanityCodeToInviteCode(oldVanity));
 			}
 		} else if (oldVanity) {
-			await inviteRepository.delete(vanityCodeToInviteCode(oldVanity));
+			await inviteRepository.releaseVanityInvite(vanityCodeToInviteCode(oldVanity), guildId);
 			await enqueueEndGuildVisitsForCode(guildId, vanityCodeToInviteCode(oldVanity));
 		}
 		const updatedGuild = await guildRepository.upsertPartial(

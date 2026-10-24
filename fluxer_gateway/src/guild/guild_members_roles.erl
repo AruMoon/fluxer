@@ -45,13 +45,14 @@ add_user_map_ids(UserMap, AccSet) ->
     lists:foldl(fun gb_sets:add/2, AccSet, maps:keys(UserMap)).
 
 -spec can_manage_roles(map(), guild_state()) -> guild_reply(map()).
-can_manage_roles(#{user_id := UserId, target_user_id := _TU, role_id := RoleId}, State) ->
+can_manage_roles(
+    #{user_id := UserId, target_user_id := TargetUserId, role_id := RoleId}, State
+) ->
     OwnerId = guild_members_common:owner_id(State),
-    Reply = check_can_manage(UserId, RoleId, OwnerId, State),
-    {reply, #{can_manage => Reply}, State};
-can_manage_roles(#{user_id := UserId, role_id := RoleId}, State) ->
-    OwnerId = guild_members_common:owner_id(State),
-    Reply = check_can_manage(UserId, RoleId, OwnerId, State),
+    Reply =
+        check_can_manage(UserId, RoleId, OwnerId, State) andalso
+            (UserId =:= TargetUserId orelse
+                check_can_manage_target(UserId, TargetUserId, OwnerId, State)),
     {reply, #{can_manage => Reply}, State}.
 
 -spec can_manage_role(map(), guild_state()) -> guild_reply(map()).

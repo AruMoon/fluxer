@@ -12,6 +12,7 @@ import type {MessageProcessingService} from '@app/api/channel/services/message/M
 import {
 	createMessageResponseDataService,
 	type MessageResponseAccessContext,
+	messageResponseAccessForAuth,
 } from '@app/api/channel/services/message/MessageResponseDataService';
 import type {MessageSearchService} from '@app/api/channel/services/message/MessageSearchService';
 import {maskThreadArtifactsFor, ThreadMessageResponses} from '@app/api/channel/services/message/ThreadMessageResponses';
@@ -106,16 +107,7 @@ export class MessageRetrievalService {
 		if (params.messageId && !(await this.canAccessMessage(authChannel, params.messageId))) {
 			throw new UnknownMessageError();
 		}
-		const canReadMessageHistory =
-			!authChannel.guild || (await authChannel.hasPermission(Permissions.READ_MESSAGE_HISTORY));
-		return {
-			authChannel,
-			access: {
-				sourceGuildId: authChannel.channel.guildId,
-				messageHistoryCutoff: canReadMessageHistory ? null : (authChannel.guild?.message_history_cutoff ?? null),
-				canReadMessageHistory,
-			},
-		};
+		return {authChannel, access: await messageResponseAccessForAuth(authChannel)};
 	}
 
 	async getMessage({

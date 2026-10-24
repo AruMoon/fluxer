@@ -5,13 +5,14 @@ import type {ChannelID, GuildID, MessageID, UserID} from '@app/api/BrandedTypes'
 import {createUserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
 import type {ChannelRepository} from '@app/api/channel/ChannelRepository';
+import type {AuthenticatedChannel} from '@app/api/channel/services/AuthenticatedChannel';
 import {requestSvcJson} from '@app/api/infrastructure/SvcErrorReply';
 import {getInstanceProductName} from '@app/api/instance/ProductName';
 import {Logger} from '@app/api/Logger';
 import type {Channel} from '@app/api/models/Channel';
 import type {Message} from '@app/api/models/Message';
 import {isJsonRecord} from '@app/api/utils/JsonBoundaryUtils';
-import {MessageTypes} from '@fluxer/constants/src/ChannelConstants';
+import {MessageTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
 import type {INatsConnectionManager} from '@pkgs/nats/src/INatsConnectionManager';
 import {NatsConnectionManager} from '@pkgs/nats/src/NatsConnectionManager';
@@ -303,6 +304,18 @@ export function messageResponseAccessForGuild(sourceGuildId: GuildID | null): Me
 		sourceGuildId,
 		messageHistoryCutoff: null,
 		canReadMessageHistory: true,
+	};
+}
+
+export async function messageResponseAccessForAuth(
+	authChannel: AuthenticatedChannel,
+): Promise<MessageResponseAccessContext> {
+	const canReadMessageHistory =
+		!authChannel.guild || (await authChannel.hasPermission(Permissions.READ_MESSAGE_HISTORY));
+	return {
+		sourceGuildId: authChannel.channel.guildId,
+		messageHistoryCutoff: canReadMessageHistory ? null : (authChannel.guild?.message_history_cutoff ?? null),
+		canReadMessageHistory,
 	};
 }
 

@@ -12,7 +12,7 @@ The routes on this page accept a user session token or a bot token, and an OAuth
 
 ## Partial user object
 
-The public account shape inside messages, relationships, guild members and applications.
+The public account object inside messages, relationships, guild members and applications.
 
 ### Structure
 
@@ -81,7 +81,7 @@ The current account as its owner sees it, returned by [Get current user](/http-a
 
 | Field | Type | Description |
 | --- | --- | --- |
-| is_staff | boolean | Whether the account has the staff flag, even when it is hidden from `flags` |
+| is_staff<sup>1</sup> | boolean | Whether the account has the staff flag, even when it is hidden from `flags` |
 | acls<sup>1</sup> | array[string] | The [Admin API](/admin-api/users/#set-user-acls) access entries, empty for most accounts |
 | traits<sup>1</sup> | array[string] | The account traits, sorted |
 | email<sup>2</sup> | ?string | The email address, or null |
@@ -90,22 +90,22 @@ The current account as its owner sees it, returned by [Get current user](/http-a
 | bio | ?string | The profile biography, or null |
 | pronouns | ?string | The profile pronouns, or null |
 | accent_color | ?integer | The profile accent color as 24-bit RGB, or null |
-| timezone? | ?string | The IANA timezone, or null |
-| timezone_privacy_flags? | integer | [Profile field privacy flags](#profile-field-privacy-flags) for the timezone |
+| timezone?<sup>1</sup> | ?string | The IANA timezone, or null |
+| timezone_privacy_flags?<sup>1</sup> | integer | [Profile field privacy flags](#profile-field-privacy-flags) for the timezone |
 | banner | ?string | The profile banner hash, or null |
 | banner_color | ?integer | The 24-bit RGB color taken from the banner, or null |
 | mfa_enabled<sup>1</sup> | boolean | Whether any authenticator is set up |
 | authenticator_types?<sup>1</sup> | array[integer] | [Authenticator types](#authenticator-types) set up for the account |
 | verified<sup>2</sup> | boolean | Whether the email address is confirmed |
-| account_limited? | boolean | Whether the account is [limited](#account-limitation) |
-| premium_type | ?integer | [Premium type](#premium-types), `0` while premium is not active |
+| account_limited?<sup>1</sup> | boolean | Whether the account is [limited](#account-limitation) |
+| premium_type<sup>1</sup> | ?integer | [Premium type](#premium-types), `0` while premium is not active |
 | premium_since<sup>1</sup> | ?ISO8601 timestamp | When premium started, or null while premium is not active |
 | premium_until<sup>1</sup> | ?ISO8601 timestamp | When the current premium period ends, or null |
 | premium_will_cancel<sup>1</sup> | boolean | Whether the premium subscription cancels at the end of the period |
 | premium_billing_cycle<sup>1</sup> | ?string | The premium billing cycle, or null |
 | premium_lifetime_sequence<sup>1</sup> | ?integer | The lifetime premium sequence number, or null |
-| premium_grace_ends_at | ?ISO8601 timestamp | When premium access ends after `premium_until` passes, or null |
-| premium_discriminator<sup>4</sup> | boolean | Whether the discriminator was picked with premium |
+| premium_grace_ends_at<sup>1</sup> | ?ISO8601 timestamp | When premium access ends after `premium_until` passes, or null |
+| premium_discriminator<sup>1</sup> <sup>4</sup> | boolean | Whether the discriminator was picked with premium |
 | premium_badge_hidden<sup>1</sup> | boolean | Whether the premium badge is hidden from the profile |
 | premium_badge_masked<sup>1</sup> | boolean | Whether a lifetime badge shows as a subscription badge |
 | premium_badge_timestamp_hidden<sup>1</sup> | boolean | Whether the premium start date is hidden from the profile |
@@ -114,7 +114,7 @@ The current account as its owner sees it, returned by [Get current user](/http-a
 | premium_enabled_override<sup>1</sup> | boolean | Whether an admin override grants premium |
 | premium_perks_disabled<sup>1</sup> | boolean | Whether premium is suspended for the account |
 | password_last_changed_at<sup>1</sup> | ?ISO8601 timestamp | When the password last changed, or null |
-| last_voice_activity_sharing_change_at | ?ISO8601 timestamp | When voice activity sharing last changed for all friends (24-hour cooldown), or null |
+| last_voice_activity_sharing_change_at<sup>1</sup> | ?ISO8601 timestamp | When voice activity sharing last changed for all friends (24-hour cooldown), or null |
 | required_actions<sup>1</sup> | array[string] | Deprecated. Always empty |
 | nsfw_allowed<sup>1</sup> | boolean | Whether the account can see age-restricted content |
 | has_dismissed_premium_onboarding<sup>1</sup> | boolean | Whether premium onboarding was dismissed, false while premium is not active |
@@ -122,19 +122,19 @@ The current account as its owner sees it, returned by [Get current user](/http-a
 | has_unread_gift_inventory<sup>1</sup> | boolean | Whether the gift inventory has unread items |
 | unread_gift_inventory_count<sup>1</sup> | integer | The number of unread gift inventory items |
 | pending_bulk_message_deletion<sup>1</sup> | ?[pending bulk message deletion](#pending-bulk-message-deletion-object) object | The scheduled deletion of all the account's messages, or null |
-| age_verified_adult? | boolean | Whether adult age verification is done, omitted when false |
-| terms_agreed_at | ?ISO8601 timestamp | When the account last accepted the terms, or null |
-| privacy_agreed_at | ?ISO8601 timestamp | When the account was last shown the current privacy policy, or null |
-| claimed? | boolean | Whether the account can sign in on another device with an email, a password or a passkey |
-| account_tier? | string | The [account tier](#account-tiers), `unclaimed`, `unverified` or `verified` |
-| verification_need? | ?string | `add_email`, `confirm_email` or `password` until the account is verified, then null |
-| has_password? | boolean | Whether the account has a password |
-| date_of_birth_required?<sup>3</sup> | boolean | Whether the account has to [set its date of birth](/http-api/users/current-user/#set-date-of-birth) first |
-| profile_restricted? | boolean | Whether other accounts see only the username and discriminator |
+| age_verified_adult?<sup>1</sup> | boolean | Whether adult age verification is done, omitted when false |
+| terms_agreed_at<sup>1</sup> | ?ISO8601 timestamp | When the account last accepted the terms, or null |
+| privacy_agreed_at<sup>1</sup> | ?ISO8601 timestamp | When the account was last shown the current privacy policy, or null |
+| claimed?<sup>1</sup> | boolean | Whether the account can sign in on another device with an email, a password or a passkey |
+| account_tier?<sup>1</sup> | string | The [account tier](#account-tiers), `unclaimed`, `unverified` or `verified` |
+| verification_need?<sup>1</sup> | ?string | `add_email`, `confirm_email` or `password` until the account is verified, then null |
+| has_password?<sup>1</sup> | boolean | Whether the account has a password |
+| date_of_birth_required?<sup>1</sup> <sup>3</sup> | boolean | Whether the account has to [set its date of birth](/http-api/users/current-user/#set-date-of-birth) first |
+| profile_restricted?<sup>1</sup> | boolean | Whether other accounts see only the username and discriminator |
 
-<sup>1</sup> With an OAuth2 bearer token on [Get current user](/http-api/users/current-user/#get-current-user), arrays are empty, `email_bounced` and `authenticator_types` are left out, booleans are false, nullable fields are null and `unread_gift_inventory_count` is `0`
+<sup>1</sup> With an OAuth2 bearer token on [Get current user](/http-api/users/current-user/#get-current-user), arrays are empty, optional fields are left out, booleans are false, nullable fields are null and `unread_gift_inventory_count` is `0`
 
-<sup>2</sup> With an OAuth2 bearer token that lacks the `email` [scope](/http-api/oauth2/#oauth2-scopes), `email` is null
+<sup>2</sup> With an OAuth2 bearer token that lacks the `email` [scope](/http-api/oauth2/#oauth2-scopes), `email` is null and `verified` is false
 
 <sup>3</sup> When the [accounts configuration](/admin-api/instance/#accounts-configuration-object) enforces it, most routes return 403 `DATE_OF_BIRTH_REQUIRED` until the date is set
 

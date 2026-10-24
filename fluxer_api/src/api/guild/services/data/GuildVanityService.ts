@@ -14,7 +14,7 @@ import type {InviteRepository} from '@app/api/invite/InviteRepository';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
 import {serializeGuildForAudit} from '@app/api/utils/AuditSerializationUtils';
 import {AuditLogActionType} from '@fluxer/constants/src/AuditLogActionType';
-import {InviteTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
+import {Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {GuildFeatures} from '@fluxer/constants/src/GuildConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
@@ -77,7 +77,7 @@ export class GuildVanityService {
 			if (guild.vanityUrlCode != null) {
 				const oldInvite = await this.inviteRepository.findUnique(vanityCodeToInviteCode(guild.vanityUrlCode));
 				if (oldInvite) {
-					await this.inviteRepository.delete(oldInvite.code);
+					await this.inviteRepository.releaseVanityInvite(oldInvite.code, guildId);
 					await enqueueEndGuildVisitsForCode(guildId, oldInvite.code);
 				}
 				const updatedGuild = await this.guildRepository.upsertPartial(guildId, {vanity_url_code: null}, guild.toRow());
@@ -94,14 +94,14 @@ export class GuildVanityService {
 			}
 			return {code: null};
 		}
-		const existingInvite = await this.inviteRepository.findUnique(createInviteCode(code));
-		if (existingInvite != null) {
+		const claimed = await this.inviteRepository.claimVanityInvite(createInviteCode(code), guildId);
+		if (claimed == null) {
 			throw InputValidationError.fromCode('code', ValidationErrorCodes.VANITY_URL_CODE_ALREADY_TAKEN);
 		}
 		if (guild.vanityUrlCode != null) {
 			const oldInvite = await this.inviteRepository.findUnique(vanityCodeToInviteCode(guild.vanityUrlCode));
 			if (oldInvite) {
-				await this.inviteRepository.delete(oldInvite.code);
+				await this.inviteRepository.releaseVanityInvite(oldInvite.code, guildId);
 				await enqueueEndGuildVisitsForCode(guildId, oldInvite.code);
 			}
 		}

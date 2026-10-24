@@ -17,6 +17,7 @@ import type {AuthenticatedChannel} from '@app/api/channel/services/Authenticated
 import {withChannelFollowLock} from '@app/api/channel/services/ChannelFollowers';
 import {dispatchChannelEvent} from '@app/api/channel/services/ChannelGatewayDispatch';
 import {buildBroadcastMessageData} from '@app/api/channel/services/message/MessageGatewayDispatch';
+import {messageResponseAccessForGuild} from '@app/api/channel/services/message/MessageResponseDataService';
 import {MessageWriteLock} from '@app/api/channel/services/message/MessageWriteLock';
 import {resolveAppliedTags} from '@app/api/channel/services/thread/ForumTagRules';
 import {assertThreadAllowed} from '@app/api/channel/services/thread/ThreadDenials';
@@ -558,6 +559,7 @@ export class ThreadCreationService {
 			viewer,
 			userId,
 			authChannel: threadAuth,
+			access: messageResponseAccessForGuild(view.channel.guildId),
 			messageId: createMessageID(BigInt(view.channel.id)),
 			requestCache,
 		});

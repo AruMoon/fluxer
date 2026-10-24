@@ -4,7 +4,14 @@ import {createTestAccount, type TestAccount} from '@app/api/auth/tests/AuthTestU
 import {createChannelID, createGuildID, createUserID} from '@app/api/BrandedTypes';
 import {authorizeBot, createTestBotAccount} from '@app/api/bot/tests/BotTestUtils';
 import {ChannelRepository} from '@app/api/channel/ChannelRepository';
-import {acceptInvite, createChannel, createChannelInvite, createGuild} from '@app/api/channel/tests/ChannelTestUtils';
+import {
+	acceptInvite,
+	createChannel,
+	createChannelInvite,
+	createGuild,
+	createPermissionOverwrite,
+	updateGuild,
+} from '@app/api/channel/tests/ChannelTestUtils';
 import {threadsRequest} from '@app/api/channel/tests/ThreadTestUtils';
 import {upsertOne} from '@app/api/database/CassandraQueryExecution';
 import {clearChannelThreadsTaintCacheForTesting} from '@app/api/experiment/ChannelThreadsGate';
@@ -23,6 +30,7 @@ import {ThreadPermissionFlags} from '@fluxer/constants/src/ThreadPermissionUtils
 import type {ThreadChannelResponse} from '@fluxer/schema/src/domains/channel/ThreadRequestSchemas';
 import type {GuildAuditLogListResponse} from '@fluxer/schema/src/domains/guild/GuildAuditLogSchemas';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
+import {extractTimestamp} from '@fluxer/snowflake/src/SnowflakeUtils';
 import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface Setup {
@@ -293,6 +301,29 @@ describe('thread message path', () => {
 				.expect(403)
 				.execute();
 			expect(await threadState(thread.id)).not.toBeNull();
+		});
+
+		it('hides the starter source from members who cannot read it in the parent', async () => {
+			const s = await setup();
+			const source = await sendMessage(harness, s.owner.token, s.channelId, 'source');
+			const thread = await threadsRequest<ThreadChannelResponse>(harness, s.owner.token)
+				.post(`/channels/${s.channelId}/messages/${source.id}/threads`)
+				.body({name: 'discussion'})
+				.expect(201)
+				.execute();
+			await updateGuild(harness, s.owner.token, s.guildId, {
+				message_history_cutoff: new Date(extractTimestamp(source.id) + 1).toISOString(),
+			});
+			await createPermissionOverwrite(harness, s.owner.token, s.channelId, s.member.userId, {
+				type: 1,
+				allow: Permissions.VIEW_CHANNEL.toString(),
+				deny: Permissions.READ_MESSAGE_HISTORY.toString(),
+			});
+			const [starter] = await listMessages(s.member.token, thread.id);
+			expect(starter).toMatchObject({id: thread.id, type: MessageTypes.THREAD_STARTER_MESSAGE});
+			expect(starter?.referenced_message).toBeNull();
+			const [ownerStarter] = await listMessages(s.owner.token, thread.id);
+			expect(ownerStarter?.referenced_message?.content).toBe('source');
 		});
 
 		it('decrements the message count on delete and counts system messages', async () => {

@@ -385,20 +385,22 @@ export const BanPhraseRequest = z.object({
 
 export type BanPhraseRequest = z.infer<typeof BanPhraseRequest>;
 
+const BanSeverityType = z
+	.number()
+	.int()
+	.min(0)
+	.max(3)
+	.optional()
+	.describe(
+		'Stored severity label: 0 allow, 1 warn, 2 block, 3 block and report (default 2). The label is informational and every row blocks whatever its severity.',
+	);
+
 export const BanUrlRequest = z.object({
 	url: createStringType(1, 2048)
 		.refine((v) => /^https?:\/\//i.test(v), 'Must be an absolute http(s) URL')
 		.describe('Absolute URL to ban. Canonicalized before storage.'),
 	category: createStringType(1, 64).optional().describe('Category / source slug (defaults to "manual")'),
-	severity: z
-		.number()
-		.int()
-		.min(0)
-		.max(3)
-		.optional()
-		.describe(
-			'Stored severity label: 0 allow, 1 warn, 2 block, 3 block and report (default 2). The label is informational and every row blocks whatever its severity.',
-		),
+	severity: BanSeverityType,
 	source_url: createStringType(1, 2048).optional().describe('Upstream source URL if imported from a feed'),
 	notes: createStringType(1, 1024).optional().describe('Internal notes for audit trail'),
 });
@@ -414,15 +416,7 @@ export const BanUrlDomainRequest = z.object({
 		.default(true)
 		.describe('If true, any subdomain rooted at this domain, or at a host the pattern matches, is also banned'),
 	category: createStringType(1, 64).optional().describe('Category / source slug (defaults to "manual")'),
-	severity: z
-		.number()
-		.int()
-		.min(0)
-		.max(3)
-		.optional()
-		.describe(
-			'Stored severity label: 0 allow, 1 warn, 2 block, 3 block and report (default 2). The label is informational and every row blocks whatever its severity.',
-		),
+	severity: BanSeverityType,
 	source_url: createStringType(1, 2048).optional().describe('Upstream source URL if imported from a feed'),
 	notes: createStringType(1, 1024).optional().describe('Internal notes for audit trail'),
 });
@@ -434,15 +428,7 @@ export const BanFileShaRequest = z.object({
 		.refine((v) => /^[0-9a-fA-F]{64}$/.test(v), 'Must be a 64-character hex SHA-256')
 		.describe('SHA-256 in hex'),
 	category: createStringType(1, 64).optional(),
-	severity: z
-		.number()
-		.int()
-		.min(0)
-		.max(3)
-		.optional()
-		.describe(
-			'Stored severity label: 0 allow, 1 warn, 2 block, 3 block and report (default 2). The label is informational and every row blocks whatever its severity.',
-		),
+	severity: BanSeverityType,
 	content_type: createStringType(1, 128).optional().describe('Optional MIME type hint for observability'),
 	source_url: createStringType(1, 2048).optional(),
 	notes: createStringType(1, 1024).optional(),
@@ -457,15 +443,7 @@ const AvatarHashShortType = createStringType(8, 10).refine(
 export const BanAvatarHashRequest = z.object({
 	hashes: z.array(AvatarHashShortType).min(1).max(1000),
 	category: createStringType(1, 64).optional(),
-	severity: z
-		.number()
-		.int()
-		.min(0)
-		.max(3)
-		.optional()
-		.describe(
-			'Stored severity label: 0 allow, 1 warn, 2 block, 3 block and report (default 2). The label is informational and every row blocks whatever its severity.',
-		),
+	severity: BanSeverityType,
 	source_url: createStringType(1, 2048).optional(),
 	reason: createStringType(1, 1024).optional(),
 	notes: createStringType(1, 1024).optional(),

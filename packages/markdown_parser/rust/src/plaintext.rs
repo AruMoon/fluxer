@@ -167,7 +167,7 @@ fn render_node_to_plaintext(node: &Node, options: &PlaintextOptions) -> String {
             if options.preserve_markdown {
                 return format!(
                     "> [!{}]\n{}",
-                    alert_type_name(*alert_type).to_ascii_uppercase(),
+                    label.to_ascii_uppercase(),
                     content
                         .split('\n')
                         .map(|line| format!("> {line}"))
@@ -442,7 +442,7 @@ fn render_nodes_to_plaintext(nodes: &[Node], options: &PlaintextOptions) -> Stri
     result
 }
 
-fn render_to_plaintext(nodes: &[Node], options: &PlaintextOptions) -> String {
+pub fn render_ast_to_plaintext(nodes: &[Node], options: &PlaintextOptions) -> String {
     let rendered = render_nodes_to_plaintext(nodes, options);
     let whitespace_normalized = if options.preserve_markdown {
         trim_horizontal_whitespace_before_newlines_preserving_empty_blockquotes(&rendered)
