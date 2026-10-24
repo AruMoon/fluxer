@@ -156,6 +156,153 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number, kvCli
 	);
 }
 
+export interface WorkerRuntime {
+	stop(): Promise<void>;
+	stalledComponents(): Array<string>;
+}
+
+interface WorkerRuntimeOptions {
+	jsConnectionManager: JetStreamConnectionManager;
+	queue: JetStreamWorkerQueue;
+	workerService: WorkerService;
+	jobLedger: JobLedgerRepository;
+	dependencies: WorkerDependencies;
+	cores: number;
+}
+
+export async function startWorkerRuntime(options: WorkerRuntimeOptions): Promise<WorkerRuntime> {
+	const {jsConnectionManager, queue, workerService, jobLedger, dependencies} = options;
+	const heartbeat = new WorkerHeartbeat({logger: Logger});
+	const runners: Array<WorkerRunner> = [];
+	let cron: CronScheduler | null = null;
+	let stopPromise: Promise<void> | null = null;
+
+	const cleanupStep = async (label: string, fn: () => Promise<void> | void): Promise<void> => {
+		try {
+			await fn();
+		} catch (error) {
+			Logger.error({err: error}, `Error during worker shutdown step: ${label}`);
+		}
+	};
+
+	const performStop = async (): Promise<void> => {
+		await cleanupStep('heartbeat', () => heartbeat.stop());
+		await cleanupStep('cron', () => cron?.stop());
+		await cleanupStep('account actions', stopAccountActionConsumer);
+		await cleanupStep('runners', async () => {
+			await awaitAll(
+				runners.map((runner) => runner.stop()),
+				'Failed to stop worker runners',
+			);
+		});
+	};
+	const runtime: WorkerRuntime = {
+		stop: () => {
+			stopPromise ??= performStop();
+			return stopPromise;
+		},
+		stalledComponents: () => heartbeat.stalledComponents(),
+	};
+
+	try {
+		validateLaneCompleteness(workerTasks);
+		Logger.info('Worker lane configuration validated');
+		const activeWorkerLanes = resolveWorkerLanes({
+			mode: Config.worker.mode,
+			laneName: Config.worker.laneName,
+			taskName: Config.worker.taskName,
+			laneConcurrencyOverrides: Config.worker.laneConcurrencyOverrides,
+			availableParallelism: options.cores,
+		});
+		const cronSchedulerEnabled = resolveCronSchedulerEnabled(Config.worker.mode, Config.worker.enableCronScheduler);
+		Logger.info(
+			{
+				workerMode: Config.worker.mode,
+				workerLane: Config.worker.laneName,
+				workerTask: Config.worker.taskName,
+				lanes: activeWorkerLanes.map((lane) => `${lane.name}(${lane.concurrency})`).join(', '),
+				cronSchedulerEnabled,
+			},
+			'Worker runtime configuration resolved',
+		);
+		await queue.ensureInfrastructure(activeWorkerLanes);
+		Logger.info('JetStream stream and lane consumers verified');
+		await queueBlocklistFeedStartupJobs(dependencies.kvClient, workerService, Config.blocklistFeeds.enabled);
+		await queuePasskeyTraitBackfill(dependencies.kvClient, workerService);
+		await queueUserAclIndexBackfill(dependencies.kvClient, workerService);
+		try {
+			const normalized = await getInstanceConfigRepository().normalizeStoredBrandingAssets(dependencies.storageService);
+			if (normalized > 0) {
+				Logger.info({normalized}, 'Normalised stored instance branding assets to references');
+			}
+		} catch (error) {
+			Logger.warn({err: error}, 'Failed to normalise stored instance branding assets');
+		}
+		if (activeWorkerLanes.some((lane) => lane.name === 'lifecycle')) {
+			const apiContext = createApiContext();
+			startAccountActionConsumer({
+				js: jsConnectionManager.getJetStreamClient(),
+				state: accountStateDepsFromContext(
+					apiContext,
+					getAdminRepository(),
+					{
+						userCacheService: dependencies.userCacheService,
+						guildRepository: dependencies.guildRepository,
+					},
+					{
+						archives: getAdminArchiveService(),
+						messageDeletionQueue: dependencies.bulkMessageDeletionQueueService,
+						messageDeletionDelayMs: Config.automatedMessageDeletionDelayDays * ms('1 day'),
+					},
+					dependencies.channelRepository,
+				),
+				guildInvites: guildInvitePauseDeps(dependencies),
+			});
+			Logger.info('Account action consumer started');
+		}
+		cron = new CronScheduler(workerService, Logger, dependencies.kvClient, heartbeat);
+		registerCronJobs(cron, queue.getJobsStreamMaxAgeMs(), dependencies.kvClient);
+		for (const lane of activeWorkerLanes) {
+			const laneTasks: Record<string, WorkerTaskHandler> = {};
+			for (const taskType of lane.taskTypes) {
+				const handler = workerTasks[taskType];
+				if (handler) {
+					laneTasks[taskType] = handler;
+				}
+			}
+			const runner = new WorkerRunner({
+				tasks: laneTasks,
+				retiredTaskTypes: lane.retiredTaskTypes,
+				queue,
+				consumerName: lane.consumerName,
+				laneName: lane.name,
+				ledger: jobLedger,
+				concurrency: lane.concurrency,
+				maxDeliver: lane.maxDeliver,
+				ackWaitMs: lane.ackWaitMs,
+				heartbeat,
+			});
+			runners.push(runner);
+		}
+		if (cronSchedulerEnabled) {
+			cron.start();
+			Logger.info('Cron scheduler started');
+		} else {
+			Logger.info('Cron scheduler disabled for this worker process');
+		}
+		await Promise.all(runners.map((runner) => runner.start()));
+		Logger.info(
+			{lanes: activeWorkerLanes.map((l) => `${l.name}(${l.concurrency})`).join(', ')},
+			'Worker runners started',
+		);
+		heartbeat.start();
+		return runtime;
+	} catch (error) {
+		await runtime.stop();
+		throw error;
+	}
+}
+
 export async function startWorkerMain(): Promise<void> {
 	Logger.info('Starting worker backend...');
 	const host = sizeProcessForHost(Logger);
@@ -166,7 +313,7 @@ export async function startWorkerMain(): Promise<void> {
 	let limitConfigService: LimitConfigService | null = null;
 	let instanceConfigRepository: InstanceConfigRepository | null = null;
 	let dependencies: WorkerDependencies | null = null;
-	let cron: CronScheduler | null = null;
+	let runtime: WorkerRuntime | null = null;
 	let metricsServer: ServerType | null = null;
 	let searchInitialized = false;
 	let shutdownPromise: Promise<void> | null = null;
@@ -186,14 +333,7 @@ export async function startWorkerMain(): Promise<void> {
 			metricsServer?.close();
 			metricsServer = null;
 		});
-		await cleanupStep('cron', () => cron?.stop());
-		await cleanupStep('account actions', stopAccountActionConsumer);
-		await cleanupStep('runners', async () => {
-			await awaitAll(
-				runners.map((runner) => runner.stop()),
-				'Failed to stop worker runners',
-			);
-		});
+		await cleanupStep('worker runtime', () => runtime?.stop());
 		await voiceShutdown;
 		await cleanupStep('storage change feed', shutdownStorageChangeFeed);
 		await cleanupStep('shared lists', stopSharedListWatch);
@@ -334,64 +474,14 @@ export async function startWorkerMain(): Promise<void> {
 			spoolWhileMissing: !Config.instance.selfHosted,
 		});
 		startSharedListWatch(jsConnectionManager.getJetStreamClient(), {selfHosted: Config.instance.selfHosted});
-		if (activeWorkerLanes.some((lane) => lane.name === 'lifecycle')) {
-			const apiContext = createApiContext();
-			startAccountActionConsumer({
-				js: jsConnectionManager.getJetStreamClient(),
-				state: accountStateDepsFromContext(
-					apiContext,
-					getAdminRepository(),
-					{
-						userCacheService: dependencies.userCacheService,
-						guildRepository: dependencies.guildRepository,
-					},
-					{
-						archives: getAdminArchiveService(),
-						messageDeletionQueue: dependencies.bulkMessageDeletionQueueService,
-						messageDeletionDelayMs: Config.automatedMessageDeletionDelayDays * ms('1 day'),
-					},
-					dependencies.channelRepository,
-				),
-				guildInvites: guildInvitePauseDeps(dependencies),
-			});
-			Logger.info('Account action consumer started');
-		}
-		cron = new CronScheduler(workerService, Logger, dependencies.kvClient, heartbeat);
-		registerCronJobs(cron, queue.getJobsStreamMaxAgeMs(), dependencies.kvClient);
-		for (const lane of activeWorkerLanes) {
-			const laneTasks: Record<string, WorkerTaskHandler> = {};
-			for (const taskType of lane.taskTypes) {
-				const handler = workerTasks[taskType];
-				if (handler) {
-					laneTasks[taskType] = handler;
-				}
-			}
-			const runner = new WorkerRunner({
-				tasks: laneTasks,
-				retiredTaskTypes: lane.retiredTaskTypes,
-				queue,
-				consumerName: lane.consumerName,
-				laneName: lane.name,
-				ledger: jobLedger,
-				concurrency: lane.concurrency,
-				maxDeliver: lane.maxDeliver,
-				ackWaitMs: lane.ackWaitMs,
-				heartbeat,
-			});
-			runners.push(runner);
-		}
-		if (cronSchedulerEnabled) {
-			cron.start();
-			Logger.info('Cron scheduler started');
-		} else {
-			Logger.info('Cron scheduler disabled for this worker process');
-		}
-		await Promise.all(runners.map((runner) => runner.start()));
-		Logger.info(
-			{lanes: activeWorkerLanes.map((l) => `${l.name}(${l.concurrency})`).join(', ')},
-			'Worker runners started',
-		);
-		heartbeat.start();
+		runtime = await startWorkerRuntime({
+			jsConnectionManager,
+			queue,
+			workerService,
+			jobLedger,
+			dependencies,
+			cores: host.cores,
+		});
 		if (Config.worker.metricsPort !== undefined) {
 			metricsServer = startWorkerMetricsServer(Config.worker.metricsPort);
 		}
