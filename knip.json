@@ -29,8 +29,10 @@
 				"emoji-regex",
 				"ioredis",
 				"maxmind",
+				"nodemailer",
 				"pdf-lib",
 				"pg",
+				"pino",
 				"undici",
 				"validator"
 			],
