@@ -118,6 +118,7 @@ export interface MasterConfig {
 				task?: string;
 				enable_cron_scheduler?: boolean;
 				metrics_port?: number;
+				embedded?: boolean;
 				lane_concurrency_overrides?: {
 					realtime?: number;
 					unfurl?: number;

@@ -637,6 +637,7 @@ export function buildAPIConfigFromMaster(master: MasterConfig): APIConfig {
 			taskName: apiWorkerConfig?.task as WorkerTaskName | undefined,
 			enableCronScheduler: apiWorkerConfig?.enable_cron_scheduler,
 			metricsPort: apiWorkerConfig?.metrics_port,
+			embedded: apiWorkerConfig?.embedded ?? false,
 			laneConcurrencyOverrides: {
 				realtime: apiWorkerConfig?.lane_concurrency_overrides?.realtime,
 				unfurl: apiWorkerConfig?.lane_concurrency_overrides?.unfurl,

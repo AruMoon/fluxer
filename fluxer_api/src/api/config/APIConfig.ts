@@ -381,6 +381,7 @@ export interface APIConfig {
 		taskName?: WorkerTaskName;
 		enableCronScheduler?: boolean;
 		metricsPort?: number;
+		embedded: boolean;
 		laneConcurrencyOverrides: {
 			realtime?: number;
 			unfurl?: number;
