@@ -27,7 +27,9 @@ handle_identify(Data, PeerIP, State) ->
 handle_rate_limited_identify(Data, PeerIP, State) ->
     case session_abuse_protection:check_identify_rate(PeerIP) of
         {error, identify_rate_limited} ->
-            hold_identify(<<"Identify rate limited">>, State);
+            gateway_handler_encode:close_with_reason(
+                rate_limited, <<"Identify rate limited">>, State
+            );
         ok ->
             handle_identify_validated(Data, PeerIP, State)
     end.

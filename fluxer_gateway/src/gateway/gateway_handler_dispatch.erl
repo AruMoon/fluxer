@@ -106,8 +106,9 @@ handle_authenticated_opcode(_, _, State) ->
 handle_rate_limited_resume(Data, State) ->
     case session_abuse_protection:check_identify_rate(peer_ip(State)) of
         {error, identify_rate_limited} ->
-            logger:debug("Holding gateway resume: reason=rate_limited"),
-            {ok, State};
+            gateway_handler_encode:close_with_reason(
+                rate_limited, <<"Resume rate limited">>, State
+            );
         ok ->
             gateway_handler_identify:handle_resume(Data, State)
     end.

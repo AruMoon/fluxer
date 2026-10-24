@@ -88,6 +88,7 @@ Identify creates a session and the Gateway answers with Ready. These failures cl
 | --- | --- | --- |
 | 4004 | `Invalid token` | The token is not valid |
 | 4008 | `Too many sessions` | The user already has 100 live sessions (bots have no limit) |
+| 4008 | `Identify rate limited` | The instance is starting too many sessions at once, so try again after a backoff |
 | 4010 | `Invalid shard` | The `shard` pair is malformed |
 | 4011 | `Sharding required` | A bot shard owns more than 2,500 guilds |
 | 4000 | `Failed to start session` | The session could not be created for another reason |
@@ -131,7 +132,7 @@ The Gateway replays every Dispatch above `seq` in order and then sends [Resumed]
 | The session is unknown or expired, or `seq` is below the replay floor | [Invalid Session](#invalid-session), and the socket can Identify |
 | `seq` is above the session sequence or below the acknowledged one | Close with `4007` and reason `Invalid sequence` |
 | The token does not own the session | Close with `4004` and reason `Invalid token` |
-| The session cannot be reached | Close with `4000` and reason `Session unavailable` |
+| The session does not answer | Close with `4000` and reason `Session unavailable` |
 
 ## Reconnect
 
