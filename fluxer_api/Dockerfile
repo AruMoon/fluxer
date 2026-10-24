@@ -23,7 +23,7 @@ COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter fluxer_api run build
 RUN pnpm deploy --legacy --filter=fluxer_api --prod --config.allow-unused-patches=true /out && \
-	rm -rf /out/pkgs
+	rm -rf /out/pkgs /out/dist
 
 FROM node:26-trixie-slim
 
