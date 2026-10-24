@@ -419,10 +419,7 @@ export class UserContentService {
 		channelId: ChannelID;
 		messageId: MessageID;
 	}): Promise<void> {
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.userRepository.findUniqueAssert(userId);
 		const savedMessageCount = await this.userRepository.countSavedMessages(userId);
 		const ctx = createLimitMatchContext({user});
 		const maxBookmarks = resolveLimitSafe(
@@ -661,8 +658,7 @@ export class UserContentService {
 		userId: UserID,
 		filter: HarvestSelfDataRequest | null,
 	): Promise<HarvestCreationResponse> {
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) throw new UnknownUserError();
+		await this.userRepository.findUniqueAssert(userId);
 		const harvestId = await this.snowflakeService.generate();
 		const harvest = new UserHarvest({
 			user_id: userId,

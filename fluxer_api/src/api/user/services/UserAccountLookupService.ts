@@ -70,8 +70,7 @@ export class UserAccountLookupService {
 		restrictProfile: boolean;
 	}> {
 		const {userId, targetId, guildId, withMutualFriends, withMutualGuilds, requestCache} = params;
-		const user = await this.deps.userAccountRepository.findUnique(targetId);
-		if (!user) throw new UnknownUserError();
+		const user = await this.deps.userAccountRepository.findUniqueAssert(targetId);
 		if (userId !== targetId) {
 			await this.validateProfileAccess(userId, targetId, user);
 		}

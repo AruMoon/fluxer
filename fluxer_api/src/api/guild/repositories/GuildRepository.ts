@@ -300,7 +300,7 @@ export class GuildRepository {
 		return result ? Number(result.count) : 0;
 	}
 
-	async upsertMember(data: GuildMemberRow, oldData?: GuildMemberRow | null): Promise<GuildMember> {
+	async upsertMember(data: GuildMemberRow): Promise<GuildMember> {
 		const guildId = data.guild_id;
 		const userId = data.user_id;
 		const result = await executeVersionedUpdate<GuildMemberRow, 'guild_id' | 'user_id'>(
@@ -673,7 +673,7 @@ export class GuildRepository {
 		return emojis.map((emoji) => new GuildEmoji(emoji));
 	}
 
-	async upsertEmoji(data: GuildEmojiRow, oldData?: GuildEmojiRow | null): Promise<GuildEmoji> {
+	async upsertEmoji(data: GuildEmojiRow): Promise<GuildEmoji> {
 		const guildId = data.guild_id;
 		const emojiId = data.emoji_id;
 		const result = await executeVersionedUpdate<GuildEmojiRow, 'guild_id' | 'emoji_id'>(
@@ -726,7 +726,7 @@ export class GuildRepository {
 		return stickers.map((sticker) => new GuildSticker(sticker));
 	}
 
-	async upsertSticker(data: GuildStickerRow, oldData?: GuildStickerRow | null): Promise<GuildSticker> {
+	async upsertSticker(data: GuildStickerRow): Promise<GuildSticker> {
 		const guildId = data.guild_id;
 		const stickerId = data.sticker_id;
 		const result = await executeVersionedUpdate<GuildStickerRow, 'guild_id' | 'sticker_id'>(

@@ -120,10 +120,7 @@ export async function createAdditionalAuthSessionFromToken(
 		throw new InvalidTokenError();
 	}
 	const {users} = ctx.services;
-	const user = await users.findUnique(existingSession.userId);
-	if (!user) {
-		throw new UnknownUserError();
-	}
+	const user = await users.findUniqueAssert(existingSession.userId);
 	if (expectedUserId && user.id.toString() !== expectedUserId) {
 		throw new SessionTokenMismatchError();
 	}

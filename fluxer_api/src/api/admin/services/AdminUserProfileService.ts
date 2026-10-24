@@ -83,10 +83,7 @@ export class AdminUserProfileService {
 
 	async clearUserFields(userId: UserID, {fields, basis}: AdminUserClearFieldsRequest, actor: EnforcementActor) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const resetFields = [...new Set(fields)];
 		let updatedUser = user;
 		const clear = async () => {
@@ -159,10 +156,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (data.bot && user.acls.size > 0) {
 			throw new AccessDeniedError();
 		}
@@ -194,10 +188,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (data.system && !user.isBot) {
 			throw InputValidationError.fromCode(
 				'system',
@@ -228,10 +219,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const updatedUser = await confirmEmailOwnership(this.deps.apiContext, user);
 		await propagateUserUpdate(userUpdateDeps, user, updatedUser);
 		await enqueueStripeCustomerEmailSync(this.deps.apiContext.services.worker, user, updatedUser);
@@ -261,10 +249,7 @@ export class AdminUserProfileService {
 		} = this.deps.apiContext.services;
 		const {discriminatorService, auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const uniqueUsernames = !user.isBot && (await getInstanceConfigRepository().usesUniqueUsernames());
 		if (uniqueUsernames) {
 			assertNoDiscriminatorChange(data.discriminator, user.discriminator);
@@ -335,10 +320,7 @@ export class AdminUserProfileService {
 		} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
@@ -394,10 +376,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const traits = user.traits;
 		traits.delete(DOB_DEFERRED_TRAIT);
 		const clearedBelowMinimumAge = traits.delete(BELOW_MINIMUM_AGE_TRAIT);

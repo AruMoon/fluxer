@@ -59,10 +59,7 @@ export function SsoIdentityAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await ctx.get('userRepository').findUnique(userId);
-			if (!user) {
-				throw new UnknownUserError();
-			}
+			await ctx.get('userRepository').findUniqueAssert(userId);
 			const identities = await ssoIdentityRepository.listForUser(userId);
 			await recordAdminRead(ctx, {
 				targetType: 'user',
@@ -118,10 +115,7 @@ export function SsoIdentityAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await ctx.get('userRepository').findUnique(userId);
-			if (!user) {
-				throw new UnknownUserError();
-			}
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const providerId = await currentProviderId();
 			const identities = await new SsoIdentityLinkService(ctx.get('userRepository')).link(
 				user,
@@ -156,10 +150,7 @@ export function SsoIdentityAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await ctx.get('userRepository').findUnique(userId);
-			if (!user) {
-				throw new UnknownUserError();
-			}
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const before = await ssoIdentityRepository.listForUser(userId);
 			const identities = await new SsoIdentityLinkService(ctx.get('userRepository')).unlink(
 				user,

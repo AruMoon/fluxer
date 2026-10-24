@@ -60,7 +60,6 @@ interface ProcessedAttachment {
 	copyOperation: AttachmentCopyOperation;
 	hasVirusDetected: boolean;
 	applyFinalObjectMetadata: boolean;
-	sourceLocalPath: string | null;
 	sniffedContentType: string | null;
 }
 
@@ -293,40 +292,37 @@ export class AttachmentProcessingService {
 				});
 			}
 			const scanResult = await this.scanMalware(sourceLocalPath);
+			const processedAttachment = {
+				attachment_id: attachmentId,
+				filename: attachment.filename,
+				size,
+				title: attachment.title ?? null,
+				description: attachment.description ?? null,
+				height,
+				width,
+				content_type: contentType,
+				content_hash: contentHash,
+				placeholder,
+				flags,
+				duration: duration ?? clientDuration,
+				nsfw,
+				waveform,
+			};
+			const copyOperation = {
+				sourceBucket: Config.s3.buckets.uploads,
+				sourceKey: attachment.upload_filename,
+				destinationBucket: Config.s3.buckets.cdn,
+				destinationKey: cdnKey,
+				newContentType: contentType,
+			};
 			if (scanResult.isVirusDetected) {
 				hasVirusDetected = true;
 				await this.storageService.deleteObject(Config.s3.buckets.uploads, attachment.upload_filename);
-				if (sourceLocalPath) {
-					await fs.promises.unlink(sourceLocalPath).catch(() => undefined);
-					sourceLocalPath = null;
-				}
 				return {
-					attachment: {
-						attachment_id: attachmentId,
-						filename: attachment.filename,
-						size,
-						title: attachment.title ?? null,
-						description: attachment.description ?? null,
-						height,
-						width,
-						content_type: contentType,
-						content_hash: contentHash,
-						placeholder,
-						flags,
-						duration: duration ?? clientDuration,
-						nsfw,
-						waveform,
-					},
-					copyOperation: {
-						sourceBucket: Config.s3.buckets.uploads,
-						sourceKey: attachment.upload_filename,
-						destinationBucket: Config.s3.buckets.cdn,
-						destinationKey: cdnKey,
-						newContentType: contentType,
-					},
+					attachment: processedAttachment,
+					copyOperation,
 					hasVirusDetected,
 					applyFinalObjectMetadata,
-					sourceLocalPath: null,
 					sniffedContentType,
 				};
 			}
@@ -337,35 +333,11 @@ export class AttachmentProcessingService {
 					ValidationErrorCodes.VOICE_MESSAGES_ATTACHMENT_MUST_BE_AUDIO,
 				);
 			}
-			const retainedLocalPath = sourceLocalPath;
-			sourceLocalPath = null;
 			return {
-				attachment: {
-					attachment_id: attachmentId,
-					filename: attachment.filename,
-					size,
-					title: attachment.title ?? null,
-					description: attachment.description ?? null,
-					height,
-					width,
-					content_type: contentType,
-					content_hash: contentHash,
-					placeholder,
-					flags,
-					duration: duration ?? clientDuration,
-					nsfw,
-					waveform,
-				},
-				copyOperation: {
-					sourceBucket: Config.s3.buckets.uploads,
-					sourceKey: attachment.upload_filename,
-					destinationBucket: Config.s3.buckets.cdn,
-					destinationKey: cdnKey,
-					newContentType: contentType,
-				},
+				attachment: processedAttachment,
+				copyOperation,
 				hasVirusDetected,
 				applyFinalObjectMetadata,
-				sourceLocalPath: retainedLocalPath,
 				sniffedContentType,
 			};
 		} catch (error) {

@@ -222,7 +222,7 @@ export class MessageResponseDataService {
 				messages: batch,
 				viewer_user_id: params.userId.toString(),
 				...(await this.accessEnvelope(params.access)),
-				include_reactions: params.includeReactions ?? true,
+				include_reactions: true,
 			});
 			if (typeof response !== 'object' || !('FoundApiMany' in response)) {
 				throw new Error(`[message-response-service] unexpected BuildResponses response: ${JSON.stringify(response)}`);

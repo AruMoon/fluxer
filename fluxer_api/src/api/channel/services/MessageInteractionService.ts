@@ -122,7 +122,7 @@ export class MessageInteractionService {
 			viewer,
 			access: 'visitor_read',
 		});
-		const pins = await this.pinService.getChannelPins({authChannel, userId, requestCache, beforeTimestamp, limit});
+		const pins = await this.pinService.getChannelPins({authChannel, userId, beforeTimestamp, limit});
 		const original = pins.items.map((item) => item.message as MessageResponse);
 		const messages = maskThreadArtifactsFor(viewer, authChannel.channel.guildId, original);
 		if (messages === original) return pins;
@@ -176,7 +176,7 @@ export class MessageInteractionService {
 		if (!authChannel.guild && authChannel.channel.type !== ChannelTypes.DM_PERSONAL_NOTES) {
 			await this.authService.validateDMSendPermissions({channel: authChannel.channel, userId});
 		}
-		await this.pinService.unpinMessage({authChannel, messageId, userId, requestCache, auditLogReason});
+		await this.pinService.unpinMessage({authChannel, messageId, userId, auditLogReason});
 	}
 
 	async getUsersForReaction({
@@ -287,7 +287,7 @@ export class MessageInteractionService {
 		messageId: MessageID;
 		emoji: string;
 	}): Promise<void> {
-		await this.removeReaction({userId, viewer, sessionId, channelId, messageId, emoji, targetId: userId, requestCache});
+		await this.removeReaction({userId, viewer, sessionId, channelId, messageId, emoji, targetId: userId});
 	}
 
 	async removeAllReactionsForEmoji({

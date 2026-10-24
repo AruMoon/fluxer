@@ -31,10 +31,7 @@ export class UserAccountLifecycleService {
 	constructor(private readonly deps: UserAccountLifecycleServiceDeps) {}
 
 	async selfDisable(userId: UserID): Promise<void> {
-		const user = await this.deps.userAccountRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.deps.userAccountRepository.findUniqueAssert(userId);
 		const updatedUser = await this.deps.userAccountRepository.updateFlags(
 			userId,
 			(flags) => flags | UserFlags.DISABLED,
@@ -46,10 +43,7 @@ export class UserAccountLifecycleService {
 	}
 
 	async selfDelete(userId: UserID): Promise<void> {
-		const user = await this.deps.userAccountRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.deps.userAccountRepository.findUniqueAssert(userId);
 		const ownedGuildIds = await this.deps.guildRepository.listOwnedGuildIds(userId);
 		if (ownedGuildIds.length > 0) {
 			throw new UserOwnsGuildsError();

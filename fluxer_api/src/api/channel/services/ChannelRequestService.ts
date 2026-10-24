@@ -8,6 +8,7 @@ import {applyForumTagEdit, type ForumTagEdit} from '@app/api/channel/services/th
 import {mapThreadToResponse} from '@app/api/channel/services/thread/ThreadMappers';
 import {withThreadParentFields} from '@app/api/channel/services/thread/ThreadParentSettings';
 import {loadThreadViews} from '@app/api/channel/services/thread/ThreadViews';
+import {withRetryingLock} from '@app/api/channel/utils/RetryingLock';
 import type {ThreadViewer} from '@app/api/experiment/ChannelThreadsGate';
 import {maskChannelResponseThreadBits} from '@app/api/guild/services/ThreadPermissionBits';
 import type {UserCacheService} from '@app/api/infrastructure/UserCacheService';
@@ -186,25 +187,7 @@ export class ChannelRequestService {
 	}
 
 	private async withForumTagsLock<T>(channelId: ChannelID, fn: () => Promise<T>): Promise<T> {
-		const lockKey = `channel:${channelId}:forum-tags`;
-		let lockToken: string | null = null;
-		for (let attempt = 0; attempt < FORUM_TAGS_LOCK_ACQUIRE_ATTEMPTS; attempt++) {
-			lockToken = await this.cacheService.acquireLock(lockKey, FORUM_TAGS_LOCK_TTL_SECONDS);
-			if (lockToken) break;
-			await new Promise((resolve) => setTimeout(resolve, FORUM_TAGS_LOCK_RETRY_DELAY_MS * (attempt + 1)));
-		}
-		if (!lockToken) {
-			throw new ThrottledError({
-				code: APIErrorCodes.RESOURCE_LOCKED,
-				retryAfterSeconds: 1,
-				data: {retry_after: 1},
-			});
-		}
-		try {
-			return await fn();
-		} finally {
-			await this.cacheService.releaseLock(lockKey, lockToken).catch(() => {});
-		}
+		return withRetryingLock(this.cacheService, `channel:${channelId}:forum-tags`, fn);
 	}
 
 	async deleteChannel(params: {

@@ -682,21 +682,7 @@ export class UserRepository {
 		return this.pushSubscriptionRepository.deleteAllPushSubscriptions(userId);
 	}
 
-	async createPayment(data: {
-		checkout_session_id: string;
-		user_id: UserID;
-		price_id: string;
-		product_type: string;
-		status: string;
-		is_gift: boolean;
-		created_at: Date;
-		purchase_geoip_country_code?: string | null;
-		purchase_client_country_code?: string | null;
-		eu_withdrawal_waiver_required?: boolean;
-		eu_withdrawal_waiver_accepted?: boolean;
-		eu_withdrawal_waiver_accepted_at?: Date | null;
-		eu_withdrawal_waiver_text_version?: string | null;
-	}): Promise<void> {
+	async createPayment(data: Parameters<PaymentRepository['createPayment']>[0]): Promise<void> {
 		return this.paymentRepository.createPayment(data);
 	}
 

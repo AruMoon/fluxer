@@ -61,7 +61,7 @@ import {
 	releaseSnowflakeService,
 	type SnowflakeServiceHandle,
 } from '@app/api/middleware/ServiceRegistry';
-import {clearSingletonsForTesting, singleton} from '@app/api/middleware/Singleton';
+import {clearSingletonsForTesting, keyedSingleton, singleton} from '@app/api/middleware/Singleton';
 import {BotAuthService} from '@app/api/oauth/BotAuthService';
 import {BotMfaMirrorService} from '@app/api/oauth/BotMfaMirrorService';
 import {ApplicationRepository} from '@app/api/oauth/repositories/ApplicationRepository';
@@ -289,23 +289,25 @@ export const getPurgeQueue: () => IPurgeQueue = singleton(() =>
 );
 export const getAssetDeletionQueue: () => IAssetDeletionQueue = singleton(() => new AssetDeletionQueue(getKVClient()));
 
-let bulkMessageDeletionQueueClient: IKVProvider | null = null;
-let bulkMessageDeletionQueue: KVBulkMessageDeletionQueueService | null = null;
-
-let threadAutoArchiveQueueClient: IKVProvider | null = null;
-let threadAutoArchiveQueue: KVThreadAutoArchiveQueueService | null = null;
-
-let premiumStateQueueClient: IKVProvider | null = null;
-let premiumStateQueue: PremiumStateReconciliationQueueService | null = null;
-
-let activityTrackerClient: IKVProvider | null = null;
-let activityTracker: KVActivityTracker | null = null;
-
-let activityBufferClient: IKVProvider | null = null;
-let activityBuffer: UserActivityBuffer | null = null;
-
-let accountDeletionQueueClient: IKVProvider | null = null;
-let accountDeletionQueue: KVAccountDeletionQueueService | null = null;
+export const getKVBulkMessageDeletionQueue = keyedSingleton(
+	getKVClient,
+	(kv) => new KVBulkMessageDeletionQueueService(kv, getUserRepository()),
+);
+export const getKVThreadAutoArchiveQueue = keyedSingleton(getKVClient, (kv) => new KVThreadAutoArchiveQueueService(kv));
+export const getPremiumStateReconciliationQueueService = keyedSingleton(
+	getKVClient,
+	(kv) => new PremiumStateReconciliationQueueService(kv),
+);
+export const getKVActivityTracker = keyedSingleton(
+	getKVClient,
+	(kv) => new KVActivityTracker(kv),
+	(tracker) => tracker.shutdown(),
+);
+export const getUserActivityBuffer = keyedSingleton(getKVClient, (kv) => new UserActivityBuffer(kv));
+export const getKVAccountDeletionQueue = keyedSingleton(
+	getKVClient,
+	(kv) => new KVAccountDeletionQueueService(kv, getUserRepository()),
+);
 
 export const getThemeService = singleton(() => new ThemeService(getStorageService()));
 export const getAttachmentUploadTraceRepository = singleton(() => new AttachmentUploadTraceRepository());

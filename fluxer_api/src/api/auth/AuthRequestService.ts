@@ -509,10 +509,7 @@ export class AuthRequestService {
 	}
 
 	private async getUserPartial(userId: string): Promise<UserPartialResponse> {
-		const user = await this.apiContext.services.users.findUnique(createUserID(BigInt(userId)));
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.apiContext.services.users.findUniqueAssert(createUserID(BigInt(userId)));
 		return mapUserToPartialResponse(user);
 	}
 

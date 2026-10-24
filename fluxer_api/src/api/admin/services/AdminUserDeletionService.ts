@@ -153,7 +153,7 @@ export class AdminUserDeletionService {
 		actor: EnforcementActor,
 	): Promise<{user: User; skippedNetworks: Array<SkippedNetwork>}> {
 		const {basis} = request;
-		const user = await this.requireUser(userId);
+		const user = await this.deps.apiContext.services.users.findUniqueAssert(userId);
 		if (
 			user.pendingDeletionAt &&
 			(!request.replace_pending_deletion_at ||
@@ -266,7 +266,7 @@ export class AdminUserDeletionService {
 
 	async cancelAccountDeletion(userId: UserID, data: AdminUserDeletionCancelRequest, actor: EnforcementActor) {
 		const {cache} = this.deps.apiContext.services;
-		const user = await this.requireUser(userId);
+		const user = await this.deps.apiContext.services.users.findUniqueAssert(userId);
 		if (!user.pendingDeletionAt) {
 			throw new NoPendingDeletionError();
 		}

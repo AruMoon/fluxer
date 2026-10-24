@@ -128,10 +128,7 @@ export class AdminUserService {
 
 	async listUserDmChannels(data: ListUserDmChannelsRequest) {
 		const userId = createUserID(data.user_id);
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await this.userRepository.findUniqueAssert(userId);
 		const channels = await this.userRepository.listHistoricalDmChannelsPaginated(userId, {
 			limit: data.limit,
 			beforeChannelId: data.before ? createChannelID(data.before) : undefined,
@@ -194,10 +191,7 @@ export class AdminUserService {
 
 	async listUserGroupDmChannels(data: ListUserGroupDmChannelsRequest) {
 		const userId = createUserID(data.user_id);
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await this.userRepository.findUniqueAssert(userId);
 		const summaries = await this.userRepository.listPrivateChannelSummaries(userId);
 		const groupDmSummaries = summaries.filter((s) => s.isGroupDm);
 		if (groupDmSummaries.length === 0) {
@@ -278,10 +272,7 @@ export class AdminUserService {
 		acls: ReadonlySet<string>,
 	) {
 		const userId = createUserID(data.user_id);
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.userRepository.findUniqueAssert(userId);
 		const updatedUser = await this.userRepository.patchUpsert(
 			userId,
 			{

@@ -80,10 +80,6 @@ export class MessageSearchService
 	>
 	implements IMessageSearchService
 {
-	constructor(adapter: TermSearchAdapter<MessageSearchFilters, SearchableMessage>) {
-		super(adapter);
-	}
-
 	async indexMessage(message: Message, authorIsBot?: boolean): Promise<void> {
 		await this.indexDocument(convertToSearchableMessage(message, authorIsBot));
 	}
@@ -181,10 +177,6 @@ export class UserSearchService
 	extends SearchAdapterServiceBase<UserSearchFilters, SearchableUser, ISearchAdapter<UserSearchFilters, SearchableUser>>
 	implements IUserSearchService
 {
-	constructor(adapter: ISearchAdapter<UserSearchFilters, SearchableUser>) {
-		super(adapter);
-	}
-
 	async indexUser(user: User): Promise<void> {
 		await this.indexDocument(convertToSearchableUser(user));
 	}
@@ -218,10 +210,6 @@ export class ReportSearchService
 	>
 	implements IReportSearchService
 {
-	constructor(adapter: ISearchAdapter<ReportSearchFilters, SearchableReport>) {
-		super(adapter);
-	}
-
 	async indexReport(report: IARSubmission): Promise<void> {
 		await this.indexDocument(convertToSearchableReport(report));
 	}
@@ -263,10 +251,6 @@ export class AuditLogSearchService
 	>
 	implements IAuditLogSearchService
 {
-	constructor(adapter: ISearchAdapter<AuditLogSearchFilters, SearchableAuditLog>) {
-		super(adapter);
-	}
-
 	async indexAuditLog(log: AdminAuditLog): Promise<void> {
 		await this.indexDocument(convertToSearchableAuditLog(log));
 	}
@@ -296,10 +280,6 @@ export class GuildMemberSearchService
 	>
 	implements IGuildMemberSearchService
 {
-	constructor(adapter: TermSearchAdapter<GuildMemberSearchFilters, SearchableGuildMember>) {
-		super(adapter);
-	}
-
 	async indexMember(member: GuildMember, user: User): Promise<void> {
 		await this.indexDocument(convertToSearchableGuildMember(member, user));
 	}

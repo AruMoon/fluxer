@@ -59,7 +59,7 @@ function mapUserFlagsToPublicBitfield(user: User): number {
 	return Number(flags & getVisiblePublicUserFlags(flags));
 }
 
-function getActiveAuthenticatorTypes(user: User): Array<UserAuthenticatorType> {
+export function getActiveAuthenticatorTypes(user: User): Array<UserAuthenticatorType> {
 	return Array.from(user.authenticatorTypes ?? []).filter(
 		(type): type is UserAuthenticatorType =>
 			type === UserAuthenticatorTypes.TOTP || type === UserAuthenticatorTypes.WEBAUTHN,

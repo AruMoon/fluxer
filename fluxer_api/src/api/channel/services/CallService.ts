@@ -155,22 +155,7 @@ export class CallService {
 		});
 		const recipientIds = Array.from(channel.recipientIds);
 		const channelRecipients = recipientIds.length > 0 ? await this.userRepository.listUsers(recipientIds) : [];
-		if (channel.type === ChannelTypes.DM) {
-			const dmRecipientIds = recipientIds.filter((id) => id !== userId);
-			if (dmRecipientIds.length === 1) {
-				await this.dmPermissionValidator.validate({senderId: userId, recipientId: dmRecipientIds[0]});
-				const caller = await this.userRepository.findUnique(userId);
-				if (caller) {
-					await assertMayStartConversation({
-						user: caller,
-						targetId: dmRecipientIds[0]!,
-						users: this.userRepository,
-						messages: this.channelRepository.messages,
-						channel,
-					});
-				}
-			}
-		}
+		await this.assertMayRingDm(channel, userId);
 		const existingCall = await this.gatewayService.getCall(channelId);
 		if (existingCall) {
 			throw new CallAlreadyExistsError();
@@ -306,22 +291,7 @@ export class CallService {
 				recipients,
 			});
 		}
-		if (channel.type === ChannelTypes.DM) {
-			const dmRecipientIds = Array.from(channel.recipientIds).filter((id) => id !== userId);
-			if (dmRecipientIds.length === 1) {
-				await this.dmPermissionValidator.validate({senderId: userId, recipientId: dmRecipientIds[0]});
-				const caller = await this.userRepository.findUnique(userId);
-				if (caller) {
-					await assertMayStartConversation({
-						user: caller,
-						targetId: dmRecipientIds[0]!,
-						users: this.userRepository,
-						messages: this.channelRepository.messages,
-						channel,
-					});
-				}
-			}
-		}
+		await this.assertMayRingDm(channel, userId);
 		const callerRequestedNoRing = recipients !== undefined && recipients.length === 0;
 		const recipientsToNotify = (
 			callerRequestedNoRing ? Array.from(channel.recipientIds) : recipients || Array.from(channel.recipientIds)
@@ -399,6 +369,27 @@ export class CallService {
 					avatar: caller.avatar,
 				},
 			);
+		}
+	}
+
+	private async assertMayRingDm(channel: Channel, userId: UserID): Promise<void> {
+		if (channel.type !== ChannelTypes.DM) {
+			return;
+		}
+		const dmRecipientIds = Array.from(channel.recipientIds).filter((id) => id !== userId);
+		if (dmRecipientIds.length !== 1) {
+			return;
+		}
+		await this.dmPermissionValidator.validate({senderId: userId, recipientId: dmRecipientIds[0]});
+		const caller = await this.userRepository.findUnique(userId);
+		if (caller) {
+			await assertMayStartConversation({
+				user: caller,
+				targetId: dmRecipientIds[0]!,
+				users: this.userRepository,
+				messages: this.channelRepository.messages,
+				channel,
+			});
 		}
 	}
 

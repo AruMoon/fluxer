@@ -422,8 +422,7 @@ export class UserAccountSettingsService {
 		requestCache: RequestCache;
 	}): Promise<User> {
 		const {userId, shareVoiceActivity, requestCache} = params;
-		const user = await this.deps.userAccountRepository.findUnique(userId);
-		if (!user) throw new UnknownUserError();
+		const user = await this.deps.userAccountRepository.findUniqueAssert(userId);
 		const lastChange = user.lastVoiceActivitySharingChangeAt;
 		const now = new Date();
 		if (lastChange != null) {

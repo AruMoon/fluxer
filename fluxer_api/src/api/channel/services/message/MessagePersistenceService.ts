@@ -465,20 +465,8 @@ export class MessagePersistenceService {
 					if ('upload_filename' in att && att.upload_filename) {
 						newAttachments.push(att as AttachmentToProcess);
 					} else {
-						const existingAtt = att as EditExistingAttachment;
-						const refId = createAttachmentID(existingAtt.id);
-						let found = message.attachments.find((existing) => existing.id === refId);
-						if (!found && refId < BigInt(message.attachments.length)) {
-							found = message.attachments[Number(refId)];
-						}
-						if (found) {
-							const updated = found.toMessageAttachment();
-							if ('title' in existingAtt && existingAtt.title !== undefined) {
-								updated.title = existingAtt.title;
-							}
-							if ('description' in existingAtt && existingAtt.description !== undefined) {
-								updated.description = existingAtt.description;
-							}
+						const updated = this.resolveExistingAttachment(message, att as EditExistingAttachment);
+						if (updated) {
 							existingAttachments.push(updated);
 						}
 					}
@@ -644,20 +632,8 @@ export class MessagePersistenceService {
 			const processedAttachments: Array<MessageAttachment> = [];
 			for (const att of data.attachments as Array<EditAttachment>) {
 				if (!('upload_filename' in att)) {
-					const existingAtt = att as EditExistingAttachment;
-					const refId = createAttachmentID(existingAtt.id);
-					let found = message.attachments.find((existing) => existing.id === refId);
-					if (!found && refId < BigInt(message.attachments.length)) {
-						found = message.attachments[Number(refId)];
-					}
-					if (found) {
-						const updated = found.toMessageAttachment();
-						if ('title' in existingAtt && existingAtt.title !== undefined) {
-							updated.title = existingAtt.title;
-						}
-						if ('description' in existingAtt && existingAtt.description !== undefined) {
-							updated.description = existingAtt.description;
-						}
+					const updated = this.resolveExistingAttachment(message, att as EditExistingAttachment);
+					if (updated) {
 						processedAttachments.push(updated);
 					}
 				}
@@ -665,6 +641,28 @@ export class MessagePersistenceService {
 			updatedAttachments = processedAttachments;
 		}
 		return {canEdit: true, updatedFlags, updatedAttachments};
+	}
+
+	private resolveExistingAttachment(
+		message: Message,
+		existingAtt: {id: bigint; title?: string | null; description?: string | null},
+	): MessageAttachment | null {
+		const refId = createAttachmentID(existingAtt.id);
+		let found = message.attachments.find((existing) => existing.id === refId);
+		if (!found && refId < BigInt(message.attachments.length)) {
+			found = message.attachments[Number(refId)];
+		}
+		if (!found) {
+			return null;
+		}
+		const updated = found.toMessageAttachment();
+		if ('title' in existingAtt && existingAtt.title !== undefined) {
+			updated.title = existingAtt.title;
+		}
+		if ('description' in existingAtt && existingAtt.description !== undefined) {
+			updated.description = existingAtt.description;
+		}
+		return updated;
 	}
 
 	async createSystemMessage(params: {

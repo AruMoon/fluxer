@@ -137,8 +137,7 @@ export class UserChannelService {
 		userCacheService: UserCacheService;
 		requestCache: RequestCache;
 	}): Promise<Channel> {
-		const callingUser = await this.userRepository.findUnique(userId);
-		if (!callingUser) throw new UnknownUserError();
+		const callingUser = await this.userRepository.findUniqueAssert(userId);
 		assertTierAllows(
 			callingUser,
 			data.recipients !== undefined ? TierGatedActions.GROUP_DM : TierGatedActions.DIRECT_MESSAGE,
@@ -189,16 +188,14 @@ export class UserChannelService {
 		requestCache: RequestCache;
 	}): Promise<Channel> {
 		if (suppressed) {
-			const targetUser = await this.userRepository.findUnique(recipientId);
-			if (!targetUser) throw new UnknownUserError();
+			await this.userRepository.findUniqueAssert(recipientId);
 			return await this.createOrOpenLocalOnlyDMChannel({userId, recipientId, userCacheService, requestCache});
 		}
 		const existingChannel = await this.userRepository.findExistingDmState(userId, recipientId);
 		if (existingChannel) {
 			return await this.reopenExistingDMChannel({userId, existingChannel, userCacheService, requestCache});
 		}
-		const targetUser = await this.userRepository.findUnique(recipientId);
-		if (!targetUser) throw new UnknownUserError();
+		await this.userRepository.findUniqueAssert(recipientId);
 		return await this.createNewDMChannel({userId, recipientId, userCacheService, requestCache});
 	}
 
@@ -226,14 +223,16 @@ export class UserChannelService {
 		}
 	}
 
-	async pinDmChannel({
+	async setDmChannelPinned({
 		userId,
 		channelId,
 		viewer,
+		pinned,
 	}: {
 		userId: UserID;
 		viewer: ThreadViewer;
 		channelId: ChannelID;
+		pinned: boolean;
 	}): Promise<void> {
 		const channel = await this.channelService.channelData.operations.getChannel({userId, viewer, channelId});
 		if (channel.type !== ChannelTypes.DM && channel.type !== ChannelTypes.GROUP_DM) {
@@ -242,31 +241,9 @@ export class UserChannelService {
 		if (!channel.recipientIds.has(userId)) {
 			throw new MissingAccessError();
 		}
-		const newPinnedDMs = await this.userRepository.addPinnedDm(userId, channelId);
-		await this.gatewayService.dispatchPresence({
-			userId: userId,
-			event: 'USER_PINNED_DMS_UPDATE',
-			data: newPinnedDMs.map(String),
-		});
-	}
-
-	async unpinDmChannel({
-		userId,
-		channelId,
-		viewer,
-	}: {
-		userId: UserID;
-		viewer: ThreadViewer;
-		channelId: ChannelID;
-	}): Promise<void> {
-		const channel = await this.channelService.channelData.operations.getChannel({userId, viewer, channelId});
-		if (channel.type !== ChannelTypes.DM && channel.type !== ChannelTypes.GROUP_DM) {
-			throw InputValidationError.fromCode('channel_id', ValidationErrorCodes.CHANNEL_MUST_BE_DM_OR_GROUP_DM);
-		}
-		if (!channel.recipientIds.has(userId)) {
-			throw new MissingAccessError();
-		}
-		const newPinnedDMs = await this.userRepository.removePinnedDm(userId, channelId);
+		const newPinnedDMs = pinned
+			? await this.userRepository.addPinnedDm(userId, channelId)
+			: await this.userRepository.removePinnedDm(userId, channelId);
 		await this.gatewayService.dispatchPresence({
 			userId: userId,
 			event: 'USER_PINNED_DMS_UPDATE',

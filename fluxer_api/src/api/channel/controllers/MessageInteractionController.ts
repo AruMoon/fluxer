@@ -9,7 +9,7 @@ import {RateLimitMiddleware} from '@app/api/middleware/RateLimitMiddleware';
 import {OpenAPI} from '@app/api/middleware/ResponseTypeMiddleware';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
 import {readStateCapable} from '@app/api/read_state/ReadStateChannelMeta';
-import type {HonoApp} from '@app/api/types/HonoEnv';
+import type {HonoApp, HonoEnv} from '@app/api/types/HonoEnv';
 import {assertTierAllows, NO_TIER_CONTEXT} from '@app/api/user/AccountTier';
 import {Validator} from '@app/api/Validator';
 import {TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';
@@ -33,6 +33,23 @@ import {
 	ReactionUsersListResponse,
 	ReactionUsersPageResponse,
 } from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
+import type {Context} from 'hono';
+
+function fetchReactionUsers(
+	ctx: Context<HonoEnv>,
+	{channel_id, message_id, emoji}: ChannelIdMessageIdEmojiParam,
+	{limit, after}: ReactionUsersQuerySchema,
+) {
+	return ctx.get('channelService').interactions.getUsersForReaction({
+		viewer: viewerFromCtx(ctx),
+		userId: ctx.get('user').id,
+		channelId: createChannelID(channel_id),
+		messageId: createMessageID(message_id),
+		emoji,
+		limit,
+		after: after ? createUserID(after) : undefined,
+	});
+}
 
 export function MessageInteractionController(app: HonoApp) {
 	app.get(
@@ -195,21 +212,7 @@ export function MessageInteractionController(app: HonoApp) {
 			tags: 'Channels',
 		}),
 		async (ctx) => {
-			const {channel_id, message_id, emoji} = ctx.req.valid('param');
-			const {limit, after} = ctx.req.valid('query');
-			const userId = ctx.get('user').id;
-			const channelId = createChannelID(channel_id);
-			const messageId = createMessageID(message_id);
-			const afterUserId = after ? createUserID(after) : undefined;
-			const result = await ctx.get('channelService').interactions.getUsersForReaction({
-				viewer: viewerFromCtx(ctx),
-				userId,
-				channelId,
-				messageId,
-				emoji,
-				limit,
-				after: afterUserId,
-			});
+			const result = await fetchReactionUsers(ctx, ctx.req.valid('param'), ctx.req.valid('query'));
 			ctx.header('X-Has-More', result.has_more ? 'true' : 'false');
 			if (result.next_after !== null) {
 				ctx.header('X-Next-After', result.next_after);
@@ -234,21 +237,7 @@ export function MessageInteractionController(app: HonoApp) {
 			tags: 'Channels',
 		}),
 		async (ctx) => {
-			const {channel_id, message_id, emoji} = ctx.req.valid('param');
-			const {limit, after} = ctx.req.valid('query');
-			const userId = ctx.get('user').id;
-			const channelId = createChannelID(channel_id);
-			const messageId = createMessageID(message_id);
-			const afterUserId = after ? createUserID(after) : undefined;
-			const result = await ctx.get('channelService').interactions.getUsersForReaction({
-				viewer: viewerFromCtx(ctx),
-				userId,
-				channelId,
-				messageId,
-				emoji,
-				limit,
-				after: afterUserId,
-			});
+			const result = await fetchReactionUsers(ctx, ctx.req.valid('param'), ctx.req.valid('query'));
 			return ctx.json(
 				{
 					items: result.users,

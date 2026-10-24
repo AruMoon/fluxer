@@ -85,6 +85,20 @@ function requireFulfilment(ctx: Context<HonoEnv>): OperatorPassFulfilmentService
 	return fulfilment;
 }
 
+async function wallStateResponse() {
+	const service = getOperatorPassWallService();
+	const state = await service.publication.loadState();
+	const snapshot = await service.publication.snapshot();
+	return {
+		version: Number(state.wall_version),
+		frozen: state.frozen,
+		frozen_at: state.frozen_at?.toISOString() ?? null,
+		frozen_by: state.frozen_by?.toString() ?? null,
+		published_at: state.published_at?.toISOString() ?? null,
+		entry_count: snapshot.entries.length,
+	};
+}
+
 async function sendWallStatement(
 	ctx: Context<HonoEnv>,
 	user: User,
@@ -160,7 +174,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const repository = getOperatorPassRepository();
 			const [pass, removal, removalHistory, purchases, wallEntry, wallHistory, heldUnits, offers] = await Promise.all([
 				repository.findOperatorPass(userId),
@@ -238,7 +252,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const body = ctx.req.valid('json');
 			const {removal, notified} = await requireFulfilment(ctx).removalService.sendNotice({
 				user,
@@ -274,7 +288,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const body = ctx.req.valid('json');
 			const {removal, notified} = await requireFulfilment(ctx).removalService.remove({
 				user,
@@ -319,7 +333,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			await requireUser(ctx, userId);
+			await ctx.get('userRepository').findUniqueAssert(userId);
 			const restored = await requireFulfilment(ctx).removalService.restore(userId);
 			await recordAdminWrite(ctx, {
 				targetType: 'user',
@@ -355,7 +369,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 			if (!found) {
 				throw new UnknownOperatorPassPurchaseError();
 			}
-			const purchaser = await requireUser(ctx, found.purchaser_id);
+			const purchaser = await ctx.get('userRepository').findUniqueAssert(found.purchaser_id);
 			const receivedAt = new Date(body.received_at);
 			const purchase = await fulfilment.withdraw({
 				purchaser,
@@ -487,7 +501,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(BigInt(ctx.req.valid('param').user_id));
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const result = await getOperatorPassWallService().moderation.approve(
 				userId,
 				ctx.get('adminUserId'),
@@ -525,7 +539,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(BigInt(ctx.req.valid('param').user_id));
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const before = await getOperatorPassWallService().getEntry(userId);
 			const body = ctx.req.valid('json');
 			if (before?.pending_revision_id?.toString() !== ctx.req.valid('param').revision_id) {
@@ -570,7 +584,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(BigInt(ctx.req.valid('param').user_id));
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const result = await getOperatorPassWallService().moderation.revert(
 				userId,
 				ctx.get('adminUserId'),
@@ -608,7 +622,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const before = await getOperatorPassWallService().getEntry(userId);
 			const body = ctx.req.valid('json');
 			const result = await getOperatorPassWallService().moderation.forceFallback(userId, ctx.get('adminUserId'), {
@@ -651,7 +665,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const stripe = ctx.get('stripeService').getStripe();
 			if (!stripe) {
 				throw new StripePaymentNotAvailableError();
@@ -698,7 +712,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const body = ctx.req.valid('json');
 			if (body.hidden && (!body.reason || !body.note)) {
 				throw new InputValidationError([
@@ -951,17 +965,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 				action: AdminAuditReadActions.GET_OPERATOR_PASS_WALL_STATE,
 				metadata: {},
 			});
-			const service = getOperatorPassWallService();
-			const state = await service.publication.loadState();
-			const snapshot = await service.publication.snapshot();
-			return ctx.json({
-				version: Number(state.wall_version),
-				frozen: state.frozen,
-				frozen_at: state.frozen_at?.toISOString() ?? null,
-				frozen_by: state.frozen_by?.toString() ?? null,
-				published_at: state.published_at?.toISOString() ?? null,
-				entry_count: snapshot.entries.length,
-			});
+			return ctx.json(await wallStateResponse());
 		},
 	);
 	app.post(
@@ -989,17 +993,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 				action: frozen ? 'freeze_operator_pass_wall' : 'unfreeze_operator_pass_wall',
 				metadata: {frozen},
 			});
-			const service = getOperatorPassWallService();
-			const state = await service.publication.loadState();
-			const snapshot = await service.publication.snapshot();
-			return ctx.json({
-				version: Number(state.wall_version),
-				frozen: state.frozen,
-				frozen_at: state.frozen_at?.toISOString() ?? null,
-				frozen_by: state.frozen_by?.toString() ?? null,
-				published_at: state.published_at?.toISOString() ?? null,
-				entry_count: snapshot.entries.length,
-			});
+			return ctx.json(await wallStateResponse());
 		},
 	);
 	app.post(
@@ -1025,17 +1019,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 				action: 'republish_operator_pass_wall',
 				metadata: {version},
 			});
-			const service = getOperatorPassWallService();
-			const state = await service.publication.loadState();
-			const snapshot = await service.publication.snapshot();
-			return ctx.json({
-				version: Number(state.wall_version),
-				frozen: state.frozen,
-				frozen_at: state.frozen_at?.toISOString() ?? null,
-				frozen_by: state.frozen_by?.toString() ?? null,
-				published_at: state.published_at?.toISOString() ?? null,
-				entry_count: snapshot.entries.length,
-			});
+			return ctx.json(await wallStateResponse());
 		},
 	);
 	app.post(
@@ -1057,7 +1041,7 @@ export function OperatorPassAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const userId = createUserID(ctx.req.valid('param').user_id);
-			const user = await requireUser(ctx, userId);
+			const user = await ctx.get('userRepository').findUniqueAssert(userId);
 			const {held} = ctx.req.valid('json');
 			const entry = await getOperatorPassWallService().retention.setLegalHold(userId, ctx.get('adminUserId'), held);
 			await indexWallAudit(

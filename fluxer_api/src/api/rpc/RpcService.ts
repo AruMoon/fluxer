@@ -302,6 +302,13 @@ export class RpcService {
 		return sticker;
 	}
 
+	private requireVoiceService(): VoiceService {
+		if (this.voiceService === null) {
+			throw new Error('Voice is not enabled on this server');
+		}
+		return this.voiceService;
+	}
+
 	async handleRpcRequest({request, requestCache}: HandleRpcRequestParams): Promise<RpcResponse> {
 		switch (request.type) {
 			case 'session':
@@ -401,10 +408,7 @@ export class RpcService {
 					{type: 'voice_get_token', guildId: request.guild_id, channelId: request.channel_id, userId: request.user_id},
 					'RPC voice_get_token received',
 				);
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				const result = await this.voiceService.getVoiceToken({
+				const result = await this.requireVoiceService().getVoiceToken({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),
@@ -427,10 +431,7 @@ export class RpcService {
 				};
 			}
 			case 'voice_force_disconnect_participant': {
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				await this.voiceService.disconnectParticipant({
+				await this.requireVoiceService().disconnectParticipant({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),
@@ -442,10 +443,7 @@ export class RpcService {
 				};
 			}
 			case 'voice_update_participant': {
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				await this.voiceService.updateParticipant({
+				await this.requireVoiceService().updateParticipant({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),
@@ -461,10 +459,7 @@ export class RpcService {
 				};
 			}
 			case 'voice_update_participant_permissions': {
-				if (this.voiceService === null) {
-					throw new Error('Voice is not enabled on this server');
-				}
-				await this.voiceService.updateParticipantPermissions({
+				await this.requireVoiceService().updateParticipantPermissions({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),

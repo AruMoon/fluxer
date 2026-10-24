@@ -42,10 +42,7 @@ export async function createSignInLink(
 	auditService: AdminAuditService,
 	args: {userId: UserID; adminUserId: UserID; auditLogReason: string | null},
 ): Promise<AdminSignInLinkResponse> {
-	const user = await ctx.services.users.findUnique(args.userId);
-	if (!user) {
-		throw new UnknownUserError();
-	}
+	const user = await ctx.services.users.findUniqueAssert(args.userId);
 	AuthUtility.assertNonBotUser(ctx, user);
 	if (!isAdmin(user.acls)) {
 		throw new MissingACLError(AdminACLs.WILDCARD);

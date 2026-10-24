@@ -161,10 +161,7 @@ export class UserRelationshipService {
 		if (userId === targetId) {
 			throw new CannotSendFriendRequestToSelfError();
 		}
-		const targetUserForAttempt = await this.userRepository.findUnique(targetId);
-		if (!targetUserForAttempt) {
-			throw new UnknownUserError();
-		}
+		const targetUserForAttempt = await this.userRepository.findUniqueAssert(targetId);
 		if (this.isDeletedUser(targetUserForAttempt)) {
 			throw new FriendRequestBlockedError();
 		}
@@ -224,18 +221,12 @@ export class UserRelationshipService {
 		if ((await getInstanceConfigRepository().getInstancePolicyConfig()).friends_disabled) {
 			throw new FriendsDisabledError();
 		}
-		const user = await this.userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await this.userRepository.findUniqueAssert(userId);
 		if (this.isDeletedUser(user)) {
 			throw new FriendRequestBlockedError();
 		}
 		assertTierAllows(user, TierGatedActions.FRIEND_ACCEPT, NO_TIER_CONTEXT);
-		const requesterUser = await this.userRepository.findUnique(targetId);
-		if (!requesterUser) {
-			throw new UnknownUserError();
-		}
+		const requesterUser = await this.userRepository.findUniqueAssert(targetId);
 		if (this.isDeletedUser(requesterUser)) {
 			throw new FriendRequestBlockedError();
 		}
@@ -250,29 +241,7 @@ export class UserRelationshipService {
 		await this.validateRelationshipCounts({userId, targetId});
 		await this.userRepository.deleteRelationship(userId, targetId, RelationshipTypes.INCOMING_REQUEST);
 		await this.userRepository.deleteRelationship(targetId, userId, RelationshipTypes.OUTGOING_REQUEST);
-		const now = new Date();
-		const [userDefault, targetDefault] = await Promise.all([
-			this.userRepository.findSettings(userId).then((s) => s?.defaultShareVoiceActivity ?? true),
-			this.userRepository.findSettings(targetId).then((s) => s?.defaultShareVoiceActivity ?? true),
-		]);
-		const userRelationship = await this.userRepository.upsertRelationship({
-			source_user_id: userId,
-			target_user_id: targetId,
-			type: RelationshipTypes.FRIEND,
-			nickname: null,
-			since: now,
-			share_voice_activity: userDefault,
-			version: 1,
-		});
-		const targetRelationship = await this.userRepository.upsertRelationship({
-			source_user_id: targetId,
-			target_user_id: userId,
-			type: RelationshipTypes.FRIEND,
-			nickname: null,
-			since: now,
-			share_voice_activity: targetDefault,
-			version: 1,
-		});
+		const [userRelationship, targetRelationship] = await this.upsertMutualFriendship(userId, targetId);
 		await this.dispatchRelationshipUpdate({
 			userId,
 			relationship: userRelationship,
@@ -299,10 +268,7 @@ export class UserRelationshipService {
 		userCacheService: UserCacheService;
 		requestCache: RequestCache;
 	}): Promise<Relationship> {
-		const targetUser = await this.userRepository.findUnique(targetId);
-		if (!targetUser) {
-			throw new UnknownUserError();
-		}
+		const targetUser = await this.userRepository.findUniqueAssert(targetId);
 		if (targetUser.isSystem) {
 			throw new CannotBlockSystemUserError();
 		}
@@ -471,27 +437,7 @@ export class UserRelationshipService {
 		userCacheService: UserCacheService;
 		requestCache: RequestCache;
 	}): Promise<Relationship> {
-		if (userId === targetId) {
-			throw new CannotSendFriendRequestToSelfError();
-		}
-		const requesterUser = await this.userRepository.findUnique(userId);
-		if (!requesterUser) {
-			throw new UnknownUserError();
-		}
-		if (this.isDeletedUser(requesterUser)) {
-			throw new FriendRequestBlockedError();
-		}
-		assertTierAllows(requesterUser, TierGatedActions.FRIEND_REQUEST, NO_TIER_CONTEXT);
-		if (requesterUser.isBot) {
-			throw new BotsCannotSendFriendRequestsError();
-		}
-		const targetUser = await this.userRepository.findUnique(targetId);
-		if (!targetUser) {
-			throw new UnknownUserError();
-		}
-		if (this.isDeletedUser(targetUser)) {
-			throw new FriendRequestBlockedError();
-		}
+		await this.loadFriendRequestUsers(userId, targetId);
 		const [
 			userFriend,
 			userBlocked,
@@ -535,29 +481,7 @@ export class UserRelationshipService {
 				? [this.userRepository.deleteRelationship(targetId, userId, RelationshipTypes.OUTGOING_REQUEST)]
 				: []),
 		]);
-		const now = new Date();
-		const [userDefaultStaff, targetDefaultStaff] = await Promise.all([
-			this.userRepository.findSettings(userId).then((s) => s?.defaultShareVoiceActivity ?? true),
-			this.userRepository.findSettings(targetId).then((s) => s?.defaultShareVoiceActivity ?? true),
-		]);
-		const userRelationship = await this.userRepository.upsertRelationship({
-			source_user_id: userId,
-			target_user_id: targetId,
-			type: RelationshipTypes.FRIEND,
-			nickname: null,
-			since: now,
-			share_voice_activity: userDefaultStaff,
-			version: 1,
-		});
-		const targetRelationship = await this.userRepository.upsertRelationship({
-			source_user_id: targetId,
-			target_user_id: userId,
-			type: RelationshipTypes.FRIEND,
-			nickname: null,
-			since: now,
-			share_voice_activity: targetDefaultStaff,
-			version: 1,
-		});
+		const [userRelationship, targetRelationship] = await this.upsertMutualFriendship(userId, targetId);
 		const hadUserRelationship = userFriend != null || hasExtraUserRelationship;
 		const hadTargetRelationship = targetFriend != null || hasExtraTargetRelationship;
 		if (hadUserRelationship) {
@@ -581,26 +505,54 @@ export class UserRelationshipService {
 		return userRelationship;
 	}
 
-	private async validateFriendRequest({userId, targetId}: {userId: UserID; targetId: UserID}): Promise<User> {
+	private async loadFriendRequestUsers(userId: UserID, targetId: UserID): Promise<User> {
 		if (userId === targetId) {
 			throw new CannotSendFriendRequestToSelfError();
 		}
-		const requesterUser = await this.userRepository.findUnique(userId);
-		if (!requesterUser) {
-			throw new UnknownUserError();
-		}
+		const requesterUser = await this.userRepository.findUniqueAssert(userId);
 		if (this.isDeletedUser(requesterUser)) {
 			throw new FriendRequestBlockedError();
 		}
 		assertTierAllows(requesterUser, TierGatedActions.FRIEND_REQUEST, NO_TIER_CONTEXT);
-		if (requesterUser?.isBot) {
+		if (requesterUser.isBot) {
 			throw new BotsCannotSendFriendRequestsError();
 		}
-		const targetUser = await this.userRepository.findUnique(targetId);
-		if (!targetUser) throw new UnknownUserError();
+		const targetUser = await this.userRepository.findUniqueAssert(targetId);
 		if (this.isDeletedUser(targetUser)) {
 			throw new FriendRequestBlockedError();
 		}
+		return targetUser;
+	}
+
+	private async upsertMutualFriendship(userId: UserID, targetId: UserID): Promise<[Relationship, Relationship]> {
+		const now = new Date();
+		const [userDefault, targetDefault] = await Promise.all([
+			this.userRepository.findSettings(userId).then((s) => s?.defaultShareVoiceActivity ?? true),
+			this.userRepository.findSettings(targetId).then((s) => s?.defaultShareVoiceActivity ?? true),
+		]);
+		const userRelationship = await this.userRepository.upsertRelationship({
+			source_user_id: userId,
+			target_user_id: targetId,
+			type: RelationshipTypes.FRIEND,
+			nickname: null,
+			since: now,
+			share_voice_activity: userDefault,
+			version: 1,
+		});
+		const targetRelationship = await this.userRepository.upsertRelationship({
+			source_user_id: targetId,
+			target_user_id: userId,
+			type: RelationshipTypes.FRIEND,
+			nickname: null,
+			since: now,
+			share_voice_activity: targetDefault,
+			version: 1,
+		});
+		return [userRelationship, targetRelationship];
+	}
+
+	private async validateFriendRequest({userId, targetId}: {userId: UserID; targetId: UserID}): Promise<User> {
+		const targetUser = await this.loadFriendRequestUsers(userId, targetId);
 		const targetIsFriendlyBot =
 			targetUser.isBot && (targetUser.flags & UserFlags.FRIENDLY_BOT) === UserFlags.FRIENDLY_BOT;
 		if (targetUser.isBot && !targetIsFriendlyBot) {
@@ -711,10 +663,7 @@ export class UserRelationshipService {
 		if (requesterUser.isBot) {
 			throw new BotsCannotSendFriendRequestsError();
 		}
-		const targetUser = await this.userRepository.findUnique(targetId);
-		if (!targetUser) {
-			throw new UnknownUserError();
-		}
+		const targetUser = await this.userRepository.findUniqueAssert(targetId);
 		if (this.isDeletedUser(targetUser)) {
 			throw new FriendRequestBlockedError();
 		}

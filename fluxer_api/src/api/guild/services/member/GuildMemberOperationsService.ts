@@ -513,7 +513,7 @@ export class GuildMemberOperationsService {
 			void this.searchIndexService.indexMember(guildMember, user, {includeDefault});
 		}
 		if (sendJoinMessage && !(guild.systemChannelFlags & SystemChannelFlags.SUPPRESS_JOIN_NOTIFICATIONS)) {
-			await this.channelService.messages.system.sendJoinSystemMessage({guildId, userId, requestCache});
+			await this.channelService.messages.system.sendJoinSystemMessage({guildId, userId});
 		}
 		void emitActivity('guild_joined', userId.toString(), {
 			user_id: userId.toString(),

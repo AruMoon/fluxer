@@ -651,8 +651,7 @@ export class AdminBanManagementService {
 	}> {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const userId = createUserID(BigInt(data.user_id));
-		const user = await userRepository.findUnique(userId);
-		if (!user) throw new UnknownUserError();
+		const user = await userRepository.findUniqueAssert(userId);
 		const avatar = user.avatarHash;
 		if (!avatar) {
 			throw new NotFoundError({code: APIErrorCodes.NOT_FOUND});

@@ -168,6 +168,12 @@ function omitUndefinedFields<T extends object>(value: T): Partial<T> {
 	return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)) as Partial<T>;
 }
 
+function nonEmptyPatch<T extends object>(value: T | null | undefined): Partial<T> | undefined {
+	if (!value) return undefined;
+	const patch = omitUndefinedFields(value);
+	return Object.keys(patch).length > 0 ? patch : undefined;
+}
+
 async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 	const instanceConfigRepository = getInstanceConfigRepository();
 	const [
@@ -568,11 +574,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 		},
 	),
 	push_relay: createInstanceConfigSectionApplier(
-		({data}) => {
-			if (!data.push_relay) return undefined;
-			const patch = omitUndefinedFields(data.push_relay);
-			return Object.keys(patch).length > 0 ? patch : undefined;
-		},
+		({data}) => nonEmptyPatch(data.push_relay),
 		async (patch, {ctx, instanceConfigRepository}) => {
 			const adminUserId = ctx.get('adminUserId').toString();
 			const landed = await instanceConfigRepository.updatePushRelayConfig((current) => ({
@@ -584,11 +586,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 		},
 	),
 	domain_migration: createInstanceConfigSectionApplier(
-		({data}) => {
-			if (!data.domain_migration) return undefined;
-			const patch = omitUndefinedFields(data.domain_migration);
-			return Object.keys(patch).length > 0 ? patch : undefined;
-		},
+		({data}) => nonEmptyPatch(data.domain_migration),
 		async (patch, {instanceConfigRepository}) => {
 			await instanceConfigRepository.updateDomainMigrationConfig((current) =>
 				DomainMigrationConfigSchema.parse({
@@ -600,11 +598,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 		},
 	),
 	voice_p2p: createInstanceConfigSectionApplier(
-		({data}) => {
-			if (!data.voice_p2p) return undefined;
-			const patch = omitUndefinedFields(data.voice_p2p);
-			return Object.keys(patch).length > 0 ? patch : undefined;
-		},
+		({data}) => nonEmptyPatch(data.voice_p2p),
 		async (patch, {instanceConfigRepository}) => {
 			await instanceConfigRepository.updateVoiceP2pConfig((current) => {
 				const next = VoiceP2pConfigSchema.parse({...current, ...patch});
@@ -613,11 +607,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 		},
 	),
 	captcha: createInstanceConfigSectionApplier(
-		({data}) => {
-			if (!data.captcha) return undefined;
-			const patch = omitUndefinedFields(data.captcha);
-			return Object.keys(patch).length > 0 ? patch : undefined;
-		},
+		({data}) => nonEmptyPatch(data.captcha),
 		async (patch, {instanceConfigRepository}) => {
 			await instanceConfigRepository.updateCaptchaConfig(patch);
 		},

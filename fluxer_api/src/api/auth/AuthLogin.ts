@@ -209,10 +209,7 @@ export async function completeIpAuthorization(
 	if (!payload) {
 		throw InputValidationError.fromCode('token', ValidationErrorCodes.INVALID_OR_EXPIRED_AUTHORIZATION_TOKEN);
 	}
-	const user = await users.findUnique(createUserID(BigInt(payload.userId)));
-	if (!user) {
-		throw new UnknownUserError();
-	}
+	const user = await users.findUniqueAssert(createUserID(BigInt(payload.userId)));
 	if (user.passwordLastChangedAt !== null && payload.createdAt < user.passwordLastChangedAt.getTime()) {
 		await cache.delete(cacheKey);
 		await cache.delete(getTokenCacheKey(token));

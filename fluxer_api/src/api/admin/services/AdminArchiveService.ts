@@ -45,19 +45,15 @@ export class AdminArchiveService {
 		return new Date(Date.now() + ARCHIVE_RETENTION_DAYS * ms('1 day'));
 	}
 
-	async triggerUserArchive(
-		targetUserId: UserID,
+	private async createQueuedArchive(
+		subjectType: ArchiveSubjectType,
+		subjectId: bigint,
 		requestedBy: UserID,
-		includeAttachments: boolean,
-	): Promise<AdminArchiveResponse> {
-		const user = await this.userRepository.findUnique(targetUserId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+	): Promise<AdminArchive> {
 		const archiveId = await this.snowflakeService.generate();
 		const archive = new AdminArchive({
-			subject_type: 'user',
-			subject_id: targetUserId,
+			subject_type: subjectType,
+			subject_id: subjectId,
 			archive_id: archiveId,
 			requested_by: requestedBy,
 			requested_at: new Date(),
@@ -73,6 +69,16 @@ export class AdminArchiveService {
 			expires_at: this.computeExpiry(),
 		});
 		await this.adminArchiveRepository.create(archive);
+		return archive;
+	}
+
+	async triggerUserArchive(
+		targetUserId: UserID,
+		requestedBy: UserID,
+		includeAttachments: boolean,
+	): Promise<AdminArchiveResponse> {
+		await this.userRepository.findUniqueAssert(targetUserId);
+		const archive = await this.createQueuedArchive('user', targetUserId, requestedBy);
 		await this.workerService.addJob('harvestUserData', {
 			userId: targetUserId.toString(),
 			harvestId: archive.archiveId.toString(),
@@ -91,25 +97,7 @@ export class AdminArchiveService {
 		if (!guild) {
 			throw new UnknownGuildError();
 		}
-		const archiveId = await this.snowflakeService.generate();
-		const archive = new AdminArchive({
-			subject_type: 'guild',
-			subject_id: targetGuildId,
-			archive_id: archiveId,
-			requested_by: requestedBy,
-			requested_at: new Date(),
-			started_at: null,
-			completed_at: null,
-			failed_at: null,
-			storage_key: null,
-			file_size: null,
-			progress_percent: 0,
-			progress_step: 'Queued',
-			error_message: null,
-			download_url_expires_at: null,
-			expires_at: this.computeExpiry(),
-		});
-		await this.adminArchiveRepository.create(archive);
+		const archive = await this.createQueuedArchive('guild', targetGuildId, requestedBy);
 		await this.workerService.addJob('harvestGuildData', {
 			guildId: targetGuildId.toString(),
 			archiveId: archive.archiveId.toString(),

@@ -11,7 +11,6 @@ import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {MEDIA_PROXY_ICON_SIZE_DEFAULT} from '@fluxer/constants/src/MediaProxyAssetSizes';
 import type {MediaProxyImageSize} from '@fluxer/constants/src/MediaProxyImageSizes';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {
 	ListGuildMembersRequest,
 	ListUserGuildsRequest,
@@ -98,10 +97,7 @@ export class AdminGuildLookupService {
 	async listUserGuilds(data: ListUserGuildsRequest) {
 		const {userRepository, guildRepository, gatewayService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await userRepository.findUniqueAssert(userId);
 		let guildIds = await userRepository.getUserGuildIds(userId);
 		guildIds.sort((a, b) => {
 			if (a < b) return -1;
