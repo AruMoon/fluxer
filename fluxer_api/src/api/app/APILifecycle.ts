@@ -204,7 +204,7 @@ export function createInitializer(
 					spoolWhileMissing: !config.instance.selfHosted,
 				});
 				startRequestErrorTelemetry();
-				startSharedListWatch(connection.getJetStreamClient());
+				startSharedListWatch(connection.getJetStreamClient(), {selfHosted: config.instance.selfHosted});
 				unregisterMetricsSections.push(
 					registerMetricsSection(renderActivityMetrics),
 					registerMetricsSection(renderSharedListMetrics),

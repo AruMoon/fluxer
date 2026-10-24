@@ -311,7 +311,7 @@ export async function startWorkerMain(): Promise<void> {
 			jsm: await jsConnectionManager.getJetStreamManager(),
 			spoolWhileMissing: !Config.instance.selfHosted,
 		});
-		startSharedListWatch(jsConnectionManager.getJetStreamClient());
+		startSharedListWatch(jsConnectionManager.getJetStreamClient(), {selfHosted: Config.instance.selfHosted});
 		if (activeWorkerLanes.some((lane) => lane.name === 'lifecycle')) {
 			const apiContext = createApiContext();
 			startAccountActionConsumer({
