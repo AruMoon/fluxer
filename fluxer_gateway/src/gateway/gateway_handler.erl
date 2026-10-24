@@ -27,6 +27,10 @@
 
 -type ws_frame() :: {text, binary()} | {binary, binary()}.
 -type ws_result() :: {ok, state()} | {[ws_frame() | {close, integer(), binary()}], state()}.
+-type ws_info_result() ::
+    ws_result()
+    | {ok, state(), hibernate}
+    | {[ws_frame() | {close, integer(), binary()}], state(), hibernate}.
 
 -export_type([state/0, ws_frame/0, ws_result/0]).
 
@@ -99,9 +103,11 @@ websocket_handle({binary, Binary}, State) when is_binary(Binary) ->
 websocket_handle(_, State) ->
     {ok, State}.
 
--spec websocket_info(term(), state()) -> ws_result().
+-spec websocket_info(term(), state()) -> ws_info_result().
 websocket_info({heartbeat_check, Token}, State) when is_reference(Token) ->
-    gateway_handler_heartbeat:handle_heartbeat_check(Token, State);
+    hibernate(gateway_handler_heartbeat:handle_heartbeat_check(Token, State));
+websocket_info({dispatch, ready, Data, Seq}, State) when is_integer(Seq), is_map(Data) ->
+    hibernate(gateway_handler_dispatch:handle_dispatch(ready, Data, Seq, State));
 websocket_info({dispatch, Event, Data, Seq}, State) when
     is_integer(Seq), is_atom(Event), is_map(Data);
     is_integer(Seq), is_binary(Event), is_map(Data);
@@ -142,6 +148,10 @@ websocket_info({process_voice_queue}, State) ->
     {ok, NewState};
 websocket_info(_, State) ->
     {ok, State}.
+
+-spec hibernate(ws_result()) -> ws_info_result().
+hibernate({Frames, State}) ->
+    {Frames, State, hibernate}.
 
 -spec terminate(term(), cowboy_req:req(), state() | term()) -> ok.
 terminate(Reason, _Req, State) when is_map(State) ->
