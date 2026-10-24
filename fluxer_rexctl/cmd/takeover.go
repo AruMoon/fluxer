@@ -138,12 +138,9 @@ func takeoverDir(ctx context.Context, app *App, dir string, opts takeoverOptions
 }
 
 func describeTakeover(u *ui.UI, r *instance.ImportReport) {
-	switch r.Source {
-	case instance.SourceEjected:
+	if r.Source == instance.SourceEjected {
 		u.Info("You manage the instance in %s yourself. rexctl takes it back with the settings in its .env file.", r.Dir)
-	case instance.SourceRexctl:
-		u.Info("An earlier rexctl manages the instance in %s. rexctl moves its settings out of .env.", r.Dir)
-	default:
+	} else {
 		u.Info("Found a Fluxer instance in %s.", r.Dir)
 	}
 	u.Info("After this, rexctl manages it. Fluxer keeps running as it is, and your data and secrets stay.")

@@ -95,14 +95,11 @@ func runImport(ctx context.Context, dir string, e *engine.Engine, dry bool) (*St
 	if err != nil {
 		return nil, nil, err
 	}
-	s, err := ParseState(data, abs, filepath.Join(abs, EnvFileName))
+	s, err := ParseState(data, abs)
 	if err != nil {
 		return nil, nil, err
 	}
-	switch {
-	case s.MigratedFromV1():
-		return importRexctl(ctx, abs, e, s, dry)
-	case s.Ejected != nil:
+	if s.Ejected != nil {
 		return importEjected(ctx, abs, e, s, dry)
 	}
 	r := &ImportReport{Source: SourceManaged, Dir: abs, Project: s.Project}
@@ -486,7 +483,7 @@ func releaseSet(dir, release string) (*stack.Set, error) {
 	if release != LegacyRelease {
 		profiles = stack.Embedded().Profiles
 	}
-	return diskSet(filesDir, release, profiles)
+	return diskSet(dir, release, profiles)
 }
 
 func RetiredService(dir string) string {

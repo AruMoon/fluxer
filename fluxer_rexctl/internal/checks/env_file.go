@@ -26,7 +26,7 @@ func (e *Env) drift() (*instance.DriftReport, error) {
 }
 
 func runEnvFile(ctx context.Context, e *Env) Result {
-	if e.state() == nil || e.state().MigratedFromV1() || e.state().Ejected != nil {
+	if e.state() == nil || e.state().Ejected != nil {
 		return skip("")
 	}
 	r, err := e.drift()

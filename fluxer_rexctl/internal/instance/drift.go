@@ -171,7 +171,7 @@ func KeepEdited(inst *Instance, name string) (string, error) {
 }
 
 func SettleEnv(inst *Instance, set []string) (string, error) {
-	if inst.State == nil || inst.State.MigratedFromV1() || inst.State.Ejected != nil {
+	if inst.State == nil || inst.State.Ejected != nil {
 		return "", nil
 	}
 	r, err := envDrift(inst)

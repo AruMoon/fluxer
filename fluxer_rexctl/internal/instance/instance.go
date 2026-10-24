@@ -340,13 +340,7 @@ func (i *Instance) Save() error {
 		return fmt.Errorf("instance: nothing to save in %s", i.Dir)
 	}
 	i.State.UpdatedAt = time.Now().UTC().Truncate(time.Second)
-	if err := i.State.Save(i.StatePath()); err != nil {
-		return err
-	}
-	if fromV1 {
-		return removeIfExists(i.Path(EnvFileName))
-	}
-	return nil
+	return i.State.Save(i.StatePath())
 }
 
 func removeIfExists(path string) error {

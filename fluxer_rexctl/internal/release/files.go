@@ -110,7 +110,7 @@ func HasSnapshot(inst *instance.Instance, version string) bool {
 	if !exists(filepath.Join(dir, snapshotState)) {
 		return false
 	}
-	return exists(filepath.Join(dir, StackDirName, stack.ProfilesFile)) || exists(filepath.Join(dir, oldEnvFile))
+	return exists(filepath.Join(dir, StackDirName, stack.ProfilesFile))
 }
 
 func SnapshotState(inst *instance.Instance, version string) (*instance.State, error) {
@@ -122,27 +122,15 @@ func SnapshotState(inst *instance.Instance, version string) (*instance.State, er
 	if err != nil {
 		return nil, err
 	}
-	return instance.ParseState(data, inst.Dir, filepath.Join(dir, oldEnvFile))
+	return instance.ParseState(data, inst.Dir)
 }
 
 func LoadSet(inst *instance.Instance, version string) (*stack.Set, error) {
 	set, err := stack.LoadSet(StackDir(inst, version))
-	if err == nil {
-		return set, nil
-	}
-	if !errors.Is(err, fs.ErrNotExist) {
-		return nil, err
-	}
-	dir := Dir(inst, version)
-	if !exists(filepath.Join(dir, oldEnvFile)) || !exists(filepath.Join(dir, stack.ComposeFile)) {
+	if errors.Is(err, fs.ErrNotExist) {
 		return nil, ErrNoSnapshot
 	}
-	files := os.DirFS(dir)
-	vars, err := stack.FilesVars(files)
-	if err != nil {
-		return nil, err
-	}
-	return &stack.Set{Release: version, Files: files, Profiles: maps.Clone(stack.Embedded().Profiles), Vars: vars}, nil
+	return set, err
 }
 
 type Restored struct {
@@ -163,7 +151,7 @@ func Restore(inst *instance.Instance, version string) (*Restored, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(saved.Images.Refs) == 0 && Valid(version) && exists(StackDir(inst, version)) {
+	if len(saved.Images.Refs) == 0 && Valid(version) {
 		return nil, fmt.Errorf("release: the snapshot of %s records no images", version)
 	}
 	r, err := stack.Render(set, stack.OverlaysFor(saved.Settings), saved.Images.Refs, inst.Project(), inst.Dir)

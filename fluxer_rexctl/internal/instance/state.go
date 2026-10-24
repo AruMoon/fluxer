@@ -104,10 +104,10 @@ func LoadState(path string) (*State, error) {
 		return nil, err
 	}
 	dir := filepath.Dir(filepath.Dir(path))
-	return ParseState(data, dir, filepath.Join(dir, EnvFileName))
+	return ParseState(data, dir)
 }
 
-func ParseState(data []byte, dir, envPath string) (*State, error) {
+func ParseState(data []byte, dir string) (*State, error) {
 	var head struct {
 		Schema  int    `json:"schema"`
 		Project string `json:"project"`
@@ -121,15 +121,7 @@ func ParseState(data []byte, dir, envPath string) (*State, error) {
 	if head.Project == "" {
 		return nil, fmt.Errorf("instance: the state in %s names no project", dir)
 	}
-	var (
-		s   *State
-		err error
-	)
-	if head.Schema < StateSchema {
-		s, err = migrateV1(data, dir, envPath)
-	} else {
-		s, err = parseV2(data, dir)
-	}
+	s, err := parseState(data, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +135,7 @@ var stateFields = map[string]bool{
 	"installed_at": true, "updated_at": true,
 }
 
-func parseV2(data []byte, dir string) (*State, error) {
+func parseState(data []byte, dir string) (*State, error) {
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("instance: reading state in %s: %w", dir, err)
