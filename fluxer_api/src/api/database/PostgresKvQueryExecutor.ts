@@ -92,6 +92,7 @@ const POSTGRES_KV_SCHEMA_MIGRATION_TIMEOUT = '30min';
 export const POSTGRES_KV_MIGRATION_TABLE = '__fluxer_schema_migrations';
 const POSTGRES_KV_MESSAGES_PARTITION_MIGRATION = 'messages_partition_key_v1';
 const POSTGRES_KV_SCHEMA_ATTEMPTS = 3;
+const KV_WRITE_PARALLELISM = 4;
 const POSTGRES_KV_SCHEMA_RETRY_DELAY_MS = 250;
 const POSTGRES_KV_CONCURRENT_DDL_CODES = new Set(['23505', '42P07', '42710']);
 const NUMERIC_ROW_KEY_BIGINT_PATTERN = '^\\{"__fluxer_type":"bigint","value":"(-?[0-9]+)"\\}$';
@@ -967,6 +968,45 @@ WHERE kv.table_name = expired.table_name AND kv.row_key = expired.row_key`,
 	return result.rowCount ?? 0;
 }
 
+function writtenRowKeys(meta: KvQueryMeta, params: CassandraParams): ReadonlyArray<string> | null {
+	try {
+		switch (meta.action) {
+			case 'upsert':
+			case 'insert':
+				return [rowKey(meta, rowFromParams(meta, params))];
+			case 'patch':
+				return [rowKeyFromParams(meta, params)];
+			case 'delete': {
+				const plan = buildCandidatePlan(meta, params);
+				if (plan.candidates.kind === 'none') return [];
+				return plan.candidates.kind === 'rowKeys' ? plan.candidates.rowKeys : null;
+			}
+			default:
+				return null;
+		}
+	} catch {
+		return null;
+	}
+}
+
+async function inParallel<T>(items: ReadonlyArray<T>, run: (item: T, index: number) => Promise<void>): Promise<void> {
+	let next = 0;
+	const errors: Array<unknown> = [];
+	const worker = async (): Promise<void> => {
+		while (errors.length === 0 && next < items.length) {
+			const index = next;
+			next += 1;
+			try {
+				await run(items[index]!, index);
+			} catch (error) {
+				errors.push(error);
+			}
+		}
+	};
+	await Promise.all(Array.from({length: Math.min(KV_WRITE_PARALLELISM, items.length)}, worker));
+	if (errors.length > 0) throw errors[0];
+}
+
 export class PostgresKvQueryExecutor {
 	private readonly table: string;
 
@@ -1180,9 +1220,41 @@ export class PostgresKvQueryExecutor {
 			});
 			return;
 		}
-		for (const query of queries) {
-			await this.executeQuery({cql: query.query, params: query.params as CassandraParams, kvMeta: query.meta});
+		const prepared = queries.map((query) => ({
+			cql: query.query,
+			params: query.params as CassandraParams,
+			kvMeta: query.meta,
+		}));
+		if (!this.writesCommute(prepared)) {
+			for (const query of prepared) await this.executeQuery(query);
+			return;
 		}
+		await inParallel(prepared, async (query) => {
+			await this.executeQuery(query);
+		});
+	}
+
+	private writesCommute(queries: ReadonlyArray<PreparedQuery>): boolean {
+		if (queries.length < 2) return false;
+		let metas: Array<KvQueryMeta>;
+		try {
+			metas = queries.map((query) => this.meta(query));
+		} catch {
+			return false;
+		}
+		if (metas.every((meta) => meta.action === 'delete')) return true;
+		const touched = new Set<string>();
+		for (let index = 0; index < queries.length; index += 1) {
+			const meta = metas[index]!;
+			const keys = writtenRowKeys(meta, queries[index]!.params);
+			if (keys === null) return false;
+			for (const key of keys) {
+				const id = `${meta.table.name}${VALUE_SEPARATOR}${key}`;
+				if (touched.has(id)) return false;
+				touched.add(id);
+			}
+		}
+		return true;
 	}
 
 	private meta(query: PreparedQuery): KvQueryMeta<Row> {
@@ -1308,25 +1380,33 @@ export class PostgresKvQueryExecutor {
 		const incoming = rowFromParams(meta, params);
 		const explicit = ttlExpiresAt(meta, params);
 		const expiresAt = explicit === undefined ? (defaultExpiresAt(meta) ?? null) : explicit;
-		const result = await db.query(
+		const values = [
+			meta.table.name,
+			partitionKey(meta, incoming),
+			rowKey(meta, incoming),
+			JSON.stringify(encodeRow(incoming)),
+			expiresAt,
+		];
+		if (meta.ifNotExists) {
+			const result = await db.query(
+				`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
+VALUES ($1, $2, $3, $4::jsonb, $5, now())
+ON CONFLICT (table_name, row_key)
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = EXCLUDED.row_data, expires_at = EXCLUDED.expires_at, updated_at = now()
+WHERE ${EXPIRED_STORED_ROW}`,
+				values,
+				'kv_insert_absent',
+			);
+			return [{'[applied]': result.rowCount === 1}];
+		}
+		await db.query(
 			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
 VALUES ($1, $2, $3, $4::jsonb, $5, now())
 ON CONFLICT (table_name, row_key)
-DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = EXCLUDED.expires_at, updated_at = now()
-WHERE NOT $6`,
-			[
-				meta.table.name,
-				partitionKey(meta, incoming),
-				key,
-				JSON.stringify(encodeRow(incoming)),
-				expiresAt,
-				meta.ifNotExists === true,
-			],
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DATA}, expires_at = EXCLUDED.expires_at, updated_at = now()`,
+			values,
 			'kv_upsert',
 		);
-		if (meta.ifNotExists) {
-			return [{'[applied]': result.rowCount === 1}];
-		}
 		return [];
 	}
 
