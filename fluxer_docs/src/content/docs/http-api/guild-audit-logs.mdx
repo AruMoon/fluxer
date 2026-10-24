@@ -26,7 +26,7 @@ Fluxer never percent-decodes a body reason either. The operation writes the acce
 Fluxer resolves the reason again when it reads an entry. A [MEMBER_BAN_ADD](#audit-actions) entry with a blank stored reason returns the ban `reason` from its change list, and a [MEMBER_UPDATE](#audit-actions) entry with a blank stored reason returns the timeout reason stored with it, when it has one. The result is trimmed, and a blank result is omitted.
 
 :::note[Some operations record no reason at all]
-Bot addition, the role Fluxer creates and assigns to a bot it adds with permissions, a Visionary role grant, a message deletion made by [Delete message attachment](/http-api/messages/#delete-message-attachment), and a consolidated bulk deletion entry never have one.
+Bot addition, the role Fluxer creates and assigns to a bot it adds with permissions, a message deletion made by [Delete message attachment](/http-api/messages/#delete-message-attachment), and a consolidated bulk deletion entry never have one.
 :::
 
 ## Guild audit log response object
