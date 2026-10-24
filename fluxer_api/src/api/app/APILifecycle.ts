@@ -54,6 +54,10 @@ import {JetStreamConnectionManager} from '@pkgs/nats/src/JetStreamConnectionMana
 import {getDefaultPostgresClient, initPostgres, shutdownPostgres} from '@pkgs/postgres/src/Client';
 
 let jsConnectionManager: JetStreamConnectionManager | null = null;
+let searchInitRetryTimer: ReturnType<typeof setTimeout> | null = null;
+let searchInitStopped = false;
+const SEARCH_INIT_RETRY_MIN_MS = 5_000;
+const SEARCH_INIT_RETRY_MAX_MS = 60_000;
 const unregisterMetricsSections: Array<() => void> = [];
 
 interface RefreshCacheLifecycle {
@@ -98,6 +102,54 @@ async function shutdownRefreshCaches(logger: LoggerInterface): Promise<void> {
 
 function unsupportedDatabaseBackend(backend: never): never {
 	throw new Error(`Unsupported database backend during shutdown: ${String(backend)}`);
+}
+
+async function initializeSearchAndWarmup(
+	kvClient: ReturnType<typeof getKVClient>,
+	logger: LoggerInterface,
+): Promise<void> {
+	await initializeSearch(getCacheService());
+	logger.info('Search initialized');
+	const warmupLockKey = 'fluxer:search:warmup:admin';
+	const warmupLockToken = randomUUID();
+	const warmupLockTtlSeconds = 60 * 60;
+	const acquiredWarmupLock = await kvClient.acquireLock(warmupLockKey, warmupLockToken, warmupLockTtlSeconds);
+	if (!acquiredWarmupLock) {
+		logger.info('Another API instance is warming search indexes, skipping warmup');
+		return;
+	}
+	try {
+		await warmupAdminSearchIndexes({
+			userRepository: getUserRepository(),
+			guildRepository: new GuildRepository(),
+			reportRepository: getReportRepository(),
+			logger,
+		});
+	} catch (error) {
+		logger.error({error}, 'Admin search warmup failed (continuing startup)');
+	} finally {
+		try {
+			await kvClient.releaseLock(warmupLockKey, warmupLockToken);
+		} catch (error) {
+			logger.warn({error}, 'Failed to release admin search warmup lock');
+		}
+	}
+}
+
+function scheduleSearchInitRetry(
+	kvClient: ReturnType<typeof getKVClient>,
+	logger: LoggerInterface,
+	attempt: number,
+): void {
+	if (searchInitStopped) return;
+	const delay = Math.min(SEARCH_INIT_RETRY_MIN_MS * 2 ** attempt, SEARCH_INIT_RETRY_MAX_MS);
+	searchInitRetryTimer = setTimeout(() => {
+		searchInitRetryTimer = null;
+		initializeSearchAndWarmup(kvClient, logger).catch((error) => {
+			logger.error({error, attempt: attempt + 1}, 'Search initialisation failed, retrying in the background');
+			scheduleSearchInitRetry(kvClient, logger, attempt + 1);
+		});
+	}, delay);
 }
 
 export function createInitializer(
@@ -216,40 +268,12 @@ export function createInitializer(
 			}
 			await ensureDeletionQueueState(getKVAccountDeletionQueue(), logger);
 			logger.info('Initializing search indexes...');
-			let searchInitialized = false;
+			searchInitStopped = false;
 			try {
-				await initializeSearch(getCacheService());
-				searchInitialized = true;
-				logger.info('Search initialized');
+				await initializeSearchAndWarmup(kvClient, logger);
 			} catch (error) {
-				logger.error({error}, 'Search initialisation failed');
-				throw error;
-			}
-			if (searchInitialized) {
-				const warmupLockKey = 'fluxer:search:warmup:admin';
-				const warmupLockToken = randomUUID();
-				const warmupLockTtlSeconds = 60 * 60;
-				const acquiredWarmupLock = await kvClient.acquireLock(warmupLockKey, warmupLockToken, warmupLockTtlSeconds);
-				if (!acquiredWarmupLock) {
-					logger.info('Another API instance is warming search indexes, skipping warmup');
-				} else {
-					try {
-						await warmupAdminSearchIndexes({
-							userRepository: getUserRepository(),
-							guildRepository: new GuildRepository(),
-							reportRepository: getReportRepository(),
-							logger,
-						});
-					} catch (error) {
-						logger.error({error}, 'Admin search warmup failed (continuing startup)');
-					} finally {
-						try {
-							await kvClient.releaseLock(warmupLockKey, warmupLockToken);
-						} catch (error) {
-							logger.warn({error}, 'Failed to release admin search warmup lock');
-						}
-					}
-				}
+				logger.error({error}, 'Search initialisation failed, retrying in the background');
+				scheduleSearchInitRetry(kvClient, logger, 0);
 			}
 			if (config.voice.enabled && config.voice.defaultRegion) {
 				const voiceDataInitializer = new VoiceDataInitializer();
@@ -308,6 +332,11 @@ export function createShutdown(config: APIConfig, logger: LoggerInterface): () =
 		}
 		await shutdownStorageChangeFeed();
 		setInjectedWorkerService(undefined);
+		searchInitStopped = true;
+		if (searchInitRetryTimer) {
+			clearTimeout(searchInitRetryTimer);
+			searchInitRetryTimer = null;
+		}
 		try {
 			await shutdownSearch();
 			logger.info('Search service shut down');

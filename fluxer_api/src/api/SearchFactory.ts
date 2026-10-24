@@ -141,18 +141,19 @@ export async function initializeSearch(lock?: ElasticsearchDistributedLock): Pro
 		await searchProvider.initialize();
 		return;
 	}
-	searchProvider = createSearchProvider(lock);
+	const provider = createSearchProvider(lock);
 	try {
-		await searchProvider.initialize();
+		await provider.initialize();
 	} catch (error) {
 		Logger.error({error}, 'Search backend initialisation failed');
 		try {
-			await shutdownSearch();
+			await provider.shutdown();
 		} catch (shutdownError) {
 			Logger.warn({error: shutdownError}, 'Failed to shut down search provider after initialisation failure');
 		}
 		throw error;
 	}
+	searchProvider = provider;
 	Logger.info('Search backend initialized successfully');
 }
 
