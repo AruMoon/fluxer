@@ -101,7 +101,7 @@ function scheduleWatch(js: JetStreamClient, state: WatchState, delayMs: number):
 			})
 			.finally(() => {
 				state.messages = null;
-				if (!state.stopped) scheduleWatch(js, state, RETRY_DELAY_MS);
+				if (!state.stopped) scheduleWatch(js, state, state.retryDelayMs);
 			});
 	}, delayMs);
 	state.retry.unref?.();
