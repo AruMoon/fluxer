@@ -5,3 +5,4 @@ services:
     environment:
       FLUXER_EDGE_SITE_ADDRESS: ":80"
       FLUXER_EDGE_TLS_DIRECTIVE: ""
+      FLUXER_EDGE_TRUSTED_PROXIES: ${FLUXER_EDGE_TRUSTED_PROXIES:-private_ranges}

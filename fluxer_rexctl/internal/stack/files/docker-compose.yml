@@ -246,7 +246,7 @@ services:
       - "${FLUXER_HTTPS_PORT:-443}:443/udp"
     environment:
       FLUXER_EDGE_SITE_ADDRESS: ${FLUXER_EDGE_SITE_ADDRESS:-${FLUXER_CADDY_SITE_ADDRESS:-${FLUXER_PUBLIC_SCHEME:-https}://${FLUXER_DOMAIN:?rexctl manages this instance. Use rexctl, docker compose -p fluxer ps or logs, or run rexctl eject to use docker compose here}}}
-      FLUXER_EDGE_TRUSTED_PROXIES: ${FLUXER_EDGE_TRUSTED_PROXIES:-private_ranges}
+      FLUXER_EDGE_TRUSTED_PROXIES: ${FLUXER_EDGE_TRUSTED_PROXIES:-127.0.0.1/32}
       FLUXER_EDGE_ENCODE: ${FLUXER_EDGE_ENCODE:-zstd gzip}
       FLUXER_EDGE_GLOBAL_OPTIONS: ${FLUXER_EDGE_GLOBAL_OPTIONS:-}
       FLUXER_EDGE_TLS_DIRECTIVE: ${FLUXER_EDGE_TLS:+tls ${FLUXER_EDGE_TLS}}

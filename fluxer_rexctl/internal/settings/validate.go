@@ -32,6 +32,23 @@ func validText(v string) error {
 	return nil
 }
 
+func trustedProxyList(v string) []string {
+	return strings.FieldsFunc(v, func(r rune) bool { return r == ',' || r == ' ' || r == '\t' })
+}
+
+func validTrustedProxies(v string) error {
+	for _, entry := range trustedProxyList(v) {
+		if entry == "private_ranges" || net.ParseIP(entry) != nil {
+			continue
+		}
+		if _, _, err := net.ParseCIDR(entry); err == nil {
+			continue
+		}
+		return fmt.Errorf("%s is not an IP address or range. Use addresses or ranges such as 10.0.0.0/8, or private_ranges.", entry)
+	}
+	return nil
+}
+
 func validBool(v string) error {
 	if _, err := strconv.ParseBool(v); err != nil {
 		return errors.New("Use true or false.")

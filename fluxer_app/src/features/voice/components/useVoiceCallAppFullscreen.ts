@@ -3,9 +3,12 @@
 import {Logger} from '@app/features/platform/utils/AppLogger';
 import {
 	exitFullscreenAPI,
+	getFullscreenElement,
 	requestFullscreen,
 	supportsFullscreenAPI,
-} from '@app/features/voice/components/media_player/hooks/useMediaFullscreen';
+} from '@app/features/platform/utils/FullscreenMediaUtils';
+import {setActivePortalHost} from '@app/features/ui/overlay/PortalHostContext';
+import Modal from '@app/features/ui/state/Modal';
 import VoiceCallFullscreen from '@app/features/voice/state/VoiceCallFullscreen';
 import type {RefObject} from 'react';
 import {useCallback, useEffect, useRef, useState} from 'react';

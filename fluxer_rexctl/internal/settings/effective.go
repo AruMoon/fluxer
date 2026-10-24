@@ -85,6 +85,8 @@ func namedVars(k Key, value string) map[string]string {
 			return nil
 		}
 		return map[string]string{"FLUXER_LIVEKIT_NODE_IP": value, "FLUXER_LIVEKIT_USE_EXTERNAL_IP": "false"}
+	case EdgeTrusted:
+		value = strings.Join(trustedProxyList(value), " ")
 	case StoragePath:
 		if b, err := strconv.ParseBool(value); err == nil {
 			value = strconv.FormatBool(b)

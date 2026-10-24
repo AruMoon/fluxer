@@ -97,7 +97,7 @@ func buildNamed() []Key {
 			Help: "The port Fluxer listens on for HTTPS"},
 		{Name: EdgePublicPort, Type: "port", Vars: []string{"FLUXER_PUBLIC_PORT"}, Validate: validPort,
 			Help: "The port people use in Fluxer's address, when it differs from the one Fluxer listens on"},
-		{Name: EdgeTrusted, Type: "list", Vars: []string{"FLUXER_EDGE_TRUSTED_PROXIES"}, Validate: validText,
+		{Name: EdgeTrusted, Type: "list", Vars: []string{"FLUXER_EDGE_TRUSTED_PROXIES"}, Validate: validTrustedProxies,
 			Help: "Proxies whose client address headers Fluxer trusts"},
 		{Name: VoiceTCPPort, Type: "port", Vars: []string{"FLUXER_LIVEKIT_TCP_PORT"}, Validate: validPort,
 			Help: "The TCP port for voice and video"},

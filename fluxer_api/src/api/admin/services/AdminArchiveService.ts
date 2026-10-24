@@ -130,7 +130,7 @@ export class AdminArchiveService {
 		}
 		if (requestedBy !== undefined) {
 			const archives = await this.adminArchiveRepository.listByRequester(requestedBy, limit, includeExpired);
-			return archives.map((a) => a.toResponse());
+			return archives.filter((a) => subjectType === 'all' || a.subjectType === subjectType).map((a) => a.toResponse());
 		}
 		if (subjectType === 'all') {
 			const [users, guilds] = await Promise.all([

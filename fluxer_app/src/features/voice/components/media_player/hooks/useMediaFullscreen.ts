@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {Logger} from '@app/features/platform/utils/AppLogger';
-import {getFullscreenElement} from '@app/features/platform/utils/FullscreenMediaUtils';
-import type {ExtendedHTMLElement, ExtendedHTMLVideoElement} from '@app/types/browser.d';
+import {
+	exitFullscreenAPI,
+	getFullscreenElement,
+	requestFullscreen,
+	supportsFullscreenAPI,
+} from '@app/features/platform/utils/FullscreenMediaUtils';
+import type {ExtendedHTMLVideoElement} from '@app/types/browser.d';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 const logger = new Logger('useMediaFullscreen');
