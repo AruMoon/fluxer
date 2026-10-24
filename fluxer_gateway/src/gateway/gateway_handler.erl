@@ -22,8 +22,9 @@
     voice_queue_timer := reference() | undefined,
     pending_identify := {map(), pid()} | undefined,
     pending_identify_retry_timer := {reference(), reference()} | undefined,
-    session_start := session_start() | undefined,
-    deferred_payloads := [map()],
+    session_start => session_start() | undefined,
+    deferred_payloads => [{atom(), map()}],
+    deferred_count => non_neg_integer(),
     connection_acquired => boolean()
 }.
 
@@ -40,7 +41,8 @@
 
 -export_type([state/0, ws_frame/0, ws_result/0, session_start/0]).
 
--define(MAX_DEFERRED_PAYLOADS, 16).
+-define(PAUSE_DEFERRED_PAYLOADS, 16).
+-define(MAX_DEFERRED_PAYLOADS, 64).
 
 -spec new_state() -> state().
 new_state() ->
@@ -64,7 +66,8 @@ new_state() ->
         pending_identify => undefined,
         pending_identify_retry_timer => undefined,
         session_start => undefined,
-        deferred_payloads => []
+        deferred_payloads => [],
+        deferred_count => 0
     }.
 
 -spec init(cowboy_req:req(), term()) ->
@@ -89,7 +92,12 @@ init(Req, _Opts) ->
             socket_pid => self(),
             peer_ip => PeerIPBinary
         },
-        #{idle_timeout => infinity, active_n => 16, req_filter => fun drop_req/1}}.
+        #{
+            idle_timeout => infinity,
+            active_n => 16,
+            max_frame_size => constants:max_payload_size(),
+            req_filter => fun drop_req/1
+        }}.
 
 -spec drop_req(cowboy_req:req()) -> map().
 drop_req(_Req) ->
@@ -126,7 +134,15 @@ handle_frame(_, State) ->
 
 -spec websocket_info(term(), state()) -> ws_info_result().
 websocket_info(Msg, State) ->
-    after_callback(handle_message(Msg, State)).
+    case maps:get(session_start, State, undefined) of
+        undefined ->
+            after_callback(handle_message(Msg, State));
+        _SessionStart ->
+            case gateway_handler_identify:handle_session_start_message(Msg, State) of
+                no_reply -> after_callback(handle_message(Msg, State));
+                Result -> after_callback(Result)
+            end
+    end.
 
 -spec handle_message(term(), state()) -> ws_info_result().
 handle_message({heartbeat_check, Token}, State) when is_reference(Token) ->
@@ -190,35 +206,35 @@ after_callback({Commands, State}) ->
     end.
 
 -spec awaiting_session(state()) -> boolean().
-awaiting_session(#{session_pid := undefined, session_start := SessionStart}) when
-    SessionStart =/= undefined
-->
-    true;
-awaiting_session(#{session_pid := undefined, pending_identify := Pending}) ->
-    Pending =/= undefined;
+awaiting_session(#{session_pid := undefined} = State) ->
+    maps:get(session_start, State, undefined) =/= undefined orelse
+        maps:get(pending_identify, State, undefined) =/= undefined;
 awaiting_session(_State) ->
     false.
 
 -spec replay_deferred(ws_result()) -> {[ws_command()] | ok, state()}.
-replay_deferred(
-    {Commands, #{session_start := undefined, deferred_payloads := [_ | _]} = State}
-) ->
-    Payloads = maps:get(deferred_payloads, State),
-    replay_payloads(Payloads, commands(Commands), State#{deferred_payloads => []});
-replay_deferred(Result) ->
-    Result.
+replay_deferred({Commands, State} = Result) ->
+    case {maps:get(session_start, State, undefined), maps:get(deferred_payloads, State, [])} of
+        {undefined, [_ | _] = Deferred} ->
+            Cleared = State#{deferred_payloads => [], deferred_count => 0},
+            replay_payloads(lists:reverse(Deferred), commands(Commands), Cleared);
+        _ ->
+            Result
+    end.
 
--spec replay_payloads([map()], [ws_command()], state()) -> {[ws_command()], state()}.
-replay_payloads([], Commands, #{session_start := undefined} = State) ->
-    {Commands ++ [{active, true}], State};
+-spec replay_payloads([{atom(), map()}], [ws_command()], state()) ->
+    {[ws_command()], state()}.
 replay_payloads([], Commands, State) ->
-    {Commands, State};
-replay_payloads([Payload | Rest], Commands, State) ->
+    case maps:get(session_start, State, undefined) of
+        undefined -> {Commands ++ [{active, true}], State};
+        _SessionStart -> {Commands, State}
+    end;
+replay_payloads([{OpAtom, Payload} | Rest], Commands, State) ->
     case closes(Commands) of
         true ->
             {Commands, State};
         false ->
-            {More, NewState} = handle_decode({ok, Payload}, State),
+            {More, NewState} = dispatch_or_defer(OpAtom, Payload, State),
             replay_payloads(Rest, Commands ++ commands(More), NewState)
     end.
 
@@ -364,30 +380,40 @@ handle_decompressed_incoming_data(Data, Encoding, CompressCtx, State) ->
 -spec handle_decode({ok, map()} | {error, term()}, state()) -> ws_result().
 handle_decode({ok, #{<<"op">> := Op} = Payload}, State) ->
     OpAtom = constants:gateway_opcode(Op),
-    case defer_payload(OpAtom, State) of
-        true ->
-            defer(Payload, State);
-        false ->
-            RateLimitResult = gateway_handler_rate_limit:check_rate_limit(State, OpAtom),
-            dispatch_after_rate_limit(RateLimitResult, OpAtom, Payload)
-    end;
+    RateLimitResult = gateway_handler_rate_limit:check_rate_limit(State, OpAtom),
+    dispatch_after_rate_limit(RateLimitResult, OpAtom, Payload);
 handle_decode({ok, _}, State) ->
     gateway_handler_encode:close_with_reason(decode_error, <<"Invalid payload">>, State);
 handle_decode({error, _Reason}, State) ->
     gateway_handler_encode:close_with_reason(decode_error, <<"Decode failed">>, State).
 
+-spec dispatch_or_defer(atom(), map(), state()) -> ws_result().
+dispatch_or_defer(OpAtom, Payload, State) ->
+    case defer_payload(OpAtom, State) of
+        true -> defer(OpAtom, Payload, State);
+        false -> gateway_handler_dispatch:handle_opcode(OpAtom, Payload, State)
+    end.
+
 -spec defer_payload(atom(), state()) -> boolean().
 defer_payload(heartbeat, _State) ->
     false;
-defer_payload(_OpAtom, _State) ->
-    true.
+defer_payload(_OpAtom, State) ->
+    maps:get(session_start, State, undefined) =/= undefined.
 
--spec defer(map(), state()) -> ws_result().
-defer(Payload, #{deferred_payloads := Deferred} = State) ->
-    NewState = State#{deferred_payloads => Deferred ++ [Payload]},
-    case length(Deferred) + 1 >= ?MAX_DEFERRED_PAYLOADS of
-        true -> {[{active, false}], NewState};
-        false -> {ok, NewState}
+-spec defer(atom(), map(), state()) -> ws_result().
+defer(OpAtom, Payload, State) ->
+    Count = maps:get(deferred_count, State, 0) + 1,
+    NewState = State#{
+        deferred_payloads => [{OpAtom, Payload} | maps:get(deferred_payloads, State, [])],
+        deferred_count => Count
+    },
+    if
+        Count > ?MAX_DEFERRED_PAYLOADS ->
+            gateway_handler_encode:close_with_reason(rate_limited, <<"Rate limited">>, State);
+        Count >= ?PAUSE_DEFERRED_PAYLOADS ->
+            {[{active, false}], NewState};
+        true ->
+            {ok, NewState}
     end.
 
 -spec dispatch_after_rate_limit(
@@ -396,7 +422,7 @@ defer(Payload, #{deferred_payloads := Deferred} = State) ->
     map()
 ) -> ws_result().
 dispatch_after_rate_limit({ok, RLState}, OpAtom, Payload) ->
-    gateway_handler_dispatch:handle_opcode(OpAtom, Payload, RLState);
+    dispatch_or_defer(OpAtom, Payload, RLState);
 dispatch_after_rate_limit({opcode_rate_limited, RLState}, _OpAtom, _Payload) ->
     {ok, RLState};
 dispatch_after_rate_limit({rate_limited, RLState}, _OpAtom, _Payload) ->
