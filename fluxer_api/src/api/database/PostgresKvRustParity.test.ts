@@ -11,7 +11,7 @@ const REPO_ROOT = path.resolve(THIS_DIR, '../../../..');
 const TYPESCRIPT_SOURCE = fs.readFileSync(path.join(THIS_DIR, 'PostgresKvQueryExecutor.ts'), 'utf8');
 const RUST_SOURCE = fs.readFileSync(path.join(REPO_ROOT, 'fluxer_svc/src/postgres.rs'), 'utf8');
 
-const RUST_INDEX_SUFFIXES = ['expires_idx', 'partition_idx', 'row_key_c_idx'];
+const RUST_INDEX_SUFFIXES = ['expires_idx', 'partition_idx', 'row_key_c_idx', 'sort_id_fill'];
 
 const API_ONLY_INDEX_SUFFIXES = [
 	'message_reactions_message_idx',
@@ -33,6 +33,9 @@ const SHARED_LITERALS = [
 	"'lz4' = ANY(enumvals)",
 	"att.attcompression <> 'l'",
 	'ALTER COLUMN row_data SET COMPRESSION lz4',
+	"IF NEW.row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN",
+	"NEW.sort_id := (NEW.row_data -> 'message_id' ->> 'value')::bigint;",
+	"FOR EACH ROW WHEN (NEW.sort_id IS NULL AND NEW.table_name IN ('messages', 'message_reactions')) EXECUTE FUNCTION",
 ];
 
 const BACKFILL_FRAGMENTS = [

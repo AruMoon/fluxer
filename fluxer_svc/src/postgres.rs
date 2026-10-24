@@ -190,6 +190,37 @@ async fn has_sort_id(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::R
     Ok(row.is_some())
 }
 
+async fn has_sort_id_fill(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::Result<bool> {
+    let row = transaction
+        .query_opt(
+            "SELECT 1 FROM pg_trigger WHERE tgrelid = to_regclass($1) AND tgname = $2",
+            &[&kv_table, &format!("{kv_table}_sort_id_fill")],
+        )
+        .await
+        .context("failed to inspect the Postgres KV sort_id fill trigger")?;
+    Ok(row.is_some())
+}
+
+async fn create_sort_id_fill(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::Result<()> {
+    let table = quote_identifier(kv_table)?;
+    let fill = quote_identifier(&format!("{kv_table}_sort_id_fill"))?;
+    transaction
+        .batch_execute(&format!(
+            r#"CREATE OR REPLACE FUNCTION {fill}() RETURNS trigger LANGUAGE plpgsql AS $fill$
+BEGIN
+    IF NEW.row_data -> 'message_id' ->> 'value' ~ '^-?[0-9]+$' THEN
+        NEW.sort_id := (NEW.row_data -> 'message_id' ->> 'value')::bigint;
+    END IF;
+    RETURN NEW;
+END
+$fill$;
+CREATE TRIGGER {fill} BEFORE INSERT OR UPDATE ON {table} FOR EACH ROW WHEN (NEW.sort_id IS NULL AND NEW.table_name IN ('messages', 'message_reactions')) EXECUTE FUNCTION {fill}();"#
+        ))
+        .await
+        .context("failed to create the Postgres KV sort_id fill trigger")?;
+    Ok(())
+}
+
 async fn needs_lz4(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::Result<bool> {
     let row = transaction
         .query_opt(
@@ -308,9 +339,10 @@ CREATE TABLE IF NOT EXISTS {table} (
         .await
         .context("failed to ensure Postgres KV schema")?;
     let add_sort_id = !has_sort_id(&transaction, kv_table).await?;
+    let add_sort_id_fill = !has_sort_id_fill(&transaction, kv_table).await?;
     let missing_options = missing_storage_options(&transaction, kv_table).await?;
     let set_lz4 = needs_lz4(&transaction, kv_table).await?;
-    if add_sort_id || !missing_options.is_empty() || set_lz4 {
+    if add_sort_id || add_sort_id_fill || !missing_options.is_empty() || set_lz4 {
         transaction
             .query_one(
                 "SELECT set_config('lock_timeout', $1, true)",
@@ -323,6 +355,9 @@ CREATE TABLE IF NOT EXISTS {table} (
                 .batch_execute(&format!("ALTER TABLE {table} ADD COLUMN sort_id bigint"))
                 .await
                 .context("failed to add the Postgres KV sort_id column")?;
+        }
+        if add_sort_id_fill {
+            create_sort_id_fill(&transaction, kv_table).await?;
         }
         if !missing_options.is_empty() {
             transaction
