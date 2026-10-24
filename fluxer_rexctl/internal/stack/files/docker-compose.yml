@@ -481,6 +481,7 @@ services:
         limits:
           memory: ${FLUXER_LIVEKIT_MEMORY_LIMIT:-512mb}
     environment:
+      GOMEMLIMIT: ${FLUXER_LIVEKIT_GOMEMLIMIT:-435MiB}
       LIVEKIT_KEYS: "${LIVEKIT_API_KEY:?rexctl manages this instance. Use rexctl, docker compose -p fluxer ps or logs, or run rexctl eject to use docker compose here}: ${LIVEKIT_API_SECRET:?rexctl manages this instance. Use rexctl, docker compose -p fluxer ps or logs, or run rexctl eject to use docker compose here}"
       LIVEKIT_CONFIG: |
         port: 7880
