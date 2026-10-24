@@ -12,7 +12,7 @@ use crate::retry::{self, RETRY_DEADLINE};
 use crate::rpc::{RpcClient, RpcError};
 use crate::server::AppState;
 use crate::subscription::{Platform, Subscription};
-use crate::unix_millis;
+use fluxer_common::time::unix_millis;
 use fluxer_svc::metrics::now_ms;
 use fluxer_svc::transport::{Transport, TransportMessage, TransportSubscriber};
 use futures::future::join_all;

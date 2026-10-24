@@ -24,7 +24,7 @@ use tower_http::compression::{CompressionLayer, CompressionLevel};
 use tracing::info;
 
 pub async fn run(cfg: Config) -> anyhow::Result<()> {
-    media_process::warmup_vips()?;
+    media_process::native_runtime::ensure_vips_init()?;
     let addr: SocketAddr = format!("{}:{}", cfg.bind_host, cfg.port).parse()?;
     let state = Arc::new(AppState::try_new(cfg)?);
     if let Some(read_endpoint) = state.cfg.storage.s3_read_endpoint.as_deref() {

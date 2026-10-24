@@ -275,7 +275,10 @@ fn request_hostname(authority: &str) -> Option<&str> {
     (!hostname.is_empty()).then_some(hostname)
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
+#[error(
+    "rendered SPA document would be {attempted_bytes} bytes, exceeding the {MAX_RENDERED_SPA_INDEX_BYTES} byte limit"
+)]
 struct SpaDocumentSizeLimitError {
     attempted_bytes: usize,
 }

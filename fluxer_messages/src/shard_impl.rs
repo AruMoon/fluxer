@@ -523,25 +523,26 @@ impl<T: Transport> MessagesShard<T> {
         let limit_i32 = limit.min(i32::MAX as u32) as i32;
         while messages.len() < limit as usize && cursor_max >= min_bucket {
             let buckets = self
-                .list_buckets_desc(channel_id, min_bucket, cursor_max, bucket_page_limit(limit))
+                .storage
+                .list_buckets(
+                    channel_id,
+                    min_bucket,
+                    cursor_max,
+                    bucket_page_limit(limit),
+                    true,
+                )
                 .await?;
             let Some(last_bucket) = buckets.last().copied() else {
                 break;
             };
-            collect_bucket_waves(
-                &buckets,
-                limit as usize,
-                &mut messages,
-                |bucket| async move {
-                    if let Some(before_id) = before_id {
-                        self.fetch_before_bucket(channel_id, bucket, before_id, limit_i32)
-                            .await
-                    } else {
-                        self.fetch_latest_bucket(channel_id, bucket, limit_i32)
-                            .await
-                    }
-                },
-            )
+            collect_bucket_waves(&buckets, limit as usize, &mut messages, |bucket| {
+                self.storage.fetch_bucket(
+                    channel_id,
+                    bucket,
+                    before_id.map(BucketBound::Before),
+                    limit_i32,
+                )
+            })
             .await?;
             if messages.len() >= limit as usize || last_bucket <= min_bucket {
                 break;
@@ -566,20 +567,26 @@ impl<T: Transport> MessagesShard<T> {
         let limit_i32 = limit.min(i32::MAX as u32) as i32;
         while messages.len() < limit as usize && cursor_min <= max_bucket {
             let buckets = self
-                .list_buckets_asc(channel_id, cursor_min, max_bucket, bucket_page_limit(limit))
+                .storage
+                .list_buckets(
+                    channel_id,
+                    cursor_min,
+                    max_bucket,
+                    bucket_page_limit(limit),
+                    false,
+                )
                 .await?;
             let Some(last_bucket) = buckets.last().copied() else {
                 break;
             };
-            collect_bucket_waves(
-                &buckets,
-                limit as usize,
-                &mut messages,
-                |bucket| async move {
-                    self.fetch_after_bucket(channel_id, bucket, after_id, limit_i32)
-                        .await
-                },
-            )
+            collect_bucket_waves(&buckets, limit as usize, &mut messages, |bucket| {
+                self.storage.fetch_bucket(
+                    channel_id,
+                    bucket,
+                    Some(BucketBound::After(after_id)),
+                    limit_i32,
+                )
+            })
             .await?;
             if messages.len() >= limit as usize || last_bucket >= max_bucket {
                 break;
@@ -1759,38 +1766,27 @@ impl MessagesStorage {
         }
     }
 
-    async fn list_buckets_desc(
+    async fn list_buckets(
         &self,
         channel_id: i64,
         min_bucket: i32,
         max_bucket: i32,
         limit: u32,
+        desc: bool,
     ) -> anyhow::Result<Vec<i32>> {
-        match self {
-            MessagesStorage::Postgres(storage) => {
-                storage
-                    .list_buckets(channel_id, min_bucket, max_bucket, limit, true)
-                    .await
-            }
-            #[cfg(feature = "scylla")]
-            MessagesStorage::Scylla(storage) => {
-                storage
-                    .list_buckets_desc(channel_id, min_bucket, max_bucket, limit)
-                    .await
-            }
-            #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
+        if min_bucket > max_bucket || limit == 0 {
+            return Ok(Vec::new());
         }
         match self {
             MessagesStorage::Postgres(storage) => {
                 storage
-                    .list_buckets(channel_id, min_bucket, max_bucket, limit, false)
+                    .list_buckets(channel_id, min_bucket, max_bucket, limit, desc)
                     .await
             }
             #[cfg(feature = "scylla")]
             MessagesStorage::Scylla(storage) => {
                 storage
-                    .list_buckets_asc(channel_id, min_bucket, max_bucket, limit)
+                    .list_buckets(channel_id, min_bucket, max_bucket, limit, desc)
                     .await
             }
             #[cfg(test)]
@@ -1798,72 +1794,23 @@ impl MessagesStorage {
         }
     }
 
-    async fn fetch_latest_bucket(
+    async fn fetch_bucket(
         &self,
         channel_id: i64,
         bucket: i32,
+        bound: Option<BucketBound>,
         limit: i32,
     ) -> anyhow::Result<Vec<Message>> {
         match self {
             MessagesStorage::Postgres(storage) => {
+                let desc = !matches!(bound, Some(BucketBound::After(_)));
                 storage
-                    .fetch_bucket(channel_id, bucket, None, true, limit)
+                    .fetch_bucket(channel_id, bucket, bound, desc, limit)
                     .await
             }
             #[cfg(feature = "scylla")]
             MessagesStorage::Scylla(storage) => {
-                storage.fetch_latest_bucket(channel_id, bucket, limit).await
-            }
-            #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
-        }
-        match self {
-            MessagesStorage::Postgres(storage) => {
-                storage
-                    .fetch_bucket(
-                        channel_id,
-                        bucket,
-                        Some(BucketBound::Before(before_id)),
-                        true,
-                        limit,
-                    )
-                    .await
-            }
-            #[cfg(feature = "scylla")]
-            MessagesStorage::Scylla(storage) => {
-                storage
-                    .fetch_before_bucket(channel_id, bucket, before_id, limit)
-                    .await
-            }
-            #[cfg(test)]
-            MessagesStorage::Deletions(_) => Ok(Vec::new()),
-        }
-    }
-
-    async fn fetch_after_bucket(
-        &self,
-        channel_id: i64,
-        bucket: i32,
-        after_id: i64,
-        limit: i32,
-    ) -> anyhow::Result<Vec<Message>> {
-        match self {
-            MessagesStorage::Postgres(storage) => {
-                storage
-                    .fetch_bucket(
-                        channel_id,
-                        bucket,
-                        Some(BucketBound::After(after_id)),
-                        false,
-                        limit,
-                    )
-                    .await
-            }
-            #[cfg(feature = "scylla")]
-            MessagesStorage::Scylla(storage) => {
-                storage
-                    .fetch_after_bucket(channel_id, bucket, after_id, limit)
-                    .await
+                storage.fetch_bucket(channel_id, bucket, bound, limit).await
             }
             #[cfg(test)]
             MessagesStorage::Deletions(_) => Ok(Vec::new()),
@@ -2120,17 +2067,23 @@ impl ScyllaMessagesStorage {
         Ok(rows.maybe_first_row::<MessageDbRow>()?.map(Into::into))
     }
 
-    async fn list_buckets_desc(
+    async fn list_buckets(
         &self,
         channel_id: i64,
         min_bucket: i32,
         max_bucket: i32,
         limit: u32,
+        desc: bool,
     ) -> anyhow::Result<Vec<i32>> {
+        let stmt = if desc {
+            &self.stmt_list_buckets_desc
+        } else {
+            &self.stmt_list_buckets_asc
+        };
         let result = self
             .db
             .execute_unpaged(
-                &self.stmt_list_buckets_desc,
+                stmt,
                 (
                     channel_id,
                     min_bucket,
@@ -2142,69 +2095,33 @@ impl ScyllaMessagesStorage {
         bucket_rows_to_vec(result.into_rows_result()?)
     }
 
-    async fn list_buckets_asc(
-        &self,
-        channel_id: i64,
-        min_bucket: i32,
-        max_bucket: i32,
-        limit: u32,
-    ) -> anyhow::Result<Vec<i32>> {
-        let result = self
-            .db
-            .execute_unpaged(
-                &self.stmt_list_buckets_asc,
-                (
-                    channel_id,
-                    min_bucket,
-                    max_bucket,
-                    limit.min(i32::MAX as u32) as i32,
-                ),
-            )
-            .await?;
-        bucket_rows_to_vec(result.into_rows_result()?)
-    }
-
-    async fn fetch_latest_bucket(
+    async fn fetch_bucket(
         &self,
         channel_id: i64,
         bucket: i32,
+        bound: Option<BucketBound>,
         limit: i32,
     ) -> anyhow::Result<Vec<Message>> {
-        let result = self
-            .db
-            .execute_unpaged(&self.stmt_get_latest, (channel_id, bucket, limit))
-            .await?;
-        rows_to_messages(result.into_rows_result()?)
-    }
-
-    async fn fetch_before_bucket(
-        &self,
-        channel_id: i64,
-        bucket: i32,
-        before_id: i64,
-        limit: i32,
-    ) -> anyhow::Result<Vec<Message>> {
-        let result = self
-            .db
-            .execute_unpaged(
-                &self.stmt_get_before,
-                (channel_id, bucket, before_id, limit),
-            )
-            .await?;
-        rows_to_messages(result.into_rows_result()?)
-    }
-
-    async fn fetch_after_bucket(
-        &self,
-        channel_id: i64,
-        bucket: i32,
-        after_id: i64,
-        limit: i32,
-    ) -> anyhow::Result<Vec<Message>> {
-        let result = self
-            .db
-            .execute_unpaged(&self.stmt_get_after, (channel_id, bucket, after_id, limit))
-            .await?;
+        let result = match bound {
+            None => {
+                self.db
+                    .execute_unpaged(&self.stmt_get_latest, (channel_id, bucket, limit))
+                    .await?
+            }
+            Some(BucketBound::Before(before_id)) => {
+                self.db
+                    .execute_unpaged(
+                        &self.stmt_get_before,
+                        (channel_id, bucket, before_id, limit),
+                    )
+                    .await?
+            }
+            Some(BucketBound::After(after_id)) => {
+                self.db
+                    .execute_unpaged(&self.stmt_get_after, (channel_id, bucket, after_id, limit))
+                    .await?
+            }
+        };
         rows_to_messages(result.into_rows_result()?)
     }
 

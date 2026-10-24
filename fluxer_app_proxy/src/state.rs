@@ -110,10 +110,13 @@ impl AppState {
             local_files,
         })
     }
+}
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum BoundedFileReadError {
+    #[error("file is {actual} bytes, exceeding the {maximum} byte limit")]
     TooLarge { actual: u64, maximum: usize },
+    #[error("{0}")]
     Io(std::io::Error),
 }
 

@@ -2,7 +2,7 @@
 
 use crate::{
     byte_budget::{BudgetedBytes, ByteBudget},
-    byte_cache::{ByteCache, ByteCacheInsertOutcome, ByteCacheSettings, ByteCacheValue},
+    byte_cache::{ByteCache, ByteCacheSettings, ByteCacheValue},
     coalescer::{ByteCoalescer, CoalescerError},
     media_process::MediaBytes,
     metrics::cache::{CoalescerMetrics, TransformCacheMetrics},
@@ -91,7 +91,7 @@ impl TransformCache {
             .run_once_until(key.clone(), deadline, work, {
                 let cache_key = key;
                 move |bytes| {
-                    if let ByteCacheInsertOutcome::Rejected(_) = cached.put(
+                    if !cached.put(
                         cache_key,
                         CachedTransform {
                             data: bytes.clone(),

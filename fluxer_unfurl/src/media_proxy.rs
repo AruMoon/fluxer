@@ -59,6 +59,19 @@ impl MediaMetadata {
             ..Default::default()
         }
     }
+
+    pub fn to_embed_media_sized(
+        &self,
+        url: &str,
+        width: Option<u32>,
+        height: Option<u32>,
+    ) -> crate::types::EmbedMedia {
+        crate::types::EmbedMedia {
+            width: width.or(self.width),
+            height: height.or(self.height),
+            ..self.to_embed_media(url)
+        }
+    }
 }
 
 impl MediaProxyClient {

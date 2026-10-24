@@ -136,30 +136,27 @@ where
         self.storage.as_ref()?.inner.get(key)
     }
 
-    pub fn put(&self, key: impl Into<String>, value: impl Into<T>) -> ByteCacheInsertOutcome {
+    #[must_use]
+    pub fn put(&self, key: impl Into<String>, value: impl Into<T>) -> bool {
         let Some(storage) = self.storage.as_ref() else {
-            return ByteCacheInsertOutcome::Rejected(ByteCacheInsertRejection::CacheDisabled);
+            return false;
         };
         let value = value.into();
         if value.bytes().is_empty() {
-            return ByteCacheInsertOutcome::Rejected(ByteCacheInsertRejection::EmptyValue);
+            return false;
         }
         if value.bytes().resident_bytes() > storage.max_entry_bytes.get() {
-            return ByteCacheInsertOutcome::Rejected(
-                ByteCacheInsertRejection::MaxEntryBytesExceeded,
-            );
+            return false;
         }
         let key = key.into();
         let Some(weight) = entry_weight(key.capacity(), &value) else {
-            return ByteCacheInsertOutcome::Rejected(ByteCacheInsertRejection::WeightExceedsU32);
+            return false;
         };
         if u64::from(weight) > storage.capacity_bytes {
-            return ByteCacheInsertOutcome::Rejected(
-                ByteCacheInsertRejection::WeightExceedsCapacity,
-            );
+            return false;
         }
         storage.inner.insert(key, value);
-        ByteCacheInsertOutcome::Inserted
+        true
     }
 }
 

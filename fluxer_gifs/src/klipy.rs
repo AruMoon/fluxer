@@ -181,6 +181,7 @@ impl KlipyClient {
         api_key: &str,
         locale: &str,
         country: &str,
+        limit: &str,
     ) -> anyhow::Result<Vec<GifItem>> {
         let locale = normalize_locale(locale);
         self.fetch_gifs(
@@ -189,27 +190,7 @@ impl KlipyClient {
                 ("key", api_key),
                 ("country", country),
                 ("locale", &locale),
-                ("limit", "1"),
-                ("media_filter", MEDIA_FILTER.as_str()),
-            ],
-        )
-        .await
-    }
-
-    pub async fn trending_gifs(
-        &self,
-        api_key: &str,
-        locale: &str,
-        country: &str,
-    ) -> anyhow::Result<Vec<GifItem>> {
-        let locale = normalize_locale(locale);
-        self.fetch_gifs(
-            "featured",
-            &[
-                ("key", api_key),
-                ("country", country),
-                ("locale", &locale),
-                ("limit", "50"),
+                ("limit", limit),
                 ("media_filter", MEDIA_FILTER.as_str()),
             ],
         )

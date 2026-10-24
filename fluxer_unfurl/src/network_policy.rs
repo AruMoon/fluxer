@@ -8,11 +8,15 @@ use url::Url;
 
 const MAX_URL_LEN: usize = 8192;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, thiserror::Error)]
 pub enum Error {
+    #[error("invalid URL")]
     InvalidUrl,
+    #[error("blocked URL")]
     BlockedUrl,
+    #[error("DNS lookup failed")]
     DnsLookupFailed,
+    #[error("host resolved to no address")]
     HostResolvedToNoAddress,
 }
 

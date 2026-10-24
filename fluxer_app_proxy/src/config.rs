@@ -7,18 +7,17 @@ use std::fmt;
 
 const DEFAULT_DISCOVERY_UPSTREAM_URL: &str = "http://localhost:8088/api/.well-known/fluxer";
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum InvalidAppProxyEnvironmentError {
-    InvalidValue {
-        name: &'static str,
-        value: String,
-        expected: &'static str,
-    },
+#[derive(Clone, Debug, Eq, PartialEq, thiserror::Error)]
+#[error("{name} must be {expected}, got {value:?}")]
+pub struct InvalidAppProxyEnvironmentError {
+    name: &'static str,
+    value: String,
+    expected: &'static str,
 }
 
 impl InvalidAppProxyEnvironmentError {
     fn new(name: &'static str, value: &str, expected: &'static str) -> Self {
-        Self::InvalidValue {
+        Self {
             name,
             value: value.to_owned(),
             expected,

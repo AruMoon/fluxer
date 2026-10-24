@@ -544,21 +544,25 @@ fn apply_local_file_headers(
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub(crate) enum LocalFileReadError {
+    #[error("local file {0:?} was not found")]
     NotFound(String),
+    #[error("local file path {0:?} is invalid")]
     InvalidPath(String),
+    #[error("local file capacity is unavailable for {0:?}")]
     Busy(String),
-    ChangedDuringRead {
-        path: String,
-        expected: usize,
-    },
+    #[error("local file {path:?} grew after its {expected} byte size was inspected")]
+    ChangedDuringRead { path: String, expected: usize },
+    #[error("local file {path:?} is {actual} bytes and exceeds the {maximum} byte limit")]
     TooLarge {
         path: String,
         actual: u64,
         maximum: usize,
     },
+    #[error("local text file {0:?} is not UTF-8")]
     InvalidUtf8(String),
+    #[error("failed to read local file {}: {source}", .path.display())]
     Io {
         path: PathBuf,
         source: std::io::Error,

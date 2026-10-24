@@ -145,10 +145,12 @@ const WORKER_SOURCES: &[&str] = &["https://*.fluxer.app", "blob:"];
 
 const MANIFEST_SOURCES: &[&str] = &["https://*.fluxer.app"];
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum CspCompileError {
-    InvalidAssetPolicy(InvalidHeaderValue),
-    InvalidSpaPolicy(InvalidHeaderValue),
+    #[error("the asset content security policy is not a valid header value")]
+    InvalidAssetPolicy(#[source] InvalidHeaderValue),
+    #[error("the SPA content security policy is not a valid header value")]
+    InvalidSpaPolicy(#[source] InvalidHeaderValue),
 }
 
 #[derive(Clone, Debug)]

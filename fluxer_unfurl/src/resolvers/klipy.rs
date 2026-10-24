@@ -104,12 +104,7 @@ async fn resolve_klipy_media(
             return None;
         }
     };
-    Some(build_embed_media_payload(
-        &resolved_url,
-        &meta,
-        format.width,
-        format.height,
-    ))
+    Some(meta.to_embed_media_sized(&resolved_url, format.width, format.height))
 }
 
 async fn resolve_media_via_api(
