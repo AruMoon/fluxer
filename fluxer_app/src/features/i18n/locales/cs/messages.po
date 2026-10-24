@@ -6325,12 +6325,19 @@ msgctxt "report-flow-blocked-button"
 msgid "Blocked"
 msgstr "Blokováno"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/AdvancedSettingsIndex.ts
+msgid "Blocked messages"
+msgstr "Blokované zprávy"
+
 #. Activity log detail line under a change to a member, for a block a moderator put on the member. The block stops the member from sending messages, reacting and joining voice, and it lifts on its own at the given date. Spell the effect out the way the English does. Do not name it with a word for a ban, a kick, a mute, a suspension or a waiting period, and do not say that time ran out. Keep the three things that are blocked. It continues the entry summary, so it has no subject. It is a past tense record of an action that already happened, never an instruction to the reader. Do not write it as a command, a button label or in first or second person. {date} is when the block ends, shown as a formatted date and time.
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogMemberMessages.ts
 msgid "Blocked the member from sending messages, reacting and joining voice until {date}"
 msgstr "Členovi bylo do {date} znemožněno odesílat zprávy, reagovat a připojovat se k hlasovým kanálům"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/AdvancedSettingsIndex.ts
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
 msgid "Blocked users"
 msgstr "Blokovaní uživatelé"
@@ -18292,6 +18299,13 @@ msgstr "Skrýt možnosti stahování médií"
 msgid "Hide members"
 msgstr "Skrýt členy"
 
+#. Settings search entry label for opting into hiding messages from blocked users completely.
+#. Short label for the experimental advanced setting.
+#: src/features/user/components/modals/tabs/advanced_settings_tab/AdvancedExperimentalControls.tsx
+#: src/features/user/components/settings_utils/search_index/AdvancedSettingsIndex.ts
+msgid "Hide messages from blocked users"
+msgstr "Skrýt zprávy od blokovaných uživatelů"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
 msgid "Hide muted"
@@ -22367,6 +22381,11 @@ msgstr "Zprávy smazány"
 #: src/features/channel/components/ChannelMessages.tsx
 msgid "Messages failed to load"
 msgstr "Zprávy se nepodařilo načíst"
+
+#. Settings search entry description. One-line summary of what the setting controls.
+#: src/features/user/components/settings_utils/search_index/AdvancedSettingsIndex.ts
+msgid "Messages from people you've blocked don't show up in channels at all"
+msgstr "Zprávy od lidí, které jste zablokovali, se v kanálech vůbec nezobrazí"
 
 #. Label in the sensitive content tab.
 #: src/features/user/components/modals/tabs/privacy_safety_tab/SensitiveContentTab.tsx

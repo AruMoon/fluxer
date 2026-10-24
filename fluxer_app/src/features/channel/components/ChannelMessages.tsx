@@ -59,6 +59,7 @@ import KeyboardMode from '@app/features/ui/state/KeyboardMode';
 import MediaViewer from '@app/features/ui/state/MediaViewer';
 import Modal from '@app/features/ui/state/Modal';
 import type {User} from '@app/features/user/models/User';
+import AdvancedSettings from '@app/features/user/state/AdvancedSettings';
 import UserSettings from '@app/features/user/state/UserSettings';
 import Users from '@app/features/user/state/Users';
 import Window from '@app/features/window/state/Window';
@@ -539,6 +540,7 @@ const CachedMessages = observer(function CachedMessages({channel, allowAutoAck =
 		};
 	}, [channel.id]);
 	const spammerOverrideVersion = LocalUserSpamOverride.version;
+	const hideBlocked = AdvancedSettings.hideBlockedMessages;
 	const channelStream = useMemo<Array<ChannelStreamItem>>(() => {
 		if (!state.messages) return [];
 		return createChannelStream({
@@ -546,8 +548,9 @@ const CachedMessages = observer(function CachedMessages({channel, allowAutoAck =
 			messages: state.messages,
 			oldestUnreadMessageId: state.visualUnreadMessageId,
 			treatSpam: true,
+			hideBlocked,
 		});
-	}, [channel, state.messages, state.messageVersion, state.visualUnreadMessageId, spammerOverrideVersion]);
+	}, [channel, state.messages, state.messageVersion, state.visualUnreadMessageId, spammerOverrideVersion, hideBlocked]);
 	useEffect(() => {
 		const messages = state.messages;
 		if (!messages?.ready) {

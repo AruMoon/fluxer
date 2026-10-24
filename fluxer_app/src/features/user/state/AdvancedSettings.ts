@@ -7,6 +7,7 @@ import {makeAutoObservable} from 'mobx';
 export const UNREAD_BADGE_CUSTOMIZATION_STORAGE_KEY = 'AdvancedSettings:unreadBadgeCustomizationEnabled';
 const KEEP_ATTACHMENTS_ON_EMPTY_MESSAGE_EDIT_STORAGE_KEY = 'AdvancedSettings:keepAttachmentsOnEmptyMessageEdit';
 const EXPRESSION_CLONE_SHORTCUTS_STORAGE_KEY = 'AdvancedSettings:expressionCloneShortcutsEnabled';
+const HIDE_BLOCKED_MESSAGES_STORAGE_KEY = 'AdvancedSettings:hideBlockedMessages';
 
 const logger = new Logger('AdvancedSettings');
 
@@ -31,6 +32,7 @@ class AdvancedSettings {
 	unreadBadgeCustomizationEnabled = readStoredBoolean(UNREAD_BADGE_CUSTOMIZATION_STORAGE_KEY);
 	keepAttachmentsOnEmptyMessageEdit = readStoredBoolean(KEEP_ATTACHMENTS_ON_EMPTY_MESSAGE_EDIT_STORAGE_KEY);
 	expressionCloneShortcutsEnabled = readStoredBoolean(EXPRESSION_CLONE_SHORTCUTS_STORAGE_KEY);
+	hideBlockedMessages = readStoredBoolean(HIDE_BLOCKED_MESSAGES_STORAGE_KEY);
 
 	constructor() {
 		makeAutoObservable(this, {}, {autoBind: true});
@@ -55,6 +57,12 @@ class AdvancedSettings {
 			},
 			{key: EXPRESSION_CLONE_SHORTCUTS_STORAGE_KEY, source: 'external'},
 		);
+		AppStorage.subscribe(
+			() => {
+				this.hideBlockedMessages = readStoredBoolean(HIDE_BLOCKED_MESSAGES_STORAGE_KEY);
+			},
+			{key: HIDE_BLOCKED_MESSAGES_STORAGE_KEY, source: 'external'},
+		);
 	}
 
 	setUnreadBadgeCustomizationEnabled(value: boolean): void {
@@ -73,6 +81,12 @@ class AdvancedSettings {
 		if (this.expressionCloneShortcutsEnabled === value) return;
 		this.expressionCloneShortcutsEnabled = value;
 		AppStorage.setItem(EXPRESSION_CLONE_SHORTCUTS_STORAGE_KEY, JSON.stringify(value));
+	}
+
+	setHideBlockedMessages(value: boolean): void {
+		if (this.hideBlockedMessages === value) return;
+		this.hideBlockedMessages = value;
+		AppStorage.setItem(HIDE_BLOCKED_MESSAGES_STORAGE_KEY, JSON.stringify(value));
 	}
 }
 
