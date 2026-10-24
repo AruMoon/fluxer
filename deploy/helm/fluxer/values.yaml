@@ -197,7 +197,7 @@ postgres:
     effective_io_concurrency: "200"
     default_statistics_target: "200"
     jit: "off"
-    min_wal_size: 512MB
+    min_wal_size: 80MB
     max_wal_size: 2GB
     checkpoint_completion_target: "0.9"
     wal_buffers: 16MB

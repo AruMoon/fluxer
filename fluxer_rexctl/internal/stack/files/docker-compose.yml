@@ -300,7 +300,7 @@ services:
       -c effective_io_concurrency=${FLUXER_POSTGRES_EFFECTIVE_IO_CONCURRENCY:-200}
       -c default_statistics_target=${FLUXER_POSTGRES_DEFAULT_STATISTICS_TARGET:-200}
       -c jit=${FLUXER_POSTGRES_JIT:-off}
-      -c min_wal_size=${FLUXER_POSTGRES_MIN_WAL_SIZE:-512MB}
+      -c min_wal_size=${FLUXER_POSTGRES_MIN_WAL_SIZE:-80MB}
       -c max_wal_size=${FLUXER_POSTGRES_MAX_WAL_SIZE:-2GB}
       -c checkpoint_completion_target=${FLUXER_POSTGRES_CHECKPOINT_COMPLETION_TARGET:-0.9}
       -c wal_buffers=${FLUXER_POSTGRES_WAL_BUFFERS:-16MB}
@@ -310,6 +310,9 @@ services:
       -c autovacuum_vacuum_scale_factor=${FLUXER_POSTGRES_AUTOVACUUM_VACUUM_SCALE_FACTOR:-0.05}
       -c autovacuum_analyze_scale_factor=${FLUXER_POSTGRES_AUTOVACUUM_ANALYZE_SCALE_FACTOR:-0.02}
       -c autovacuum_vacuum_cost_limit=${FLUXER_POSTGRES_AUTOVACUUM_VACUUM_COST_LIMIT:-2000}
+      -c autovacuum_max_workers=${FLUXER_POSTGRES_AUTOVACUUM_MAX_WORKERS:-3}
+      -c max_parallel_workers_per_gather=${FLUXER_POSTGRES_MAX_PARALLEL_WORKERS_PER_GATHER:-2}
+      -c max_parallel_workers=${FLUXER_POSTGRES_MAX_PARALLEL_WORKERS:-8}
       -c track_io_timing=${FLUXER_POSTGRES_TRACK_IO_TIMING:-on}
       -c shared_preload_libraries=${FLUXER_POSTGRES_SHARED_PRELOAD_LIBRARIES:-pg_stat_statements}
     shm_size: ${FLUXER_POSTGRES_SHM_SIZE:-1gb}
