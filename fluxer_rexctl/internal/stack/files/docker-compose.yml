@@ -380,6 +380,7 @@ services:
       MEILI_UPGRADE_DB: "true"
       MEILI_MAX_INDEXING_MEMORY: ${FLUXER_MEILISEARCH_MAX_INDEXING_MEMORY:-256mb}
       MEILI_MAX_INDEXING_THREADS: ${FLUXER_MEILISEARCH_MAX_INDEXING_THREADS:-2}
+      MEILI_LOG_LEVEL: ${FLUXER_MEILISEARCH_LOG_LEVEL:-WARN}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?rexctl manages this instance. Use rexctl, docker compose -p fluxer ps or logs, or run rexctl eject to use docker compose here}
     volumes:
       - meilisearch-data:/meili_data
