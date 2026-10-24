@@ -16,6 +16,7 @@ import type {ThreadMemberRow} from '@app/api/database/types/ThreadTypes';
 import {EMPTY_USER_ROW} from '@app/api/database/types/UserTypes';
 import {clearChannelThreadsTaintCacheForTesting, insertGuildThreadMarker} from '@app/api/experiment/ChannelThreadsGate';
 import {getSnowflakeService} from '@app/api/middleware/ServiceRegistry';
+import {getStoreBillingRepository} from '@app/api/middleware/ServiceSingletons';
 import {buildStorePurchaseRow} from '@app/api/store_billing/tests/StoreBillingTestUtils';
 import {
 	GuildMembersByUserId,
@@ -214,9 +215,7 @@ interface SeedData {
 	recoveryKitCreatedAt?: Date;
 }
 
-const UserDataSchema = z.looseObject({
-	operator_passes: z.array(z.looseObject({events: z.array(z.looseObject({kind: z.string()}))})),
-});
+const UserDataSchema = z.looseObject({});
 
 async function exportUserData(data: SeedData = {}) {
 	for (const purchase of data.storePurchases ?? []) await getStoreBillingRepository().insertPurchase(purchase);
@@ -225,13 +224,13 @@ async function exportUserData(data: SeedData = {}) {
 		await deps.instanceConfigRepository.setAccountIdentityMode(AccountIdentityModes.USERNAME, 'setup');
 		await upsertOne(
 			UserRecoveryKits.upsertAll({
-				user_id: userId,
+				user_id: AUTHOR,
 				secret_hash: 'recovery-secret',
 				created_at: data.recoveryKitCreatedAt,
 			}),
 		);
 	}
-	const archive = await harvestUserArchive(harness, deps, userId);
+	const archive = await harvestUserArchive(harness, deps, AUTHOR);
 	return UserDataSchema.parse(archive.readJson('user.json'));
 }
 

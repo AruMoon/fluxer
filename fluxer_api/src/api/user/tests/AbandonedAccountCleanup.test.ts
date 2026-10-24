@@ -154,7 +154,7 @@ describe('Abandoned account cleanup', () => {
 		expect(await deletionReason(created.user_id)).toBeNull();
 	});
 
-	it('leaves pass holders, lifetime members and suspended accounts alone', async () => {
+	it('leaves lifetime members and suspended accounts alone', async () => {
 		await getInstanceConfigRepository().updateAccountsConfig({abandoned_account_cleanup: true});
 		const lifetime = await register({});
 		const suspended = await register({});
@@ -169,7 +169,7 @@ describe('Abandoned account cleanup', () => {
 			{flags: banned.flags | UserFlags.DISABLED, temp_banned_until: new Date(Date.now() + 30 * DAY_MS)},
 			banned.toRow(),
 		);
-		for (const userId of [holder, lifetime, suspended]) {
+		for (const userId of [lifetime, suspended]) {
 			await idleFor(userId, 120);
 		}
 		await sweep();

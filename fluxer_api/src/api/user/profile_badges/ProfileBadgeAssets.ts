@@ -10,7 +10,7 @@ export const PROFILE_BADGE_ASSETS = {
 	premium: 'c61a26d1f983369c',
 } as const;
 
-export const OPERATOR_PASS_COUNT_BADGE_ASSETS = {
+const OPERATOR_PASS_COUNT_BADGE_ASSETS = {
 	'2': '0b2c8e24de04c3f1',
 	'3': '124e3a5e2027dea1',
 	'4': '7377e2a1c9d4d2b6',
@@ -22,7 +22,7 @@ export const OPERATOR_PASS_COUNT_BADGE_ASSETS = {
 	'9+': 'bd36eed73a899545',
 } as const;
 
-export const OPERATOR_PASS_SMALL_BADGE_ASSETS = {
+const OPERATOR_PASS_SMALL_BADGE_ASSETS = {
 	'9+': '88fe85ac14a20fb5',
 } as const;
 

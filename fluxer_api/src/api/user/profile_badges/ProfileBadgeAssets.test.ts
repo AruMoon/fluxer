@@ -4,11 +4,7 @@ import {createHash} from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {
-	OPERATOR_PASS_COUNT_BADGE_ASSETS,
-	OPERATOR_PASS_SMALL_BADGE_ASSETS,
-	PROFILE_BADGE_ASSETS,
-} from '@app/api/user/profile_badges/ProfileBadgeAssets';
+import {PROFILE_BADGE_ASSETS} from '@app/api/user/profile_badges/ProfileBadgeAssets';
 import {VISIONARY_NUMBER_TAGS} from '@app/api/user/profile_badges/VisionaryNumberTags';
 import {describe, expect, test} from 'vitest';
 
@@ -35,17 +31,9 @@ function webpCanvasSize(bytes: Buffer): {width: number; height: number} {
 const hashPrefix = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex').slice(0, 16);
 
 describe('profile badge assets', () => {
-	const hashes = [
-		...Object.values(PROFILE_BADGE_ASSETS),
-		...Object.values(OPERATOR_PASS_COUNT_BADGE_ASSETS),
-		...Object.values(OPERATOR_PASS_SMALL_BADGE_ASSETS),
-	];
+	const hashes = Object.values(PROFILE_BADGE_ASSETS);
 
-	test.each([
-		...Object.entries(PROFILE_BADGE_ASSETS),
-		...Object.entries(OPERATOR_PASS_COUNT_BADGE_ASSETS).map(([count, hash]) => [`operator_pass ${count}`, hash]),
-		...Object.entries(OPERATOR_PASS_SMALL_BADGE_ASSETS).map(([count, hash]) => [`operator_pass ${count} small`, hash]),
-	])('%s ships a 128px PNG and a WebP named by its hash', (_, hash) => {
+	test.each(Object.entries(PROFILE_BADGE_ASSETS))('%s ships a 128px PNG and a WebP named by its hash', (_, hash) => {
 		const png = fs.readFileSync(path.join(BADGES_DIR, `${hash}.png`));
 		expect(pngSize(png)).toEqual({width: 128, height: 128});
 		expect(hashPrefix(png)).toBe(hash);

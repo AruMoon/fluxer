@@ -10,7 +10,7 @@ import {
 import {ms} from 'itty-time';
 
 export const OPERATOR_PASS_WAITLIST_VERIFY_EXPIRY_MS = ms('48 hours');
-export const OPERATOR_PASS_WAITLIST_FOLLOWUP_EXPIRY_MS = ms('30 minutes');
+const OPERATOR_PASS_WAITLIST_FOLLOWUP_EXPIRY_MS = ms('30 minutes');
 
 const ENTRY_ID_PATTERN = /^[0-9a-f]{32}$/u;
 const VERIFY_SECRET_PATTERN = /^[0-9a-f]{64}$/u;
@@ -69,7 +69,7 @@ function getUnsubscribeSecret(): string {
 	return deriveOperatorPassSecret(OPERATOR_PASS_UNSUBSCRIBE_SECRET_LABEL);
 }
 
-export function createOperatorPassUnsubscribeToken(entryId: string, secret: string = getUnsubscribeSecret()): string {
+function createOperatorPassUnsubscribeToken(entryId: string, secret: string = getUnsubscribeSecret()): string {
 	return `${entryId}.${signEntryId(entryId, secret)}`;
 }
 

@@ -9,7 +9,7 @@ import type {IKVProvider} from '@pkgs/kv_client/src/IKVProvider';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
 import {ms} from 'itty-time';
 
-export const OPERATOR_PASS_WAITLIST_CLEANUP_LOCK_KEY = 'operator_pass:waitlist_cleanup:lock';
+const OPERATOR_PASS_WAITLIST_CLEANUP_LOCK_KEY = 'operator_pass:waitlist_cleanup:lock';
 
 const OPERATOR_PASS_WAITLIST_PENDING_RETENTION_MS = ms('7 days');
 const OPERATOR_PASS_WAITLIST_RETENTION_MS = ms('30 days');
@@ -18,15 +18,18 @@ const LOCK_TTL_SECONDS = 120;
 const DEFAULT_PAGE_SIZE = 100;
 const DEFAULT_TIME_BUDGET_MS = ms('50 seconds');
 
+interface OperatorPassWaitlistCleanupDependencies {
 	kvClient: IKVProvider;
 	operatorPassRepository: OperatorPassRepository;
 }
 
+interface OperatorPassWaitlistCleanupOptions {
 	pageSize?: number;
 	timeBudgetMs?: number;
 	now?: () => number;
 }
 
+interface OperatorPassWaitlistCleanupResult {
 	ran: boolean;
 	scanned: number;
 	deleted: number;
@@ -46,6 +49,7 @@ function getStatusDeleteAt(entry: OperatorPassWaitlistRow): number | null {
 	}
 }
 
+function getOperatorPassWaitlistDeleteAt(
 	entry: OperatorPassWaitlistRow,
 	priceRisesAt: Date | null = Config.operatorPass.priceRisesAt,
 ): number {
@@ -59,6 +63,7 @@ function isDue(entry: OperatorPassWaitlistRow | null, nowMs: number): entry is O
 	return entry != null && getOperatorPassWaitlistDeleteAt(entry) <= nowMs;
 }
 
+async function runOperatorPassWaitlistCleanup(
 	deps: OperatorPassWaitlistCleanupDependencies,
 	options: OperatorPassWaitlistCleanupOptions = {},
 ): Promise<OperatorPassWaitlistCleanupResult> {

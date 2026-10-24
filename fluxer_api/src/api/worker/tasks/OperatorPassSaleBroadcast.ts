@@ -21,8 +21,8 @@ import {formatMinorUnitPrice} from '@fluxer/number_utils/src/PriceFormatting';
 import type {IBulkEmailSession} from '@pkgs/email/src/IEmailService';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
 
-export const OPERATOR_PASS_SALE_BROADCAST_LOCK_KEY = 'operator_pass:sale_broadcast:lock';
-export const OPERATOR_PASS_SALE_EMAIL_CLAIM_PREFIX = 'operator_pass:sale_email:claim:';
+const OPERATOR_PASS_SALE_BROADCAST_LOCK_KEY = 'operator_pass:sale_broadcast:lock';
+const OPERATOR_PASS_SALE_EMAIL_CLAIM_PREFIX = 'operator_pass:sale_email:claim:';
 
 function formatOperatorPassEarlyBirdPrice(entry: OperatorPassWaitlistRow): string {
 	const currency = resolveOperatorPassCurrency(entry.country_code);
@@ -67,6 +67,7 @@ const SALE_BROADCAST: OperatorPassWaitlistBroadcast = {
 	},
 };
 
+async function runOperatorPassSaleBroadcast(
 	deps: OperatorPassWaitlistBroadcastDependencies,
 	options: OperatorPassWaitlistBroadcastOptions = {},
 ): Promise<OperatorPassWaitlistBroadcastResult> {

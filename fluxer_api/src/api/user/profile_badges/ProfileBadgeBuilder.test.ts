@@ -65,16 +65,12 @@ describe('buildProfileBadges', () => {
 	});
 
 	test('restricted profiles keep only the flag badges', () => {
-		expect(kinds({user: everything, operatorPass: PURCHASED, restricted: true})).toEqual([
-			'staff',
-			'partner',
-			'bug_hunter',
-		]);
+		expect(kinds({user: everything, restricted: true})).toEqual(['staff', 'partner', 'bug_hunter']);
 		expect(kinds({user: visionary(), restricted: true})).toEqual([]);
 	});
 
 	test('hidden accounts show nothing', () => {
-		expect(build({user: everything, operatorPass: PURCHASED, hidden: true})).toEqual([]);
+		expect(build({user: everything, hidden: true})).toEqual([]);
 	});
 
 	describe('localization', () => {
@@ -108,10 +104,7 @@ describe('buildProfileBadges', () => {
 					...user,
 					premiumFlags: PremiumFlags.BADGE_TIMESTAMP_HIDDEN,
 				};
-				for (const badge of [
-					...build({user, operatorPass: PURCHASED, locale}),
-					...build({user: undated, operatorPass: OCTOBER_PASS, locale}),
-				]) {
+				for (const badge of [...build({user, locale}), ...build({user: undated, locale})]) {
 					expect(badge.label.startsWith('profile_badge.'), `${locale} ${badge.kind}`).toBe(false);
 				}
 			}

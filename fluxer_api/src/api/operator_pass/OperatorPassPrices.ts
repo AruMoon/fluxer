@@ -205,7 +205,7 @@ export function parseOperatorPassMaxQuantity(value: number | undefined): number 
 	return value;
 }
 
-export const OPERATOR_PASS_DEFAULT_WALL_TIER_MINIMUMS: ReadonlyArray<number> = [1, 2, 5, 10];
+const OPERATOR_PASS_DEFAULT_WALL_TIER_MINIMUMS: ReadonlyArray<number> = [1, 2, 5, 10];
 
 export function parseOperatorPassWallTiers(source: string | undefined): ReadonlyArray<number> {
 	const trimmed = (source ?? '').trim();

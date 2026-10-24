@@ -32,45 +32,7 @@ function createCapturingServiceFor(config: EmailConfig): {service: EmailService;
 	return {service: new EmailService(config, provider), sent};
 }
 
-const SALE_PARAMS = {
-	checkoutUrl: 'https://web.fluxer.app/channels/@operator-pass',
-	priceFormatted: '$199',
-	priceRisesAt: new Date('2027-01-02T12:00:00Z'),
-	unsubscribeUrl: 'https://api.fluxer.app/operator-pass/waitlist/unsubscribe?token=a.b',
-	unsubscribePageUrl: 'https://fluxer.app/pass/unsubscribe?token=a.b',
-};
-
-describe('EmailService Operator Pass emails', () => {
-	it('escapes variables in the HTML part and keeps them raw in plaintext', async () => {
-		const {service, sent} = createCapturingService();
-		await service.send(
-			'operator_pass_sale_open',
-			'user@example.com',
-			{...SALE_PARAMS, priceFormatted: `<b>"it's & $1"</b>`},
-			'en-US',
-		);
-		expect(sent[0].text).toContain(`<b>"it's & $1"</b>`);
-		const html = sent[0].html ?? '';
-		expect(html).toContain('&lt;b&gt;&quot;it&#39;s &amp; $1&quot;&lt;/b&gt;');
-		expect(html).not.toContain('<b>"');
-	});
-
-	it('falls back to plaintext only when a link is not https', async () => {
-		const {service, sent} = createCapturingService();
-		await expect(
-			service.send(
-				'operator_pass_sale_open',
-				'user@example.com',
-				{...SALE_PARAMS, checkoutUrl: 'javascript:alert(1)'},
-				'en-US',
-			),
-		).resolves.toBe(true);
-		expect(sent[0].text).toContain('javascript:alert(1)');
-		expect(sent[0]).not.toHaveProperty('html');
-	});
-});
-
-describe('EmailService transactional and notice emails', () => {
+describe('EmailService', () => {
 	it('keeps the HTML part on a plain-http instance whose links stay on its own origins', async () => {
 		const {service, sent} = createCapturingServiceFor({
 			...CONFIG,

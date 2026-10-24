@@ -21,7 +21,7 @@ export function getOperatorPassWithdrawalEndsOn(endsAt: Date): string {
 	return new Date(endsAt.getTime() + COUNTRY_DEADLINE_UTC_OFFSET_MS).toISOString().slice(0, 10);
 }
 
-export function getOperatorPassCountryWithdrawalDeadline(endsAt: Date): Date {
+function getOperatorPassCountryWithdrawalDeadline(endsAt: Date): Date {
 	const [year, month, day] = getOperatorPassWithdrawalEndsOn(endsAt).split('-').map(Number) as [number, number, number];
 	return new Date(Date.UTC(year, month - 1, day + 1) - COUNTRY_DEADLINE_UTC_OFFSET_MS);
 }

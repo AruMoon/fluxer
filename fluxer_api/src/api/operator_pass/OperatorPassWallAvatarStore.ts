@@ -26,11 +26,11 @@ const PRIVATE_SIZE = Math.max(...OPERATOR_PASS_WALL_AVATAR_SIZES);
 const AVATAR_SOURCE_MAX_BYTES = 16 * 1024 * 1024;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
-export function operatorPassWallAvatarKey(sha256: string, size: number): string {
+function operatorPassWallAvatarKey(sha256: string, size: number): string {
 	return `operator-wall/${sha256}-${size}.webp`;
 }
 
-export function operatorPassWallPrivateAvatarKey(sha256: string): string {
+function operatorPassWallPrivateAvatarKey(sha256: string): string {
 	return `operator-wall-private/${sha256}.webp`;
 }
 

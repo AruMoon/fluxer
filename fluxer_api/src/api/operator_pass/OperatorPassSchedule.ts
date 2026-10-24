@@ -84,7 +84,7 @@ export function resolveOperatorPassCurrency(
 	);
 }
 
-export interface OperatorPassQuote {
+interface OperatorPassQuote {
 	phase: OperatorPassPhase;
 	currency: OperatorPassCurrency;
 	amountMinor: number;
@@ -100,7 +100,7 @@ function signQuotePayload(payload: string, secret: string): string {
 	return createHmac('sha256', secret).update(payload).digest('base64url');
 }
 
-export function signOperatorPassQuote(quote: OperatorPassQuote, secret: string = getQuoteSecret()): string {
+function signOperatorPassQuote(quote: OperatorPassQuote, secret: string = getQuoteSecret()): string {
 	const payload = Buffer.from(
 		JSON.stringify({
 			v: QUOTE_VERSION,
@@ -156,7 +156,7 @@ function parseQuotePayload(payload: string): OperatorPassQuote | null {
 	return {phase: p as OperatorPassPhase, currency: c, amountMinor: a, issuedAtMs: t, userId: u};
 }
 
-export function verifyOperatorPassQuote(token: string, secret: string = getQuoteSecret()): OperatorPassQuote | null {
+function verifyOperatorPassQuote(token: string, secret: string = getQuoteSecret()): OperatorPassQuote | null {
 	if (token.length === 0 || token.length > QUOTE_MAX_LENGTH) {
 		return null;
 	}

@@ -128,7 +128,7 @@ function getOperatorPassCheckoutBoxText(params: {
 		: getContentMessage('billing.operator_pass_waiver_checkout', locale);
 }
 
-export function resolveOperatorPassPurchaseBlockedReason(params: {
+function resolveOperatorPassPurchaseBlockedReason(params: {
 	phase: OperatorPassStateResponse['phase'];
 	user: User;
 	removed: boolean;

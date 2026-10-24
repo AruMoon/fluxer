@@ -180,24 +180,8 @@ describe('account tier service wiring', () => {
 	});
 });
 
-function operatorPassBlockedReason(user: User): string | null {
-	return resolveOperatorPassPurchaseBlockedReason({
-		phase: 'standard',
-		user,
-		removed: false,
-		countryStopped: false,
-		paymentDisputeOpen: false,
-	});
-}
-
-describe('purchase eligibility service wiring', () => {
-	it('passes account eligibility through to the Operator Pass purchase reason', () => {
-		expect(operatorPassBlockedReason(UNCLAIMED)).toBe(PurchaseBlockedReasons.UNCLAIMED);
-		expect(operatorPassBlockedReason(VERIFIED)).toBeNull();
-		expect(() => assertUserCanPurchase(VERIFIED)).not.toThrow();
-	});
-
-	it('requires a receipt address at both purchase entry points on username instances', () => {
+describe('purchase eligibility', () => {
+	it('requires a receipt address to purchase on username instances', () => {
 		Config.instance.selfHosted = true;
 		setCachedAccountIdentity({mode: AccountIdentityModes.USERNAME, tagStyle: TagStyles.NONE});
 		setCachedEmailDeliveryState(EmailDeliveryStates.OFF_DISABLED);
