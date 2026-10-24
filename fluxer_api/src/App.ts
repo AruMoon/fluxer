@@ -41,7 +41,9 @@ async function main(): Promise<void> {
 	const server = createServer(app, buildAPIServerOptions(Config));
 	Logger.info({port: Config.port}, `Starting Fluxer API on port ${Config.port}`);
 	const operatorServer = await listenOperatorSocket(app, OPERATOR_SOCKET_PATH, Logger);
-	const stop = async (): Promise<void> => {
+	let stopping: Promise<void> | null = null;
+	const stop = (): Promise<void> => (stopping ??= stopServices());
+	const stopServices = async (): Promise<void> => {
 		await Promise.all([
 			(async () => {
 				await closeHttpServer(server);
@@ -59,7 +61,8 @@ async function main(): Promise<void> {
 			await startEmbeddedWorker(host.cores);
 		} catch (error) {
 			Logger.fatal({error}, 'Failed to start the embedded worker');
-			await stop();
+			const forceExit = new Promise<void>((resolve) => setTimeout(resolve, 30000).unref());
+			await Promise.race([stop().catch(() => undefined), forceExit]);
 			process.exit(1);
 		}
 	}
