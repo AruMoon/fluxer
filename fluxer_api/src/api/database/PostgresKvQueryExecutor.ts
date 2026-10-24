@@ -1496,6 +1496,15 @@ export class PostgresKvQueryExecutor {
 		state: PageState,
 		pageSize: number,
 	): Promise<{rows: Array<Row>; pageState: string | null}> {
+		const ordered = await this.orderedWalk(meta, params, plan.candidates, state.after ?? null, pageSize, this.client);
+		if (ordered !== null) {
+			const rows = this.projected(meta, ordered.entries);
+			if (!ordered.more || ordered.after === null) return {rows, pageState: null};
+			return {
+				rows,
+				pageState: encodePageState({offset: state.offset + ordered.entries.length, after: ordered.after}),
+			};
+		}
 		const entries = this.matchingEntries(meta, await this.candidates(meta, plan, this.client), params);
 		const compare = rowComparator(meta);
 		entries.sort((left, right) => compare(left.row, right.row));
