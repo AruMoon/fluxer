@@ -550,6 +550,10 @@ services:
   gateway:
     <<: *fluxer-service
     image: ${FLUXER_REGISTRY:-ghcr.io/${FLUXER_REGISTRY_OWNER:-fluxerapp}}/fluxer-gateway:${FLUXER_IMAGE_TAG:-v1}
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     deploy:
       resources:
         limits:
