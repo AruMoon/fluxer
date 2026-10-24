@@ -1303,7 +1303,11 @@ async function updatePendingRegistrationUser(
 		return;
 	}
 	const traits = new Set(user.traits);
-	if (!traits.has(REGISTRATION_PENDING_APPROVAL_TRAIT) && !traits.has(REGISTRATION_REJECTED_TRAIT)) {
+	if (
+		!pendingRegistration &&
+		!traits.has(REGISTRATION_PENDING_APPROVAL_TRAIT) &&
+		!traits.has(REGISTRATION_REJECTED_TRAIT)
+	) {
 		throw new UnknownUserError();
 	}
 	const wasPendingApproval = traits.delete(REGISTRATION_PENDING_APPROVAL_TRAIT);
