@@ -10,7 +10,7 @@ rexctl installs Fluxer on one machine and keeps it running. To run Fluxer on a K
 
 ## What you need
 
-- A 64-bit Linux, macOS or Windows machine with at least 2 CPU cores, 4 GB of memory and 20 GB of free disk space. That's enough for about 1,000 people online at the same time. On a bigger machine, rexctl gives Fluxer more room each time it starts, with no settings to change.
+- A 64-bit Linux, macOS or Windows machine with at least 2 CPU cores, 4 GB of memory and 20 GB of free disk space. That's enough for about 1,000 people online at the same time. rexctl sizes Fluxer to the machine's memory and CPUs every time it starts, so a bigger machine needs no extra settings.
 - On macOS and Windows, [Docker Desktop](https://docs.docker.com/desktop/). On Linux, rexctl installs Docker for you if it's missing.
 - A domain or subdomain for your instance, such as `chat.example.com`.
 - An `A` record for that domain pointing to the machine's public IP address. rexctl checks it before it asks for a certificate.
