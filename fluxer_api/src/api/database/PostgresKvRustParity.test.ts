@@ -11,9 +11,14 @@ const REPO_ROOT = path.resolve(THIS_DIR, '../../../..');
 const TYPESCRIPT_SOURCE = fs.readFileSync(path.join(THIS_DIR, 'PostgresKvQueryExecutor.ts'), 'utf8');
 const RUST_SOURCE = fs.readFileSync(path.join(REPO_ROOT, 'fluxer_svc/src/postgres.rs'), 'utf8');
 
-const RUST_INDEX_SUFFIXES = ['expires_idx', 'partition_idx', 'partition_row_idx', 'row_key_c_idx'];
+const RUST_INDEX_SUFFIXES = ['expires_idx', 'partition_idx', 'row_key_c_idx'];
 
-const API_ONLY_INDEX_SUFFIXES = ['message_reactions_message_idx', 'messages_message_idx', 'row_key_numeric_idx'];
+const API_ONLY_INDEX_SUFFIXES = [
+	'message_reactions_message_idx',
+	'messages_message_idx',
+	'partition_row_idx',
+	'row_key_numeric_idx',
+];
 
 const SHARED_LITERALS = [
 	'120s',

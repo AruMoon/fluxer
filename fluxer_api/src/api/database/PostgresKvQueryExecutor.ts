@@ -849,8 +849,12 @@ function sortIdIndexNames(kvTable: string): Array<string> {
 	return POSTGRES_KV_SORT_ID_TABLES.map((tableName) => sortIdIndexName(kvTable, tableName));
 }
 
-function retiredIndexNames(kvTable: string): Array<string> {
+function jsonbSortIndexNames(kvTable: string): Array<string> {
 	return [`${kvTable}_messages_message_idx`, `${kvTable}_message_reactions_message_idx`];
+}
+
+function retiredIndexNames(kvTable: string): Array<string> {
+	return [...jsonbSortIndexNames(kvTable), `${kvTable}_partition_row_idx`];
 }
 
 async function repairInvalidPostgresKvIndexes(db: PostgresQueryable, kvTable: string): Promise<void> {
@@ -1034,7 +1038,8 @@ WHERE idx.indrelid = to_regclass($1) AND cls.relname = ANY($2::text[])`,
 		POSTGRES_KV_MIGRATION_TABLE,
 		POSTGRES_KV_SORT_ID_MIGRATION,
 	]);
-	if (marked.rows.length === 0 || retired.rows.length > 0) {
+	const jsonbSortIndexes = jsonbSortIndexNames(kvTable);
+	if (marked.rows.length === 0 || retired.rows.some(({index_name}) => jsonbSortIndexes.includes(index_name))) {
 		for (const tableName of POSTGRES_KV_SORT_ID_TABLES) {
 			await backfillPostgresKvSortIds(db, table, tableName);
 		}

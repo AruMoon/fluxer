@@ -431,6 +431,7 @@ pub struct KvClient {
     get_row_sql: String,
     get_rows_sql: String,
     get_partition_rows_sql: String,
+    get_ordered_rows_sql: String,
     delete_row_sql: String,
     sort_ids: Arc<SortIdState>,
 }
@@ -448,6 +449,9 @@ impl KvClient {
                 "SELECT row_key, row_data FROM {table} WHERE table_name = $1 AND row_key = ANY($2::text[]) AND (expires_at IS NULL OR expires_at > now())"
             ),
             get_partition_rows_sql: format!(
+                r#"SELECT row_key, row_data FROM {table} WHERE table_name = $1 AND (row_key = $2 OR (row_key COLLATE "C" >= $2 || chr(31) AND row_key COLLATE "C" < $2 || ' ')) AND (expires_at IS NULL OR expires_at > now())"#
+            ),
+            get_ordered_rows_sql: format!(
                 "SELECT row_key, row_data FROM {table} WHERE table_name = $1 AND partition_key = $2 AND (expires_at IS NULL OR expires_at > now())"
             ),
             delete_row_sql: format!("DELETE FROM {table} WHERE table_name = $1 AND row_key = $2"),
@@ -500,7 +504,7 @@ impl KvClient {
         table_name: &str,
         field_name: &str,
     ) -> anyhow::Result<(String, String)> {
-        let base = &self.get_partition_rows_sql;
+        let base = &self.get_ordered_rows_sql;
         if field_name == "message_id"
             && let Some(sorted) = POSTGRES_KV_SORT_ID_TABLES
                 .iter()
