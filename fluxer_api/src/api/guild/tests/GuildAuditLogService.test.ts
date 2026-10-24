@@ -1,13 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {
-	createChannelID,
-	createGuildID,
-	createRoleID,
-	createUserID,
-	type RoleID,
-	type UserID,
-} from '@app/api/BrandedTypes';
+import {createGuildID, createUserID} from '@app/api/BrandedTypes';
 import {GuildAuditLogService} from '@app/api/guild/GuildAuditLogService';
 import {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import {getSnowflakeService} from '@app/api/middleware/ServiceRegistry';
@@ -15,7 +8,7 @@ import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHa
 import {NoopGatewayService} from '@app/api/test/NoopGatewayService';
 import {RecordingWorkerService} from '@app/api/test/RecordingWorkerService';
 import {AuditLogActionType} from '@fluxer/constants/src/AuditLogActionType';
-import {afterEach, assert, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, assert, beforeEach, describe, expect, it} from 'vitest';
 
 const GUILD_ID = createGuildID(1420000000000000000n);
 const ACTOR_ID = createUserID(1420000000000000001n);

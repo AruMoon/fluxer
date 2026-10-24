@@ -677,9 +677,6 @@ importers:
       mime:
         specifier: 'catalog:'
         version: 4.1.0
-      nodemailer:
-        specifier: 'catalog:'
-        version: 10.1.4
       pdf-lib:
         specifier: 'catalog:'
         version: 1.17.1

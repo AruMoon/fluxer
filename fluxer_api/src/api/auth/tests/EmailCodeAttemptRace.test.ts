@@ -31,7 +31,7 @@ import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {EmailCodeResendCooldownError} from '@fluxer/errors/src/domains/auth/EmailCodeResendCooldownError';
 import {RateLimitError} from '@fluxer/errors/src/domains/core/RateLimitError';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
-import type {IRateLimitService} from '@pkgs/rate_limit/src/IRateLimitService';
+import {RateLimitService} from '@pkgs/rate_limit/src/RateLimitService';
 import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 const GUESSES = 40;
@@ -192,22 +192,28 @@ describe('Email code attempt cap under concurrency', () => {
 	});
 });
 
-describe('Daily code failure caps', () => {
-	const allowAll: IRateLimitService = {
-		checkLimit: async () => ({allowed: true, limit: 0, remaining: 0, resetTime: new Date()}),
-	} as unknown as IRateLimitService;
+function budgetEnv() {
+	const kv = new MockKVProvider();
+	return {kv, rateLimit: new RateLimitService(kv), enforce: true};
+}
 
-	async function failFrom(env: Parameters<typeof recordAddressCodeFailure>[0], emailKey: string, clientIp: string) {
+describe('Daily code failure caps', () => {
+	async function failFrom(
+		env: Parameters<typeof recordAddressCodeFailure>[0],
+		emailKey: string,
+		ipFor: (failure: number) => string,
+	) {
 		for (let failure = 0; failure < CODE_FAILURES_DAILY_CAP; failure++) {
+			const clientIp = ipFor(failure);
 			await assertEmailSendAllowed(env, {emailKey, requester: 'unknown', clientIp});
 			await recordAddressCodeFailure(env, {emailKey, network: requesterNetworkKey(clientIp)});
 		}
 	}
 
 	it('stops unknown requesters on the failing IPv4 /24 only', async () => {
-		const env = {kv: new MockKVProvider(), rateLimit: allowAll, enforce: true};
+		const env = budgetEnv();
 		const emailKey = normalizeEmailKey('target@example.com');
-		await failFrom(env, emailKey, '203.0.113.9');
+		await failFrom(env, emailKey, (failure) => `203.0.113.${failure + 1}`);
 		await expect(
 			assertEmailSendAllowed(env, {emailKey, requester: 'unknown', clientIp: '203.0.113.77'}),
 		).rejects.toBeInstanceOf(EmailCodeResendCooldownError);
@@ -220,9 +226,9 @@ describe('Daily code failure caps', () => {
 	});
 
 	it('stops unknown requesters on the failing IPv6 /48 only', async () => {
-		const env = {kv: new MockKVProvider(), rateLimit: allowAll, enforce: true};
+		const env = budgetEnv();
 		const emailKey = normalizeEmailKey('target@example.com');
-		await failFrom(env, emailKey, '2001:db8:1:1::1');
+		await failFrom(env, emailKey, (failure) => `2001:db8:1:${failure + 1}::1`);
 		await expect(
 			assertEmailSendAllowed(env, {emailKey, requester: 'unknown', clientIp: '2001:db8:1:ffff::2'}),
 		).rejects.toBeInstanceOf(EmailCodeResendCooldownError);
@@ -232,11 +238,11 @@ describe('Daily code failure caps', () => {
 	});
 
 	it('stops every code to an account once its own wrong codes reach the account cap', async () => {
-		const env = {kv: new MockKVProvider(), rateLimit: allowAll, enforce: true};
+		const env = budgetEnv();
 		const emailKey = normalizeEmailKey('owner@example.com');
 		const userId = '1234567890';
 		for (let failure = 0; failure < ACCOUNT_CODE_FAILURES_DAILY_CAP; failure++) {
-			await assertEmailSendAllowed(env, {emailKey, requester: 'known', clientIp: '203.0.113.9', userId});
+			await assertEmailSendAllowed(env, {emailKey, requester: 'known', clientIp: `203.0.113.${failure + 1}`, userId});
 			await recordAccountCodeFailure(env, userId);
 		}
 		for (const requester of ['known', 'unknown'] as const) {
@@ -250,7 +256,7 @@ describe('Daily code failure caps', () => {
 	});
 
 	it('caps lookups at 30 per IP and 300 per subnet', async () => {
-		const env = {kv: new MockKVProvider(), rateLimit: countingRateLimit(), enforce: true};
+		const env = budgetEnv();
 		for (let lookup = 0; lookup < 30; lookup++) await enforceLookupHardLimits(env, '203.0.113.1');
 		await expect(enforceLookupHardLimits(env, '203.0.113.1')).rejects.toBeInstanceOf(RateLimitError);
 		for (let host = 2; host <= 10; host++) {

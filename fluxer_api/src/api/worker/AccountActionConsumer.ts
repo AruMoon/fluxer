@@ -96,7 +96,7 @@ async function publishOutcome(deps: AccountActionDeps, key: string, outcome: Act
 	await emitActivity('action_outcome', key, outcome, workerMeta(), outcome.action_id);
 }
 
-export async function handleActionMessage(deps: AccountActionDeps, msg: JsMsg): Promise<void> {
+async function handleActionMessage(deps: AccountActionDeps, msg: JsMsg): Promise<void> {
 	const env = decodeActionEnvelope(msg.data);
 	if (!env) {
 		msg.term('undecodable action envelope');

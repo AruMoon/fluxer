@@ -71,7 +71,6 @@
 		"livekit-server-sdk": "catalog:",
 		"maxmind": "catalog:",
 		"mime": "catalog:",
-		"nodemailer": "catalog:",
 		"pdf-lib": "catalog:",
 		"pg": "catalog:",
 		"pino": "catalog:",

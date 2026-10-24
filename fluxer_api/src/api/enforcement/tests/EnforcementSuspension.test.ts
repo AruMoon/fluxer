@@ -35,7 +35,7 @@ import {DeletionReasons} from '@fluxer/constants/src/Core';
 import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
 import {ms} from 'itty-time';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, test} from 'vitest';
 
 describe('Enforcement suspensions', () => {
 	let harness: ApiTestHarness;
@@ -66,11 +66,12 @@ describe('Enforcement suspensions', () => {
 		return {target, channelId: systemChannel.id, channelName: systemChannel.name!, messageId: message.id};
 	}
 
-	test('records the decision before the state and sets the pointer in the same user write', async () => {
+	test('records the decision and points the suspended user at it', async () => {
 		const target = await createTestAccount(harness);
 		const decisionId = await suspend(harness, staff, target.userId);
 		const user = await loadUser(target);
 		expect(user.enforcementDecisionId).toBe(BigInt(decisionId));
+		expect(user.tempBannedUntil).not.toBeNull();
 		expect((user.flags & UserFlags.DISABLED) !== 0n).toBe(true);
 		const decision = await getDecision(harness, staff, decisionId);
 		expect(decision).toMatchObject({kind: 'suspension', status: 'active', notice_status: 'sent', replaced: false});
@@ -306,9 +307,7 @@ describe('Enforcement suspensions', () => {
 
 	test('records undelivered when email is off on the instance', async () => {
 		const target = await createTestAccount(harness);
-		const config = getInstanceConfigRepository();
-		const effective = await config.getEffectiveEmailConfig();
-		vi.spyOn(config, 'getEffectiveEmailConfig').mockResolvedValue({...effective, enabled: false});
+		await getInstanceConfigRepository().setInstanceIntegrationsConfig({email: {delivery: 'off'}});
 		await clearTestEmails(harness);
 		const decisionId = await suspend(harness, staff, target.userId);
 		expect((await getDecision(harness, staff, decisionId)).notice_status).toBe('undelivered');

@@ -26,6 +26,7 @@ const MODULE_REGISTRY_TEST_FILES = ['src/api/voice/tests/VoiceAvailabilityServic
 
 const INSTANCE_POLICY_TEST_FILES = ['src/api/admin/tests/InstanceConfigPendingRegistrationApproval.test.ts'];
 
+const NATIVE_TIMEZONE_TEST_FILES = ['src/api/utils/AgeUtils.test.ts'];
 
 const sharedExclude = [...configDefaults.exclude, 'pkgs/**', '../fluxer_desktop/**', '**/target/**'];
 

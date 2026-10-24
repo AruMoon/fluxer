@@ -30,7 +30,7 @@ import {HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {DeletionReasons} from '@fluxer/constants/src/Core';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, test} from 'vitest';
 
 interface ValidationErrorBody {
 	errors: Array<{path: string; code: string}>;
@@ -162,7 +162,7 @@ describe('Enforcement content, profile and community decisions', () => {
 			expect(worker.byTask('messageShred')).toEqual([]);
 		});
 
-		test('a restricted shred stores every entry without content before the job is queued', async () => {
+		test('a restricted shred stores every entry without content', async () => {
 			const {target, entries} = await guildMessages(2);
 			const response = await shredRequest(target.userId, {entries, basis: enforcement(RESTRICTED)})
 				.expect(HTTP_STATUS.OK)

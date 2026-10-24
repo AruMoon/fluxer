@@ -35,6 +35,12 @@ interface MfaRequiredResponse {
 	backup_codes: boolean;
 }
 
+async function lastEmail(harness: ApiTestHarness, type: string, recipient: string): Promise<TestEmailRecord> {
+	const email = findLastTestEmail(await listTestEmails(harness, {recipient}), type);
+	expect(email).not.toBeNull();
+	return email!;
+}
+
 async function claimEmailWithoutPassword(harness: ApiTestHarness, account: TestAccount): Promise<TestAccount> {
 	await unclaimAccount(harness, account.userId);
 	const start = await createBuilder<{ticket: string; original_proof?: string}>(harness, account.token)
@@ -46,7 +52,7 @@ async function claimEmailWithoutPassword(harness: ApiTestHarness, account: TestA
 		.post('/users/@me/email-change/request-new')
 		.body({ticket: start.ticket, new_email: email, original_proof: start.original_proof})
 		.execute();
-	const newEmail = await waitForEmail(harness, 'email_change_new', email);
+	const newEmail = await lastEmail(harness, 'email_change_new', email);
 	const verify = await createBuilder<{email_token: string}>(harness, account.token)
 		.post('/users/@me/email-change/verify-new')
 		.body({ticket: start.ticket, code: newEmail.metadata['code'], original_proof: start.original_proof})
@@ -58,7 +64,7 @@ async function claimEmailWithoutPassword(harness: ApiTestHarness, account: TestA
 async function requestPasswordReset(harness: ApiTestHarness, email: string): Promise<string> {
 	await clearTestEmails(harness);
 	await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email}).expect(204).execute();
-	const mail = await waitForEmail(harness, 'password_reset', email);
+	const mail = await lastEmail(harness, 'password_reset', email);
 	const token = mail.metadata['token'];
 	expect(token).toBeDefined();
 	return token!;
@@ -83,7 +89,7 @@ describe('Auth reset password requires MFA', () => {
 			.body({secret, code: totpCodeNow(secret), password: account.password})
 			.execute();
 		await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email: account.email}).expect(204).execute();
-		const email = await waitForEmail(harness, 'password_reset', account.email);
+		const email = await lastEmail(harness, 'password_reset', account.email);
 		const token = email.metadata['token'];
 		expect(token).toBeDefined();
 		const newPassword = 'new-strong-password-123';
@@ -122,7 +128,7 @@ describe('Auth reset password requires MFA', () => {
 		await registerWebAuthnCredential(harness, account.token, device, () => ({password: account.password}));
 		await clearTestEmails(harness);
 		await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email: account.email}).expect(204).execute();
-		const email = await waitForEmail(harness, 'password_reset', account.email);
+		const email = await lastEmail(harness, 'password_reset', account.email);
 		const token = email.metadata['token'];
 		expect(token).toBeDefined();
 		const resetResp = await createBuilderWithoutAuth<LoginSuccessResponse | MfaRequiredResponse>(harness)
@@ -139,7 +145,7 @@ describe('Auth reset password requires MFA', () => {
 		await setWebAuthnTwoFactor(harness, account.token, true, {password: account.password});
 		await clearTestEmails(harness);
 		await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email: account.email}).expect(204).execute();
-		const email = await waitForEmail(harness, 'password_reset', account.email);
+		const email = await lastEmail(harness, 'password_reset', account.email);
 		const token = email.metadata['token'];
 		expect(token).toBeDefined();
 		const resetResp = await createBuilderWithoutAuth<MfaRequiredResponse>(harness)
@@ -246,7 +252,7 @@ describe('Auth reset password requires MFA', () => {
 			.execute();
 		await clearTestEmails(harness);
 		await createBuilderWithoutAuth(harness).post('/auth/forgot').body({email: account.email}).expect(204).execute();
-		const token = (await waitForEmail(harness, 'password_reset', account.email)).metadata['token'];
+		const token = (await lastEmail(harness, 'password_reset', account.email)).metadata['token'];
 		const reset = await createBuilderWithoutAuth<MfaRequiredResponse>(harness)
 			.post('/auth/reset')
 			.body({token, password: 'new-strong-password-123'})

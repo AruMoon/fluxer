@@ -8,8 +8,7 @@ import {guildVisitRepository} from '@app/api/guild/visits/GuildVisitorAccess';
 import {getGuildRepository, getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
-import {HttpStatus} from '@fluxer/constants/src/HttpConstants';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface SessionData {
 	data: {visit_guild_ids: Array<string>};

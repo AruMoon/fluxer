@@ -23,6 +23,7 @@ import {
 	type StripeApiHandlers,
 } from '@app/api/test/msw/handlers/StripeApiHandlers';
 import {server} from '@app/api/test/msw/server';
+import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
 import {HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {getCurrencyPreferences, getGiftCurrencyPreferences, isLocalizedCurrency} from '@app/api/utils/CurrencyUtils';
@@ -116,7 +117,7 @@ function restoreGlobalState(state: GlobalState): void {
 	setStoredBillingConfig(state.storedBilling);
 }
 
-const WORKER_HELPERS = {logger: new NoopLogger()} as unknown as WorkerTaskHelpers;
+const WORKER_HELPERS = createTestWorkerHelpers();
 
 function useOperatorBilling(overrides: Partial<StoredBillingConfig> = {}): void {
 	Config.instance.selfHosted = true;

@@ -12,8 +12,7 @@ import {
 import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {generateUniquePassword, HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
-import {UserRepository} from '@app/api/user/repositories/UserRepository';
-import {afterAll, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 describe('Password reset flow', () => {
 	let harness: ApiTestHarness;
@@ -166,29 +165,23 @@ describe('Password reset flow', () => {
 			.expect(HTTP_STATUS.FORBIDDEN)
 			.execute();
 		const approval = findLastTestEmail(await listTestEmails(harness, {recipient: account.email}), 'ip_authorization');
-		vi.useFakeTimers({toFake: ['Date']});
-		vi.setSystemTime(new Date(Date.now() + 1000));
-		try {
-			await createBuilderWithoutAuth(harness)
-				.post('/auth/forgot')
-				.body({email: account.email})
-				.expect(HTTP_STATUS.NO_CONTENT)
-				.execute();
-			const token = findLastTestEmail(await listTestEmails(harness, {recipient: account.email}), 'password_reset')!
-				.metadata!.token!;
-			await createBuilderWithoutAuth(harness)
-				.post('/auth/reset')
-				.body({token, password: generateUniquePassword()})
-				.execute();
-			await createBuilderWithoutAuth(harness)
-				.post('/auth/authorize-ip')
-				.header('x-forwarded-for', '192.0.2.88')
-				.body({token: approval!.metadata['token']})
-				.expect(HTTP_STATUS.BAD_REQUEST)
-				.execute();
-		} finally {
-			vi.useRealTimers();
-		}
+		await createBuilderWithoutAuth(harness)
+			.post('/auth/forgot')
+			.body({email: account.email})
+			.expect(HTTP_STATUS.NO_CONTENT)
+			.execute();
+		const token = findLastTestEmail(await listTestEmails(harness, {recipient: account.email}), 'password_reset')!
+			.metadata!.token!;
+		await createBuilderWithoutAuth(harness)
+			.post('/auth/reset')
+			.body({token, password: generateUniquePassword()})
+			.execute();
+		await createBuilderWithoutAuth(harness)
+			.post('/auth/authorize-ip')
+			.header('x-forwarded-for', '192.0.2.88')
+			.body({token: approval!.metadata['token']})
+			.expect(HTTP_STATUS.BAD_REQUEST)
+			.execute();
 	});
 	it('rejects invalid reset token', async () => {
 		await createTestAccount(harness);

@@ -1,35 +1,37 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {SsoService} from '@app/api/auth/services/SsoService';
-import {getConfig} from '@app/api/Config';
-import {setCassandraQueryExecutorForTesting} from '@app/api/database/CassandraQueryExecution';
-import {InstanceConfigRepository} from '@app/api/instance/InstanceConfigRepository';
-import {InstanceController} from '@app/api/instance/InstanceController';
-import type {LimitConfigService} from '@app/api/limits/LimitConfigService';
-import {InMemoryCassandraQueryExecutor} from '@app/api/test/InMemoryCassandraQueryExecutor';
-import type {HonoEnv} from '@app/api/types/HonoEnv';
+import {createAuthHarness} from '@app/api/auth/tests/AuthTestUtils';
+import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
+import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
+import {createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
 import {parseInstanceDiscoveryDocument} from '@fluxer/instance_bootstrap/src/Discovery';
 import type {WellKnownFluxerResponse} from '@fluxer/schema/src/domains/instance/InstanceSchemas';
-import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
-import {Hono} from 'hono';
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 describe('discovery fields for self-hosted clients', () => {
-	const repositories: Array<InstanceConfigRepository> = [];
-	const discoveryEnabled = getConfig().discovery.enabled;
+	let harness: ApiTestHarness;
 
+	beforeAll(async () => {
+		harness = await createAuthHarness();
+	});
+	beforeEach(async () => {
+		await harness.reset();
+	});
 	afterEach(() => {
-		getConfig().discovery.enabled = discoveryEnabled;
-		for (const repository of repositories) {
-			repository.shutdown();
-		}
-		repositories.length = 0;
+		getInstanceConfigRepository().clearCacheForTesting();
+	});
+	afterAll(async () => {
+		await harness?.shutdown();
 	});
 
 	it('keeps friend requests off on an instance that turned direct messages off before the split', async () => {
-		const repository = createRepository();
-		await repository.setConfig('instance_policy_config', JSON.stringify({direct_messages_disabled: true}));
-		const discovery = await readDiscovery(repository);
+		await getInstanceConfigRepository().setConfig(
+			'instance_policy_config',
+			JSON.stringify({direct_messages_disabled: true}),
+		);
+		const discovery = await createBuilderWithoutAuth<WellKnownFluxerResponse>(harness)
+			.get('/.well-known/fluxer')
+			.execute();
 		expect(discovery.community).toMatchObject({direct_messages_disabled: true, friends_disabled: true});
 	});
 

@@ -12,7 +12,7 @@ import {
 import {NoopLogger} from '@app/api/test/mocks/NoopLogger';
 import type {LoggerInterface} from '@fluxer/logger/src/LoggerInterface';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(THIS_DIR, '../../../..');

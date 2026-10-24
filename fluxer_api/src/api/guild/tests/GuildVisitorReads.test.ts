@@ -13,7 +13,7 @@ import type {LimitConfigSnapshot} from '@fluxer/limits/src/LimitTypes';
 import type {ChannelResponse} from '@fluxer/schema/src/domains/channel/ChannelSchemas';
 import type {GuildResponse} from '@fluxer/schema/src/domains/guild/GuildResponseSchemas';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
-import {afterAll, afterEach, assert, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, assert, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface Registered {
 	token: string;

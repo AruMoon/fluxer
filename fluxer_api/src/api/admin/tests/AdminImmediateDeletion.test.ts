@@ -8,7 +8,7 @@ import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {triggerDeletionWorker, waitForDeletionCompletion} from '@app/api/user/tests/UserTestUtils';
 import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 describe('immediate account deletion from the admin panel', () => {
 	let harness: ApiTestHarness;

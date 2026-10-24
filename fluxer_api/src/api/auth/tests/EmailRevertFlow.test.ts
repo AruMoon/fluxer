@@ -10,12 +10,14 @@ import {
 	type TestAccount,
 } from '@app/api/auth/tests/AuthTestUtils';
 import {createUserID} from '@app/api/BrandedTypes';
+import {resetApiServicesForTesting} from '@app/api/CreateApiContext';
+import {setInjectedWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {getUserRepository} from '@app/api/middleware/ServiceSingletons';
 import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {NoopWorkerService} from '@app/api/test/NoopWorkerService';
+import {RecordingWorkerService} from '@app/api/test/RecordingWorkerService';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
 import {UserTraits} from '@app/api/user/UserTraits';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface EmailChangeStartResponse {
 	ticket: string;
@@ -198,10 +200,12 @@ describe('Email revert flow', () => {
 			.body({stripe_customer_id: 'cus_email_revert_sync'})
 			.expect(200)
 			.execute();
-		const addJob = vi.spyOn(NoopWorkerService.prototype, 'addJob');
+		const worker = new RecordingWorkerService();
+		setInjectedWorkerService(worker);
+		resetApiServicesForTesting();
 		const revertToken = await changeEmailAndGetRevertToken(harness, account);
 		const newPassword = uniquePassword();
-		addJob.mockClear();
+		worker.jobs.length = 0;
 		const revertResp = await createBuilderWithoutAuth<EmailRevertResponse>(harness)
 			.post('/auth/email-revert')
 			.body({
@@ -210,7 +214,7 @@ describe('Email revert flow', () => {
 			})
 			.execute();
 		expect(revertResp.token.length).toBeGreaterThan(0);
-		expect(addJob).toHaveBeenCalledWith('syncStripeCustomerEmail', {userId: account.userId});
+		expect(worker.byTask('syncStripeCustomerEmail').map((job) => job.payload)).toContainEqual({userId: account.userId});
 		expect(Object.keys(revertResp).sort()).toEqual(['token', 'user', 'user_id']);
 		await createBuilder(harness, account.token).get('/users/@me').expect(401).execute();
 		const user = await createBuilder<UserPrivateResponse>(harness, revertResp.token).get('/users/@me').execute();

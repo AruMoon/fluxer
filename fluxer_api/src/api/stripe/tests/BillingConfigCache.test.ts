@@ -15,7 +15,7 @@ import {
 	setStoredBillingConfig,
 } from '@app/api/stripe/BillingConfigCache';
 import {getStripeClient} from '@app/api/stripe/StripeClient';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
 const ENV_PRICES = {
 	monthlyUsd: 'price_monthly_usd',

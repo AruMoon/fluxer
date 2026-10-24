@@ -13,6 +13,7 @@ import {createUserID, type UserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
 import {createApiContext} from '@app/api/CreateApiContext';
 import {SYSTEM_USER_ID} from '@app/api/constants/Core';
+import {Db} from '@app/api/database/CassandraTypes';
 import {close, endDecision} from '@app/api/enforcement/tests/EnforcementTestUtils';
 import {setInjectedWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
@@ -45,7 +46,7 @@ import {UserFlags, UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
 import type {EnforcementDecisionResponse} from '@fluxer/schema/src/domains/admin/EnforcementSchemas';
 import {EmailService} from '@pkgs/email/src/EmailService';
 import {SmtpEmailProvider} from '@pkgs/email/src/SmtpEmailProvider';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test} from 'vitest';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXEMPT_REASONS = [
@@ -176,10 +177,18 @@ describe('Plutonium payment disputes', () => {
 		return smtp;
 	}
 
-	function passWarningDate(): void {
-		const now = Date.now();
-		vi.useFakeTimers({toFake: ['Date']});
-		vi.setSystemTime(new Date(now + 8 * DAY_MS));
+	async function backdateReview(
+		disputeId: string,
+		field: 'warning_deadline' | 'closed_at',
+		agoMs: number,
+	): Promise<void> {
+		const review = await disputes.findReview(disputeId);
+		expect(review).not.toBeNull();
+		await disputes.updateReview(review!, {[field]: Db.set(new Date(Date.now() - agoMs))});
+	}
+
+	async function passWarningDate(disputeId: string): Promise<void> {
+		await backdateReview(disputeId, 'warning_deadline', DAY_MS);
 	}
 
 	let eventCounter = 0;
@@ -951,7 +960,7 @@ describe('Plutonium payment disputes', () => {
 			expect(smtp.attempts).toHaveLength(1);
 			expect(smtp.attempts[0]).toMatchObject({from: '<warnings@example.com>', to: `<${buyer.email}>`});
 			expect(smtp.delivered).toEqual([]);
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_incomplete');
 			await closeDispute('pi_warn_incomplete', 'lost');
 			const user = await userRepository.findUniqueAssert(idOf(buyer));
 			expect(user.flags & UserFlags.DELETED).toBe(0n);
@@ -975,7 +984,7 @@ describe('Plutonium payment disputes', () => {
 			await openDispute('pi_warn_lost');
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_lost', 'unjustified', 'Plutonium was used for three weeks.');
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_lost');
 			await closeDispute('pi_warn_lost', 'lost');
 			expect(stripe.spies.cancelledSubscriptions).toEqual(['sub_pi_warn_lost']);
 			const review = await disputes.findReview('dp_pi_warn_lost');
@@ -1037,7 +1046,7 @@ describe('Plutonium payment disputes', () => {
 			await openDispute('pi_warn_lost_twice');
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_lost_twice', 'unjustified');
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_lost_twice');
 			await closeDispute('pi_warn_lost_twice', 'lost');
 			await closeDispute('pi_warn_lost_twice', 'lost');
 			const emails = await listTestEmails(harness, {recipient: buyer.email});
@@ -1056,7 +1065,7 @@ describe('Plutonium payment disputes', () => {
 				pending_deletion_at: holderDeletionAt,
 				deletion_reason_code: DeletionReasons.USER_REQUESTED,
 			});
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_holder');
 			await closeDispute('pi_warn_holder', 'lost');
 			const closed = await userRepository.findUniqueAssert(idOf(buyer));
 			expect(closed.flags & UserFlags.DELETED).toBe(UserFlags.DELETED);
@@ -1082,7 +1091,8 @@ describe('Plutonium payment disputes', () => {
 			const admin = await staff();
 			await decide(admin, 'dp_pi_two_lost_a', 'unjustified');
 			await decide(admin, 'dp_pi_two_lost_b', 'unjustified');
-			passWarningDate();
+			await passWarningDate('dp_pi_two_lost_a');
+			await passWarningDate('dp_pi_two_lost_b');
 			await closeDispute('pi_two_lost_a', 'lost');
 			await closeDispute('pi_two_lost_b', 'lost');
 			const decisionId = (await disputes.findReview('dp_pi_two_lost_a'))?.enforcement_decision_id ?? null;
@@ -1119,7 +1129,7 @@ describe('Plutonium payment disputes', () => {
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_waits', 'unjustified', 'Plutonium was used for three weeks.');
 			const spamDecisionId = await close(harness, admin, buyer.userId);
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_waits');
 			await closeDispute('pi_warn_waits', 'lost');
 			expect((await disputes.findReview('dp_pi_warn_waits'))?.enforcement_decision_id ?? null).toBeNull();
 			const waiting = (await reviews(admin)).find((entry) => entry.dispute_id === 'dp_pi_warn_waits');
@@ -1163,7 +1173,7 @@ describe('Plutonium payment disputes', () => {
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_swept', 'unjustified');
 			const spamDecisionId = await close(harness, admin, buyer.userId);
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_swept');
 			await closeDispute('pi_warn_swept', 'lost');
 			setInjectedWorkerService(new NoopWorkerService());
 			try {
@@ -1178,7 +1188,7 @@ describe('Plutonium payment disputes', () => {
 			await closePaymentDisputeAccounts({}, createTestWorkerHelpers());
 			expect((await disputes.findReview('dp_pi_warn_swept'))?.enforcement_decision_id ?? null).toBeNull();
 
-			vi.setSystemTime(new Date(Date.now() + 11 * 60 * 1000));
+			await backdateReview('dp_pi_warn_swept', 'closed_at', 11 * 60 * 1000);
 			await closePaymentDisputeAccounts({}, createTestWorkerHelpers());
 			const decisionId = (await disputes.findReview('dp_pi_warn_swept'))?.enforcement_decision_id ?? null;
 			expect(decisionId).not.toBeNull();
@@ -1207,7 +1217,7 @@ describe('Plutonium payment disputes', () => {
 			await openDispute('pi_warn_reversed');
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_reversed', 'unjustified');
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_reversed');
 			await closeDispute('pi_warn_reversed', 'lost');
 			const decisionId = String((await disputes.findReview('dp_pi_warn_reversed'))?.enforcement_decision_id);
 			const reversed = await createBuilder<ReviewResponse & {reversal_note: string}>(harness, admin.token)
@@ -1247,7 +1257,7 @@ describe('Plutonium payment disputes', () => {
 			await openDispute('pi_warn_ended');
 			const admin = await staff();
 			await decide(admin, 'dp_pi_warn_ended', 'unjustified');
-			passWarningDate();
+			await passWarningDate('dp_pi_warn_ended');
 			await closeDispute('pi_warn_ended', 'lost');
 			const decisionId = String((await disputes.findReview('dp_pi_warn_ended'))?.enforcement_decision_id);
 			await createBuilder(harness, admin.token)

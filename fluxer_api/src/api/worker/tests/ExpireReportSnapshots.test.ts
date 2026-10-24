@@ -16,7 +16,7 @@ import {ReportRepository} from '@app/api/report/ReportRepository';
 import type {IReportSearchService} from '@app/api/search/IReportSearchService';
 import {MockStorageService} from '@app/api/test/mocks/MockStorageService';
 import {InMemorySearchProvider} from '@app/api/test/search/InMemorySearchProvider';
-import expireReportSnapshots, {
+import {
 	CHILD_SAFETY_REPORT_RETENTION_DAYS,
 	processReportRetention,
 	REPORT_COMPLAINT_WINDOW_DAYS,
@@ -30,7 +30,7 @@ import {DeletionReasons} from '@fluxer/constants/src/Core';
 import type {ReportItemOutcome} from '@fluxer/schema/src/domains/admin/AdminSchemas';
 import {serializeReportProfileSnapshot} from '@fluxer/schema/src/domains/report/ReportProfileSnapshotSchemas';
 import {ms} from 'itty-time';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it} from 'vitest';
 
 const NOW = new Date('2027-06-01T12:00:00.000Z');
 const DAY_MS = ms('1 day');

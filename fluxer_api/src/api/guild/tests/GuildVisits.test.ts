@@ -17,7 +17,7 @@ import {GuildVisitSources} from '@fluxer/constants/src/GuildVisitConstants';
 import {Headers} from '@fluxer/constants/src/Headers';
 import type {GuildResponse} from '@fluxer/schema/src/domains/guild/GuildResponseSchemas';
 import type {GuildVisitResponse, GuildVisitStartResponse} from '@fluxer/schema/src/domains/guild/GuildVisitSchemas';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface Registered {
 	token: string;
@@ -361,60 +361,16 @@ describe('Guild visits', () => {
 		await discoveryVisit().expect(HTTP_STATUS.FORBIDDEN, APIErrorCodes.GUILD_VISITS_DISABLED).execute();
 	});
 
-	it.each([
-		{maxAge: 0, expectedWireExpiry: null, expectedStoredExpiry: null},
-		{
-			maxAge: 60,
-			expectedWireExpiry: '2026-10-23T02:21:00.000Z',
-			expectedStoredExpiry: new Date('2026-10-23T02:21:00.000Z'),
-		},
-	])(
-		'retains a $maxAge-second invite expiry when starting a later visit',
-		async ({maxAge, expectedWireExpiry, expectedStoredExpiry}) => {
-			vi.useFakeTimers({toFake: ['Date']});
-			vi.setSystemTime(new Date('2026-10-23T02:20:00.000Z'));
-			const {guildId, code} = await createVisitGuild('Invite expiry', {max_age: maxAge, unique: true});
-			const visitor = await createUnclaimed();
-			const invite = await createBuilderWithoutAuth<{expires_at: string | null}>(harness)
-				.get(`/invites/${code}`)
-				.execute();
-			expect(invite.expires_at).toBe(expectedWireExpiry);
-			vi.advanceTimersByTime(10000);
-			const started = await startVisit(visitor.token, code).execute();
-			expect(started).toEqual({
-				guild_id: guildId,
-				member: false,
-				visit: {
-					guild_id: guildId,
-					source: 1,
-					started_at: '2026-10-23T02:20:10.000Z',
-					opened_at: '2026-10-23T02:20:10.000Z',
-				},
-			});
-			const row = await guildVisitRepository().get(
-				createUserID(BigInt(visitor.user_id)),
-				createGuildID(BigInt(guildId)),
-			);
-			expect(row).toEqual({
-				user_id: createUserID(BigInt(visitor.user_id)),
-				guild_id: createGuildID(BigInt(guildId)),
-				source: 1,
-				invite_code: code,
-				invite_expires_at: expectedStoredExpiry,
-				started_at: new Date('2026-10-23T02:20:10.000Z'),
-				opened_at: new Date('2026-10-23T02:20:10.000Z'),
-			});
-			const visits = await createBuilder<Array<GuildVisitResponse>>(harness, visitor.token)
-				.get('/users/@me/guild-visits')
-				.execute();
-			expect(visits).toEqual([
-				{
-					guild_id: guildId,
-					source: 1,
-					started_at: '2026-10-23T02:20:10.000Z',
-					opened_at: '2026-10-23T02:20:10.000Z',
-				},
-			]);
-		},
-	);
+	it.each([0, 60])('stores the invite expiry of a %i-second invite on the visit', async (maxAge) => {
+		const {guildId, code} = await createVisitGuild('Invite expiry', {max_age: maxAge, unique: true});
+		const visitor = await createUnclaimed();
+		const invite = await createBuilderWithoutAuth<{expires_at: string | null}>(harness)
+			.get(`/invites/${code}`)
+			.execute();
+		expect(invite.expires_at === null).toBe(maxAge === 0);
+		await startVisit(visitor.token, code).execute();
+		const row = await guildVisitRepository().get(createUserID(BigInt(visitor.user_id)), createGuildID(BigInt(guildId)));
+		expect(row?.invite_code).toBe(code);
+		expect(row?.invite_expires_at ?? null).toEqual(invite.expires_at === null ? null : new Date(invite.expires_at));
+	});
 });

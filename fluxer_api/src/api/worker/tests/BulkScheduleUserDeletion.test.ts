@@ -47,7 +47,7 @@ import {emailLinkUrls, renderEmailTemplateText, reportResolvedSlots} from '@pkgs
 import {getEmailTemplate} from '@pkgs/email/src/email_i18n/EmailI18n';
 import type {WorkerTaskResult} from '@pkgs/worker/src/contracts/WorkerTask';
 import type {WorkerJobPayload} from '@pkgs/worker/src/contracts/WorkerTypes';
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, test} from 'vitest';
 
 interface ReportResponse {
 	report_id: string;

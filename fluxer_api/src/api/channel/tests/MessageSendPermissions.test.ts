@@ -3,11 +3,11 @@
 import {createPermissionOverwrite, setupTestGuildWithMembers} from '@app/api/channel/tests/ChannelTestUtils';
 import {ensureSessionStarted} from '@app/api/message/tests/MessageTestUtils';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {HTTP_STATUS, TEST_TIMEOUTS, wait} from '@app/api/test/TestConstants';
+import {HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {Permissions} from '@fluxer/constants/src/ChannelConstants';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
-import {afterAll, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 describe('Message send permissions', () => {
 	let harness: ApiTestHarness;

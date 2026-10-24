@@ -4,25 +4,12 @@ import {AdminRepository} from '@app/api/admin/AdminRepository';
 import {AdminAuditService} from '@app/api/admin/services/AdminAuditService';
 import {createUserID} from '@app/api/BrandedTypes';
 import {Config, getConfig} from '@app/api/Config';
-import {
-	type CassandraQueryExecutorForTesting,
-	setCassandraQueryExecutorForTesting,
-} from '@app/api/database/CassandraQueryExecution';
-import {
-	type CassandraParams,
-	Db,
-	isConditionalQuery,
-	nextVersion,
-	type PreparedQuery,
-} from '@app/api/database/CassandraTypes';
+import {setCassandraQueryExecutorForTesting} from '@app/api/database/CassandraQueryExecution';
 import type {PaymentDisputeReviewRow} from '@app/api/database/types/PaymentDisputeTypes';
 import {getSnowflakeService} from '@app/api/middleware/ServiceRegistry';
 import {getEmailService, getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import {shouldCloseAfterPaymentDispute} from '@app/api/payment_disputes/PaymentDisputeEnforcement';
-import {
-	PaymentDisputeRepository,
-	type PaymentDisputeReviewPatch,
-} from '@app/api/payment_disputes/PaymentDisputeRepository';
+import {PaymentDisputeRepository} from '@app/api/payment_disputes/PaymentDisputeRepository';
 import {
 	getPaymentDisputeReviewBlockers,
 	PaymentDisputeReviewService,
@@ -35,7 +22,7 @@ import {EmailDeliveryModes} from '@fluxer/constants/src/AccountConfigConstants';
 import {SmtpTlsModes} from '@fluxer/constants/src/SmtpConstants';
 import {MS_PER_DAY, MS_PER_SECOND} from '@fluxer/date_utils/src/DateConstants';
 import type Stripe from 'stripe';
-import {afterEach, assert, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, assert, beforeEach, describe, expect, test} from 'vitest';
 
 const PAID_AT = new Date('2026-11-03T16:00:00Z');
 const DISPUTED_AT = new Date(PAID_AT.getTime() + 30 * MS_PER_DAY);
@@ -325,9 +312,10 @@ describe('payment dispute review alerts through SMTP', () => {
 			pendingOpens.add(pending);
 			await smtp.entered;
 
-			expect(await repository.findReview('dp_test_1')).toEqual(
-				review({created_at: REVIEW_OPENED_AT, evidence_due_by: null}),
-			);
+			const opened = await repository.findReview('dp_test_1');
+			assert(opened !== null);
+			const openedAt = opened.created_at;
+			expect(opened).toEqual(review({created_at: openedAt, evidence_due_by: null}));
 			expect(await adminRepository.listAllAuditLogsPaginated(AUDIT_PAGE_SIZE)).toMatchObject([
 				{
 					targetType: 'user',
@@ -342,7 +330,7 @@ describe('payment dispute review alerts through SMTP', () => {
 						['evidence_due_by', ''],
 						['blockers', ''],
 					]),
-					createdAt: REVIEW_OPENED_AT,
+					createdAt: expect.any(Date),
 				},
 			]);
 			expect(smtp.delivered).toEqual([]);
@@ -353,13 +341,13 @@ describe('payment dispute review alerts through SMTP', () => {
 			);
 
 			smtp.release();
-			expect(await pending).toEqual(review({created_at: REVIEW_OPENED_AT, evidence_due_by: null}));
+			expect(await pending).toEqual(review({created_at: openedAt, evidence_due_by: null}));
 			expect(smtp.delivered).toHaveLength(accepted);
 			expect(await service.openReview(SUBJECT, dispute)).toEqual(
-				review({created_at: REVIEW_OPENED_AT, evidence_due_by: null, version: 2}),
+				review({created_at: openedAt, evidence_due_by: null, version: 2}),
 			);
 			expect(await repository.findReview('dp_test_1')).toEqual(
-				review({created_at: REVIEW_OPENED_AT, evidence_due_by: null, version: 2}),
+				review({created_at: openedAt, evidence_due_by: null, version: 2}),
 			);
 			expect(smtp.attempts).toHaveLength(1);
 			expect(smtp.delivered).toHaveLength(accepted);

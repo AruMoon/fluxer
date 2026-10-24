@@ -5,9 +5,14 @@ import {createTestAccount, setUserACLs} from '@app/api/auth/tests/AuthTestUtils'
 import {Config, getConfig} from '@app/api/Config';
 import {getPngDataUrl} from '@app/api/emoji/tests/EmojiTestUtils';
 import {NoopPurgeQueue} from '@app/api/infrastructure/CachePurgeQueue';
-import {getAssetDeletionQueue, getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
+import {
+	getAssetDeletionQueue,
+	getGuildRepository,
+	getInstanceConfigRepository,
+	getUserRepository,
+} from '@app/api/middleware/ServiceSingletons';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {NoopLogger} from '@app/api/test/mocks/NoopLogger';
+import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import processAssetDeletionQueue from '@app/api/worker/tasks/ProcessAssetDeletionQueue';
 import {clearWorkerDependencies, setWorkerDependenciesForTest} from '@app/api/worker/WorkerContext';
@@ -54,8 +59,8 @@ describe('branding image cleanup', () => {
 			purgeQueue: new NoopPurgeQueue(),
 			storageService: harness.storageService,
 			instanceConfigRepository: getInstanceConfigRepository(),
-			userRepository: {findUnique: async () => null} as never,
-			guildRepository: {findUnique: async () => null, getMember: async () => null} as never,
+			userRepository: getUserRepository(),
+			guildRepository: getGuildRepository(),
 		});
 	});
 
@@ -83,7 +88,7 @@ describe('branding image cleanup', () => {
 	}
 
 	async function storedAfterCleanup(key: string): Promise<boolean> {
-		await processAssetDeletionQueue({}, HELPERS);
+		await processAssetDeletionQueue({}, createTestWorkerHelpers());
 		return harness.storageService.hasObject(Config.s3.buckets.cdn, key);
 	}
 

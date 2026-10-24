@@ -26,7 +26,7 @@ import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import {MS_PER_DAY, MS_PER_HOUR, MS_PER_MINUTE} from '@fluxer/date_utils/src/DateConstants';
 import {EmailService} from '@pkgs/email/src/EmailService';
 import {SmtpEmailProvider} from '@pkgs/email/src/SmtpEmailProvider';
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, test} from 'vitest';
 
 const SESSION_HASH_BYTES = 32;
 const EXTRA_SESSION_COUNT = 250;
@@ -94,10 +94,9 @@ describe('Account closure and credentials', () => {
 		await createBuilder(harness, account.token).get('/users/@me').expect(HTTP_STATUS.UNAUTHORIZED).execute();
 	});
 
-	test('a session of a user with the DELETED flag is refused and revoked', async () => {
+	test('a session of a user with the DELETED flag is refused', async () => {
 		const account = await createTestAccount(harness);
-		const userId = createUserID(BigInt(account.userId));
-		await markDeleted(userId);
+		await markDeleted(createUserID(BigInt(account.userId)));
 		await createBuilder(harness, account.token).get('/users/@me').expect(HTTP_STATUS.UNAUTHORIZED).execute();
 	});
 
@@ -308,6 +307,7 @@ describe('Account closure and credentials', () => {
 			},
 			provider,
 		);
+		const requestedAt = Date.now();
 		deletionRequest = harness.requestJson({
 			path: '/users/@me/delete',
 			method: 'POST',
@@ -322,18 +322,18 @@ describe('Account closure and credentials', () => {
 		expect(smtp.attempts[0]?.to).toBe(`<${account.email}>`);
 		smtp.release();
 		const response = await deletionRequest;
+		const respondedAt = Date.now();
 		expect(response.status).toBe(HTTP_STATUS.NO_CONTENT);
 		expect(smtp.delivered).toEqual([]);
 		expect(await new AuthSessionRepository().listAuthSessions(userId)).toEqual([]);
 		const user = await storedUser(userId);
-		expect(user.pendingDeletionAt?.toISOString()).toBe('2030-01-02T00:00:00.000Z');
+		const pendingDeletionAt = user.pendingDeletionAt?.getTime() ?? 0;
+		expect(pendingDeletionAt).toBeGreaterThanOrEqual(requestedAt + DELETION_GRACE_HOURS * MS_PER_HOUR);
+		expect(pendingDeletionAt).toBeLessThanOrEqual(respondedAt + DELETION_GRACE_HOURS * MS_PER_HOUR);
 		expect(user.flags & UserFlags.SELF_DELETED).toBe(UserFlags.SELF_DELETED);
-		expect(
-			await getKVAccountDeletionQueue().getReadyDeletions(
-				new Date('2030-01-02T00:00:00Z').getTime(),
-				DELETION_QUEUE_LIMIT,
-			),
-		).toEqual([{userId, deletionReasonCode: 1}]);
+		expect(await getKVAccountDeletionQueue().getReadyDeletions(pendingDeletionAt, DELETION_QUEUE_LIMIT)).toEqual([
+			{userId, deletionReasonCode: 1},
+		]);
 		await createBuilder(harness, account.token).get('/users/@me').expect(HTTP_STATUS.UNAUTHORIZED).execute();
 	});
 });

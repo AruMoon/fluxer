@@ -47,7 +47,7 @@ import {ChannelFlags, MAX_THREAD_MEMBERS} from '@fluxer/constants/src/ThreadCons
 import {MaxThreadMembersError} from '@fluxer/errors/src/domains/channel/MaxThreadMembersError';
 import {ThreadAlreadyCreatedForMessageError} from '@fluxer/errors/src/domains/channel/ThreadAlreadyCreatedForMessageError';
 import {createSnowflakeFromTimestamp} from '@fluxer/snowflake/src/Snowflake';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
 const GUILD_ID = createGuildID(1_900_000_000_000_000_000n);
 const PARENT_ID = createChannelID(1_900_000_000_000_000_100n);
@@ -359,8 +359,10 @@ function describeThreadRepository(backend: string, makeExecutor: () => Promise<C
 		});
 
 		it('drops and reports stale index rows, and repairs missing ones', async () => {
-			const drift = vi.fn();
-			const threads = new ThreadRepository(repositories.channelData, repositories.messages, drift);
+			const drifted: Array<Array<ChannelID>> = [];
+			const threads = new ThreadRepository(repositories.channelData, repositories.messages, (threadIds) => {
+				drifted.push(threadIds);
+			});
 			const threadId = freshThreadId();
 			await threads.create(createParams(threadId));
 			await threads.updateState(threadId, () => ({archived: true}));
@@ -373,7 +375,7 @@ function describeThreadRepository(backend: string, makeExecutor: () => Promise<C
 				}),
 			);
 			expect(await threads.listActiveThreads(GUILD_ID)).toEqual([]);
-			expect(drift).toHaveBeenCalledWith([threadId]);
+			expect(drifted).toContainEqual([threadId]);
 			expect(
 				await fetchMany(ActiveThreadsByGuild.selectCql({where: ActiveThreadsByGuild.where.eq('guild_id')}), {
 					guild_id: GUILD_ID,

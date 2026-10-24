@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {createTestAccount, type TestAccount} from '@app/api/auth/tests/AuthTestUtils';
-import {createChannelID, createGuildID, createMessageID, createUserID} from '@app/api/BrandedTypes';
+import {createChannelID, createGuildID, createUserID} from '@app/api/BrandedTypes';
 import {authorizeBot, createTestBotAccount} from '@app/api/bot/tests/BotTestUtils';
 import {ChannelRepository} from '@app/api/channel/ChannelRepository';
-import {MessageSearchService} from '@app/api/channel/services/message/MessageSearchService';
 import {acceptInvite, createChannel, createChannelInvite, createGuild} from '@app/api/channel/tests/ChannelTestUtils';
 import {threadsRequest} from '@app/api/channel/tests/ThreadTestUtils';
 import {upsertOne} from '@app/api/database/CassandraQueryExecution';
@@ -24,7 +23,7 @@ import {ThreadPermissionFlags} from '@fluxer/constants/src/ThreadPermissionUtils
 import type {ThreadChannelResponse} from '@fluxer/schema/src/domains/channel/ThreadRequestSchemas';
 import type {GuildAuditLogListResponse} from '@fluxer/schema/src/domains/guild/GuildAuditLogSchemas';
 import type {MessageResponse} from '@fluxer/schema/src/domains/message/MessageResponseSchemas';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface Setup {
 	owner: TestAccount;
@@ -403,7 +402,7 @@ describe('thread message path', () => {
 			await threadsRequest(harness, s.owner.token).get(`/guilds/${s.guildId}/audit-logs?action_type=110`).execute();
 		});
 
-		it('tags batched thread message deletes and never merges parent deletes across hidden entries', async () => {
+		it('never merges parent message deletes across hidden thread entries', async () => {
 			const s = await setup();
 			const thread = await startThread(s.owner.token, s.channelId);
 			const remove = (channelId: string, messageId: string) =>

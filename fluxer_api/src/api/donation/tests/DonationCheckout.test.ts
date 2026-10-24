@@ -52,14 +52,10 @@ describe('POST /donations/checkout', () => {
 			.body({...createValidCheckoutBody(), interval: null, is_business: false})
 			.expect(200)
 			.execute();
-		const [business, personal] = stripeHandlers.spies.createdCheckoutSessions as unknown as Array<{
-			mode?: string;
-			customer_creation?: string;
-			invoice_creation?: {enabled?: string};
-		}>;
+		const [business, personal] = stripeHandlers.spies.createdCheckoutSessions;
 		expect(business).toMatchObject({mode: 'payment', customer_creation: 'always', invoice_creation: {enabled: 'true'}});
 		expect(personal).toMatchObject({mode: 'payment', customer_creation: 'always'});
-		expect(personal?.invoice_creation).toBeUndefined();
+		expect(personal).not.toHaveProperty('invoice_creation');
 	});
 	test('sets subscription mode', async () => {
 		await createDonationCheckoutBuilder(harness).body(createValidCheckoutBody()).expect(200).execute();

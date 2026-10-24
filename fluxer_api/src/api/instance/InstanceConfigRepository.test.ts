@@ -14,7 +14,7 @@ import {ensureSetupToken, isSetupTokenEnforced} from '@app/api/instance/SetupTok
 import {InstanceConfigWriteRaceExecutor} from '@app/api/instance/tests/InstanceConfigWriteRaceExecutor';
 import {InMemoryCassandraQueryExecutor} from '@app/api/test/InMemoryCassandraQueryExecutor';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
 const REGISTRATION_CONFIG_KEY = 'registration_config';
 const REGISTRATION_URLS_KEY = 'registration_urls';
@@ -693,7 +693,8 @@ describe('InstanceConfigRepository setup token', () => {
 	});
 
 	it('confirms the admin bootstrap against the database and repairs a stale snapshot', async () => {
-		const stale = createPod();
+		const stale = new InstanceConfigRepository(new MockKVProvider());
+		repositories.push(stale);
 		const writer = createPod();
 		expect(await stale.isAdminBootstrapped()).toBe(false);
 		await writer.claimAdminBootstrap();
@@ -708,9 +709,12 @@ describe('InstanceConfigRepository setup token', () => {
 
 	it('refuses to start when the setup token cannot be stored', async () => {
 		useSelfHostedProduction();
-		const pod = createPod();
-		vi.spyOn(pod, 'createSetupTokenIfAbsent').mockRejectedValueOnce(new Error('database down'));
-		await expect(ensureSetupToken(pod, accountExists)).rejects.toThrow('database down');
+		executor.watch(SETUP_TOKEN_HASH_KEY);
+		executor.competeBeforeEachWrite(async () => {
+			throw new Error('database down');
+		});
+		await expect(ensureSetupToken(createPod(), accountExists)).rejects.toThrow('database down');
+		expect(await executor.readDirectly(SETUP_TOKEN_HASH_KEY)).toBeNull();
 	});
 });
 

@@ -11,7 +11,7 @@ import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import {ChannelOverrideFlags} from '@fluxer/constants/src/ThreadConstants';
 import type {UserGuildSettingsResponse} from '@fluxer/schema/src/domains/user/UserResponseSchemas';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 const repository = new ChannelRepository();
 

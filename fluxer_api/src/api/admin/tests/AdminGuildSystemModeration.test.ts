@@ -8,7 +8,7 @@ import {HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {AuditLogActionType} from '@fluxer/constants/src/AuditLogActionType';
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, test} from 'vitest';
 
 const SYSTEM_USER_ID = '0';
 const STAFF_REASON = 'Staff ticket 4410: member is under 18';

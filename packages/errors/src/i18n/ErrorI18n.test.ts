@@ -4,7 +4,7 @@ import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {SsoRequiredReasons} from '@fluxer/errors/src/domains/auth/SsoRequiredError';
 import {getErrorMessageUnsafe} from '@fluxer/errors/src/i18n/ErrorI18n';
 import {ERROR_I18N_LOCALE_MESSAGES} from '@fluxer/errors/src/i18n/ErrorI18nLocales';
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 describe('ErrorI18n global IP block messages', () => {
 	const HOSTED = {

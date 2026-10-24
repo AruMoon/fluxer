@@ -3,7 +3,7 @@
 import {getCachedAccountsConfig, setCachedAccountsConfig} from '@app/api/instance/AccountsConfigCache';
 import {calculateAge, canUserAccessNsfwContent, parseDateOfBirth} from '@app/api/utils/AgeUtils';
 import {DateOfBirthPolicies, type DateOfBirthPolicy} from '@fluxer/constants/src/AccountConfigConstants';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 function setDateOfBirthPolicy(dateOfBirth: DateOfBirthPolicy): void {
 	setCachedAccountsConfig({

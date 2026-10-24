@@ -5,11 +5,11 @@ import {acceptInvite, createChannel, createChannelInvite, createGuild} from '@ap
 import {threadsRequest} from '@app/api/channel/tests/ThreadTestUtils';
 import {clearChannelThreadsTaintCacheForTesting} from '@app/api/experiment/ChannelThreadsGate';
 import {ensureSessionStarted} from '@app/api/message/tests/MessageTestUtils';
-import {getSnowflakeService} from '@app/api/middleware/ServiceRegistry';
+import {getSnowflakeService, setInjectedWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {getThreadSearchService} from '@app/api/SearchFactory';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {NoopWorkerService} from '@app/api/test/NoopWorkerService';
-import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
+import {SyncTaskWorkerService} from '@app/api/test/SyncTaskWorkerService';
 import refreshSearchIndex from '@app/api/worker/tasks/RefreshSearchIndex';
 import {backfillThreadSearch, syncThreadSearchDocument} from '@app/api/worker/tasks/ThreadSearchTasks';
 import {clearWorkerDependencies, setWorkerDependencies} from '@app/api/worker/WorkerContext';
@@ -22,7 +22,7 @@ import type {
 } from '@fluxer/schema/src/domains/channel/ForumRequestSchemas';
 import type {ThreadChannelResponse} from '@fluxer/schema/src/domains/channel/ThreadRequestSchemas';
 import type {WorkerTaskHandler} from '@pkgs/worker/src/contracts/WorkerTask';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 const HANDLERS: Record<string, WorkerTaskHandler> = {
 	syncThreadSearchDocument,
@@ -40,7 +40,7 @@ interface Setup {
 
 describe('thread search', () => {
 	let harness: ApiTestHarness;
-	let pending: Array<Promise<unknown>>;
+	let worker: SyncTaskWorkerService;
 
 	beforeAll(async () => {
 		harness = await createApiTestHarness({search: 'enabled'});
@@ -50,20 +50,13 @@ describe('thread search', () => {
 		await harness.reset();
 		clearChannelThreadsTaintCacheForTesting();
 		setWorkerDependencies(await initializeWorkerDependencies(getSnowflakeService()));
-		pending = [];
-		vi.spyOn(NoopWorkerService.prototype, 'addJob').mockImplementation((async (
-			task: string,
-			payload: Record<string, unknown>,
-		) => {
-			const handler = HANDLERS[task];
-			if (handler) pending.push(handler(payload, createTestWorkerHelpers({attempt: {isLastAttempt: true}})));
-			return 0n;
-		}) as () => Promise<bigint>);
+		worker = new SyncTaskWorkerService(HANDLERS, {deferred: true});
+		setInjectedWorkerService(worker);
 		await getThreadSearchService()!.deleteAllDocuments();
 	});
 
 	afterEach(() => {
-		vi.restoreAllMocks();
+		setInjectedWorkerService(new NoopWorkerService());
 	});
 
 	afterAll(async () => {
@@ -73,7 +66,7 @@ describe('thread search', () => {
 	});
 
 	async function settle(): Promise<void> {
-		while (pending.length > 0) await Promise.all(pending.splice(0));
+		await worker.drain({maxAttempts: 1});
 	}
 
 	async function setup(): Promise<Setup> {

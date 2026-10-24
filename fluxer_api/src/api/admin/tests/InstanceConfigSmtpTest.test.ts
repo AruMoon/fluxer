@@ -9,8 +9,7 @@ import type {
 	InstanceConfigResponse,
 	InstanceEmailSmtpTestResponse,
 } from '@fluxer/schema/src/domains/admin/AdminSchemas';
-import nodemailer, {type Transporter} from 'nodemailer';
-import {afterAll, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 describe('instance SMTP settings', () => {
 	let harness: ApiTestHarness;

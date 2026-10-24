@@ -5,14 +5,14 @@ import {createAuthHarness, createTestAccount, setUserACLs} from '@app/api/auth/t
 import {getConfig} from '@app/api/Config';
 import {getCachedAccountIdentityMode} from '@app/api/instance/AccountIdentityModeCache';
 import type {InstanceConfigRepository} from '@app/api/instance/InstanceConfigRepository';
-import {getCacheService, getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
+import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
 import {AccountIdentityModes} from '@fluxer/constants/src/AccountIdentityConstants';
 import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 const ACCOUNT_IDENTITY_CONFIG_KEY = 'account_identity_config';
 const SETUP_TOKEN = 'setup-token-for-tests-0123456789-abcdefghijklmnopqrstuvwxyz';

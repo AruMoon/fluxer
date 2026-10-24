@@ -28,9 +28,8 @@ import {PaymentRepository} from '@app/api/user/repositories/PaymentRepository';
 import {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {HttpStatus} from '@fluxer/constants/src/HttpConstants';
 import {UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
-import {MS_PER_DAY, MS_PER_MINUTE} from '@fluxer/date_utils/src/DateConstants';
-import Stripe from 'stripe';
-import {afterAll, afterEach, assert, beforeAll, beforeEach, describe, expect, test, vi} from 'vitest';
+import {MS_PER_DAY} from '@fluxer/date_utils/src/DateConstants';
+import {afterAll, afterEach, assert, beforeAll, beforeEach, describe, expect, test} from 'vitest';
 
 const MOCK_PRICES = {
 	monthlyUsd: 'price_monthly_usd',
@@ -147,8 +146,8 @@ describe('StripeWebhookService - checkout.session.completed', () => {
 		test.each([
 			['valid timestamp without consent', '2025-01-02T03:04:05.000Z', null, '2025-01-02T03:04:05.000Z'],
 			['valid timestamp with consent', '2025-01-02T03:04:05.000Z', 'accepted', '2025-01-02T03:04:05.000Z'],
-			['invalid timestamp with consent', 'invalid', 'accepted', '2026-10-21T12:00:00.000Z'],
-			['empty timestamp with consent', '', 'accepted', '2026-10-21T12:00:00.000Z'],
+			['invalid timestamp with consent', 'invalid', 'accepted', 'now'],
+			['empty timestamp with consent', '', 'accepted', 'now'],
 			['invalid timestamp without consent', 'invalid', null, null],
 			['empty timestamp without consent', '', null, null],
 		] as const)('recovers a missing payment with %s', async (_label, timestamp, consent, expected) => {
@@ -164,12 +163,19 @@ describe('StripeWebhookService - checkout.session.completed', () => {
 				},
 			});
 			event.data.object.consent = {terms_of_service: consent};
+			const before = Date.now();
 
 			await sendStripeWebhook(harness, event);
 
 			const payment = await new PaymentRepository().getPaymentByCheckoutSession(sessionId);
 			expect(payment?.status).toBe('completed');
-			expect(payment?.euWithdrawalWaiverAcceptedAt?.toISOString() ?? null).toBe(expected);
+			const acceptedAt = payment?.euWithdrawalWaiverAcceptedAt ?? null;
+			if (expected === 'now') {
+				expect(acceptedAt?.getTime()).toBeGreaterThanOrEqual(before);
+				expect(acceptedAt?.getTime()).toBeLessThanOrEqual(Date.now());
+			} else {
+				expect(acceptedAt?.toISOString() ?? null).toBe(expected);
+			}
 		});
 
 		test('flags an open payment dispute review when a checkout opened before the dispute completes', async () => {

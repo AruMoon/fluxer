@@ -11,12 +11,14 @@ import {
 	loginUser,
 	type TestAccount,
 } from '@app/api/auth/tests/AuthTestUtils';
+import {resetApiServicesForTesting} from '@app/api/CreateApiContext';
+import {setInjectedWorkerService} from '@app/api/middleware/ServiceRegistry';
 import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import type {ApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {NoopWorkerService} from '@app/api/test/NoopWorkerService';
+import {RecordingWorkerService} from '@app/api/test/RecordingWorkerService';
 import {createBuilder, createBuilderWithoutAuth} from '@app/api/test/TestRequestBuilder';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 
 interface EmailChangeStartResponse {
 	ticket: string;
@@ -374,7 +376,9 @@ describe('Email change flow', () => {
 			.body({has_ever_purchased: true, stripe_customer_id: 'cus_email_change_sync'})
 			.expect(200)
 			.execute();
-		const addJob = vi.spyOn(NoopWorkerService.prototype, 'addJob');
+		const worker = new RecordingWorkerService();
+		setInjectedWorkerService(worker);
+		resetApiServicesForTesting();
 		const startResp = await startEmailChange(harness, account, account.password);
 		let originalProof: string;
 		if (startResp.require_original) {
@@ -414,7 +418,7 @@ describe('Email change flow', () => {
 			.execute();
 		expect(updated.email).toBe(newEmail);
 		expect(updated.has_ever_purchased).toBe(true);
-		expect(addJob).toHaveBeenCalledWith('syncStripeCustomerEmail', {userId: account.userId});
+		expect(worker.byTask('syncStripeCustomerEmail').map((job) => job.payload)).toContainEqual({userId: account.userId});
 	});
 	it('requires MFA (not password) for email_token apply when user has TOTP enabled', async () => {
 		const account = await createTestAccount(harness);
