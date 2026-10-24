@@ -135,10 +135,7 @@ func Sizing(hw Hardware, memory bool, fixed map[string]string) map[string]string
 const EmbeddedWorkerVar = "FLUXER_API_EMBEDDED_WORKER"
 
 func embeddedWorker(hw Hardware, fixed map[string]string) bool {
-	if on, err := strconv.ParseBool(strings.TrimSpace(fixed[EmbeddedWorkerVar])); err == nil {
-		return on
-	}
-	return false
+	return strings.ToLower(strings.TrimSpace(fixed[EmbeddedWorkerVar])) == "true"
 }
 
 func FoldWorker(hw Hardware, env, fixed map[string]string) map[string]string {
