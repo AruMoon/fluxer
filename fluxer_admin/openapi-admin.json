@@ -16327,7 +16327,7 @@
 						],
 						"additionalProperties": false
 					},
-					"code": {"type": "string", "minLength": 1, "maxLength": 256},
+					"code": {"type": "string", "minLength": 1, "maxLength": 128},
 					"url": {"type": "string"}
 				},
 				"required": ["registration_url", "code", "url"],
@@ -17321,7 +17321,7 @@
 							"properties": {
 								"node_id": {"type": "string", "minLength": 1, "maxLength": 256},
 								"status": {"type": "string", "minLength": 1, "maxLength": 256},
-								"sessions": {"$ref": "#/components/schemas/Int32Type"},
+								"sessions": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
 								"session_resumes_total": {
 									"nullable": true,
 									"type": "integer",
@@ -17340,22 +17340,22 @@
 									"minimum": 0,
 									"maximum": 9007199254740991
 								},
-								"guilds": {"$ref": "#/components/schemas/Int32Type"},
-								"presences": {"$ref": "#/components/schemas/Int32Type"},
-								"calls": {"$ref": "#/components/schemas/Int32Type"},
+								"guilds": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
+								"presences": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
+								"calls": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
 								"memory": {
 									"type": "object",
 									"properties": {
-										"total": {"$ref": "#/components/schemas/Int64StringType"},
-										"processes": {"$ref": "#/components/schemas/Int64StringType"},
-										"system": {"$ref": "#/components/schemas/Int64StringType"}
+										"total": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int64StringType"}]},
+										"processes": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int64StringType"}]},
+										"system": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int64StringType"}]}
 									},
 									"required": ["total", "processes", "system"],
 									"additionalProperties": false
 								},
-								"process_count": {"$ref": "#/components/schemas/Int32Type"},
-								"process_limit": {"$ref": "#/components/schemas/Int32Type"},
-								"uptime_seconds": {"$ref": "#/components/schemas/Int32Type"},
+								"process_count": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
+								"process_limit": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
+								"uptime_seconds": {"nullable": true, "allOf": [{"$ref": "#/components/schemas/Int32Type"}]},
 								"cluster_metrics": {
 									"type": "object",
 									"properties": {
@@ -24469,7 +24469,7 @@
 					"THREAD_ALREADY_CREATED_FOR_MESSAGE",
 					"THREAD_ARCHIVED",
 					"THREAD_LOCKED",
-					"TWO_FA_NOT_ENABLED",
+					"TWO_FA_ALREADY_ENABLED",
 					"TWO_FACTOR_REQUIRED",
 					"UNAUTHORIZED",
 					"UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS",
@@ -24829,7 +24829,7 @@
 					"A thread has already been created for this message.",
 					"This thread is archived.",
 					"This thread is locked.",
-					"Two-factor authentication isn't enabled.",
+					"Two-factor authentication is already enabled.",
 					"Two-factor authentication is required.",
 					"Unauthorized.",
 					"Claim your account to accept friend requests.",

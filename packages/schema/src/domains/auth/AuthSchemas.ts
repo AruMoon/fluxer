@@ -50,7 +50,7 @@ export const RegisterRequest = z.object({
 			'Whether the person submitted the step that says creating the account accepts the terms of service. Must be true when the instance publishes terms or a privacy policy',
 		),
 	invite_code: createStringType(0, 256).nullish().describe('Guild invite code to join after registration'),
-	registration_url_code: createStringType(1, 256)
+	registration_url_code: createStringType(1, 128)
 		.nullish()
 		.describe('Admin-issued registration URL code to use for this registration'),
 	theme: RegisterThemeType.optional().describe('Initial UI theme preference for the new account'),
@@ -630,7 +630,7 @@ export const IdentifyRequest = z.object({
 	),
 	login: UsernameType.optional().describe('Username to sign in or sign up with, on username instances'),
 	device_proof: DeviceProofType.optional(),
-	registration_url_code: createStringType(1, 256)
+	registration_url_code: createStringType(1, 128)
 		.nullish()
 		.describe('Admin-issued registration URL code, for sign-ups'),
 });
@@ -663,7 +663,7 @@ export type IdentifyResponse = z.infer<typeof IdentifyResponse>;
 
 export const EmailCodeSendRequest = z.object({
 	ticket: createStringType(1, 128).describe('Ticket from POST /auth/identify'),
-	registration_url_code: createStringType(1, 256)
+	registration_url_code: createStringType(1, 128)
 		.nullish()
 		.describe('Admin-issued registration URL code, for sign-ups'),
 });
@@ -687,7 +687,7 @@ export const EmailCodeVerifyRequest = z.object({
 		.describe(
 			'For sign-ups, whether the person submitted the step that says creating the account accepts the terms of service. Must be true when the instance publishes terms or a privacy policy',
 		),
-	registration_url_code: createStringType(1, 256)
+	registration_url_code: createStringType(1, 128)
 		.nullish()
 		.describe('Admin-issued registration URL code, for sign-ups'),
 	invite_code: createStringType(0, 256).nullish().describe('Invite to open after the date of birth step, for sign-ups'),
@@ -712,7 +712,7 @@ export const AccountHandoffRequest = z.object({
 		.regex(/^[0-9a-f]{64}$/u)
 		.describe('Hex SHA-256 of the nonce the browser keeps until redeeming'),
 	locale: z.string().min(2).max(16).optional().describe('Locale of the page the account was created from'),
-	registration_url_code: createStringType(1, 256)
+	registration_url_code: createStringType(1, 128)
 		.nullish()
 		.describe('Admin-issued registration URL code, for sign-ups'),
 });

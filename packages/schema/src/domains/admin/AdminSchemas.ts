@@ -1067,7 +1067,7 @@ export type CreateRegistrationUrlRequest = z.infer<typeof CreateRegistrationUrlR
 
 export const CreateRegistrationUrlResponse = z.object({
 	registration_url: RegistrationUrlResponse,
-	code: createStringType(1, 256),
+	code: createStringType(1, 128),
 	url: z.string(),
 });
 
@@ -1428,21 +1428,21 @@ export const NodeStatsResponse = z.object({
 			z.object({
 				node_id: createStringType(1, 256),
 				status: createStringType(1, 256),
-				sessions: Int32Type,
+				sessions: Int32Type.nullable(),
 				session_resumes_total: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
 				websocket_dispatches_total: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
 				websocket_dispatch_drops_total: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
-				guilds: Int32Type,
-				presences: Int32Type,
-				calls: Int32Type,
+				guilds: Int32Type.nullable(),
+				presences: Int32Type.nullable(),
+				calls: Int32Type.nullable(),
 				memory: z.object({
-					total: Int64StringType,
-					processes: Int64StringType,
-					system: Int64StringType,
+					total: Int64StringType.nullable(),
+					processes: Int64StringType.nullable(),
+					system: Int64StringType.nullable(),
 				}),
-				process_count: Int32Type,
-				process_limit: Int32Type,
-				uptime_seconds: Int32Type,
+				process_count: Int32Type.nullable(),
+				process_limit: Int32Type.nullable(),
+				uptime_seconds: Int32Type.nullable(),
 				cluster_metrics: z
 					.object({
 						gateway_cluster_member_count: Int32Type,

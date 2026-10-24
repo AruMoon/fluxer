@@ -86,20 +86,20 @@ One node's statistics. A node that does not answer within 10 seconds is listed w
 | --- | --- | --- |
 | node_id | string | The name the node reports for itself |
 | status<sup>1</sup> | string | The health this node reported |
-| sessions | integer | The number of connected Gateway sessions |
+| sessions | ?integer | The number of connected Gateway sessions |
 | session_resumes_total | ?integer | The total number of session resumes |
 | websocket_dispatches_total | ?integer | The total number of WebSocket dispatches |
 | websocket_dispatch_drops_total | ?integer | The total number of WebSocket dispatches dropped |
-| guilds | integer | The number of live guild processes |
-| presences | integer | The number of tracked presences |
-| calls | integer | The number of live calls |
+| guilds | ?integer | The number of live guild processes |
+| presences | ?integer | The number of tracked presences |
+| calls | ?integer | The number of live calls |
 | memory | [node memory](#node-memory-object) object | The memory accounting |
-| process_count | integer | The number of Erlang processes running |
-| process_limit | integer | The maximum number of Erlang processes |
-| uptime_seconds | integer | The seconds since this node started |
+| process_count | ?integer | The number of Erlang processes running |
+| process_limit | ?integer | The maximum number of Erlang processes |
+| uptime_seconds | ?integer | The seconds since this node started |
 | cluster_metrics? | [gateway cluster metrics](#gateway-cluster-metrics-object) object | How this node sees the cluster, absent when the node did not answer |
 
-<sup>1</sup> `healthy` or `unavailable`. An `unavailable` node has no `cluster_metrics` and null counters.
+<sup>1</sup> `healthy` or `unavailable`. An `unavailable` node has no `cluster_metrics`, and its counts and `memory` values are null.
 
 ## Gateway cluster metrics object
 
@@ -134,15 +134,15 @@ The cluster as one node sees it. Each `_total` count starts at zero when the nod
 
 ## Node memory object
 
-Byte counts for one node, or summed over all polled nodes. Each count is a decimal string.
+Byte counts for one node, or summed over all polled nodes. Each count is a decimal string, or null for a node that did not answer.
 
 ### Structure
 
 | Field | Type | Description |
 | --- | --- | --- |
-| total | string | The total bytes allocated |
-| processes | string | The bytes allocated to Erlang processes |
-| system | string | The bytes allocated outside Erlang processes |
+| total | ?string | The total bytes allocated |
+| processes | ?string | The bytes allocated to Erlang processes |
+| system | ?string | The bytes allocated outside Erlang processes |
 
 ## Guild memory statistics object
 
