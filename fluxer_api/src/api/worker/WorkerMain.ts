@@ -125,7 +125,13 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number, kvCli
 		cron.upsert('syncUrlBlocklists', 'syncUrlBlocklists', {}, '0 0 */6 * * *', {ledger: true});
 		cron.upsert('syncFileShaBlocklists', 'syncFileShaBlocklists', {}, '0 0 */12 * * *', {ledger: true});
 	}
-	cron.upsert('flushUserActivityBuffer', 'flushUserActivityBuffer', {}, '*/10 * * * * *', {ledger: false});
+	cron.upsert(
+		'flushUserActivityBuffer',
+		'flushUserActivityBuffer',
+		{},
+		Config.instance.selfHosted ? '0 * * * * *' : '*/10 * * * * *',
+		{ledger: false},
+	);
 	cron.upsert('drainActivitySpool', 'drainActivitySpool', {}, '*/5 * * * * *', {
 		ledger: false,
 		enabled: activityEventsPublishing,
