@@ -76,6 +76,7 @@ interface QueryShape {
 }
 
 interface PlanFragments {
+	using: string;
 	predicate: string;
 	params: Array<unknown>;
 }
@@ -142,14 +143,17 @@ function numericRowKeyExpr(column: string): string {
 
 const NUMERIC_ROW_KEY = numericRowKeyExpr('kv.row_key');
 
-function planStatementName(prefix: string, plan: CandidatePlan): string | undefined {
+function planStatementName(prefix: string, plan: CandidatePlan): string {
 	switch (plan.kind) {
 		case 'rowKeys':
 			return `${prefix}_rowkeys`;
 		case 'range':
 			return `${prefix}_range`;
+		case 'ranges':
+		case 'rangeGroups':
+			return `${prefix}_ranges`;
 		default:
-			return undefined;
+			return `${prefix}_scan`;
 	}
 }
 
@@ -641,27 +645,31 @@ export function buildCandidatePlan(meta: KvQueryMeta, params: CassandraParams): 
 }
 
 function rangeFragments(group: RangeGroup): PlanFragments {
-	const params: Array<unknown> = [];
-	const arms = group.lowerBounds.map((lowerBound, index) => {
-		params.push(lowerBound, group.upperBounds[index]);
-		return `(kv.row_key COLLATE "C" >= $${params.length} AND kv.row_key COLLATE "C" < $${params.length + 1})`;
-	});
-	return {predicate: ` AND (${arms.join(' OR ')})`, params};
+	return {
+		using: 'unnest($2::text[], $3::text[]) AS r(lo, hi)',
+		predicate: ' AND kv.row_key COLLATE "C" >= r.lo AND kv.row_key COLLATE "C" < r.hi',
+		params: [group.lowerBounds, group.upperBounds],
+	};
+}
+
+function fromPlan(table: string, fragments: PlanFragments): string {
+	return fragments.using === '' ? `${table} kv` : `${table} kv, ${fragments.using}`;
 }
 
 function planFragments(plan: Exclude<CandidatePlan, {kind: 'rangeGroups'}>): PlanFragments {
 	switch (plan.kind) {
 		case 'rowKeys':
-			return {predicate: ' AND kv.row_key = ANY($2::text[])', params: [plan.rowKeys]};
+			return {using: '', predicate: ' AND kv.row_key = ANY($2::text[])', params: [plan.rowKeys]};
 		case 'range':
 			return {
+				using: '',
 				predicate: ' AND kv.row_key COLLATE "C" >= $2 AND kv.row_key COLLATE "C" < $3',
 				params: [plan.lowerBound, plan.upperBound],
 			};
 		case 'ranges':
 			return rangeFragments(plan);
 		default:
-			return {predicate: '', params: []};
+			return {using: '', predicate: '', params: []};
 	}
 }
 
@@ -1243,7 +1251,11 @@ export class PostgresKvQueryExecutor {
 			(range) =>
 				`(SELECT kv.row_key FROM ${this.table} kv WHERE kv.table_name = $1 AND ${range} AND (kv.expires_at IS NULL OR kv.expires_at > now()) AND ${NUMERIC_ROW_KEY} IS NULL ORDER BY kv.row_key COLLATE "C" LIMIT 1) IS NOT NULL`,
 		);
-		const result = await db.query<{found: boolean}>(`SELECT ${probes.join(' OR ')} AS found`, [meta.table.name]);
+		const result = await db.query<{found: boolean}>(
+			`SELECT ${probes.join(' OR ')} AS found`,
+			[meta.table.name],
+			'kv_non_numeric_probe',
+		);
 		return result.rows[0]?.found === true;
 	}
 
@@ -1307,9 +1319,12 @@ export class PostgresKvQueryExecutor {
 	): Promise<Array<StoredRow>> {
 		const params: Array<unknown> = [meta.table.name, limit];
 		let predicate = '';
+		let shape = 'key';
 		if (numeric) {
 			predicate = ` AND ${NUMERIC_ROW_KEY} IS NOT NULL`;
+			shape = 'numeric';
 			if (floor) {
+				shape = floor.inclusive ? 'numeric_from' : 'numeric_above';
 				params.push(floor.value);
 				predicate += ` AND ${NUMERIC_ROW_KEY} ${floor.inclusive ? '>=' : '>'} $${params.length}::numeric`;
 			}
@@ -1327,6 +1342,7 @@ export class PostgresKvQueryExecutor {
 		const result = await db.query<StoredRow>(
 			`SELECT kv.row_key, kv.row_data FROM ${this.table} kv WHERE kv.table_name = $1${predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now()) ORDER BY ${order} LIMIT $2`,
 			params,
+			`kv_scan_${shape}_${after === null ? 'start' : 'next'}`,
 		);
 		return result.rows;
 	}
@@ -1485,10 +1501,10 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXP
 		meta: KvQueryMeta,
 		fragments: PlanFragments,
 		db: PostgresQueryable,
-		name?: string,
+		name: string,
 	): Promise<Array<StoredRow>> {
 		const result = await db.query<StoredRow>(
-			`SELECT kv.row_key, kv.row_data FROM ${this.table} kv WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
+			`SELECT kv.row_key, kv.row_data FROM ${fromPlan(this.table, fragments)} WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
 			[meta.table.name, ...fragments.params],
 			name,
 		);
@@ -1537,6 +1553,7 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXP
 		const result = await db.query<StoredRow>(
 			`SELECT kv.row_key, kv.row_data FROM ${this.table} kv WHERE kv.table_name = $1 AND (kv.expires_at IS NULL OR kv.expires_at > now()) LIMIT $2`,
 			[meta.table.name, limit],
+			'kv_sel_unordered',
 		);
 		return this.matchingRows(meta, result.rows, {}).map((row) =>
 			projectRow(row, meta.columns as ReadonlyArray<string> | undefined),
@@ -1583,7 +1600,7 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXP
 		let total = 0;
 		for (const fragments of planFragmentGroups(plan.candidates)) {
 			const result = await db.query<{count: string}>(
-				`SELECT count(*) AS count FROM ${this.table} kv WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
+				`SELECT count(*) AS count FROM ${fromPlan(this.table, fragments)} WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
 				[meta.table.name, ...fragments.params],
 				planStatementName('kv_count', plan.candidates),
 			);
@@ -1639,6 +1656,7 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DA
 			throw new Error('Conditional writes require expected values');
 		}
 		const bindings: Array<unknown> = [meta.table.name, rowKeyFromParams(meta, params)];
+		let expiry = 'keep';
 		const predicates = ['kv.table_name = $1', 'kv.row_key = $2', '(kv.expires_at IS NULL OR kv.expires_at > now())'];
 		for (const {col, expectedParam} of meta.conditions) {
 			if (!Object.hasOwn(params, expectedParam) || params[expectedParam] === undefined) {
@@ -1662,13 +1680,15 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DA
 			if (explicit !== undefined) {
 				bindings.push(explicit);
 				assignments.push(`expires_at = $${bindings.length}`);
+				expiry = 'set';
 			} else if (fallback !== undefined) {
 				bindings.push(fallback);
 				assignments.push(`expires_at = GREATEST(kv.expires_at, $${bindings.length}::timestamptz)`);
+				expiry = 'extend';
 			}
 			sql = `UPDATE ${this.table} kv SET ${assignments.join(', ')} WHERE ${where}`;
 		}
-		const result = await db.query(sql, bindings);
+		const result = await db.query(sql, bindings, `kv_cond_${meta.action}_${meta.conditions.length}_${expiry}`);
 		if (result.rowCount !== 0 && result.rowCount !== 1) {
 			throw new Error('Conditional write returned an invalid affected row count');
 		}
@@ -1798,7 +1818,7 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = ${MERGED_ROW_DA
 			if (plan.candidates.kind === 'scan') logFullScan(meta);
 			for (const fragments of planFragmentGroups(plan.candidates)) {
 				await db.query(
-					`DELETE FROM ${this.table} kv WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
+					`DELETE FROM ${this.table} kv${fragments.using === '' ? '' : ` USING ${fragments.using}`} WHERE kv.table_name = $1${fragments.predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now())`,
 					[meta.table.name, ...fragments.params],
 					planStatementName('kv_del', plan.candidates),
 				);
