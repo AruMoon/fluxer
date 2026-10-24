@@ -282,12 +282,23 @@ start_session(Request, SocketPid, State) ->
 -spec start_session_with_drain_guard(boolean(), map(), pid(), state()) -> ws_result().
 start_session_with_drain_guard(true, Request, SocketPid, State) ->
     hold_session_start(Request, SocketPid, <<"Gateway draining">>, State);
-start_session_with_drain_guard(false, Request, SocketPid, State) ->
+start_session_with_drain_guard(false, Request, SocketPid, State0) ->
+    State = release_hold(State0),
     case session_manager:send_start(Request, SocketPid) of
         {ok, StartRequest} ->
             {ok, await_session_start(StartRequest, Request, SocketPid, State)};
         {error, Reason} ->
             handle_session_start_result({error, Reason}, Request, SocketPid, State)
+    end.
+
+-spec release_hold(state()) -> state().
+release_hold(State) ->
+    case maps:get(pending_identify, State, undefined) of
+        undefined ->
+            State;
+        _Held ->
+            gateway_rollout_config:unsubscribe_changes(self()),
+            clear_pending_identify(State)
     end.
 
 -spec await_session_start(session_manager:start_request(), map(), pid(), state()) -> state().
@@ -407,7 +418,14 @@ handle_pending_identify_retry(Token, State) ->
     end.
 
 -spec retry_pending_identify(state()) -> ws_result().
-retry_pending_identify(#{pending_identify := {Request, SocketPid}} = State) when
+retry_pending_identify(State) ->
+    case maps:get(session_start, State, undefined) of
+        undefined -> retry_held_identify(State);
+        _SessionStart -> {ok, State}
+    end.
+
+-spec retry_held_identify(state()) -> ws_result().
+retry_held_identify(#{pending_identify := {Request, SocketPid}} = State) when
     is_map(Request), is_pid(SocketPid)
 ->
     case gateway_rollout_config:session_rollout_percentage() > 0 of
@@ -416,12 +434,12 @@ retry_pending_identify(#{pending_identify := {Request, SocketPid}} = State) when
                 gateway_node_router:is_draining(),
                 Request,
                 SocketPid,
-                RetryState
+                State
             );
         false ->
             {ok, schedule_pending_identify_retry(State)}
     end;
-retry_pending_identify(State) ->
+retry_held_identify(State) ->
     {ok, clear_pending_identify(State)}.
 
 -spec hold_session_start(map() | undefined, pid() | undefined, binary(), state()) ->
