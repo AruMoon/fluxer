@@ -54,6 +54,26 @@ interface RangeGroup {
 	upperBounds: Array<string>;
 }
 
+interface KeyBound {
+	op: '<' | '<=' | '>' | '>=';
+	value: string;
+}
+
+interface OrderedRange {
+	lowerBound: string;
+	upperBound: string;
+	segment: number;
+	descending: boolean;
+	bounds: Array<KeyBound>;
+	partition: string | null;
+}
+
+interface OrderedWalk {
+	entries: Array<PageEntry>;
+	after: string | null;
+	more: boolean;
+}
+
 export type CandidatePlan =
 	| {kind: 'none'}
 	| {kind: 'rowKeys'; rowKeys: Array<string>}
@@ -116,6 +136,15 @@ const MERGED_ROW_DATA = `CASE WHEN ${EXPIRED_STORED_ROW} THEN EXCLUDED.row_data 
 const KEPT_EXPIRES_AT = `CASE WHEN ${EXPIRED_STORED_ROW} THEN NULL ELSE kv.expires_at END`;
 const NO_EXPIRY = 'infinity';
 const BIGINT_ROW_KEY_PREFIX = `{"${ENCODED_TYPE_KEY}":"bigint","value":"`;
+const INT64_MIN = -(2n ** 63n);
+const INT64_MAX = 2n ** 63n - 1n;
+const KEY_BOUND_OPERATORS: Partial<Record<WhereExpr<Row>['kind'], KeyBound['op']>> = {
+	lt: '<',
+	lte: '<=',
+	gt: '>',
+	gte: '>=',
+};
+const KEY_BOUND_NAMES: Record<KeyBound['op'], string> = {'<': 'lt', '<=': 'lte', '>': 'gt', '>=': 'gte'};
 const NON_NUMERIC_ROW_KEY_RANGES = [
 	`kv.row_key COLLATE "C" < '-'`,
 	`kv.row_key COLLATE "C" >= ':' AND kv.row_key COLLATE "C" < '${BIGINT_ROW_KEY_PREFIX}'`,
@@ -144,6 +173,12 @@ function numericRowKeyExpr(column: string): string {
 }
 
 const NUMERIC_ROW_KEY = numericRowKeyExpr('kv.row_key');
+
+function numericKeySegmentExpr(segment: number): string {
+	const value = `split_part(kv.row_key, chr(31), ${segment})`;
+	const digits = `substr(${value}, ${BIGINT_ROW_KEY_PREFIX.length + 1}, greatest(length(${value}) - ${BIGINT_ROW_KEY_PREFIX.length + 2}, 0))`;
+	return `(CASE WHEN left(${value}, ${BIGINT_ROW_KEY_PREFIX.length}) = '${BIGINT_ROW_KEY_PREFIX}' AND right(${value}, 2) = '"}' AND ${digits} ~ '^-?[0-9]+$' THEN ${digits}::numeric WHEN ${value} ~ '${NUMERIC_ROW_KEY_NUMBER_PATTERN}' THEN ${value}::numeric END)`;
+}
 
 function planStatementName(prefix: string, plan: CandidatePlan): string {
 	switch (plan.kind) {
@@ -798,6 +833,52 @@ function pageStart(meta: KvQueryMeta, entries: ReadonlyArray<PageEntry>, state: 
 	return start;
 }
 
+function integerKeyValue(value: unknown): string | null {
+	if (typeof value === 'bigint') return value.toString();
+	if (typeof value === 'number' && Number.isSafeInteger(value)) return String(value);
+	return null;
+}
+
+function fitsInt64(value: string): boolean {
+	if (!/^-?[0-9]+$/.test(value)) return false;
+	const parsed = BigInt(value);
+	return parsed >= INT64_MIN && parsed <= INT64_MAX;
+}
+
+function orderedRange(meta: KvQueryMeta, params: CassandraParams, plan: CandidatePlan): OrderedRange | null {
+	if (plan.kind !== 'range') return null;
+	const primaryKey = meta.table.primaryKey as ReadonlyArray<string>;
+	const column = primaryKey[primaryKey.length - 1]!;
+	if (plan.lowerBound.split(VALUE_SEPARATOR).length !== primaryKey.length) return null;
+	if (meta.orderBy !== undefined && meta.orderBy.col !== column) return null;
+	const bounds: Array<KeyBound> = [];
+	for (const clause of whereClauses(meta)) {
+		const op = KEY_BOUND_OPERATORS[clause.kind];
+		if (clause.col !== column || op === undefined) continue;
+		const value = integerKeyValue(getParam(params, clause.param));
+		if (value !== null) bounds.push({op, value});
+	}
+	const shape = queryShape(meta);
+	if (Math.min(shape.leadingClauses.length, primaryKey.length - 1) + bounds.length !== shape.clauseCount) return null;
+	const sorted =
+		column === 'message_id' &&
+		POSTGRES_KV_SORT_ID_TABLES.includes(meta.table.name) &&
+		meta.table.partitionKey.length === primaryKey.length - 1 &&
+		bounds.every((bound) => fitsInt64(bound.value));
+	return {
+		lowerBound: plan.lowerBound,
+		upperBound: plan.upperBound,
+		segment: primaryKey.length,
+		descending: meta.orderBy?.direction === 'DESC',
+		bounds,
+		partition: sorted ? plan.lowerBound.slice(0, -VALUE_SEPARATOR.length) : null,
+	};
+}
+
+function lastKeySegmentValue(key: string): string | null {
+	return numericRowKeyValue(key.slice(key.lastIndexOf(VALUE_SEPARATOR) + VALUE_SEPARATOR.length));
+}
+
 function parseRawMeta(cql: string): KvQueryMeta<Row> | null {
 	const normalized = normalizeCql(cql).replace(/;$/, '');
 	const update =
@@ -1429,6 +1510,128 @@ export class PostgresKvQueryExecutor {
 		};
 	}
 
+	private async orderedWalk(
+		meta: KvQueryMeta,
+		params: CassandraParams,
+		plan: CandidatePlan,
+		after: string | null,
+		want: number,
+		db: PostgresQueryable,
+	): Promise<OrderedWalk | null> {
+		const range = orderedRange(meta, params, plan);
+		if (range === null) return null;
+		const afterValue = after === null ? null : lastKeySegmentValue(after);
+		if (after !== null && (afterValue === null || !after.startsWith(range.lowerBound))) return null;
+		const probe = await this.probeOrderedRange(meta, range, db);
+		const sorted = range.partition !== null && !probe.unsorted && (afterValue === null || fitsInt64(afterValue));
+		if (!sorted && probe.mixed) return null;
+		const limit = want + 1;
+		const entries: Array<PageEntry> = [];
+		let cursor = after;
+		let cursorValue = afterValue;
+		for (;;) {
+			const batch = await this.orderedBatch(meta, range, sorted, cursor, cursorValue, limit, db);
+			for (let index = 0; index < batch.length; index += 1) {
+				const stored = batch[index]!;
+				cursor = stored.row_key;
+				const entry = this.matchingEntry(meta, stored, params);
+				if (entry) entries.push(entry);
+				if (entries.length === want) {
+					return {entries, after: cursor, more: index < batch.length - 1 || batch.length === limit};
+				}
+			}
+			if (batch.length < limit || cursor === null) return {entries, after: cursor, more: false};
+			cursorValue = lastKeySegmentValue(cursor);
+			if (cursorValue === null) throw new Error('Postgres KV ordered walk read a non-numeric key');
+		}
+	}
+
+	private async probeOrderedRange(
+		meta: KvQueryMeta,
+		range: OrderedRange,
+		db: PostgresQueryable,
+	): Promise<{mixed: boolean; unsorted: boolean}> {
+		const live = '(kv.expires_at IS NULL OR kv.expires_at > now())';
+		const params: Array<unknown> = [
+			meta.table.name,
+			range.lowerBound,
+			`${range.lowerBound}-`,
+			`${range.lowerBound}:`,
+			`${range.lowerBound}${BIGINT_ROW_KEY_PREFIX}`,
+			`${range.lowerBound}${BIGINT_ROW_KEY_PREFIX}:`,
+			range.upperBound,
+		];
+		const spans: Array<[number, number]> = [
+			[2, 3],
+			[4, 5],
+			[6, 7],
+		];
+		const mixed = spans
+			.map(
+				([lo, hi]) =>
+					`(SELECT 1 FROM ${this.table} kv WHERE kv.table_name = $1 AND kv.row_key COLLATE "C" >= $${lo} AND kv.row_key COLLATE "C" < $${hi} AND ${live} LIMIT 1) IS NOT NULL`,
+			)
+			.join(' OR ');
+		let unsorted = 'false';
+		let name = 'kv_ordered_probe';
+		if (range.partition !== null) {
+			params.push(range.partition);
+			unsorted = `EXISTS (SELECT 1 FROM ${this.table} kv WHERE kv.table_name = $1 AND kv.table_name = '${meta.table.name}' AND kv.partition_key = $8 AND kv.row_key COLLATE "C" >= $2 AND kv.row_key COLLATE "C" < $7 AND kv.sort_id IS NULL AND ${live})`;
+			name = `kv_ordered_probe_${meta.table.name}`;
+		}
+		const result = await db.query<{mixed: boolean; unsorted: boolean}>(
+			`SELECT ${mixed} AS mixed, ${unsorted} AS unsorted`,
+			params,
+			name,
+		);
+		const row = result.rows[0];
+		return {mixed: row?.mixed !== false, unsorted: row?.unsorted !== false};
+	}
+
+	private async orderedBatch(
+		meta: KvQueryMeta,
+		range: OrderedRange,
+		sorted: boolean,
+		after: string | null,
+		afterValue: string | null,
+		limit: number,
+		db: PostgresQueryable,
+	): Promise<Array<StoredRow>> {
+		const key = sorted ? 'kv.sort_id' : numericKeySegmentExpr(range.segment);
+		const cast = sorted ? 'bigint' : 'numeric';
+		const direction = range.descending ? 'DESC' : 'ASC';
+		const params: Array<unknown> = [meta.table.name, range.lowerBound, range.upperBound, limit];
+		let predicate = '';
+		const shape = [sorted ? meta.table.name : `seg${range.segment}`, direction.toLowerCase()];
+		if (sorted) {
+			params.push(range.partition);
+			predicate += ` AND kv.table_name = '${meta.table.name}' AND kv.partition_key = $${params.length}`;
+		}
+		for (const bound of range.bounds) {
+			params.push(bound.value);
+			predicate += ` AND ${key} ${bound.op} $${params.length}::${cast}`;
+			shape.push(KEY_BOUND_NAMES[bound.op]);
+		}
+		const op = range.descending ? '<' : '>';
+		if (after !== null && afterValue !== null) {
+			params.push(afterValue);
+			if (sorted) {
+				predicate += ` AND kv.sort_id ${op} $${params.length}::bigint`;
+			} else {
+				params.push(after);
+				predicate += ` AND (${key}, kv.row_key COLLATE "C") ${op} ($${params.length - 1}::numeric, $${params.length})`;
+			}
+			shape.push('next');
+		}
+		const order = sorted ? `kv.sort_id ${direction}` : `${key} ${direction}, kv.row_key COLLATE "C" ${direction}`;
+		const result = await db.query<StoredRow>(
+			`SELECT kv.row_key, kv.row_data FROM ${this.table} kv WHERE kv.table_name = $1 AND kv.row_key COLLATE "C" >= $2 AND kv.row_key COLLATE "C" < $3${predicate} AND (kv.expires_at IS NULL OR kv.expires_at > now()) ORDER BY ${order} LIMIT $4`,
+			params,
+			`kv_ordered_${shape.join('_')}`,
+		);
+		return result.rows;
+	}
+
 	private projected(meta: KvQueryMeta, entries: ReadonlyArray<PageEntry>): Array<Row> {
 		return entries.map((entry) => projectRow(entry.row, meta.columns as ReadonlyArray<string> | undefined));
 	}
@@ -1644,6 +1847,10 @@ DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXP
 		) {
 			const walk = {numeric: true, after: null, since: null};
 			return this.projected(meta, (await this.walkScan(meta, params, walk, meta.limit, db)).entries);
+		}
+		if (typeof meta.limit === 'number' && Number.isInteger(meta.limit) && meta.limit > 0) {
+			const ordered = await this.orderedWalk(meta, params, plan.candidates, null, meta.limit, db);
+			if (ordered !== null) return this.projected(meta, ordered.entries);
 		}
 		let rows = this.matchingRows(meta, await this.candidates(meta, plan, db), params);
 		rows = sortRows(meta, rows);
