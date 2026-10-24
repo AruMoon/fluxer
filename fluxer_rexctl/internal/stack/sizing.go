@@ -138,7 +138,7 @@ func setBytes(out map[string]string, k string, mebibytes int) {
 
 func parseMiB(s string) int {
 	s = strings.ToLower(strings.TrimSpace(s))
-	i := strings.IndexFunc(s, func(r rune) bool { return r < '0' || r > '9' })
+	i := strings.IndexFunc(s, func(r rune) bool { return (r < '0' || r > '9') && r != '.' })
 	if i == 0 {
 		return 0
 	}
@@ -146,7 +146,7 @@ func parseMiB(s string) int {
 	if i > 0 {
 		digits, unit = s[:i], strings.TrimSpace(s[i:])
 	}
-	n, err := strconv.ParseInt(digits, 10, 64)
+	n, err := strconv.ParseFloat(digits, 64)
 	if err != nil {
 		return 0
 	}
