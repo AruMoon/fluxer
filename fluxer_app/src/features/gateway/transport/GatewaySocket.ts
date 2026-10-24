@@ -46,7 +46,9 @@ const GATEWAY_TIMEOUTS = {
 	ResumeResponse: 15000,
 	ResumeWindow: 180000,
 	MinReconnect: 1000,
-	MaxReconnect: 60000,
+	MaxReconnect: 10000,
+	MaxReconnectWhileDispatchesFail: 60000,
+	ReconnectFloor: 500,
 	ReconnectSpread: 2000,
 	Hello: 20000,
 } as const;
@@ -218,7 +220,7 @@ type GatewaySocketEventArgs<K extends keyof GatewaySocketEvents> = GatewaySocket
 
 export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 	private readonly log: Logger;
-	private reconnectBackoff: ExponentialBackoff;
+	private reconnectAttempts = 0;
 	private socket: GatewayWireTransport | null = null;
 	private removeSocketMessageListener: (() => void) | null = null;
 	private connectionState: GatewayState = GatewayState.Disconnected;
@@ -1284,13 +1286,21 @@ export class GatewaySocket extends EventEmitter<GatewaySocketEvents> {
 			return GATEWAY_TIMEOUTS.MinReconnect + this.reconnectSpread();
 		}
 		this.lastReconnectAt = now;
-		const delay = this.reconnectBackoff.next();
-		this.log.debug(`Reconnect backoff attempt=${this.reconnectBackoff.getCurrentAttempts()} delay=${delay}ms`);
+		this.reconnectAttempts += 1;
+		const cap =
+			this.consecutiveDispatchFailures > 0
+				? GATEWAY_TIMEOUTS.MaxReconnectWhileDispatchesFail
+				: GATEWAY_TIMEOUTS.MaxReconnect;
+		const ceiling = Math.min(GATEWAY_TIMEOUTS.MinReconnect * 2 ** (this.reconnectAttempts - 1), cap);
+		const delay = Math.floor(
+			GATEWAY_TIMEOUTS.ReconnectFloor + Math.random() * (ceiling - GATEWAY_TIMEOUTS.ReconnectFloor),
+		);
+		this.log.debug(`Reconnect backoff attempt=${this.reconnectAttempts} delay=${delay}ms`);
 		return delay;
 	}
 
 	private resetBackoffInternal(): void {
-		this.reconnectBackoff.reset();
+		this.reconnectAttempts = 0;
 	}
 
 	private resetBackoffUnlessDispatchesKeepFailing(): void {
