@@ -23,6 +23,8 @@
 -type pending_presence_buffer() :: eqwalizer:dynamic([map()] | queue:queue(map())).
 -type reaction_buffer() :: eqwalizer:dynamic([map()] | queue:queue(map())).
 
+-define(HIBERNATE_AFTER_MS, 5000).
+
 -type session_state() :: #{
     id => session_id(),
     user_id => user_id(),
@@ -81,7 +83,7 @@
 
 -spec start_link(map()) -> {ok, pid()} | ignore | {error, term()}.
 start_link(SessionData) ->
-    gen_server:start_link(?MODULE, SessionData, []).
+    gen_server:start_link(?MODULE, SessionData, [{hibernate_after, ?HIBERNATE_AFTER_MS}]).
 
 -spec init(map()) -> {ok, session_state()}.
 init(SessionData) ->
@@ -125,34 +127,41 @@ handle_call(_, _From, State) ->
     {reply, ok, State}.
 
 -spec handle_cast(term(), session_state()) ->
+    {noreply, session_state()}
+    | {noreply, session_state(), hibernate}
+    | {stop, normal, session_state()}.
+handle_cast(Msg, State) ->
+    hibernate_after_ready(State, handle_cast_message(Msg, State)).
+
+-spec handle_cast_message(term(), session_state()) ->
     {noreply, session_state()} | {stop, normal, session_state()}.
-handle_cast({presence_update, Update}, State) when is_map(Update) ->
+handle_cast_message({presence_update, Update}, State) when is_map(Update) ->
     session_lifecycle:handle_presence_update_cast(Update, State);
-handle_cast({dispatch, Event, {pre_encoded, EncodedData} = Data}, State) when
+handle_cast_message({dispatch, Event, {pre_encoded, EncodedData} = Data}, State) when
     is_atom(Event), is_binary(EncodedData)
 ->
     session_dispatch:handle_dispatch(Event, Data, State);
-handle_cast({dispatch, Event, {pre_encoded, EncodedData} = Data}, State) when
+handle_cast_message({dispatch, Event, {pre_encoded, EncodedData} = Data}, State) when
     is_binary(Event), is_binary(EncodedData)
 ->
     session_dispatch:handle_dispatch(Event, Data, State);
-handle_cast({dispatch, Event, Data}, State) when
+handle_cast_message({dispatch, Event, Data}, State) when
     is_atom(Event), is_map(Data);
     is_atom(Event), is_list(Data)
 ->
     session_dispatch:handle_dispatch(Event, Data, State);
-handle_cast({dispatch, Event, Data}, State) when
+handle_cast_message({dispatch, Event, Data}, State) when
     is_binary(Event), is_map(Data);
     is_binary(Event), is_list(Data)
 ->
     session_dispatch:handle_dispatch(Event, Data, State);
-handle_cast({voice_rejected, ErrorAtom}, State) when is_atom(ErrorAtom) ->
+handle_cast_message({voice_rejected, ErrorAtom}, State) when is_atom(ErrorAtom) ->
     ok = session_voice:report_rejection(ErrorAtom, State),
     {noreply, State};
-handle_cast({voice_signal, Data}, State) when is_map(Data) ->
+handle_cast_message({voice_signal, Data}, State) when is_map(Data) ->
     ok = session_voice:handle_voice_signal(Data, State),
     {noreply, State};
-handle_cast(Msg, State) ->
+handle_cast_message(Msg, State) ->
     handle_cast_guild_or_lifecycle(Msg, State).
 
 -spec handle_cast_guild_or_lifecycle(term(), session_state()) ->
@@ -233,37 +242,57 @@ do_handle_cast_call(_, State) ->
     {noreply, State}.
 
 -spec handle_info(term(), session_state()) ->
+    {noreply, session_state()}
+    | {noreply, session_state(), hibernate}
+    | {stop, normal, session_state()}.
+handle_info(Msg, State) ->
+    hibernate_after_ready(State, handle_info_message(Msg, State)).
+
+-spec handle_info_message(term(), session_state()) ->
     {noreply, session_state()} | {stop, normal, session_state()}.
-handle_info({presence_connect, Attempt}, #{presence_pid := undefined} = State) when
+handle_info_message({presence_connect, Attempt}, #{presence_pid := undefined} = State) when
     is_integer(Attempt), Attempt >= 0
 ->
     session_connection_presence:handle_presence_connect(Attempt, State);
-handle_info({presence_connect, _Attempt}, State) ->
+handle_info_message({presence_connect, _Attempt}, State) ->
     {noreply, State};
-handle_info({guild_connect, GuildId, Attempt}, State) when
+handle_info_message({guild_connect, GuildId, Attempt}, State) when
     is_integer(GuildId), is_integer(Attempt), Attempt >= 0
 ->
     session_connection_guild:handle_guild_connect(GuildId, Attempt, State);
-handle_info({guild_connect_result, _, _, _} = Msg, State) ->
+handle_info_message({guild_connect_result, _, _, _} = Msg, State) ->
     handle_info_guild_connect_result(Msg, State);
-handle_info({guild_connect_timeout, GuildId, Attempt, Token}, State) when
+handle_info_message({guild_connect_timeout, GuildId, Attempt, Token}, State) when
     is_integer(GuildId), is_integer(Attempt), Attempt >= 0, is_reference(Token)
 ->
     session_connection_guild:handle_guild_connect_timeout(GuildId, Attempt, Token, State);
-handle_info({call_reconnect, ChannelId, Attempt}, State) when
+handle_info_message({call_reconnect, ChannelId, Attempt}, State) when
     is_integer(ChannelId), is_integer(Attempt), Attempt >= 0
 ->
     session_connection_retry:handle_call_reconnect(ChannelId, Attempt, State);
-handle_info({gateway_timing_update, Timings}, State) ->
+handle_info_message({gateway_timing_update, Timings}, State) ->
     {noreply, gateway_timings:merge_state(Timings, State)};
-handle_info({thread_user_flip, _Version}, State) ->
+handle_info_message({thread_user_flip, _Version}, State) ->
     {noreply, notify_thread_user_flip(State)};
-handle_info({dm_partner_mutual, GuildId, PartnerIds}, State) when
+handle_info_message({dm_partner_mutual, GuildId, PartnerIds}, State) when
     is_integer(GuildId), is_list(PartnerIds)
 ->
     session_dm_partners:handle_mutual(GuildId, PartnerIds, State);
-handle_info(Msg, State) ->
+handle_info_message(Msg, State) ->
     handle_info_lifecycle(Msg, State).
+
+-spec hibernate_after_ready(
+    session_state(), {noreply, session_state()} | {stop, normal, session_state()}
+) ->
+    {noreply, session_state()}
+    | {noreply, session_state(), hibernate}
+    | {stop, normal, session_state()}.
+hibernate_after_ready(#{ready := Ready}, {noreply, #{ready := undefined} = State}) when
+    Ready =/= undefined
+->
+    {noreply, State, hibernate};
+hibernate_after_ready(_OldState, Result) ->
+    Result.
 
 -spec notify_thread_user_flip(session_state()) -> session_state().
 notify_thread_user_flip(#{id := SessionId} = State) when is_binary(SessionId) ->

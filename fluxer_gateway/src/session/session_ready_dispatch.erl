@@ -62,13 +62,12 @@ dispatch_ready_to_socket(State) ->
     StateAfterHealth = session_guild_health:dispatch_ready(StateAfterGuilds),
     schedule_call_creates(StateAfterHealth, SessionId),
     StateAfterPresences = release_pending_presences(StateAfterHealth, CollectedPresences),
-    FinalState = StateAfterPresences#{
+    FinalState = maps:remove(gw_timings, StateAfterPresences#{
         ready => undefined,
         collected_guild_states => [],
         collected_sessions => [],
         collected_presences => []
-    },
-    erlang:garbage_collect(),
+    }),
     {noreply, FinalState}.
 
 -spec release_pending_presences(session_state(), [map()]) -> session_state().

@@ -7,6 +7,8 @@
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
+-define(HIBERNATE_AFTER_MS, 5000).
+
 -type user_id() :: integer().
 -type session_id() :: binary().
 -type status() :: online | offline | idle | dnd | invisible.
@@ -52,7 +54,9 @@
 
 -spec start_link(presence_data()) -> {ok, pid()} | {error, term()}.
 start_link(PresenceData) ->
-    shard_utils:normalize_start_link(gen_server:start_link(?MODULE, PresenceData, [])).
+    shard_utils:normalize_start_link(
+        gen_server:start_link(?MODULE, PresenceData, [{hibernate_after, ?HIBERNATE_AFTER_MS}])
+    ).
 
 -spec init(presence_data()) -> {ok, state()}.
 init(PresenceData) ->
