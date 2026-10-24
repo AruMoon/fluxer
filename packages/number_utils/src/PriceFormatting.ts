@@ -74,10 +74,10 @@ const HOME_COUNTRIES_BY_CURRENCY: Readonly<Record<string, ReadonlySet<string>>> 
 
 const STRIPE_TWO_DECIMAL_WHOLE_UNIT_CURRENCIES = new Set(['ISK', 'HUF', 'UGX']);
 const RIGHT_TO_LEFT_LANGUAGES = new Set(['ar', 'he']);
-const BIDI_MARKS = /[‎‏؜]/g;
-const LEFT_TO_RIGHT_ISOLATE = '⁦';
-const POP_DIRECTIONAL_ISOLATE = '⁩';
-const NO_BREAK_SPACE = ' ';
+const BIDI_MARKS = /[\u200E\u200F\u061C]/g;
+const LEFT_TO_RIGHT_ISOLATE = '\u2066';
+const POP_DIRECTIONAL_ISOLATE = '\u2069';
+const NO_BREAK_SPACE = '\u00A0';
 
 const localeByLowerCaseTag = new Map<string, LocaleCode>(
 	Object.values(Locales).map((locale) => [locale.toLowerCase(), locale]),

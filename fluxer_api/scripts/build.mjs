@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {readFileSync, rmSync} from 'node:fs';
+import {readdirSync, readFileSync, rmSync} from 'node:fs';
 import {isBuiltin} from 'node:module';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -45,13 +45,26 @@ await build({
 	platform: 'node',
 	format: 'esm',
 	target: 'node24',
-	charset: 'utf8',
+	charset: 'ascii',
 	sourcemap: true,
 	sourcesContent: false,
 	logLevel: 'info',
 	banner: {js: '// SPDX-License-Identifier: AGPL-3.0-or-later'},
 	plugins: [workspacePlugin],
 });
+
+for (const file of readdirSync(OUT_DIR).filter((name) => name.endsWith('.js'))) {
+	const source = readFileSync(join(OUT_DIR, file), 'utf-8');
+	const index = source.search(/[\u0080-\uFFFF]/);
+	if (index !== -1) {
+		const line = source.slice(0, index).split('\n').length;
+		throw new Error(
+			`${file}:${line} contains a non-ASCII character. ` +
+				'V8 stores a module source with any such character as a two-byte string, which doubles its memory. ' +
+				'Write the character as a \\u escape.',
+		);
+	}
+}
 
 if (undeclaredDependencies.size > 0) {
 	const names = [...undeclaredDependencies].sort().join(', ');
