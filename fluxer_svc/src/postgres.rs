@@ -190,6 +190,19 @@ async fn has_sort_id(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::R
     Ok(row.is_some())
 }
 
+async fn needs_lz4(transaction: &Transaction<'_>, kv_table: &str) -> anyhow::Result<bool> {
+    let row = transaction
+        .query_opt(
+            r#"SELECT att.attcompression <> 'l' AND EXISTS (SELECT 1 FROM pg_settings WHERE name = 'default_toast_compression' AND 'lz4' = ANY(enumvals)) AS needs_lz4
+FROM pg_attribute att
+WHERE att.attrelid = to_regclass($1) AND att.attname = 'row_data' AND NOT att.attisdropped"#,
+            &[&kv_table],
+        )
+        .await
+        .context("failed to inspect Postgres KV row_data compression")?;
+    Ok(row.and_then(|row| row.get::<_, Option<bool>>("needs_lz4")) == Some(true))
+}
+
 async fn missing_storage_options(
     transaction: &Transaction<'_>,
     kv_table: &str,
@@ -296,7 +309,8 @@ CREATE TABLE IF NOT EXISTS {table} (
         .context("failed to ensure Postgres KV schema")?;
     let add_sort_id = !has_sort_id(&transaction, kv_table).await?;
     let missing_options = missing_storage_options(&transaction, kv_table).await?;
-    if add_sort_id || !missing_options.is_empty() {
+    let set_lz4 = needs_lz4(&transaction, kv_table).await?;
+    if add_sort_id || !missing_options.is_empty() || set_lz4 {
         transaction
             .query_one(
                 "SELECT set_config('lock_timeout', $1, true)",
@@ -318,6 +332,14 @@ CREATE TABLE IF NOT EXISTS {table} (
                 ))
                 .await
                 .context("failed to set Postgres KV storage options")?;
+        }
+        if set_lz4 {
+            transaction
+                .batch_execute(&format!(
+                    "ALTER TABLE {table} ALTER COLUMN row_data SET COMPRESSION lz4"
+                ))
+                .await
+                .context("failed to set Postgres KV row_data compression")?;
         }
         transaction
             .query_one("SELECT set_config('lock_timeout', '0', true)", &[])

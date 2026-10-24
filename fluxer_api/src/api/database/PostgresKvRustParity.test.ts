@@ -30,6 +30,9 @@ const SHARED_LITERALS = [
 	'sort_id bigint,',
 	'ADD COLUMN sort_id bigint',
 	"attname = 'sort_id'",
+	"'lz4' = ANY(enumvals)",
+	"att.attcompression <> 'l'",
+	'ALTER COLUMN row_data SET COMPRESSION lz4',
 ];
 
 const BACKFILL_FRAGMENTS = [

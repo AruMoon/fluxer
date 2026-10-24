@@ -911,6 +911,16 @@ async function postgresKvHasSortId(db: PostgresQueryable, kvTable: string): Prom
 	return result.rows.length > 0;
 }
 
+async function postgresKvNeedsLz4(db: PostgresQueryable, kvTable: string): Promise<boolean> {
+	const result = await db.query<{needs_lz4: boolean}>(
+		`SELECT att.attcompression <> 'l' AND EXISTS (SELECT 1 FROM pg_settings WHERE name = 'default_toast_compression' AND 'lz4' = ANY(enumvals)) AS needs_lz4
+FROM pg_attribute att
+WHERE att.attrelid = to_regclass($1) AND att.attname = 'row_data' AND NOT att.attisdropped`,
+		[kvTable],
+	);
+	return result.rows[0]?.needs_lz4 === true;
+}
+
 async function missingPostgresKvStorageOptions(db: PostgresQueryable, kvTable: string): Promise<Array<string>> {
 	const result = await db.query<{options: Array<string> | null}>(
 		'SELECT reloptions AS options FROM pg_class WHERE oid = to_regclass($1)',
@@ -940,10 +950,12 @@ CREATE TABLE IF NOT EXISTS ${table} (
 )`);
 		const addSortId = !(await postgresKvHasSortId(db, kvTable));
 		const missingOptions = await missingPostgresKvStorageOptions(db, kvTable);
-		if (addSortId || missingOptions.length > 0) {
+		const setLz4 = await postgresKvNeedsLz4(db, kvTable);
+		if (addSortId || missingOptions.length > 0 || setLz4) {
 			await db.query("SELECT set_config('lock_timeout', $1, true)", [POSTGRES_KV_ALTER_LOCK_TIMEOUT]);
 			if (addSortId) await db.query(`ALTER TABLE ${table} ADD COLUMN sort_id bigint`);
 			if (missingOptions.length > 0) await db.query(`ALTER TABLE ${table} SET (${missingOptions.join(', ')})`);
+			if (setLz4) await db.query(`ALTER TABLE ${table} ALTER COLUMN row_data SET COMPRESSION lz4`);
 			await db.query("SELECT set_config('lock_timeout', '0', true)");
 		}
 		if (!(await postgresKvRowKeyIsCCollated(db, kvTable))) {
