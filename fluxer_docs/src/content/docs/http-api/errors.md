@@ -56,7 +56,7 @@ When a field fails a check, the request returns 400 `INVALID_FORM_BODY` with an 
 
 `path` joins field names and array indexes with dots, as in `embeds.0.title`. A `path` of `root` means the error is about the whole request.
 
-On [Modify current user settings](/http-api/users/settings/#modify-current-user-settings), the trusted domain, age restriction and synced preferences checks return 400 `VALIDATION_ERROR` with the same `errors` shape. Other field failures there return `INVALID_FORM_BODY`.
+On [Modify current user settings](/http-api/users/settings/#modify-current-user-settings), the trusted domain, age restriction and synced preferences checks return 400 `VALIDATION_ERROR` with the same `errors` structure. Other field failures there return `INVALID_FORM_BODY`.
 
 ## Extra fields
 
@@ -326,6 +326,7 @@ These are the values of the top-level `code`, and the [OpenAPI document](/http-a
 | `STRIPE_WEBHOOK_SIGNATURE_MISSING` | Stripe webhook signature is missing |
 | `SUDO_MODE_REQUIRED` | Sudo mode is required |
 | `SUDO_SECOND_FACTOR_REQUIRED` | Confirm it's you with your authenticator app, passkey or a backup code |
+| `SYNCED_PREFERENCES_CONFLICT` | Your preferences changed on another device |
 | `TAG_ALREADY_TAKEN` | This tag is already taken |
 | `TEMPORARY_INVITE_REQUIRES_PRESENCE` | Temporary invite requires presence |
 | `TEST_HARNESS_DISABLED` | Test harness is disabled |
@@ -334,7 +335,7 @@ These are the values of the top-level `code`, and the [OpenAPI document](/http-a
 | `THREAD_ARCHIVED` | This thread is archived |
 | `THREAD_LOCKED` | This thread is locked |
 | `TWO_FACTOR_REQUIRED` | Two-factor authentication is required |
-| `TWO_FA_NOT_ENABLED` | Two-factor authentication isn't enabled |
+| `TWO_FA_ALREADY_ENABLED` | Two-factor authentication is already enabled |
 | `UNAUTHORIZED` | Unauthorized |
 | `UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS` | Claim your account to accept friend requests |
 | `UNCLAIMED_ACCOUNT_CANNOT_ADD_REACTIONS` | Claim your account to add reactions |

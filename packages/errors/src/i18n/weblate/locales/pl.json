@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Brak zarejestrowanych kluczy dostępu.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Uwierzytelnianie kluczem dostępu nie powiodło się.",
 	"mfa_and_passkeys.totp_not_enabled": "Uwierzytelnianie dwuskładnikowe za pomocą aplikacji uwierzytelniającej nie jest włączone dla tego konta.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Wymagane uwierzytelnianie dwuskładnikowe.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Nieznane poświadczenie WebAuthn.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Osiągnięto limit {count, plural, one {# poświadczenia WebAuthn} few {# poświadczeń WebAuthn} many {# poświadczeń WebAuthn} other {# poświadczenia WebAuthn}}.",

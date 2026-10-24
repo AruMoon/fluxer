@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "등록된 패스키가 없어요.",
 	"mfa_and_passkeys.passkey_authentication_failed": "패스키 인증에 실패했어요.",
 	"mfa_and_passkeys.totp_not_enabled": "이 계정에는 인증 앱을 통한 2단계 인증이 활성화되어 있지 않아요.",
-	"mfa_and_passkeys.two_factor_not_enabled": "2단계 인증이 활성화되지 않았어요.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "2단계 인증이 필요해요.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "알 수 없는 WebAuthn 인증 정보예요.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "WebAuthn 인증 정보는 최대 {count, plural, other {#개}}까지 등록할 수 있어요.",

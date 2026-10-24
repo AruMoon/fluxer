@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Tidak ada passkey yang terdaftar.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Autentikasi passkey gagal.",
 	"mfa_and_passkeys.totp_not_enabled": "Autentikasi dua faktor dengan aplikasi autentikator belum diaktifkan untuk akun ini.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Autentikasi dua faktor belum diaktifkan.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Autentikasi dua faktor diperlukan.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Kredensial WebAuthn tidak dikenal.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Kamu telah mencapai batas maksimal {count} {count, plural, other {kredensial WebAuthn}}.",

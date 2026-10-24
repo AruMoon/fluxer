@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Δεν έχουν καταχωριστεί κλειδιά πρόσβασης.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Η επαλήθευση κλειδιού πρόσβασης απέτυχε.",
 	"mfa_and_passkeys.totp_not_enabled": "Ο έλεγχος ταυτότητας δύο παραγόντων μέσω εφαρμογής ελέγχου ταυτότητας δεν είναι ενεργοποιημένος για αυτόν τον λογαριασμό.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Ο έλεγχος ταυτότητας δύο παραγόντων δεν είναι ενεργοποιημένος.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Απαιτείται έλεγχος ταυτότητας δύο παραγόντων.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Άγνωστο διαπιστευτήριο WebAuthn.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Έχεις φτάσει το μέγιστο των {count} {count, plural, one {διαπιστευτηρίου WebAuthn} other {διαπιστευτηρίων WebAuthn}}.",

@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Aucune clé d'accès n'est enregistrée.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Échec de l'authentification par clé d'accès.",
 	"mfa_and_passkeys.totp_not_enabled": "L'authentification à deux facteurs par application d'authentification n'est pas activée pour ce compte.",
-	"mfa_and_passkeys.two_factor_not_enabled": "L'authentification à deux facteurs n'est pas activée.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "L'authentification à deux facteurs est requise.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Identifiant WebAuthn inconnu.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Vous avez atteint le maximum de {count, plural, =1 {# identifiant WebAuthn} other {# identifiants WebAuthn}}.",

@@ -529,7 +529,7 @@ export const ERROR_I18N_MESSAGES = {
 	'mfa_and_passkeys.passkey_authentication_failed': 'Passkey authentication failed.',
 	'mfa_and_passkeys.totp_not_enabled':
 		"Two-factor authentication using an authenticator app isn't enabled for this account.",
-	'mfa_and_passkeys.two_factor_not_enabled': "Two-factor authentication isn't enabled.",
+	'mfa_and_passkeys.two_factor_already_enabled': 'Two-factor authentication is already enabled.',
 	'mfa_and_passkeys.two_factor_required': 'Two-factor authentication is required.',
 	'mfa_and_passkeys.unknown_webauthn_credential': 'Unknown WebAuthn credential.',
 	'mfa_and_passkeys.webauthn_credential_limit_reached':

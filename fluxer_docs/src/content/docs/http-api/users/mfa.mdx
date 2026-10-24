@@ -379,7 +379,7 @@ The body extends the [sudo verification object](#sudo-verification-object) with 
 | Status | Body | Condition |
 | --- | --- | --- |
 | 200 | [MFA backup codes](#mfa-backup-codes-object) object | TOTP was enabled |
-| 400 | [error response](/http-api/#error-response) | `INVALID_CODE` on the path `code`, or `TWO_FA_NOT_ENABLED` when TOTP is already enabled |
+| 400 | [error response](/http-api/#error-response) | `INVALID_CODE` on the path `code`, or `TWO_FA_ALREADY_ENABLED` when TOTP is already enabled |
 | 403 | [error response](/http-api/#error-response) | `MFA_EMAIL_VERIFICATION_REQUIRED` or `ACCOUNT_VERIFICATION_REQUIRED` when the account isn't verified |
 
 The rate limit is 10 requests per minute, on the `user:mfa:totp:enable` bucket.

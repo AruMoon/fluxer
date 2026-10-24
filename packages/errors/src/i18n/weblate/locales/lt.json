@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Nėra registruotų prieigos raktų.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Prieigos rakto autentifikavimas nepavyko.",
 	"mfa_and_passkeys.totp_not_enabled": "Šioje paskyroje neįjungtas dviejų veiksnių autentifikavimas per autentifikavimo programėlę.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Dviejų veiksnių autentifikavimas neįjungtas.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Reikalingas dviejų veiksnių autentifikavimas.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Nežinomas WebAuthn kredencialas.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Pasiekei {count, plural, one {# WebAuthn kredencialo} few {# WebAuthn kredencialų} many {# WebAuthn kredencialo} other {# WebAuthn kredencialų}} ribą.",

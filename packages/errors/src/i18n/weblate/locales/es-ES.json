@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "No hay claves de acceso registradas.",
 	"mfa_and_passkeys.passkey_authentication_failed": "La autenticación de clave de acceso ha fallado.",
 	"mfa_and_passkeys.totp_not_enabled": "La autenticación de dos factores con la app de autenticación no está habilitada para esta cuenta.",
-	"mfa_and_passkeys.two_factor_not_enabled": "La autenticación de dos factores no está habilitada.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Se requiere autenticación de dos factores.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Credencial de WebAuthn desconocida.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Has alcanzado el máximo de {count} {count, plural, one {credencial} other {credenciales}} WebAuthn.",

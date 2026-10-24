@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Kayıtlı geçiş anahtarı bulunmuyor.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Geçiş anahtarı kimlik doğrulaması başarısız oldu.",
 	"mfa_and_passkeys.totp_not_enabled": "Bu hesap için kimlik doğrulayıcı uygulamasıyla iki faktörlü doğrulama etkin değil.",
-	"mfa_and_passkeys.two_factor_not_enabled": "İki faktörlü kimlik doğrulama etkin değil.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "İki faktörlü kimlik doğrulama gerekli.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Bilinmeyen WebAuthn kimlik bilgisi.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "{count, plural, one {# WebAuthn kimlik bilgisi} other {# WebAuthn kimlik bilgisi}} sınırına ulaştın.",

@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "パスキーが登録されていません。",
 	"mfa_and_passkeys.passkey_authentication_failed": "パスキー認証に失敗しました。",
 	"mfa_and_passkeys.totp_not_enabled": "このアカウントでは認証アプリの2段階認証が有効になっていません。",
-	"mfa_and_passkeys.two_factor_not_enabled": "2段階認証が有効になっていません。",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "2段階認証が必要です。",
 	"mfa_and_passkeys.unknown_webauthn_credential": "不明なWebAuthn認証情報です。",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "WebAuthn認証情報の上限{count, plural, other {#件}}に達しました。",

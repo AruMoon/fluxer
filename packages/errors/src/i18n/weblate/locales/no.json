@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Ingen passnøkler er registrert.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Passnøkkelautentisering mislyktes.",
 	"mfa_and_passkeys.totp_not_enabled": "Tofaktorautentisering med en autentiseringsapp er ikke aktivert for denne kontoen.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Tofaktorautentisering er ikke aktivert.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Tofaktorautentisering er påkrevd.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Ukjent WebAuthn-legitimasjon.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Du har nådd grensen på {count, plural, one {# WebAuthn-legitimasjon} other {# WebAuthn-legitimasjoner}}.",

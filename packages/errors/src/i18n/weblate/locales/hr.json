@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Nema registriranih pristupnih ključeva.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Autentifikacija pristupnim ključem nije uspjela.",
 	"mfa_and_passkeys.totp_not_enabled": "Dvofaktorska autentifikacija putem aplikacije za autentifikaciju nije omogućena za ovaj račun.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Dvofaktorska autentifikacija nije omogućena.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Dvofaktorska autentifikacija je obavezna.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Nepoznata WebAuthn vjerodajnica.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Dosegnut je maksimum od {count, plural, one {# WebAuthn vjerodajnice} few {# WebAuthn vjerodajnice} other {# WebAuthn vjerodajnica}}.",

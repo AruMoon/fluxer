@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "אין מפתחות גישה רשומים.",
 	"mfa_and_passkeys.passkey_authentication_failed": "אימות מפתח הגישה נכשל.",
 	"mfa_and_passkeys.totp_not_enabled": "אימות דו-שלבי באמצעות אפליקציית אימות לא מופעל בחשבון זה.",
-	"mfa_and_passkeys.two_factor_not_enabled": "אימות דו-שלבי לא מופעל.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "נדרש אימות דו-שלבי.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "אישור WebAuthn לא ידוע.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "הגעת למספר המרבי של {count} {count, plural, one {אישור WebAuthn} other {אישורי WebAuthn}}.",

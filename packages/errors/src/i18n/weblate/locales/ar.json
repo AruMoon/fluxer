@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "لم يتم تسجيل أي مفاتيح مرور.",
 	"mfa_and_passkeys.passkey_authentication_failed": "فشلت مصادقة مفتاح المرور.",
 	"mfa_and_passkeys.totp_not_enabled": "المصادقة الثنائية عبر تطبيق المصادقة غير مفعّلة لهذا الحساب.",
-	"mfa_and_passkeys.two_factor_not_enabled": "المصادقة الثنائية غير مفعّلة.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "المصادقة الثنائية مطلوبة.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "بيانات اعتماد WebAuthn غير معروفة.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "لقد وصلت إلى الحد الأقصى وهو {count, plural, zero {# من بيانات اعتماد WebAuthn} one {بيانات اعتماد WebAuthn واحدة} two {# من بيانات اعتماد WebAuthn} few {# من بيانات اعتماد WebAuthn} many {# من بيانات اعتماد WebAuthn} other {# من بيانات اعتماد WebAuthn}}.",

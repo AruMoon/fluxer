@@ -17251,7 +17251,7 @@
 						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
 					}
 				},
-				"description": "Retrieves the current authenticated user's profile information, including account details and settings. OAuth2 bearer tokens require identify scope, and email is returned only when the email scope is also present. Bearer tokens receive a reduced response: sensitive fields such as MFA status, authenticator types, ACLs, traits, premium billing details, and password metadata are omitted. Session and bot tokens return the full user object with all private fields.",
+				"description": "Retrieves the current authenticated user's profile information, including account details and settings. OAuth2 bearer tokens require identify scope, and email is returned only when the email scope is also present. Bearer tokens receive a reduced response with only identity and profile fields. Session and bot tokens return the full user object with all private fields.",
 				"security": [{"botToken": []}, {"oauth2Token": ["identify"]}, {"sessionToken": []}]
 			},
 			"patch": {
@@ -44693,7 +44693,7 @@
 					"THREAD_ALREADY_CREATED_FOR_MESSAGE",
 					"THREAD_ARCHIVED",
 					"THREAD_LOCKED",
-					"TWO_FA_NOT_ENABLED",
+					"TWO_FA_ALREADY_ENABLED",
 					"TWO_FACTOR_REQUIRED",
 					"UNAUTHORIZED",
 					"UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS",
@@ -45053,7 +45053,7 @@
 					"A thread has already been created for this message.",
 					"This thread is archived.",
 					"This thread is locked.",
-					"Two-factor authentication isn't enabled.",
+					"Two-factor authentication is already enabled.",
 					"Two-factor authentication is required.",
 					"Unauthorized.",
 					"Claim your account to accept friend requests.",

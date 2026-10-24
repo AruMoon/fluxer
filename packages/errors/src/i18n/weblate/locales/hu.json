@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Nincs regisztrált jelszókulcs.",
 	"mfa_and_passkeys.passkey_authentication_failed": "A jelszókulcsos hitelesítés nem sikerült.",
 	"mfa_and_passkeys.totp_not_enabled": "Ehhez a fiókhoz nincs engedélyezve a hitelesítő alkalmazást használó kétlépcsős azonosítás.",
-	"mfa_and_passkeys.two_factor_not_enabled": "A kétlépcsős azonosítás nincs engedélyezve.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Kétlépcsős azonosítás szükséges.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Ismeretlen WebAuthn-hitelesítőadat.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Elérted a WebAuthn-hitelesítőadatok megengedett számát ({count, plural, one {#} other {#}}).",

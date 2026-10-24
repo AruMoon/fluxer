@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Er zijn geen passkeys geregistreerd.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Passkey-authenticatie mislukt.",
 	"mfa_and_passkeys.totp_not_enabled": "Tweefactorauthenticatie via een authenticator-app is niet ingeschakeld voor dit account.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Tweefactorauthenticatie is niet ingeschakeld.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Tweefactorauthenticatie is vereist.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Onbekende WebAuthn-credential.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Je hebt het maximum van {count, plural, one {# WebAuthn-credential} other {# WebAuthn-credentials}} bereikt.",

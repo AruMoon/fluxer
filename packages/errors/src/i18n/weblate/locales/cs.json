@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Nejsou zaregistrovány žádné přístupové klíče.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Ověření přístupovým klíčem se nezdařilo.",
 	"mfa_and_passkeys.totp_not_enabled": "Dvoufaktorové ověřování pomocí ověřovací aplikace není pro tento účet zapnuté.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Dvoufaktorové ověřování není zapnuté.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Je vyžadováno dvoufaktorové ověřování.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Neznámé přihlašovací údaje WebAuthn.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Dosáhli jste limitu {count, plural, one {# přihlašovacího údaje WebAuthn} few {# přihlašovacích údajů WebAuthn} many {# přihlašovacího údaje WebAuthn} other {# přihlašovacích údajů WebAuthn}}.",

@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "ไม่มีพาสคีย์ที่ลงทะเบียนไว้",
 	"mfa_and_passkeys.passkey_authentication_failed": "การยืนยันตัวตนด้วยพาสคีย์ล้มเหลว",
 	"mfa_and_passkeys.totp_not_enabled": "บัญชีนี้ยังไม่ได้เปิดใช้งานการยืนยันตัวตนแบบสองขั้นตอนผ่านแอปยืนยันตัวตน",
-	"mfa_and_passkeys.two_factor_not_enabled": "ไม่ได้เปิดใช้งานการยืนยันตัวตนแบบสองขั้นตอน",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "จำเป็นต้องมีการยืนยันตัวตนแบบสองขั้นตอน",
 	"mfa_and_passkeys.unknown_webauthn_credential": "ไม่พบข้อมูลรับรอง WebAuthn",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "คุณมีข้อมูลรับรอง WebAuthn ครบ {count} {count, plural, other {รายการ}} แล้ว",

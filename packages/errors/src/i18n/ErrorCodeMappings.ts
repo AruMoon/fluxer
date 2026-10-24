@@ -337,7 +337,7 @@ export const ErrorCodeToI18nKey = {
 	[APIErrorCodes.TEMPORARY_INVITE_REQUIRES_PRESENCE]: 'channels_and_guilds.temporary_invite_requires_presence',
 	[APIErrorCodes.TEST_HARNESS_DISABLED]: 'admin_and_system.test_harness_disabled',
 	[APIErrorCodes.TEST_HARNESS_FORBIDDEN]: 'admin_and_system.test_harness_forbidden',
-	[APIErrorCodes.TWO_FA_NOT_ENABLED]: 'mfa_and_passkeys.two_factor_not_enabled',
+	[APIErrorCodes.TWO_FA_ALREADY_ENABLED]: 'mfa_and_passkeys.two_factor_already_enabled',
 	[APIErrorCodes.TWO_FACTOR_REQUIRED]: 'mfa_and_passkeys.two_factor_required',
 	[APIErrorCodes.UNAUTHORIZED]: 'account.unauthorized',
 	[APIErrorCodes.UNCLAIMED_ACCOUNT_CANNOT_ACCEPT_FRIEND_REQUESTS]: 'account.unclaimed_cannot_accept_friend_requests',

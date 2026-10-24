@@ -409,7 +409,7 @@
 	"mfa_and_passkeys.no_passkeys_registered": "Nicio cheie de acces nu este înregistrată.",
 	"mfa_and_passkeys.passkey_authentication_failed": "Autentificarea cu cheia de acces nu a reușit.",
 	"mfa_and_passkeys.totp_not_enabled": "Autentificarea în doi pași prin aplicație nu este activată pentru acest cont.",
-	"mfa_and_passkeys.two_factor_not_enabled": "Autentificarea în doi pași nu este activată.",
+	"mfa_and_passkeys.two_factor_already_enabled": "Two-factor authentication is already enabled.",
 	"mfa_and_passkeys.two_factor_required": "Autentificarea în doi pași este obligatorie.",
 	"mfa_and_passkeys.unknown_webauthn_credential": "Acreditare WebAuthn necunoscută.",
 	"mfa_and_passkeys.webauthn_credential_limit_reached": "Ai atins numărul maxim de {count, plural, one {# acreditare WebAuthn} few {# acreditări WebAuthn} other {# de acreditări WebAuthn}}.",
