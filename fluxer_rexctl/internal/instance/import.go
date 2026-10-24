@@ -182,7 +182,7 @@ func importInstaller(ctx context.Context, dir string, e *engine.Engine, dry bool
 		overlays = append(overlays, stack.Overlay(o))
 	}
 	vals, err := importValues(valueInput{
-		env: env, set: set, custom: custom, overlays: overlays, legacy: true,
+		env: env, set: set, custom: custom, overlays: overlays,
 		examples: examples, proxies: live.proxies,
 	})
 	if err != nil {

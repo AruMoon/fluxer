@@ -20,19 +20,18 @@ const SetupTokenVar = "FLUXER_SETUP_TOKEN"
 var legacyImageVars = []string{"FLUXER_IMAGE_TAG", "FLUXER_REGISTRY", "FLUXER_REGISTRY_OWNER"}
 
 type valueInput struct {
-	env        map[string]string
-	set        *stack.Set
-	custom     []byte
-	overlays   []stack.Overlay
-	legacy     bool
-	examples   map[string]string
-	proxies    engine.Proxies
+	env      map[string]string
+	set      *stack.Set
+	custom   []byte
+	overlays []stack.Overlay
+	examples map[string]string
+	proxies  engine.Proxies
 }
 
 type valueResult struct {
-	settings   map[string]string
-	secrets    map[string]string
-	admin      map[string]string
+	settings map[string]string
+	secrets  map[string]string
+	admin    map[string]string
 
 	dropped       []string
 	defaults      []string
@@ -46,16 +45,9 @@ func importValues(in valueInput) (*valueResult, error) {
 		env = map[string]string{}
 	}
 	r := &valueResult{
-		settings:   map[string]string{},
-		secrets:    map[string]string{},
-		admin:      map[string]string{},
-	}
-	}
-	if !in.legacy {
-			if err := m.Apply(env); err != nil {
-				return nil, err
-			}
-		}
+		settings: map[string]string{},
+		secrets:  map[string]string{},
+		admin:    map[string]string{},
 	}
 	for k := range env {
 		if strings.HasPrefix(k, "COMPOSE_") {
@@ -75,7 +67,7 @@ func importValues(in valueInput) (*valueResult, error) {
 			delete(env, k)
 			continue
 		}
-		if in.legacy && (isImageVar(k) || isMemoryVar(in.set, k)) {
+		if isImageVar(k) || isMemoryVar(in.set, k) {
 			continue
 		}
 		if equalsDefault(defaults[k], v, original) {
@@ -122,7 +114,7 @@ func importValues(in valueInput) (*valueResult, error) {
 		v := env[k]
 		key, isNamed := named[k]
 		switch {
-		case in.legacy && isImageVar(k):
+		case isImageVar(k):
 			r.settings[k] = v
 		case tunnel && k == tunnelBindVar && slices.Contains(in.set.Vars, edgeBindVar):
 			r.settings[settings.EdgeBind] = v
@@ -146,7 +138,7 @@ func importValues(in valueInput) (*valueResult, error) {
 			r.settings[settings.IPv6] = "true"
 		}
 	}
-	if err := dropRedundant(in.set, r, in.legacy); err != nil {
+	if err := dropRedundant(in.set, r); err != nil {
 		return nil, err
 	}
 	if err := preserve(in.set, r, original, read, defaults); err != nil {
@@ -351,44 +343,7 @@ func importProxies(env map[string]string, engineProxies engine.Proxies, out map[
 	return used
 }
 
-func memoryProfile(set *stack.Set, chosen map[string]string) {
-	keys := stack.ProfileKeys(set)
-	mem := map[string]string{}
-	for _, k := range keys {
-		if v, ok := chosen[k]; ok {
-			mem[k] = v
-		}
-	}
-	if len(mem) == 0 {
-		return
-	}
-	name := string(stack.ProfileOf(set, mem))
-	want := set.Profiles[name]
-	if name == "" || len(want) == 0 {
-		chosen[settings.MemoryProfile] = largestProfile(set)
-		return
-	}
-	chosen[settings.MemoryProfile] = name
-	for k, v := range want {
-		if chosen[k] == v {
-			delete(chosen, k)
-		}
-	}
-}
-
-func largestProfile(set *stack.Set) string {
-	if _, ok := set.Profiles["large"]; ok {
-		return "large"
-	}
-	for _, name := range slices.Sorted(maps.Keys(set.Profiles)) {
-		if len(set.Profiles[name]) == 0 {
-			return name
-		}
-	}
-	return ""
-}
-
-func dropRedundant(set *stack.Set, r *valueResult, legacy bool) error {
+func dropRedundant(set *stack.Set, r *valueResult) error {
 	full, err := settings.Effective(set, r.settings, r.secrets, r.admin)
 	if err != nil {
 		return err
@@ -397,7 +352,7 @@ func dropRedundant(set *stack.Set, r *valueResult, legacy bool) error {
 		envVar := k
 		if k == settings.EdgePublicPort {
 			envVar = "FLUXER_PUBLIC_PORT"
-		} else if !isRawVar(k) || (legacy && (isImageVar(k) || isMemoryVar(set, k))) {
+		} else if !isRawVar(k) || isImageVar(k) || isMemoryVar(set, k) {
 			continue
 		}
 		v := r.settings[k]
