@@ -23,6 +23,21 @@ interface MeilisearchIndexAdapterOptions<TFilters> {
 	buildQuery?: (query: string, filters: TFilters) => string;
 }
 
+interface MeilisearchIndexSettings {
+	searchableAttributes?: Array<unknown>;
+	filterableAttributes?: Array<unknown>;
+	sortableAttributes?: Array<unknown>;
+	pagination?: {maxTotalHits?: number};
+}
+
+function sameAttributes(current: Array<unknown> | undefined, wanted: Array<string>): boolean {
+	return current !== undefined && current.length === wanted.length && current.every((value, i) => value === wanted[i]);
+}
+
+function sameAttributeSet(current: Array<unknown> | undefined, wanted: Array<string>): boolean {
+	return sameAttributes(current?.slice().sort(), wanted.slice().sort());
+}
+
 interface MeilisearchSearchResponse<TResult> {
 	hits: Array<TResult>;
 	estimatedTotalHits?: number;
@@ -70,12 +85,25 @@ export class MeilisearchIndexAdapter<
 				}
 			}
 		}
-		await Promise.all([
-			this.applySetting('PUT', 'searchable-attributes', this.indexDefinition.searchableAttributes),
-			this.applySetting('PUT', 'filterable-attributes', this.indexDefinition.filterableAttributes),
-			this.applySetting('PUT', 'sortable-attributes', this.indexDefinition.sortableAttributes),
-			this.applySetting('PATCH', 'pagination', {maxTotalHits: MAX_TOTAL_HITS}),
-		]);
+		const current = await this.client.request<MeilisearchIndexSettings>(
+			'GET',
+			`/indexes/${encodeURIComponent(uid)}/settings`,
+		);
+		const {searchableAttributes, filterableAttributes, sortableAttributes} = this.indexDefinition;
+		const updates: Array<Promise<void>> = [];
+		if (!sameAttributes(current.searchableAttributes, searchableAttributes)) {
+			updates.push(this.applySetting('PUT', 'searchable-attributes', searchableAttributes));
+		}
+		if (!sameAttributeSet(current.filterableAttributes, filterableAttributes)) {
+			updates.push(this.applySetting('PUT', 'filterable-attributes', filterableAttributes));
+		}
+		if (!sameAttributeSet(current.sortableAttributes, sortableAttributes)) {
+			updates.push(this.applySetting('PUT', 'sortable-attributes', sortableAttributes));
+		}
+		if (current.pagination?.maxTotalHits !== MAX_TOTAL_HITS) {
+			updates.push(this.applySetting('PATCH', 'pagination', {maxTotalHits: MAX_TOTAL_HITS}));
+		}
+		await Promise.all(updates);
 		this.initialized = true;
 	}
 
