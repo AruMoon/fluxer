@@ -74,6 +74,7 @@ env_services_config() ->
 -spec env_gateway_config() -> map().
 env_gateway_config() ->
     maps:merge(env_gateway_base_config(), #{
+        <<"zstd_window_log">> => env_int("FLUXER_GATEWAY_ZSTD_WINDOW_LOG", 17),
         <<"guild_visitor_sessions_max">> => env_int(
             "FLUXER_GATEWAY_GUILD_VISITOR_SESSIONS_MAX",
             visitor_limit_default(guild_visitor_sessions_max)
@@ -348,6 +349,7 @@ build_misc_config(Service) ->
     #{
         voice_state_counts_sync_interval_ms =>
             get_int(Service, <<"voice_state_counts_sync_interval_ms">>, 30000),
+        zstd_window_log => get_int(Service, <<"zstd_window_log">>, 17),
         logger_level => get_log_level(Service, <<"logger_level">>, info)
     }.
 
