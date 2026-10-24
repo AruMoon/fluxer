@@ -109,7 +109,7 @@ describe('pending registration approval and the stock community', () => {
 		await createBuilder(harness, admin.token)
 			.patch(`/admin/instance/pending-registrations/${outsider.userId}`)
 			.body({status: 'approved'})
-			.expect(HTTP_STATUS.OK)
+			.expect(HTTP_STATUS.NOT_FOUND)
 			.execute();
 
 		await createBuilder(harness, owner.token)
@@ -399,7 +399,7 @@ describe('pending registration approval and the stock community', () => {
 		expect(await listTestEmails(harness, {recipient: rejectedBody.email as string})).toEqual([]);
 	});
 
-	it('sends no approval email for an account that was not waiting', async () => {
+	it('leaves an account that was not waiting untouched', async () => {
 		const admin = await setUserACLs(harness, await createTestAccount(harness), [
 			AdminACLs.AUTHENTICATE,
 			AdminACLs.REGISTRATION_REVIEW,
@@ -407,13 +407,16 @@ describe('pending registration approval and the stock community', () => {
 		const outsider = await createTestAccount(harness);
 		await clearTestEmails(harness);
 
-		await createBuilder(harness, admin.token)
-			.patch(`/admin/instance/pending-registrations/${outsider.userId}`)
-			.body({status: 'approved'})
-			.expect(HTTP_STATUS.OK)
-			.execute();
+		for (const status of ['approved', 'rejected'] as const) {
+			await createBuilder(harness, admin.token)
+				.patch(`/admin/instance/pending-registrations/${outsider.userId}`)
+				.body({status})
+				.expect(HTTP_STATUS.NOT_FOUND)
+				.execute();
+		}
 
 		expect(await listTestEmails(harness, {recipient: outsider.email})).toEqual([]);
+		await createBuilder(harness, outsider.token).get('/users/@me').expect(HTTP_STATUS.OK).execute();
 	});
 
 	it('drops the pending registration when the account is deleted', async () => {

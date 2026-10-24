@@ -56,6 +56,7 @@ import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {InstancePolicyTransitionNotAllowedError} from '@fluxer/errors/src/domains/core/InstancePolicyTransitionNotAllowedError';
 import {NotFoundError} from '@fluxer/errors/src/domains/core/NotFoundError';
+import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import {
 	BrandingAssetUploadRequest,
 	CreateRegistrationUrlRequest,
@@ -1154,7 +1155,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 			const pendingRegistration = (await instanceConfigRepository.getPendingRegistrations()).find(
 				(entry) => entry.user_id === userId,
 			);
-			await updatePendingRegistrationUser(ctx, userId, decision, pendingRegistration?.invite_code ?? null);
+			await updatePendingRegistrationUser(ctx, userId, decision, pendingRegistration);
 			await instanceConfigRepository.removePendingRegistration(userId);
 			return ctx.json({pending_registrations: await instanceConfigRepository.getPendingRegistrations()});
 		},
@@ -1288,7 +1289,7 @@ async function updatePendingRegistrationUser(
 	ctx: Context<HonoEnv>,
 	userId: string,
 	decision: 'approve' | 'reject',
-	inviteCode: string | null,
+	pendingRegistration: {invite_code?: string | null} | undefined,
 ): Promise<void> {
 	const userRepository = ctx.get('userRepository');
 	const user = await userRepository.findUnique(createUserID(BigInt(userId)));
@@ -1302,6 +1303,9 @@ async function updatePendingRegistrationUser(
 		return;
 	}
 	const traits = new Set(user.traits);
+	if (!traits.has(REGISTRATION_PENDING_APPROVAL_TRAIT) && !traits.has(REGISTRATION_REJECTED_TRAIT)) {
+		throw new UnknownUserError();
+	}
 	const wasPendingApproval = traits.delete(REGISTRATION_PENDING_APPROVAL_TRAIT);
 	if (decision === 'reject') {
 		traits.add(REGISTRATION_REJECTED_TRAIT);
@@ -1312,7 +1316,7 @@ async function updatePendingRegistrationUser(
 	if (decision === 'approve' && wasPendingApproval) {
 		await maybeAutoJoinInvite(ctx.get('inviteService'), {
 			userId: user.id,
-			inviteCode,
+			inviteCode: pendingRegistration?.invite_code ?? null,
 			requestCache: ctx.get('requestCache'),
 		});
 		await ctx.get('singleCommunityService').joinStockCommunity(user.id, ctx.get('requestCache'));
