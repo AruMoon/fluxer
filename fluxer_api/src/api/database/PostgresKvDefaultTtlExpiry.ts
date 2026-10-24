@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import {createHash} from 'node:crypto';
 import {
 	POSTGRES_KV_MIGRATION_TABLE,
 	postgresKvPassRecorded,
@@ -21,6 +22,16 @@ export const DEFAULT_TTL_TABLES: ReadonlyArray<{name: string; defaultTtlSeconds:
 				: [{name: table.name, defaultTtlSeconds: table.defaultTtlSeconds}],
 	),
 ];
+
+const DEFAULT_TTL_EXPIRY_MARKER = `default_ttl_expiry_v1:${createHash('sha256')
+	.update(
+		DEFAULT_TTL_TABLES.map((table) => `${table.name}:${table.defaultTtlSeconds}`)
+			.sort()
+			.join('\n'),
+	)
+	.digest('hex')
+	.slice(0, 16)}`;
+const DEFAULT_TTL_EXPIRY_RESUME = `${DEFAULT_TTL_EXPIRY_MARKER}_resume`;
 
 export interface LegacyDefaultTtlExpiryResult {
 	deleted: number;
