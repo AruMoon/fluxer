@@ -2,7 +2,7 @@
 
 import {
 	POSTGRES_KV_MIGRATION_TABLE,
-	postgresKvPassIsFresh,
+	postgresKvPassRecorded,
 	recordPostgresKvCleanPass,
 } from '@app/api/database/PostgresKvQueryExecutor';
 import * as DonationTables from '@app/api/donation/DonationTables';
@@ -95,7 +95,7 @@ export async function expireLegacyDefaultTtlRows(
 	client: IPostgresClient,
 	deadlineMs: number,
 ): Promise<LegacyDefaultTtlExpiryResult | null> {
-	if (await postgresKvPassIsFresh(client, DEFAULT_TTL_EXPIRY_MARKER, CLEAN_PASS_INTERVAL_MS)) {
+	if (await postgresKvPassRecorded(client, DEFAULT_TTL_EXPIRY_MARKER)) {
 		return null;
 	}
 	const kvTable = quoteIdentifier(client.kvTable());

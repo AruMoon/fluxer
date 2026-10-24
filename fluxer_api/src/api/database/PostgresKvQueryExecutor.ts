@@ -121,9 +121,10 @@ const NON_NUMERIC_ROW_KEY_RANGES = [
 	`kv.row_key COLLATE "C" >= '${BIGINT_ROW_KEY_PREFIX}:'`,
 ];
 
+export async function postgresKvPassRecorded(client: IPostgresClient, marker: string): Promise<boolean> {
 	const result = await client.query(
-		`SELECT 1 FROM ${quoteIdentifier(client.kvTable())} WHERE table_name = $1 AND row_key = $2 AND (row_data ->> 'applied_at')::timestamptz > now() - make_interval(secs => $3::double precision)`,
-		[POSTGRES_KV_MIGRATION_TABLE, marker, maxAgeMs / 1000],
+		`SELECT 1 FROM ${quoteIdentifier(client.kvTable())} WHERE table_name = $1 AND row_key = $2`,
+		[POSTGRES_KV_MIGRATION_TABLE, marker],
 	);
 	return result.rows.length > 0;
 }
