@@ -355,3 +355,7 @@ func removeIfExists(path string) error {
 	}
 	return nil
 }
+
+func ReleaseDefault(set *stack.Set, name string) string {
+	return composeDefault(set, nil, nil, name)
+}

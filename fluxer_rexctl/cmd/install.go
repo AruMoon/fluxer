@@ -56,10 +56,12 @@ type installFlags struct {
 	VoiceTCPPort  int
 	VoiceUDPPort  int
 	Setup         setupFlags
+	Storage       storageFlags
 }
 
 type installer struct {
 	answers *setup.Answers
+	storage *storageChoice
 	app     *App
 	c       *cobra.Command
 	f       *installFlags
@@ -105,11 +107,15 @@ func newInstallCmd(app *App) *cobra.Command {
 	}
 	confirmFlag(c, &f.Confirm)
 	f.Setup.bind(c)
+	f.Storage.bind(c)
 	return c
 }
 
 func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags) error {
 	if err := validateInstallFlags(f); err != nil {
+		return err
+	}
+	if err := f.Storage.validate(c); err != nil {
 		return err
 	}
 	if names := f.Setup.passedNames(c); f.SetupWhere == "browser" && len(names) > 0 {
@@ -177,6 +183,12 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 	if err := in.openFirewall(ctx); err != nil {
 		return err
 	}
+	if err := in.askStorage(); err != nil {
+		return err
+	}
+	if err := in.checkStorage(ctx); err != nil {
+		return err
+	}
 	if err := in.askSetupWhere(); err != nil {
 		return err
 	}
@@ -213,6 +225,7 @@ func (in *installer) missingFlags() error {
 	if f.Domain == "" {
 		missing = append(missing, "--domain")
 	}
+	missing = append(missing, f.Storage.missing(in.c)...)
 	terminal := f.SetupWhere == "terminal" || (f.SetupWhere == "" && f.Setup.passed(in.c))
 	if terminal && !f.NoStart {
 		s := f.Setup
@@ -857,6 +870,9 @@ func (in *installer) write(ctx context.Context, inst *instance.Instance, deleteO
 	if f.MemoryProfile != "" {
 		st.Settings[settings.MemoryProfile] = f.MemoryProfile
 	}
+	if in.storage != nil {
+		maps.Copy(st.Settings, in.storage.values())
+	}
 	if _, err := secrets.Mint(st.Secrets, false); err != nil {
 		return ui.Wrap(err, "Couldn't create your instance's secrets.", "Run rexctl install again.")
 	}
@@ -910,6 +926,9 @@ func (in *installer) resume(ctx context.Context, inst *instance.Instance) error 
 	if in.f.DryRun {
 		in.app.UI.Info("rexctl would start Fluxer at %s and finish setup.", inst.Origin())
 		return nil
+	}
+	if err := in.resumeStorage(ctx, inst); err != nil {
+		return err
 	}
 	if err := in.askSetupWhere(); err != nil {
 		return err

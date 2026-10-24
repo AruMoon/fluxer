@@ -348,6 +348,34 @@ rexctl install [flags]
 
   The username for the SMTP server.
 
+- `--storage-access-key string`
+
+  The object store access key.
+
+- `--storage-bucket-prefix string`
+
+  Text to put before each bucket name, like chat- for chat-fluxer.
+
+- `--storage-endpoint string`
+
+  Your own S3-compatible object store, like https://s3.example.com, instead of the bundled one.
+
+- `--storage-path-style`
+
+  Put the bucket in the path of object store addresses instead of the host name. The default is `true`.
+
+- `--storage-public-endpoint string`
+
+  The object store address browsers use, when it differs from --storage-endpoint.
+
+- `--storage-region string`
+
+  The object store region (found from --storage-endpoint when it can be).
+
+- `--storage-secret-key-file string`
+
+  File with the object store secret key, or - for stdin.
+
 - `--take-over`
 
   Take over Fluxer data found on this machine.
