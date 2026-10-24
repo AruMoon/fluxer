@@ -45,10 +45,7 @@ safe_config_value(ConfigKey, GetConfigValue) ->
 
 -spec default_shard_count() -> pos_integer().
 default_shard_count() ->
-    shard_utils:max_positive([
-        erlang:system_info(logical_processors_available),
-        erlang:system_info(schedulers_online)
-    ]).
+    erlang:system_info(schedulers_online).
 
 -spec select_shard(term(), pos_integer()) -> non_neg_integer().
 select_shard(Key, Count) when Count > 0 ->
