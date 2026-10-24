@@ -158,7 +158,7 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number, kvCli
 
 export async function startWorkerMain(): Promise<void> {
 	Logger.info('Starting worker backend...');
-	sizeProcessForHost(Logger);
+	const host = sizeProcessForHost(Logger);
 	let cassandraInitialized = false;
 	let postgresInitialized = false;
 	let jsConnectionManager: JetStreamConnectionManager | null = null;
