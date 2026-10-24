@@ -12,6 +12,7 @@ import {
 } from '@app/api/infrastructure/activity/ActivityEvents';
 import {setActivityProcessChannel} from '@app/api/infrastructure/activity/ActivityMeta';
 import {startSharedListWatch, stopSharedListWatch} from '@app/api/infrastructure/activity/SharedLists';
+import {sizeProcessForHost} from '@app/api/infrastructure/HostResources';
 import type {ISnowflakeService} from '@app/api/infrastructure/ISnowflakeService';
 import {shutdownStorageChangeFeed} from '@app/api/infrastructure/StorageServiceFactory';
 import type {InstanceConfigRepository} from '@app/api/instance/InstanceConfigRepository';
@@ -157,6 +158,7 @@ function registerCronJobs(cron: CronScheduler, jobsStreamMaxAgeMs: number, kvCli
 
 export async function startWorkerMain(): Promise<void> {
 	Logger.info('Starting worker backend...');
+	sizeProcessForHost(Logger);
 	let cassandraInitialized = false;
 	let postgresInitialized = false;
 	let jsConnectionManager: JetStreamConnectionManager | null = null;

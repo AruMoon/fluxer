@@ -4,6 +4,7 @@ import {createAPIApp} from '@app/api/App';
 import {OPERATOR_SOCKET_PATH} from '@app/api/admin/operator/OperatorRequests';
 import {listenOperatorSocket} from '@app/api/admin/operator/OperatorSocket';
 import {buildAPIServerOptions, initializeConfig} from '@app/api/Config';
+import {sizeProcessForHost} from '@app/api/infrastructure/HostResources';
 import {initializeLogger} from '@app/api/Logger';
 import {Config} from '@app/Config';
 import {Logger} from '@app/Logger';
@@ -24,6 +25,7 @@ async function closeHttpServer(server: {close: (callback: (error?: Error) => voi
 async function main(): Promise<void> {
 	initializeConfig(Config);
 	initializeLogger(Logger);
+	sizeProcessForHost(Logger);
 	const {app, initialize, shutdown} = await createAPIApp({
 		config: Config,
 		logger: Logger,
