@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {getApiJobQueue} from '@app/api/app/APILifecycle';
+import {getApiJobQueue, whenSearchReady} from '@app/api/app/APILifecycle';
 import {Logger} from '@app/api/Logger';
 import {getSnowflakeService} from '@app/api/middleware/ServiceRegistry';
 import {clearWorkerDependencies, setWorkerDependencies} from '@app/api/worker/WorkerContext';
@@ -9,6 +9,10 @@ import type {WorkerRuntime} from '@app/api/worker/WorkerMain';
 let starting: Promise<WorkerRuntime | null> | null = null;
 let stopping: Promise<void> | null = null;
 let runtime: WorkerRuntime | null = null;
+let cancelStart: () => void = () => {};
+const startCancelled = new Promise<void>((resolve) => {
+	cancelStart = resolve;
+});
 
 async function start(cores: number): Promise<WorkerRuntime | null> {
 	const jobs = getApiJobQueue();
@@ -19,6 +23,8 @@ async function start(cores: number): Promise<WorkerRuntime | null> {
 		import('@app/api/worker/WorkerDependencies'),
 		import('@app/api/worker/WorkerMain'),
 	]);
+	if (stopping) return null;
+	await Promise.race([whenSearchReady(), startCancelled]);
 	if (stopping) return null;
 	const dependencies = await initializeWorkerDependencies(getSnowflakeService());
 	if (stopping) return null;
@@ -35,6 +41,7 @@ export function startEmbeddedWorker(cores: number): Promise<void> {
 }
 
 export function stopEmbeddedWorker(): Promise<void> {
+	cancelStart();
 	stopping ??= (async () => {
 		if (!starting) return;
 		const [result] = await Promise.allSettled([starting]);

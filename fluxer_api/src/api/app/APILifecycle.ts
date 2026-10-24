@@ -58,6 +58,10 @@ let jobQueue: ApiJobQueue | null = null;
 let searchInitRetryTimer: ReturnType<typeof setTimeout> | null = null;
 let searchInitStopped = false;
 let searchInitInFlight: Promise<void> | null = null;
+let markSearchReady: () => void = () => {};
+const searchReady = new Promise<void>((resolve) => {
+	markSearchReady = resolve;
+});
 const SEARCH_INIT_RETRY_MIN_MS = 5_000;
 const SEARCH_INIT_RETRY_MAX_MS = 60_000;
 const unregisterMetricsSections: Array<() => void> = [];
@@ -113,6 +117,10 @@ export function getApiJobQueue(): ApiJobQueue | null {
 	return jobQueue;
 }
 
+export function whenSearchReady(): Promise<void> {
+	return searchReady;
+}
+
 function unsupportedDatabaseBackend(backend: never): never {
 	throw new Error(`Unsupported database backend during shutdown: ${String(backend)}`);
 }
@@ -122,6 +130,7 @@ async function initializeSearchAndWarmup(
 	logger: LoggerInterface,
 ): Promise<void> {
 	await initializeSearch(getCacheService());
+	markSearchReady();
 	if (searchInitStopped) return;
 	logger.info('Search initialized');
 	const warmupLockKey = 'fluxer:search:warmup:admin';
