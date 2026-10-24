@@ -50,9 +50,10 @@
     request := identify_request(),
     socket_pid := pid(),
     froms := [gen_server:from()],
-    worker_ref := reference(),
+    worker_ref := reference() | undefined,
     worker_token := reference(),
     timeout_ref := reference(),
+    queued_at := integer(),
     slot_held => boolean()
 }.
 
@@ -171,12 +172,10 @@ handle_cast(_, State) ->
 -spec handle_info(Info, State) -> {noreply, state()} when
     Info :: {'DOWN', reference(), process, pid(), term()} | term(),
     State :: state().
-handle_info({identify_slot_acquired, SessionId, WorkerToken}, State) when
+handle_info({session_start_admitted, {SessionId, WorkerToken}}, State) when
     is_binary(SessionId), is_reference(WorkerToken)
 ->
-    session_manager_shard_lifecycle:note_identify_slot_acquired(
-        SessionId, WorkerToken, State
-    );
+    session_manager_shard_lifecycle:admit_identify_fetch(SessionId, WorkerToken, State);
 handle_info({identify_fetch_result, SessionId, WorkerToken, FetchResult}, State) when
     is_binary(SessionId), is_reference(WorkerToken)
 ->
@@ -185,10 +184,12 @@ handle_info({identify_fetch_result, SessionId, WorkerToken, FetchResult}, State)
     );
 handle_info({identify_fetch_result, SessionId, FetchResult}, State) when is_binary(SessionId) ->
     session_manager_shard_lifecycle:complete_identify_fetch(SessionId, FetchResult, State);
-handle_info({identify_fetch_timeout, SessionId, WorkerRef}, State) when
-    is_binary(SessionId), is_reference(WorkerRef)
+handle_info({identify_fetch_timeout, SessionId, WorkerToken}, State) when
+    is_binary(SessionId), is_reference(WorkerToken)
 ->
-    session_manager_shard_lifecycle:handle_identify_fetch_timeout(SessionId, WorkerRef, State);
+    session_manager_shard_lifecycle:handle_identify_fetch_timeout(
+        SessionId, WorkerToken, State
+    );
 handle_info({'DOWN', Ref, process, Pid, Reason}, State) when is_reference(Ref), is_pid(Pid) ->
     IdentifyWorkers = maps:get(identify_workers, State),
     case maps:take(Ref, IdentifyWorkers) of

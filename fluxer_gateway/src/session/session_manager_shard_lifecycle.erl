@@ -7,7 +7,7 @@
     handle_start_call/5,
     start_session_process/4,
     start_identify_fetch/5,
-    note_identify_slot_acquired/3,
+    admit_identify_fetch/3,
     complete_identify_fetch/3, complete_identify_fetch/4,
     handle_identify_fetch_timeout/3,
     maybe_fail_pending_identify/4,
@@ -33,9 +33,10 @@
     request := map(),
     socket_pid := pid(),
     froms := [gen_server:from()],
-    worker_ref := reference(),
+    worker_ref := reference() | undefined,
     worker_token := reference(),
     timeout_ref := reference(),
+    queued_at := integer(),
     slot_held => boolean()
 }.
 -type start_reply() ::
@@ -262,15 +263,10 @@ supersede_identify_fetch(Request, SocketPid, From, State, SessionId, PendingIden
     state()
 ) -> {noreply, state()}.
 start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Froms, State) ->
-    ManagerPid = self(),
-    PeerIP = maps:get(peer_ip, Request),
     WorkerToken = make_ref(),
-    {WorkerPid, WorkerRef} = spawn_monitor(fun() ->
-        erlang:process_flag(fullsweep_after, 0),
-        run_identify_fetch(ManagerPid, SessionId, WorkerToken, PeerIP, Request)
-    end),
+    ok = gateway_concurrency:request_session_start({SessionId, WorkerToken}),
     TimeoutRef = erlang:send_after(
-        ?IDENTIFY_FETCH_TIMEOUT_MS, self(), {identify_fetch_timeout, SessionId, WorkerRef}
+        ?IDENTIFY_FETCH_TIMEOUT_MS, self(), {identify_fetch_timeout, SessionId, WorkerToken}
     ),
     PendingIdentifies = maps:get(pending_identifies, State),
     NewPending = PendingIdentifies#{
@@ -278,75 +274,77 @@ start_identify_fetch_with_waiters(Request, SocketPid, SessionId, Froms, State) -
             request => Request,
             socket_pid => SocketPid,
             froms => Froms,
-            worker_ref => WorkerRef,
+            worker_ref => undefined,
             worker_token => WorkerToken,
             timeout_ref => TimeoutRef,
+            queued_at => gateway_timings:start(),
             slot_held => false
         }
     },
-    IdentifyWorkers = maps:get(identify_workers, State),
-    NewWorkers = IdentifyWorkers#{WorkerRef => {SessionId, WorkerPid}},
-    {noreply, State#{pending_identifies := NewPending, identify_workers := NewWorkers}}.
+    {noreply, State#{pending_identifies := NewPending}}.
 
--spec note_identify_slot_acquired(session_id(), reference(), state()) -> {noreply, state()}.
-note_identify_slot_acquired(SessionId, WorkerToken, State) ->
+-spec admit_identify_fetch(session_id(), reference(), state()) -> {noreply, state()}.
+admit_identify_fetch(SessionId, WorkerToken, State) ->
     PendingIdentifies = maps:get(pending_identifies, State),
     case maps:get(SessionId, PendingIdentifies, undefined) of
-        #{worker_token := WorkerToken} = PendingIdentify ->
-            Updated = PendingIdentify#{slot_held => true},
-            NewPending = PendingIdentifies#{SessionId := Updated},
-            {noreply, State#{pending_identifies := NewPending}};
+        #{worker_token := WorkerToken, worker_ref := undefined} = PendingIdentify ->
+            admit_pending_identify(
+                socket_alive(maps:get(socket_pid, PendingIdentify)),
+                SessionId,
+                PendingIdentify,
+                State
+            );
         _ ->
             gateway_concurrency:release_session_start(),
             {noreply, State}
     end.
 
--spec run_identify_fetch(pid(), session_id(), reference(), term(), map()) -> ok.
-run_identify_fetch(ManagerPid, SessionId, WorkerToken, PeerIP, Request) ->
-    Result = acquire_and_fetch(ManagerPid, SessionId, WorkerToken, Request, PeerIP),
+-spec admit_pending_identify(boolean(), session_id(), pending_identify(), state()) ->
+    {noreply, state()}.
+admit_pending_identify(false, SessionId, PendingIdentify, State) ->
+    gateway_concurrency:release_session_start(),
+    cancel_identify_timeout(PendingIdentify),
+    ManagerPid = self(),
+    Request = maps:get(request, PendingIdentify),
+    WorkerToken = maps:get(worker_token, PendingIdentify),
+    QueuedAt = maps:get(queued_at, PendingIdentify),
+    {WorkerPid, WorkerRef} = spawn_monitor(fun() ->
+        erlang:process_flag(fullsweep_after, 0),
+        run_identify_fetch(ManagerPid, SessionId, WorkerToken, Request, QueuedAt)
+    end),
+    PendingIdentifies = maps:get(pending_identifies, State),
+    Admitted = PendingIdentify#{worker_ref => WorkerRef, slot_held => true},
+    IdentifyWorkers = maps:get(identify_workers, State),
+    {noreply, State#{
+        pending_identifies := PendingIdentifies#{SessionId := Admitted},
+        identify_workers := IdentifyWorkers#{WorkerRef => {SessionId, WorkerPid}}
+    }}.
+
+-spec run_identify_fetch(pid(), session_id(), reference(), map(), integer()) -> ok.
+run_identify_fetch(ManagerPid, SessionId, WorkerToken, Request, QueuedAt) ->
+    Result = fetch_identify_data(Request, QueuedAt),
     ManagerPid ! {identify_fetch_result, SessionId, WorkerToken, Result},
     ok.
 
--spec acquire_and_fetch(pid(), session_id(), reference(), map(), term()) -> term().
-acquire_and_fetch(ManagerPid, SessionId, WorkerToken, Request, PeerIP) ->
+-spec fetch_identify_data(map(), integer()) -> {term(), gateway_timings:recorder()}.
+fetch_identify_data(Request, QueuedAt) ->
     GwTimings0 = maps:get(gw_timings, Request, gateway_timings:new()),
-    AcquireFetchStartedAt = gateway_timings:start(),
-    AcquireStartedAt = gateway_timings:start(),
-    AcquireResult = gateway_concurrency:try_acquire_session_start(),
-    AcquireSpan = gateway_timings:span(
-        <<"gateway_concurrency:try_acquire_session_start/0">>, AcquireStartedAt
+    WaitSpan = gateway_timings:span(
+        <<"gateway_concurrency:request_session_start/1">>, QueuedAt
     ),
-    case AcquireResult of
-        {error, at_capacity} ->
-            GwTimings = gateway_timings:record_function(
-                acquire_and_fetch,
-                <<"session_manager_shard_lifecycle:acquire_and_fetch/2">>,
-                AcquireFetchStartedAt,
-                #{children => [AcquireSpan]},
-                GwTimings0
-            ),
-            {{error, at_capacity}, GwTimings};
-        ok ->
-            ManagerPid ! {identify_slot_acquired, SessionId, WorkerToken},
-            do_fetch_rpc(Request, PeerIP, GwTimings0, AcquireFetchStartedAt, [AcquireSpan])
-    end.
-
--spec do_fetch_rpc(map(), term(), gateway_timings:recorder(), integer(), [map()]) ->
-    {term(), gateway_timings:recorder()}.
-do_fetch_rpc(Request, PeerIP, GwTimings0, AcquireFetchStartedAt, ParentChildren) ->
-    RpcStartedAt = gateway_timings:start(),
-    Result = session_manager_shard_drain:fetch_rpc_data(Request, PeerIP),
+    FetchStartedAt = gateway_timings:start(),
+    Result = session_manager_shard_drain:fetch_rpc_data(Request, maps:get(peer_ip, Request)),
     Remote = gateway_timings:api_remote_from_session_result(Result),
     RpcSpan = gateway_timings:span(
         <<"session_manager_shard_drain:fetch_rpc_data/2">>,
-        RpcStartedAt,
+        FetchStartedAt,
         #{remote => Remote}
     ),
     GwTimings = gateway_timings:record_function(
-        acquire_and_fetch,
-        <<"session_manager_shard_lifecycle:acquire_and_fetch/2">>,
-        AcquireFetchStartedAt,
-        #{children => ParentChildren ++ [RpcSpan]},
+        fetch_identify_data,
+        <<"session_manager_shard_lifecycle:fetch_identify_data/2">>,
+        QueuedAt,
+        #{children => [WaitSpan, RpcSpan]},
         GwTimings0
     ),
     {Result, GwTimings}.
@@ -405,12 +403,14 @@ release_identify_slot(PendingIdentify) ->
     end.
 
 -spec handle_identify_fetch_timeout(session_id(), reference(), state()) -> {noreply, state()}.
-handle_identify_fetch_timeout(SessionId, WorkerRef, State) ->
+handle_identify_fetch_timeout(SessionId, WorkerToken, State) ->
     PendingIdentifies = maps:get(pending_identifies, State),
     case maps:get(SessionId, PendingIdentifies, undefined) of
-        #{worker_ref := WorkerRef} = PendingIdentify ->
+        #{worker_token := WorkerToken} = PendingIdentify ->
             reply_to_waiters(maps:get(froms, PendingIdentify, []), {error, timeout}),
-            State1 = kill_identify_worker(WorkerRef, PendingIdentify, State),
+            State1 = kill_identify_worker(
+                maps:get(worker_ref, PendingIdentify), PendingIdentify, State
+            ),
             RemainingPending = maps:remove(SessionId, maps:get(pending_identifies, State1)),
             {noreply, State1#{pending_identifies := RemainingPending}};
         _Other ->
@@ -524,7 +524,9 @@ split_fetch_result({Result, GwTimings} = FetchResult, Request) ->
 split_fetch_result(Result, Request) ->
     {Result, maps:get(gw_timings, Request, gateway_timings:new())}.
 
--spec kill_identify_worker(reference(), pending_identify(), state()) -> state().
+-spec kill_identify_worker(reference() | undefined, pending_identify(), state()) -> state().
+kill_identify_worker(undefined, _PendingIdentify, State) ->
+    State;
 kill_identify_worker(WorkerRef, PendingIdentify, State) ->
     IdentifyWorkers = maps:get(identify_workers, State),
     case maps:take(WorkerRef, IdentifyWorkers) of
