@@ -4,6 +4,7 @@ import {getKvMeta, getTableMetadata} from '@app/api/database/CassandraMetaRegist
 import type {
 	CassandraParams,
 	ColumnName,
+	KvAdvance,
 	KvColumnParam,
 	KvQueryMeta,
 	PreparedQuery,
@@ -1232,6 +1233,69 @@ export class PostgresKvQueryExecutor {
 		await inParallel(prepared, async (query) => {
 			await this.executeQuery(query);
 		});
+	}
+
+	async advanceRows(writes: ReadonlyArray<KvAdvance>): Promise<Array<boolean>> {
+		const written = writes.map(() => false);
+		await inParallel(writes, async (write, index) => {
+			written[index] = await this.advanceRow(write);
+		});
+		return written;
+	}
+
+	private async advanceRow(write: KvAdvance): Promise<boolean> {
+		const meta: KvQueryMeta = {action: 'patch', table: write.table};
+		const always = write.always ?? {};
+		const increments = Object.entries(write.increment ?? {});
+		const params: Array<unknown> = [
+			write.table.name,
+			rowKey(meta, write.pk),
+			write.guard.col,
+			write.guard.value.toString(),
+			JSON.stringify(encodeRow(always)),
+			JSON.stringify(encodeRow(write.set)),
+		];
+		const guard = `COALESCE((kv.row_data -> $3::text ->> 'value')::numeric ${write.guard.orEqual ? '<=' : '<'} $4::numeric, true)`;
+		let advanced = 'kv.row_data || $5::jsonb || $6::jsonb';
+		for (const [column, amount] of increments) {
+			params.push(column, amount);
+			const name = `$${params.length - 1}::text`;
+			advanced += ` || jsonb_build_object(${name}, COALESCE((kv.row_data ->> ${name})::numeric, 0) + $${params.length}::numeric)`;
+		}
+		const rowData = `CASE WHEN ${guard} THEN ${advanced} ELSE kv.row_data || $5::jsonb END`;
+		const unconditional = Object.keys(always).length > 0;
+		const fallbackTtl = defaultExpiresAt(meta);
+		const shape = [
+			write.guard.orEqual ? 'lte' : 'lt',
+			increments.length,
+			unconditional ? 'always' : 'guarded',
+			fallbackTtl === undefined ? 'keep' : 'ttl',
+		].join('_');
+		if (write.insert === null) {
+			const assignments = [`row_data = ${rowData}`, 'updated_at = now()'];
+			if (fallbackTtl !== undefined) {
+				params.push(fallbackTtl);
+				assignments.push(`expires_at = GREATEST(kv.expires_at, $${params.length}::timestamptz)`);
+			}
+			const result = await this.client.query(
+				`UPDATE ${this.table} kv SET ${assignments.join(', ')} WHERE kv.table_name = $1 AND kv.row_key = $2 AND (kv.expires_at IS NULL OR kv.expires_at > now())${unconditional ? '' : ` AND ${guard}`}`,
+				params,
+				`kv_advance_update_${shape}`,
+			);
+			return result.rowCount === 1;
+		}
+		params.push(partitionKey(meta, write.insert), JSON.stringify(encodeRow(write.insert)), fallbackTtl ?? null);
+		const last = params.length;
+		const expiresAt = fallbackTtl === undefined ? KEPT_EXPIRES_AT : 'GREATEST(kv.expires_at, EXCLUDED.expires_at)';
+		const result = await this.client.query(
+			`INSERT INTO ${this.table} AS kv (table_name, partition_key, row_key, row_data, expires_at, updated_at)
+VALUES ($1, $${last - 2}, $2, $${last - 1}::jsonb, $${last}, now())
+ON CONFLICT (table_name, row_key)
+DO UPDATE SET partition_key = EXCLUDED.partition_key, row_data = CASE WHEN ${EXPIRED_STORED_ROW} THEN EXCLUDED.row_data ELSE ${rowData} END, expires_at = ${expiresAt}, updated_at = now()${unconditional ? '' : `\nWHERE ${EXPIRED_STORED_ROW} OR ${guard}`}`,
+			params,
+			`kv_advance_upsert_${shape}`,
+		);
+		return result.rowCount === 1;
 	}
 
 	private writesCommute(queries: ReadonlyArray<PreparedQuery>): boolean {

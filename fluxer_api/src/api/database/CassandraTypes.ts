@@ -104,6 +104,16 @@ export interface KvQueryMeta<Row extends object = Record<string, unknown>> {
 	ifNotExists?: boolean;
 }
 
+export interface KvAdvance {
+	table: KvTableSpec;
+	pk: CassandraParams;
+	guard: {col: string; value: bigint; orEqual?: boolean};
+	set: CassandraParams;
+	always?: CassandraParams;
+	increment?: Record<string, number>;
+	insert: CassandraParams | null;
+}
+
 export interface PreparedQuery<P extends CassandraParams = CassandraParams> {
 	cql: string;
 	params: P;

@@ -2,7 +2,13 @@
 
 import {logBatch, logQuery} from '@app/api/database/CassandraDevLogger';
 import {getIsDev} from '@app/api/database/CassandraMetaRegistry';
-import type {CassandraParams, KvQueryMeta, PreparedQuery, QueryTemplate} from '@app/api/database/CassandraTypes';
+import type {
+	CassandraParams,
+	KvAdvance,
+	KvQueryMeta,
+	PreparedQuery,
+	QueryTemplate,
+} from '@app/api/database/CassandraTypes';
 import {
 	assertNoUndefinedParams,
 	getStatementMeta,
@@ -46,6 +52,7 @@ export interface CassandraQueryExecutorForTesting {
 		},
 	): Promise<PagedQueryResult<T>>;
 	executeBatch(queries: Array<{query: string; params: object; meta?: KvQueryMeta}>, atomic?: boolean): Promise<void>;
+	advanceRows?(writes: ReadonlyArray<KvAdvance>): Promise<Array<boolean>>;
 	reset?(): void;
 	shutdown?(): Promise<void>;
 }
@@ -257,6 +264,20 @@ export async function fetchManyInChunks<
 		}),
 	);
 	return results.flat();
+}
+
+export async function advanceRows(
+	writes: ReadonlyArray<KvAdvance>,
+	readThenWrite: () => Promise<Array<boolean>>,
+): Promise<Array<boolean>> {
+	if (writes.length === 0) return [];
+	const executor = activeExecutor();
+	return executor?.advanceRows ? executor.advanceRows(writes) : readThenWrite();
+}
+
+export async function advanceRow(write: KvAdvance, readThenWrite: () => Promise<boolean>): Promise<boolean> {
+	const [written] = await advanceRows([write], async () => [await readThenWrite()]);
+	return written === true;
 }
 
 export async function upsertOne<P extends CassandraParams = CassandraParams>(
