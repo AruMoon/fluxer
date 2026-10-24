@@ -621,7 +621,7 @@ func nextState(inst *instance.Instance, set *stack.Set, images stack.ImageSet, t
 	}
 	var pins []string
 	if cur.Release == stack.LegacyRelease {
-		pins = slices.Sorted(maps.Keys(instance.ConvertLegacy(&next, set, next.Images.Refs).Pins))
+		pins = slices.Sorted(maps.Keys(instance.ConvertLegacy(&next, set, next.Images.Refs)))
 	}
 	if _, err := secrets.Mint(next.Secrets, true); err != nil {
 		return nil, nil, err

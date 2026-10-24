@@ -347,7 +347,7 @@ func (p *AdoptPlan) classify(name, shipped string) {
 	if err != nil {
 		return
 	}
-	if !isShipped(shipped, data, p.rendered) {
+	if !isShipped(shipped, data) {
 		p.keepMine(name)
 	}
 }
@@ -527,7 +527,7 @@ func overlayFor(path, dir string) string {
 	return ""
 }
 
-func isShipped(name string, data []byte, extra map[string]string) bool {
+func isShipped(name string, data []byte) bool {
 	sum := sha256.Sum256(normalizeLF(data))
 	h := hex.EncodeToString(sum[:])
 	if slices.Contains(shippedHashes[name], h) {

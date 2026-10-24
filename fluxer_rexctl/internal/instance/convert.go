@@ -11,13 +11,10 @@ import (
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
 )
 
-func ConvertLegacy(s *State, next *stack.Set, nextImages map[string]string) *LegacyConversion {
-	c := &LegacyConversion{Pins: map[string]string{}}
+func ConvertLegacy(s *State, next *stack.Set, nextImages map[string]string) map[string]string {
+	pins := map[string]string{}
 	for _, k := range legacyImageVars {
-		if _, ok := s.Settings[k]; ok {
-			delete(s.Settings, k)
-			c.Dropped = append(c.Dropped, k)
-		}
+		delete(s.Settings, k)
 	}
 	infra := map[string]string{}
 	for svc, v := range settings.ImageVars {
@@ -38,14 +35,14 @@ func ConvertLegacy(s *State, next *stack.Set, nextImages map[string]string) *Leg
 			continue
 		}
 		s.Settings[settings.ImagesPrefix+svc] = v
-		c.Pins[svc] = v
+		pins[svc] = v
 	}
 	if v, ok := s.Settings[tunnelBindVar]; ok && s.Settings[settings.EdgeMode] == settings.EdgeTunnel && slices.Contains(next.Vars, edgeBindVar) {
 		delete(s.Settings, tunnelBindVar)
 		s.Settings[settings.EdgeBind] = v
 	}
 	stack.ConvertLegacySettings(s.Settings)
-	return c
+	return pins
 }
 
 const (
