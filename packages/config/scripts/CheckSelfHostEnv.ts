@@ -83,7 +83,9 @@ const INPUT_NAMES: Record<string, string> = {
 	MEILI_NO_ANALYTICS: 'FLUXER_MEILISEARCH_NO_ANALYTICS',
 	MEILI_MAX_INDEXING_MEMORY: 'FLUXER_MEILISEARCH_MAX_INDEXING_MEMORY',
 	MEILI_MAX_INDEXING_THREADS: 'FLUXER_MEILISEARCH_MAX_INDEXING_THREADS',
-	GOMEMLIMIT: 'FLUXER_SEAWEEDFS_GOMEMLIMIT',
+	MEILI_LOG_LEVEL: 'FLUXER_MEILISEARCH_LOG_LEVEL',
+	MALLOC_ARENA_MAX: 'FLUXER_MALLOC_ARENA_MAX',
+	TOKIO_WORKER_THREADS: 'FLUXER_TOKIO_WORKER_THREADS',
 	WEED_MASTER_VOLUME_GROWTH_COPY_1: 'FLUXER_SEAWEEDFS_VOLUME_GROWTH',
 	LIVEKIT_KEYS: 'LIVEKIT_API_KEY',
 	NODE_EXTRA_CA_CERTS: 'FLUXER_NODE_EXTRA_CA_CERTS',
@@ -115,8 +117,21 @@ function checkHelmChart(): void {
 	}
 }
 
+function expectedInput(serviceName: string, key: string): string {
+	const prefix = `FLUXER_${serviceName.toUpperCase().replace('-', '_')}`;
+	if (key === 'FLUXER_POSTGRES_MAX_CONNECTIONS' && OWN_POOL_SIZES.has(serviceName)) {
+		return `${prefix}_POSTGRES_MAX_CONNECTIONS`;
+	}
+	if (key === 'GOMEMLIMIT' || (key === 'TOKIO_WORKER_THREADS' && serviceName === 'media-proxy')) {
+		return `${prefix}_${key}`;
+	}
+	return INPUT_NAMES[key] ?? key;
+}
+
 function checkComposeForwarding(): void {
-	const services = mapping(mapping(parse(readSelfHosting('docker-compose.yml'), {merge: true})).services);
+	const services = mapping(
+		mapping(parse(readSelfHosting('docker-compose.yml'), {merge: true, maxAliasCount: -1})).services,
+	);
 	const service = (name: string) => mapping(services[name]);
 	const environment = (name: string): Record<string, string> =>
 		Object.fromEntries(Object.entries(mapping(service(name).environment)).map(([key, value]) => [key, String(value)]));
@@ -139,10 +154,7 @@ function checkComposeForwarding(): void {
 			if (match == null) {
 				continue;
 			}
-			const expected =
-				key === 'FLUXER_POSTGRES_MAX_CONNECTIONS' && OWN_POOL_SIZES.has(serviceName)
-					? `FLUXER_${serviceName.toUpperCase().replace('-', '_')}_POSTGRES_MAX_CONNECTIONS`
-					: (INPUT_NAMES[key] ?? key);
+			const expected = expectedInput(serviceName, key);
 			if (match[1] !== expected) {
 				problems.push(`${serviceName}.${key} reads ${match[1]} from .env, expected ${expected}`);
 			}
