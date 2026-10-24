@@ -115,6 +115,11 @@ fn build_router(state: Arc<AppState>, drain: HttpRequestDrain) -> Router {
         .route("/_sniff", post(routes::internal::sniff_handler))
         .route("/_thumbnail", post(routes::internal::thumbnail_handler))
         .route("/_frames", post(routes::internal::frames_handler))
+        .route("/_strip", post(routes::internal::strip_handler))
+        .route(
+            "/_audio_duration",
+            post(routes::internal::audio_duration_handler),
+        )
         .route(
             "/v1/relay/{*key}",
             put(routes::relay::relay_put).options(routes::relay::relay_options),

@@ -22,9 +22,10 @@ LIBHEIF_FLOOR_REASON="src/native_shim/heif_pixels.c compiles a different HEIF de
 
 FFMPEG_BUILD_MODULES="zlib dav1d aom"
 LIBHEIF_BUILD_MODULES="libde265 dav1d aom"
-REQUIRED_DECODERS="apng gif h264 hevc vp8 vp9 libdav1d libaom-av1 mjpeg png webp bmp"
+REQUIRED_DECODERS="apng gif h264 hevc vp8 vp9 libdav1d libaom-av1 mjpeg png webp bmp aac mp3float vorbis opus flac alac pcm_s16le"
 REQUIRED_ENCODERS="gif"
-REQUIRED_DEMUXERS="apng bmp_pipe gif"
+REQUIRED_DEMUXERS="apng bmp_pipe gif mov,mp4,m4a,3gp,3g2,mj2 matroska,webm avi flv mpegts mpeg asf mp3 wav flac aac aiff ogg"
+REQUIRED_MUXERS="3gp mp4 mov webm matroska avi flv mpegts mpeg asf mp3 wav flac adts aiff ogg"
 
 log() { printf '==> %s\n' "$*" >&2; }
 
@@ -231,6 +232,8 @@ verify_ffmpeg_codecs() {
     require_listed "$listing" encoder "$REQUIRED_ENCODERS"
     listing="$(ffmpeg_listing "$binary" -demuxers)"
     require_listed "$listing" demuxer "$REQUIRED_DEMUXERS"
+    listing="$(ffmpeg_listing "$binary" -muxers)"
+    require_listed "$listing" muxer "$REQUIRED_MUXERS"
 }
 
 if [ "$(uname -s)" = "Darwin" ]; then

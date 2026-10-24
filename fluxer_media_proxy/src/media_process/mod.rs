@@ -19,12 +19,17 @@ pub(crate) mod native_runtime;
 mod nsfw_processing;
 mod placeholder;
 mod streaming_encoder;
+mod strip;
 mod transform;
 mod transform_plan;
 mod video_thumbnail;
 
 pub use metadata::{MetadataOptions, finish_metadata, prepare_metadata};
 pub use native_cost::{NativeCost, av_native_cost, image_transform_cost, metadata_cost};
+pub use strip::{
+    AvContainer, StrippedImage, audio_duration_seconds, av_container, strip_av_metadata,
+    strip_image_metadata, strips_image,
+};
 pub use transform::transform_image;
 pub use video_thumbnail::extract_video_thumbnail;
 

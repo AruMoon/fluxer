@@ -11,7 +11,8 @@ use crate::{
         format_policy::is_svg_content_type,
         media_operations::{
             MediaFailure, MediaInput, MediaInputLimit, MetadataOutput, STORED_SNIFF_PREFIX_BYTES,
-            load_media_input, read_sniff_prefix, resolve_metadata,
+            StrippedMedia, load_media_input, probe_audio_duration, read_sniff_prefix,
+            resolve_metadata, strip_media,
         },
         response::{
             GeneratedMediaResponse,
@@ -36,6 +37,9 @@ use base64::{Engine as _, engine::general_purpose};
 use bytes::Bytes;
 use serde::Deserialize;
 use std::sync::Arc;
+
+const MEDIA_WIDTH_HEADER: &str = "x-fluxer-media-width";
+const MEDIA_HEIGHT_HEADER: &str = "x-fluxer-media-height";
 
 #[derive(Debug, Deserialize)]
 struct MetadataRequest {
@@ -106,6 +110,36 @@ impl FramesRequest {
             url: self.url,
             with_base64: None,
         }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct MediaSourceRequest {
+    #[serde(rename = "type")]
+    typ: String,
+    base64: Option<String>,
+    upload_filename: Option<String>,
+    filename: Option<String>,
+    bucket: Option<String>,
+    key: Option<String>,
+    content_type: Option<String>,
+}
+
+impl MediaSourceRequest {
+    fn into_parts(self) -> (MetadataRequest, Option<String>) {
+        let request = MetadataRequest {
+            version: None,
+            typ: self.typ,
+            nsfw: "allow".to_owned(),
+            base64: self.base64,
+            upload_filename: self.upload_filename,
+            filename: self.filename,
+            bucket: self.bucket,
+            key: self.key,
+            url: None,
+            with_base64: None,
+        };
+        (request, self.content_type)
     }
 }
 
@@ -331,6 +365,75 @@ pub(in crate::server) async fn sniff_handler(
         StatusCode::OK,
         serde_json::json!({ "content_type": content_type }).to_string(),
     )
+}
+
+async fn read_media_source(
+    app: &AppState,
+    headers: &HeaderMap,
+    request: Request<Body>,
+) -> Result<(MediaInput, Option<String>), Box<Response>> {
+    if !check_internal_auth(headers, app.cfg.secret_key.expose()) {
+        return Err(Box::new(text(StatusCode::UNAUTHORIZED, "Unauthorized")));
+    }
+    let body = read_limited_body(request)
+        .await
+        .map_err(|status| Box::new(text(status, canonical_reason_str(status))))?;
+    let req: MediaSourceRequest = serde_json::from_slice(&body)
+        .map_err(|_| Box::new(text(StatusCode::BAD_REQUEST, "Bad Request")))?;
+    let (request, content_type) = req.into_parts();
+    let input = request
+        .into_media_input()
+        .map_err(|failure| Box::new(failure.into_response()))?;
+    Ok((input, content_type))
+}
+
+pub(in crate::server) async fn strip_handler(
+    State(app): State<Arc<AppState>>,
+    headers: HeaderMap,
+    request: Request<Body>,
+) -> Response {
+    let (input, content_type) = match read_media_source(&app, &headers, request).await {
+        Ok(source) => source,
+        Err(response) => return *response,
+    };
+    let StrippedMedia {
+        data,
+        content_type,
+        dimensions,
+    } = match strip_media(&app, input, content_type).await {
+        Ok(stripped) => stripped,
+        Err(failure) => return failure.into_response(),
+    };
+    let mut builder = Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, content_type)
+        .header(header::CONTENT_LENGTH, data.len());
+    if let Some((width, height)) = dimensions {
+        builder = builder
+            .header(MEDIA_WIDTH_HEADER, width)
+            .header(MEDIA_HEIGHT_HEADER, height);
+    }
+    builder
+        .body(Body::from(data))
+        .unwrap_or_else(|_| text(StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error"))
+}
+
+pub(in crate::server) async fn audio_duration_handler(
+    State(app): State<Arc<AppState>>,
+    headers: HeaderMap,
+    request: Request<Body>,
+) -> Response {
+    let (input, _) = match read_media_source(&app, &headers, request).await {
+        Ok(source) => source,
+        Err(response) => return *response,
+    };
+    match probe_audio_duration(&app, input).await {
+        Ok(duration) => json_response(
+            StatusCode::OK,
+            serde_json::json!({ "duration_seconds": duration }).to_string(),
+        ),
+        Err(failure) => failure.into_response(),
+    }
 }
 
 fn check_internal_auth(headers: &HeaderMap, secret: &str) -> bool {

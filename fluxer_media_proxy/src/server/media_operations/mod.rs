@@ -2,12 +2,14 @@
 
 mod failure;
 mod input;
+mod strip;
 
 pub(in crate::server) use failure::MediaFailure;
 pub(in crate::server) use input::{
     MediaInput, MediaInputLimit, STORED_SNIFF_PREFIX_BYTES, load_media_input, read_sniff_prefix,
     spool_stored_media,
 };
+pub(in crate::server) use strip::{StrippedMedia, probe_audio_duration, strip_media};
 
 use crate::{
     constants::{self, AssetExtension},

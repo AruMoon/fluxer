@@ -53,6 +53,15 @@ pub struct WebpAnimLimits {
 }
 
 #[repr(C)]
+#[derive(Default)]
+pub struct FluxerAVAudioDurationOut {
+    pub frames_seconds: c_double,
+    pub frame_count: c_int,
+    pub stream_seconds: c_double,
+    pub format_seconds: c_double,
+}
+
+#[repr(C)]
 pub struct FluxerAVMetadataOut {
     pub has_video: c_int,
     pub has_audio: c_int,
@@ -191,6 +200,8 @@ unsafe extern "C" {
         deadline_monotonic_ms: c_longlong,
         out: *mut *mut VipsImage,
     ) -> c_int;
+    pub fn fluxer_vips_srgb_without_alpha(input: *mut VipsImage, out: *mut *mut VipsImage)
+    -> c_int;
     pub fn fluxer_vips_extract_area(
         input: *mut VipsImage,
         out: *mut *mut VipsImage,
@@ -297,6 +308,21 @@ unsafe extern "C" {
         max_width: c_int,
         max_height: c_int,
         out: *mut FluxerAVMetadataOut,
+    ) -> c_int;
+    pub fn fluxer_av_strip_metadata(
+        media_data: *const c_void,
+        media_len: size_t,
+        demuxer: *const c_char,
+        muxer: *const c_char,
+        faststart: c_int,
+        output_path: *const c_char,
+        deadline_monotonic_ms: c_longlong,
+    ) -> c_int;
+    pub fn fluxer_av_audio_duration(
+        media_data: *const c_void,
+        media_len: size_t,
+        deadline_monotonic_ms: c_longlong,
+        out: *mut FluxerAVAudioDurationOut,
     ) -> c_int;
     pub fn fluxer_ffmpeg_extract_apng_frames_for_nsfw(
         apng_data: *const c_void,
