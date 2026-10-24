@@ -489,6 +489,22 @@ func releaseSet(dir, release string) (*stack.Set, error) {
 	return diskSet(filesDir, release, profiles)
 }
 
+func RetiredService(dir string) string {
+	var doc map[string]any
+	if err := yaml.Unmarshal(readCustom(dir), &doc); err != nil {
+		return ""
+	}
+	services, _ := doc["services"].(map[string]any)
+	for _, name := range slices.Sorted(maps.Keys(services)) {
+		svc, _ := services[name].(map[string]any)
+		if _, ok := svc["image"]; ok || slices.Contains(stack.Services, name) {
+			continue
+		}
+		return name
+	}
+	return ""
+}
+
 func readCustom(dir string) []byte {
 	data, _ := os.ReadFile(filepath.Join(dir, CustomCompose))
 	return data

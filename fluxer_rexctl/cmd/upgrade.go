@@ -373,6 +373,10 @@ func upgradeStack(ctx context.Context, app *App, inst *instance.Instance, e *eng
 		clearUpgrade(inst)
 		return ui.Wrap(err, "This rexctl has no Fluxer release built in.", "Download rexctl again, then run rexctl upgrade.")
 	}
+	if retired := instance.RetiredService(inst.Dir); retired != "" {
+		clearUpgrade(inst)
+		return ui.Refused(fmt.Sprintf("%s changes %s, which Fluxer %s no longer runs.", instance.CustomCompose, retired, toShort), retiredFix(retired, fromShort))
+	}
 	if err := release.Snapshot(inst, from, refList(inst.State.Images.Refs)); err != nil {
 		clearUpgrade(inst)
 		return ui.Wrap(err, fmt.Sprintf("Couldn't save the files of %s.", fluxerName(fromShort)), "Check that the disk isn't full, then run rexctl upgrade again.")
@@ -592,6 +596,14 @@ func printRecoveryPlan(app *App, inst *instance.Instance) string {
 		}
 	}
 	return pend.From
+}
+
+func retiredFix(name, fromShort string) string {
+	still := fmt.Sprintf("You're still on %s.", fluxerName(fromShort))
+	if base, ok := strings.CutSuffix(name, "-shard"); ok && slices.Contains(stack.Services, base) {
+		return fmt.Sprintf("%s Move those changes to %s, then run rexctl upgrade again.", still, base)
+	}
+	return fmt.Sprintf("%s Remove %s from %s, then run rexctl upgrade again.", still, name, instance.CustomCompose)
 }
 
 func nextState(inst *instance.Instance, set *stack.Set, images stack.ImageSet, to string) (*instance.State, []string, error) {
