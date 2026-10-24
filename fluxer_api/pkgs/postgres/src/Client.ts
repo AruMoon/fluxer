@@ -7,6 +7,7 @@ import pg from 'pg';
 const MAX_DIAGNOSTIC_FIELD_LENGTH = 128;
 const INVALID_PASSWORD_CODE = '28P01';
 const PASSWORD_MISMATCH_DOCS = 'https://docs.fluxer.app/operator/rexctl/#rexctl-doctor';
+const SYNCHRONOUS_COMMIT_LEVELS = new Set(['on', 'off', 'local', 'remote_write', 'remote_apply']);
 
 interface PostgresConnectionDiagnostic {
 	phase: 'idle' | 'checked_out';
@@ -35,6 +36,7 @@ interface PostgresConfig {
 	maxConnections?: number;
 	kvTable?: string;
 	preparedStatements?: boolean;
+	synchronousCommit?: string;
 }
 
 export interface PostgresQueryable {
@@ -126,6 +128,11 @@ class PostgresClient implements IPostgresClient {
 		config: PostgresConfig,
 		private readonly onConnectionError: PostgresConnectionErrorReporter,
 	) {
+		if (config.synchronousCommit !== undefined && !SYNCHRONOUS_COMMIT_LEVELS.has(config.synchronousCommit)) {
+			throw new Error(
+				`Postgres synchronous_commit must be one of ${[...SYNCHRONOUS_COMMIT_LEVELS].join(', ')}, got ${JSON.stringify(config.synchronousCommit)}`,
+			);
+		}
 		this.config = {...config};
 		this.pool = null;
 	}
@@ -142,6 +149,7 @@ class PostgresClient implements IPostgresClient {
 	}
 
 	private async openPool(): Promise<void> {
+		const synchronousCommit = this.config.synchronousCommit;
 		const poolConfig: PoolConfig & {scramMaxIterations: number} = {
 			connectionString: this.config.url || undefined,
 			host: this.config.url ? undefined : (this.config.host ?? '127.0.0.1'),
@@ -152,6 +160,11 @@ class PostgresClient implements IPostgresClient {
 			ssl: this.config.ssl ? {rejectUnauthorized: true, ca: normalizePem(this.config.sslCa)} : undefined,
 			max: this.config.maxConnections ?? 20,
 			scramMaxIterations: 0,
+			onConnect: synchronousCommit
+				? async (client) => {
+						await client.query(`SET synchronous_commit = ${synchronousCommit}`).catch(() => {});
+					}
+				: undefined,
 		};
 		const pool = new pg.Pool(poolConfig);
 		this.observePoolConnections(pool);

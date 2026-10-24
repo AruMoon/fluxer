@@ -36,6 +36,7 @@ import {
 import {initializeSearch, shutdownSearch} from '@app/api/SearchFactory';
 import {accountStateDepsFromContext} from '@app/api/user/services/AccountStateApplier';
 import {awaitAll} from '@app/api/utils/ConcurrencyUtils';
+import {readOptionalEnv} from '@app/api/utils/IntegerOptions';
 import {startAccountActionConsumer, stopAccountActionConsumer} from '@app/api/worker/AccountActionConsumer';
 import {queueBlocklistFeedStartupJobs} from '@app/api/worker/BlocklistFeedStartup';
 import {CronScheduler} from '@app/api/worker/CronScheduler';
@@ -235,7 +236,13 @@ export async function startWorkerMain(): Promise<void> {
 
 	try {
 		if (Config.database.backend === 'postgres') {
-			await initPostgres(Config.postgres, (diagnostic) => Logger.error(diagnostic, 'Postgres connection error'));
+			await initPostgres(
+				{
+					...Config.postgres,
+					synchronousCommit: readOptionalEnv('FLUXER_WORKER_POSTGRES_SYNCHRONOUS_COMMIT')?.trim() ?? 'off',
+				},
+				(diagnostic) => Logger.error(diagnostic, 'Postgres connection error'),
+			);
 			postgresInitialized = true;
 			const postgres = getDefaultPostgresClient();
 			await ensurePostgresKvSchema(postgres);
