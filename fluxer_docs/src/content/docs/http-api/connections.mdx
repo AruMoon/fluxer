@@ -63,7 +63,7 @@ The flags decide which viewers see the connection on the owner's profile, using 
 Fluxer checks the proof once, when the connection is created. Use either method.
 
 - Publish a TXT record at `_fluxer.<domain>` with the value `fluxer-verification=<token>`.
-- Serve the token alone, without the prefix, at `https://<domain>/.well-known/fluxer-verification` with a 2xx status. Redirects are not followed.
+- Serve the token alone, without the prefix, at `https://<domain>/.well-known/fluxer-verification` with a 2xx status. Fluxer follows up to three HTTPS redirects to the same path on the domain with or without `www.`.
 
 ## Bluesky authorization object
 
