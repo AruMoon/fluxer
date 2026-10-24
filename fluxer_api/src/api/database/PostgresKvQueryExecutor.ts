@@ -1021,8 +1021,22 @@ export async function ensurePostgresKvSchema(client: IPostgresClient): Promise<v
 			await new Promise((resolve) => setTimeout(resolve, POSTGRES_KV_SCHEMA_RETRY_DELAY_MS));
 		}
 	}
-	if (await postgresKvIndexesPending(client)) {
-		await client.session((db) => migratePostgresKvIndexes(db, client.kvTable()));
+	await enableStatementStats(client);
+}
+
+async function enableStatementStats(client: IPostgresClient): Promise<void> {
+	try {
+		const missing = await client.query(
+			`SELECT 1 FROM pg_available_extensions
+WHERE name = 'pg_stat_statements'
+	AND installed_version IS NULL
+	AND 'pg_stat_statements' = ANY(string_to_array(replace(current_setting('shared_preload_libraries'), ' ', ''), ','))`,
+		);
+		if (missing.rows.length === 0) return;
+		await client.query('CREATE EXTENSION IF NOT EXISTS pg_stat_statements');
+	} catch (error) {
+		if (isConcurrentDdlConflict(error)) return;
+		logWarn({error}, 'Postgres KV could not enable pg_stat_statements');
 	}
 }
 
