@@ -52,7 +52,7 @@
 
 -spec start_link(presence_data()) -> {ok, pid()} | {error, term()}.
 start_link(PresenceData) ->
-    normalize_start_link(gen_server:start_link(?MODULE, PresenceData, [])).
+    shard_utils:normalize_start_link(gen_server:start_link(?MODULE, PresenceData, [])).
 
 -spec init(presence_data()) -> {ok, state()}.
 init(PresenceData) ->

@@ -4,7 +4,7 @@
 -typing([eqwalizer]).
 
 -export([
-    new/0, from_sorted/2, destroy/1, memory_bytes/1, insert/2, delete/2, range/3, to_list/1
+    new/0, from_sorted/2, destroy/1, insert/2, delete/2, range/3, to_list/1
 ]).
 
 -type oset() :: reference().

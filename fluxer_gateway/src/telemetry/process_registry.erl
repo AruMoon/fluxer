@@ -10,7 +10,7 @@
     register_and_monitor/3,
     lookup_or_monitor/3,
     safe_unregister/1, safe_unregister/2,
-    cleanup_on_down/2, cleanup_on_down/3,
+    cleanup_on_down/3,
     get_count/1,
     force_stop_process/1
 ]).

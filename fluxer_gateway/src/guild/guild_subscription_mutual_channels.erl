@@ -43,7 +43,7 @@ filter_session_member_ids(Requests, Memo, State) ->
     Exceptions =
         case Memo of
             #{exceptions := Cached} -> Cached;
-            _ -> exceptions(State)
+            _ -> guild_viewable_memo:exceptions(State)
         end,
     Views = maps:get(views, Memo, #{}),
     Sessions = maps:get(sessions, State, #{}),
@@ -162,7 +162,7 @@ kept_if(false, _MemberId, Kept) -> Kept.
     {term(), #{term() => [integer()]}}.
 member_channel_key(MemberId, Exceptions, State, Cache) ->
     Key =
-        case memo_key(MemberId, Exceptions, State) of
+        case guild_viewable_memo:memo_key(MemberId, Exceptions, State) of
             bypass -> {user, MemberId};
             {ok, RawRoles} -> {roles, RawRoles}
         end,
@@ -206,13 +206,13 @@ keep_member_with_mutual_channel(MemberId, _SessionUserId, SessionMap, State, {Ke
 %% by one of those bypasses the memo.
 -spec new_memo(guild_state()) -> memo().
 new_memo(State) ->
-    #{exceptions => exceptions(State), cache => #{}}.
+    #{exceptions => guild_viewable_memo:exceptions(State), cache => #{}}.
 
 -spec memoised_has_mutual_channel(user_id(), map(), guild_state(), memo()) ->
     {boolean(), memo()}.
 memoised_has_mutual_channel(MemberId, SessionMap, State, Memo) ->
     #{exceptions := Exceptions, cache := Cache} = Memo,
-    case memo_key(MemberId, Exceptions, State) of
+    case guild_viewable_memo:memo_key(MemberId, Exceptions, State) of
         bypass ->
             {has_mutual_channel(MemberId, SessionMap, State), Memo};
         {ok, RawRoles} ->

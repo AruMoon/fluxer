@@ -115,7 +115,7 @@ classify_non_target_session(SessionData, SessionUserId, TargetChannelMap, State)
 session_shares_channels(SessionData, SessionUserId, TargetChannelMap, State) ->
     case maps:find(viewable_channels, SessionData) of
         {ok, ViewableMap} when is_map(ViewableMap) ->
-            maps_share_any_key(ViewableMap, TargetChannelMap);
+            map_utils:maps_share_any_key(ViewableMap, TargetChannelMap);
         _ ->
             session_channel_list_shares(SessionUserId, TargetChannelMap, State)
     end.

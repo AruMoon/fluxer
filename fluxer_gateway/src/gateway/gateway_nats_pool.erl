@@ -105,7 +105,7 @@ init([]) ->
         slots => #{},
         monitors => #{},
         connecting => #{},
-        rpc_enabled => nats_rpc_enabled(),
+        rpc_enabled => gateway_nats_pool_conn:nats_rpc_enabled(),
         subs => #{},
         handler_count => 0,
         handler_refs => #{},
@@ -151,7 +151,7 @@ handle_info({_Conn, _Sid, {msg, Subject, Payload, MsgOpts}}, State) when
 ->
     {noreply, handle_rpc_msg(Subject, Payload, MsgOpts, State)};
 handle_info({handler_done, _Pid}, State) ->
-    {noreply, decrement_handler_count(State)};
+    {noreply, gateway_nats_pool_conn:decrement_handler_count(State)};
 handle_info({Conn, closed}, State) ->
     {noreply, handle_conn_event_down(conn_from_term(Conn), State)};
 handle_info({Conn, {error, _Reason}}, State) ->
@@ -252,7 +252,7 @@ disable_slot_subscription(Idx, Sids, Slots) ->
 disconnect_slot(_Idx, undefined) ->
     ok;
 disconnect_slot(_Idx, Conn) ->
-    ignore_disconnect(Conn).
+    gateway_nats_pool_conn:ignore_disconnect(Conn).
 
 -spec handle_connect_ok(non_neg_integer(), pid(), nats:conn(), map()) -> map().
 handle_connect_ok(Idx, Pid, Conn, State) ->
@@ -295,7 +295,7 @@ accept_connect_ok(Idx, Entry, Conn, State) ->
 
 -spec ignore_stale_connect_ok(nats:conn(), map()) -> map().
 ignore_stale_connect_ok(Conn, State) ->
-    ignore_disconnect(Conn),
+    gateway_nats_pool_conn:ignore_disconnect(Conn),
     State.
 
 -spec remove_slot_monitors(non_neg_integer(), map()) -> map().
@@ -304,7 +304,7 @@ remove_slot_monitors(Idx, Monitors) ->
 
 -spec cleanup_old_conn(nats:conn() | undefined) -> ok.
 cleanup_old_conn(undefined) -> ok;
-cleanup_old_conn(OldConn) -> ignore_disconnect(OldConn).
+cleanup_old_conn(OldConn) -> gateway_nats_pool_conn:ignore_disconnect(OldConn).
 
 -spec handle_connect_error(non_neg_integer(), pid(), term(), map()) -> map().
 handle_connect_error(Idx, Pid, Reason, #{connecting := Connecting} = State) ->
@@ -398,7 +398,7 @@ send_overloaded(ReplyTo) ->
 handle_conn_event_down(Conn, #{pool_size := PoolSize} = State) ->
     case gateway_nats_pool_conn:find_slot_by_conn(Conn, State) of
         undefined ->
-            ignore_disconnect(Conn),
+            gateway_nats_pool_conn:ignore_disconnect(Conn),
             State;
         Idx ->
             gateway_nats_pool_conn:handle_conn_down(Idx, Conn, PoolSize, State)
@@ -475,7 +475,7 @@ handle_legacy_connect_timeout(Idx, #{connecting := Connecting} = State) ->
 
 -spec accept_connect_timeout(non_neg_integer(), term(), map()) -> map().
 accept_connect_timeout(Idx, Entry, #{connecting := Connecting} = State) ->
-    maybe_kill_connect_pid(connecting_entry_pid(Entry)),
+    gateway_nats_pool_conn:maybe_kill_connect_pid(connecting_entry_pid(Entry)),
     logger:warning("Gateway NATS pool slot connect attempt timed out", #{slot => Idx}),
     gateway_nats_pool_conn:schedule_reconnect(Idx, self()),
     State#{connecting => maps:remove(Idx, Connecting)}.

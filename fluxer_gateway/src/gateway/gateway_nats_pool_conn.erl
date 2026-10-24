@@ -19,7 +19,12 @@
     max_handlers/0,
     parse_nats_url/1,
     build_connect_opts/1,
-    reconnect_delay/1
+    reconnect_delay/1,
+    nats_rpc_enabled/0,
+    decrement_handler_count/1,
+    maybe_kill_connect_pid/1,
+    ignore_disconnect/1,
+    ignore_unsub/2
 ]).
 
 -define(DEFAULT_POOL_SIZE, 16).
@@ -347,3 +352,24 @@ coerce_sid({'$sid', N} = Sid) when is_integer(N) ->
     {ok, Sid};
 coerce_sid(_) ->
     error.
+
+-spec nats_rpc_enabled() -> boolean().
+nats_rpc_enabled() ->
+    case fluxer_gateway_env:get(nats_rpc_enabled) of
+        false -> false;
+        _ -> true
+    end.
+
+-spec decrement_handler_count(map()) -> map().
+decrement_handler_count(#{handler_count := HC} = State) when HC > 0 ->
+    State#{handler_count => HC - 1};
+decrement_handler_count(State) ->
+    State.
+
+-spec maybe_kill_connect_pid(pid() | undefined) -> ok.
+maybe_kill_connect_pid(Pid) when is_pid(Pid) ->
+    unlink(Pid),
+    exit(Pid, kill),
+    ok;
+maybe_kill_connect_pid(undefined) ->
+    ok.

@@ -30,7 +30,7 @@
 
 -spec start_link() -> {ok, pid()} | {error, term()}.
 start_link() ->
-    normalize_start_link(gen_server:start_link({local, ?MODULE}, ?MODULE, [], [])).
+    shard_utils:normalize_start_link(gen_server:start_link({local, ?MODULE}, ?MODULE, [], [])).
 
 -spec put(integer(), map()) -> ok.
 put(UserId, Presence) when is_integer(UserId), is_map(Presence) ->

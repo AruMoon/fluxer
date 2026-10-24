@@ -9,8 +9,7 @@
     rpc_subjects_for_role/1,
     do_connect/1,
     do_subscribe/1,
-    schedule_reconnect/1,
-    max_handlers/0
+    schedule_reconnect/1
 ]).
 
 -define(RECONNECT_DELAY_MS, 2000).

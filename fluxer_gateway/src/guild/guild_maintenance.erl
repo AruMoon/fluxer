@@ -271,7 +271,7 @@ session_shares_member_channels(SessionData, MemberViewable, State) ->
     case maps:get(user_id, SessionData, undefined) of
         SessionUserId when is_integer(SessionUserId) ->
             SessionViewable = session_viewable_channels(SessionData, SessionUserId, State),
-            maps_share_any_key(SessionViewable, MemberViewable);
+            map_utils:maps_share_any_key(SessionViewable, MemberViewable);
         _ ->
             false
     end.

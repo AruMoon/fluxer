@@ -89,12 +89,12 @@ count_online_member_indexed(_UserId, _Ctx, _OtherUserId, _Presence, Acc) ->
 shares_viewable_channel(OtherUserId, {ViewerMap, Index, State}, Memo) ->
     case maps:find(OtherUserId, Index) of
         {ok, OtherMap} ->
-            {maps_share_any_key(OtherMap, ViewerMap), Memo};
+            {map_utils:maps_share_any_key(OtherMap, ViewerMap), Memo};
         error ->
             {OtherMap, Memo1} = guild_viewable_memo:memoised_channel_map(
                 OtherUserId, State, ensure_memo(Memo, State)
             ),
-            {maps_share_any_key(OtherMap, ViewerMap), Memo1}
+            {map_utils:maps_share_any_key(OtherMap, ViewerMap), Memo1}
     end.
 
 -spec ensure_memo(memo() | undefined, guild_state()) -> memo().

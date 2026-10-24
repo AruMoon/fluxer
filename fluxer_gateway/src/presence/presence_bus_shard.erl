@@ -11,7 +11,9 @@
 
 -spec start_link(non_neg_integer()) -> {ok, pid()} | {error, term()}.
 start_link(ShardIndex) ->
-    normalize_start_link(gen_server:start_link(?MODULE, #{shard_index => ShardIndex}, [])).
+    shard_utils:normalize_start_link(
+        gen_server:start_link(?MODULE, #{shard_index => ShardIndex}, [])
+    ).
 
 -spec init(map()) -> {ok, state(), hibernate} | {stop, term()}.
 init(#{shard_index := ShardIndex}) ->

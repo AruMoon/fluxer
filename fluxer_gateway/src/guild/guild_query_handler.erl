@@ -125,7 +125,7 @@ handle_query(Msg, From, State) ->
 handle_get_counts(State) ->
     MemberCount = maps:get(member_count, State, 0),
     PublicOnlineCount = guild_public_online:compute_count(State),
-    ok = maybe_put_guild_count_cache(State, MemberCount, PublicOnlineCount),
+    ok = guild_maintenance:maybe_put_guild_count_cache(State, MemberCount, PublicOnlineCount),
     {reply, #{member_count => MemberCount, presence_count => PublicOnlineCount}, State}.
 
 -spec handle_get_user_counts(user_id(), guild_state()) -> {reply, map(), guild_state()}.

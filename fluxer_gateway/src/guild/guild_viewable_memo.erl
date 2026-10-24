@@ -3,7 +3,7 @@
 -module(guild_viewable_memo).
 -typing([eqwalizer]).
 
--export([new/1, memoised_channel_map/3, channel_map/2, exceptions/1]).
+-export([new/1, memoised_channel_map/3, channel_map/2, exceptions/1, memo_key/3]).
 -export_type([memo/0, user_id/0, guild_state/0]).
 
 -type user_id() :: integer().

@@ -13,7 +13,9 @@
 
 -spec start_link(non_neg_integer()) -> {ok, pid()} | {error, term()}.
 start_link(ShardIndex) ->
-    normalize_start_link(gen_server:start_link(?MODULE, #{shard_index => ShardIndex}, [])).
+    shard_utils:normalize_start_link(
+        gen_server:start_link(?MODULE, #{shard_index => ShardIndex}, [])
+    ).
 
 -spec table_name(non_neg_integer()) -> atom().
 table_name(Index) ->

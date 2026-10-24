@@ -68,7 +68,9 @@ enqueue_session_connect_async_for_session(GuildId, Attempt, Request, Msg, Sessio
             Queue0 = ensure_session_connect_queue(
                 maps:get(session_connect_queue, State, queue:new())
             ),
-            Filtered = drop_queued(SessionId, Queue0),
+            Filtered = guild_sessions_connect_cleanup:filter_session_from_queue(
+                SessionId, Queue0
+            ),
             do_enqueue(GuildId, Attempt, Request, Msg, SessionId, Pending0, Filtered, State);
         {enqueue, fresh} ->
             Queue0 = ensure_session_connect_queue(
@@ -345,7 +347,7 @@ log_dropped_session_connect(Item, Queued, MaxQueue) ->
         " attempt=~p queued=~p max_queue=~p",
         [
             queued_guild_id(Item),
-            queued_session_id(Item),
+            guild_sessions_connect_cleanup:queued_session_id(Item),
             queued_attempt(Item),
             Queued,
             MaxQueue
@@ -367,7 +369,7 @@ notify_dropped_session_connect(Item) ->
 
 -spec cleanup_dropped_session_connect(term(), map()) -> map().
 cleanup_dropped_session_connect(Item, State) ->
-    case queued_session_id(Item) of
+    case guild_sessions_connect_cleanup:queued_session_id(Item) of
         SessionId when is_binary(SessionId) ->
             State1 = remove_pending_session_connect(SessionId, State),
             discard_pending_session(SessionId, overloaded, State1);

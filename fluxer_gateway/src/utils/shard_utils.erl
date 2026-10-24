@@ -12,7 +12,8 @@
     safe_gen_call_wrapped/3,
     safe_apply/2,
     safe_cast/2,
-    check_mailbox_pressure/1
+    check_mailbox_pressure/1,
+    normalize_start_link/1
 ]).
 
 -export_type([shard/0]).
@@ -127,3 +128,11 @@ check_pid_mailbox_pressure(Pid) ->
         {message_queue_len, Len} when Len > ?MAILBOX_PRESSURE_THRESHOLD -> overloaded;
         _ -> ok
     end.
+
+-spec normalize_start_link(gen_server:start_ret()) -> {ok, pid()} | {error, term()}.
+normalize_start_link({ok, Pid}) ->
+    {ok, Pid};
+normalize_start_link({error, Reason}) ->
+    {error, Reason};
+normalize_start_link(ignore) ->
+    {error, ignore}.

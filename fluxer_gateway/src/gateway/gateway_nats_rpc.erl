@@ -41,14 +41,14 @@ disable_rpc_subscription() ->
 init([]) ->
     process_flag(trap_exit, true),
     erlang:process_flag(fullsweep_after, 10),
-    RpcEnabled = nats_rpc_enabled(),
+    RpcEnabled = gateway_nats_pool_conn:nats_rpc_enabled(),
     self() ! connect,
     {ok, #{
         conn => undefined,
         sub => undefined,
         handler_count => 0,
         handler_refs => #{},
-        max_handlers => gateway_nats_rpc_handler:max_handlers(),
+        max_handlers => gateway_nats_pool_conn:max_handlers(),
         monitor_ref => undefined,
         connecting_pid => undefined,
         connecting_token => undefined,
@@ -71,10 +71,10 @@ handle_call(enable_rpc_subscription, _From, #{conn := Conn} = State) when
     Conn =/= undefined
 ->
     NewState = gateway_nats_rpc_handler:do_subscribe(State#{rpc_enabled => true}),
-    ignore_pool_enable_subscription(),
+    ignore_pool_call(fun gateway_nats_pool:enable_rpc_subscription/0),
     {reply, ok, NewState};
 handle_call(enable_rpc_subscription, _From, State) ->
-    ignore_pool_enable_subscription(),
+    ignore_pool_call(fun gateway_nats_pool:enable_rpc_subscription/0),
     {reply, ok, State#{rpc_enabled => true}};
 handle_call(disable_rpc_subscription, _From, State) ->
     {reply, ok, do_disable_rpc(State)};
@@ -108,7 +108,7 @@ handle_info({Conn, _Sid, {msg, Subject, Payload, MsgOpts}}, #{conn := Conn} = St
 ->
     {noreply, handle_msg(Subject, Payload, MsgOpts, State)};
 handle_info({handler_done, _Pid}, State) ->
-    {noreply, decrement_handler_count(State)};
+    {noreply, gateway_nats_pool_conn:decrement_handler_count(State)};
 handle_info(
     {'DOWN', MRef, process, _Pid, _Reason},
     #{handler_refs := HRefs, handler_count := HC} = State
@@ -135,7 +135,7 @@ handle_handler_down(MRef, HRefs, HandlerCount, State) ->
 -spec terminate(term(), map()) -> ok.
 terminate(_Reason, #{conn := Conn} = State) when Conn =/= undefined ->
     cleanup_connect_attempt(State),
-    ignore_disconnect(Conn),
+    gateway_nats_pool_conn:ignore_disconnect(Conn),
     logger:info("Gateway NATS RPC subscriber stopped"),
     ok;
 terminate(_Reason, State) ->
@@ -161,7 +161,7 @@ connect_if_needed(State) ->
 
 -spec reconnect_after_disconnect(nats:conn(), map()) -> map().
 reconnect_after_disconnect(Conn, State) ->
-    ignore_disconnect(Conn),
+    gateway_nats_pool_conn:ignore_disconnect(Conn),
     schedule_conn_reconnect(State).
 
 -spec schedule_conn_reconnect(map()) -> map().
@@ -195,7 +195,7 @@ handle_connect_ok(Pid, Conn, State) ->
                 connecting_timer => undefined
             };
         _ ->
-            ignore_disconnect(Conn),
+            gateway_nats_pool_conn:ignore_disconnect(Conn),
             State
     end.
 
@@ -204,7 +204,7 @@ cleanup_old(State) ->
     OldConn = maps:get(conn, State, undefined),
     case OldConn of
         undefined -> ok;
-        _ -> ignore_disconnect(OldConn)
+        _ -> gateway_nats_pool_conn:ignore_disconnect(OldConn)
     end,
     OldMRef = maps:get(monitor_ref, State, undefined),
     case OldMRef of
@@ -216,7 +216,7 @@ cleanup_old(State) ->
 -spec cleanup_connect_attempt(map()) -> ok.
 cleanup_connect_attempt(State) ->
     cancel_connect_timer(State),
-    maybe_kill_connect_pid(maps:get(connecting_pid, State, undefined)).
+    gateway_nats_pool_conn:maybe_kill_connect_pid(maps:get(connecting_pid, State, undefined)).
 
 -spec cancel_connect_timer(map()) -> ok.
 cancel_connect_timer(State) ->
@@ -250,7 +250,7 @@ handle_connect_timeout(Token, State) ->
     case maps:get(connecting_token, State, undefined) of
         Token ->
             Pid = maps:get(connecting_pid, State, undefined),
-            maybe_kill_connect_pid(Pid),
+            gateway_nats_pool_conn:maybe_kill_connect_pid(Pid),
             logger:warning("Gateway NATS RPC connect attempt timed out, retrying"),
             gateway_nats_rpc_handler:do_connect(
                 State#{
@@ -428,71 +428,28 @@ do_dispatch_rpc(ReplyTo, Subject, Payload, HC, _MaxH, HRefs, State) ->
 do_disable_rpc(#{conn := Conn, sub := Sids} = State) when
     Conn =/= undefined, is_list(Sids)
 ->
-    [ignore_unsub(Conn, Sid) || Sid <- Sids],
-    ignore_pool_disable_subscription(),
+    [gateway_nats_pool_conn:ignore_unsub(Conn, Sid) || Sid <- Sids],
+    ignore_pool_call(fun gateway_nats_pool:disable_rpc_subscription/0),
     logger:info("Gateway NATS RPC unsubscribed", #{subscription_count => length(Sids)}),
     State#{sub => undefined, rpc_enabled => false};
 do_disable_rpc(#{conn := Conn, sub := Sid} = State) when
     Conn =/= undefined, Sid =/= undefined
 ->
-    ignore_unsub(Conn, Sid),
-    ignore_pool_disable_subscription(),
+    gateway_nats_pool_conn:ignore_unsub(Conn, Sid),
+    ignore_pool_call(fun gateway_nats_pool:disable_rpc_subscription/0),
     logger:info("Gateway NATS RPC unsubscribed"),
     State#{sub => undefined, rpc_enabled => false};
 do_disable_rpc(State) ->
-    ignore_pool_disable_subscription(),
+    ignore_pool_call(fun gateway_nats_pool:disable_rpc_subscription/0),
     State#{rpc_enabled => false}.
 
 -spec conn_from_term(term()) -> nats:conn().
 conn_from_term(Conn) when is_pid(Conn) ->
     Conn.
 
--spec ignore_disconnect(nats:conn()) -> ok.
-ignore_disconnect(Conn) ->
-    try nats:disconnect(Conn) of
-        _ -> ok
-    catch
-        throw:_ -> ok;
-        error:_ -> ok;
-        exit:_ -> ok
-    end.
-
--spec ignore_unsub(nats:conn(), term()) -> ok.
-ignore_unsub(Conn, Sid) ->
-    case coerce_sid(Sid) of
-        {ok, TypedSid} -> safe_unsub(Conn, TypedSid);
-        error -> ok
-    end.
-
--spec safe_unsub(nats:conn(), nats:sid()) -> ok.
-safe_unsub(Conn, TypedSid) ->
-    try nats:unsub(Conn, TypedSid) of
-        _ -> ok
-    catch
-        throw:_ -> ok;
-        error:_ -> ok;
-        exit:_ -> ok
-    end.
-
--spec coerce_sid(term()) -> {ok, nats:sid()} | error.
-coerce_sid({'$sid', N} = Sid) when is_integer(N) ->
-    {ok, Sid};
-coerce_sid(_) ->
-    error.
-
--spec ignore_pool_enable_subscription() -> ok.
-ignore_pool_enable_subscription() ->
-    try gateway_nats_pool:enable_rpc_subscription() of
-        _ -> ok
-    catch
-        throw:_ -> ok;
-        error:_ -> ok;
-        exit:_ -> ok
-    end.
-
--spec ignore_pool_disable_subscription() -> ok.
-ignore_pool_disable_subscription() ->
-    try gateway_nats_pool:disable_rpc_subscription() of
+-spec ignore_pool_call(fun(() -> term())) -> ok.
+ignore_pool_call(PoolCall) ->
+    try PoolCall() of
         _ -> ok
     catch
         throw:_ -> ok;

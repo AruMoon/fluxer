@@ -7,7 +7,7 @@
 
 -spec init(cowboy_req:req(), term()) -> {ok, cowboy_req:req(), term()}.
 init(Req0, State) ->
-    case is_loopback_request(Req0) of
+    case health_handler:is_loopback_request(Req0) of
         false ->
             Req = cowboy_req:reply(
                 403,
