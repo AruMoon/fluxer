@@ -20,6 +20,7 @@ import {
 } from '@app/api/auth/InstanceAddress';
 import {createInviteCode, createUserID, type UserID} from '@app/api/BrandedTypes';
 import type {APIConfig} from '@app/api/config/APIConfig';
+import type {LocalDate} from '@app/api/database/LocalDate';
 import {EMPTY_USER_ROW, type UserRow} from '@app/api/database/types/UserTypes';
 import {emitActivity} from '@app/api/infrastructure/activity/ActivityEvents';
 import type {RegMethod} from '@app/api/infrastructure/activity/Contract.generated';
@@ -534,7 +535,7 @@ async function createAccountUnlocked(
 }
 
 interface RegistrationDateOfBirth {
-	date: types.LocalDate | null;
+	date: LocalDate | null;
 	adult: boolean;
 	deferred: boolean;
 }

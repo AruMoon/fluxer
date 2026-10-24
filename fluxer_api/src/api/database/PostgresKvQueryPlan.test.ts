@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import cassandra from 'cassandra-driver';
+import {LocalDate} from '@app/api/database/LocalDate';
 import {describe, expect, it} from 'vitest';
 import '@app/api/Tables';
 import {getTableMetadata} from '@app/api/database/CassandraMetaRegistry';
@@ -439,8 +439,8 @@ describe('PostgresKvQueryExecutor key equality', () => {
 		['false', false],
 		['date', new Date('2020-01-01T00:00:00.000Z')],
 		['buffer', Buffer.from('2020-01-01')],
-		['local-date', cassandra.types.LocalDate.fromString('2020-01-01')],
-		['other-local-date', cassandra.types.LocalDate.fromString('2021-06-05')],
+		['local-date', LocalDate.fromString('2020-01-01')],
+		['other-local-date', LocalDate.fromString('2021-06-05')],
 	];
 
 	it('accepts an equality exactly when both sides share a row key', () => {
@@ -457,7 +457,7 @@ describe('PostgresKvQueryExecutor key equality', () => {
 	});
 
 	it('does not equate a LocalDate with its string rendering', () => {
-		const localDate = cassandra.types.LocalDate.fromString('2020-01-01');
+		const localDate = LocalDate.fromString('2020-01-01');
 		expect(matchesWhere({a: localDate}, eqWhere, {a: localDate} as CassandraParams)).toBe(true);
 		expect(matchesWhere({a: localDate}, eqWhere, {a: '2020-01-01'} as CassandraParams)).toBe(false);
 		expect(matchesWhere({a: '2020-01-01'}, eqWhere, {a: localDate} as CassandraParams)).toBe(false);

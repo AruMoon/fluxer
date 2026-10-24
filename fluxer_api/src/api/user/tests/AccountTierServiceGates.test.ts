@@ -6,6 +6,7 @@ import {createTotpSecret, totpCodeNow} from '@app/api/auth/tests/AuthTestUtils';
 import {createGuildID, createUserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
 import {createApiContext} from '@app/api/CreateApiContext';
+import {LocalDate} from '@app/api/database/LocalDate';
 import {EMPTY_USER_ROW, type UserRow} from '@app/api/database/types/UserTypes';
 import {setCachedAccountIdentity} from '@app/api/instance/AccountIdentityModeCache';
 import {
@@ -46,7 +47,7 @@ function createUser(overrides: Partial<UserRow> = {}): User {
 		password_hash: 'hash',
 		traits: new Set<string>(),
 		flags: UserFlags.HAS_SESSION_STARTED,
-		date_of_birth: types.LocalDate.fromString('1990-01-01'),
+		date_of_birth: LocalDate.fromString('1990-01-01'),
 		...overrides,
 	});
 }

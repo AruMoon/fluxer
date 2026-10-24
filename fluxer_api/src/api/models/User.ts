@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {UserID} from '@app/api/BrandedTypes';
+import {LocalDate} from '@app/api/database/LocalDate';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import {checkIsPremium, getEffectivePremiumUntil} from '@app/api/user/UserHelpers';
 import {
@@ -179,7 +180,7 @@ export class User {
 			accent_color: this.accentColor,
 			timezone: this.timezone,
 			timezone_privacy_flags: this.timezonePrivacyFlags,
-			date_of_birth: this.dateOfBirth ? types.LocalDate.fromString(this.dateOfBirth) : null,
+			date_of_birth: this.dateOfBirth ? LocalDate.fromString(this.dateOfBirth) : null,
 			locale: this.locale,
 			flags: this.flags,
 			premium_flags: this.premiumFlags,

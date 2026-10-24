@@ -11,6 +11,7 @@ import type {
 	WhereExpr,
 } from '@app/api/database/CassandraTypes';
 import {isConditionalQuery, validateTtlSeconds} from '@app/api/database/CassandraTypes';
+import {LocalDate} from '@app/api/database/LocalDate';
 import {Logger} from '@app/api/Logger';
 import {type IPostgresClient, type PostgresQueryable, quoteIdentifier} from '@pkgs/postgres/src/Client';
 
@@ -178,7 +179,7 @@ function encodeValue(value: unknown): unknown {
 			value: [...value.entries()].map(([key, entry]) => [encodeValue(key), encodeValue(entry)]),
 		};
 	}
-	if (typeof value === 'object' && value.constructor?.name === 'LocalDate') {
+	if (value instanceof LocalDate) {
 		return {[ENCODED_TYPE_KEY]: 'local_date', value: value.toString()};
 	}
 	if (Array.isArray(value)) return value.map(encodeValue);
@@ -205,7 +206,7 @@ function decodeValue(value: unknown): unknown {
 			((value.value as Array<[unknown, unknown]>) ?? []).map(([key, entry]) => [decodeValue(key), decodeValue(entry)]),
 		);
 	}
-	if (encodedType === 'local_date') return cassandra.types.LocalDate.fromString(String(value.value));
+	if (encodedType === 'local_date') return LocalDate.fromString(String(value.value));
 	const decoded: Record<string, unknown> = {};
 	for (const [key, entry] of Object.entries(value)) {
 		decoded[key] = decodeValue(entry);
@@ -307,7 +308,7 @@ function comparisonValue(value: unknown): unknown {
 	if (value instanceof Date) {
 		return value.getTime();
 	}
-	return value?.constructor?.name === 'LocalDate' ? value.toString() : value;
+	return value instanceof LocalDate ? value.toString() : value;
 }
 
 function compareValues(left: unknown, right: unknown): number {
@@ -328,7 +329,7 @@ export function valuesEqual(left: unknown, right: unknown): boolean {
 	if (left == null && right == null) return true;
 	if (left instanceof Date && right instanceof Date) return left.getTime() === right.getTime();
 	if (Buffer.isBuffer(left) && Buffer.isBuffer(right)) return left.equals(right);
-	if (left?.constructor?.name === 'LocalDate' && right?.constructor?.name === 'LocalDate') {
+	if (left instanceof LocalDate && right instanceof LocalDate) {
 		return left.toString() === right.toString();
 	}
 	return left === right;

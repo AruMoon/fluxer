@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type cassandra from 'cassandra-driver';
+import {LocalDate} from '@app/api/database/LocalDate';
 
 const MAX_TTL_SECONDS = 630_720_000;
 
@@ -42,7 +42,7 @@ export type CassandraParam =
 	| boolean
 	| Buffer
 	| Date
-	| cassandra.types.LocalDate
+	| LocalDate
 	| Set<unknown>
 	| Map<unknown, unknown>
 	| Array<unknown>
@@ -353,7 +353,7 @@ function findUndefinedPath(value: unknown): string | null {
 	const t = typeof value;
 	if (t === 'string' || t === 'number' || t === 'bigint' || t === 'boolean') return null;
 	if (value instanceof Date || value instanceof Buffer) return null;
-	if (t === 'object' && value.constructor?.name === 'LocalDate') return null;
+	if (value instanceof LocalDate) return null;
 	if (Array.isArray(value)) {
 		for (let i = 0; i < value.length; i++) {
 			const suffix = findUndefinedPath(value[i]);

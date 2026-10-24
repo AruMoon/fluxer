@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type {CassandraParams, KvQueryMeta, KvTableSpec, WhereExpr} from '@app/api/database/CassandraTypes';
+import {LocalDate} from '@app/api/database/LocalDate';
 import {buildCandidatePlan, keyFromColumns, matchesWhere} from '@app/api/database/PostgresKvQueryExecutor';
 import {describe, expect, it} from 'vitest';
 
@@ -36,7 +37,7 @@ const VALUES: Array<[string, unknown]> = [
 	['date-epoch-2', new Date(0)],
 	['buf-a', Buffer.from('a')],
 	['buf-a-2', Buffer.from('a')],
-	['localdate', cassandra.types.LocalDate.fromString('2020-01-01')],
+	['localdate', LocalDate.fromString('2020-01-01')],
 	['localdate-str', '2020-01-01'],
 ];
 

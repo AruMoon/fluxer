@@ -5,6 +5,7 @@ import {mapUserToAdminResponse} from '@app/api/admin/models/UserTypes';
 import type {AdminAuditService} from '@app/api/admin/services/AdminAuditService';
 import {confirmEmailOwnership} from '@app/api/auth/EmailOwnership';
 import {createUserID, type UserID} from '@app/api/BrandedTypes';
+import {LocalDate} from '@app/api/database/LocalDate';
 import type {EnforcementDecisionRow} from '@app/api/database/types/EnforcementTypes';
 import type {EnforcementActor} from '@app/api/enforcement/EnforcementActor';
 import {decisionAuditMetadata, type EnforcementDecisionService} from '@app/api/enforcement/EnforcementDecisionService';
@@ -383,7 +384,7 @@ export class AdminUserProfileService {
 		let updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
-				date_of_birth: types.LocalDate.fromString(data.date_of_birth),
+				date_of_birth: LocalDate.fromString(data.date_of_birth),
 				traits: traits.size > 0 ? traits : null,
 			},
 			user.toRow(),

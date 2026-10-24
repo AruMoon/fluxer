@@ -10,6 +10,7 @@ import type {
 	MessageID,
 	UserID,
 } from '@app/api/BrandedTypes';
+import type {LocalDate} from '@app/api/database/LocalDate';
 import type {LocaleCode} from '@fluxer/constants/src/Locales';
 import type {GuildFolderIcon, MentionReplyPreference} from '@fluxer/constants/src/UserConstants';
 import type {types} from 'cassandra-driver';
@@ -44,7 +45,7 @@ export interface UserRow {
 	accent_color: number | null;
 	timezone: string | null;
 	timezone_privacy_flags: number | null;
-	date_of_birth: types.LocalDate | null;
+	date_of_birth: LocalDate | null;
 	locale: string | null;
 	flags: bigint | null;
 	premium_flags?: number | null;
