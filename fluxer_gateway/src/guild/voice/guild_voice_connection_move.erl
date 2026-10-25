@@ -66,7 +66,6 @@ do_request_move_token(Context, ChannelIdValue, Member, SessionId, MoveState, Gui
     TokenNonce = voice_utils:generate_token_nonce(),
     Lat = maps:get(latitude, Context, undefined),
     Lng = maps:get(longitude, Context, undefined),
-    ClientIP = maps:get(client_ip, Context, undefined),
     Build = #{
         context => Context,
         channel_id => ChannelIdValue,
@@ -100,8 +99,7 @@ do_request_move_token(Context, ChannelIdValue, Member, SessionId, MoveState, Gui
                 Lat,
                 Lng,
                 Decision,
-                maps:get(country_code, Context, undefined),
-                ClientIP
+                maps:get(country_code, Context, undefined)
             ),
             handle_move_token_result(Decision, TokenResult, Build)
     end.
