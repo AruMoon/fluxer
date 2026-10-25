@@ -6,13 +6,11 @@
 -export([
     build_voice_token_rpc_request/6,
     build_voice_token_rpc_request/8,
-    build_voice_token_rpc_request/9,
     build_force_disconnect_rpc_request/4,
     build_update_participant_rpc_request/6,
     build_update_participant_permissions_rpc_request/5,
     add_geolocation_to_request/3,
     add_rtc_region_to_request/2,
-    add_client_ip_to_request/2,
     apply_voice_permissions_to_flags/2,
     compute_voice_permissions/3,
     generate_token_nonce/0
@@ -76,49 +74,6 @@ build_voice_token_rpc_request(GuildId, ChannelId, UserId, ConnectionId, Latitude
         end,
     WithConnection = add_connection_id_to_request(BaseReq, ConnectionId),
     add_geolocation_to_request(WithConnection, Latitude, Longitude).
-
--spec build_voice_token_rpc_request(
-    integer() | null,
-    integer(),
-    integer(),
-    binary() | integer() | null,
-    coordinate_input(),
-    coordinate_input(),
-    binary() | undefined | null,
-    voice_permissions(),
-    binary() | null
-) -> map().
-build_voice_token_rpc_request(
-    GuildId,
-    ChannelId,
-    UserId,
-    ConnectionId,
-    Latitude,
-    Longitude,
-    ClientIP,
-    VoicePermissions,
-    TokenNonce
-) ->
-    BaseReq = build_voice_token_rpc_request(
-        GuildId,
-        ChannelId,
-        UserId,
-        ConnectionId,
-        Latitude,
-        Longitude,
-        VoicePermissions,
-        TokenNonce
-    ),
-    add_client_ip_to_request(BaseReq, ClientIP).
-
--spec add_client_ip_to_request(map(), binary() | undefined | null) -> map().
-add_client_ip_to_request(RequestMap, ClientIP) ->
-    case ClientIP of
-        ClientIPBin when is_binary(ClientIPBin), byte_size(ClientIPBin) > 0 ->
-            RequestMap#{<<"client_ip">> => ClientIPBin};
-        _ ->
-            RequestMap
-    end.
 
 -spec add_geolocation_to_request(
     map(),
