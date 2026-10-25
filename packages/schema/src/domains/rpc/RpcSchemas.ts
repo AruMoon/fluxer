@@ -155,7 +155,7 @@ export const RpcRequest = z.discriminatedUnion('type', [
 			.string()
 			.regex(/^[A-Z]{2}$/u)
 			.optional()
-			.describe('ISO 3166-1 alpha-2 country code used for voice region selection'),
+			.describe('ISO 3166-1 alpha-2 country code of the session, omitted when unknown'),
 	}),
 	z.object({
 		type: z.literal('kick_temporary_member').describe('Request type for kicking temporary guild members'),
