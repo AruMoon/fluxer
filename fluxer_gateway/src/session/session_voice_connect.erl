@@ -47,13 +47,7 @@ handle_voice_state_update(Data, State) ->
         user_id => UserId,
         e2ee_capable => E2EECapable,
         bot => Bot,
-        country_code =>
-            case maps:get(country_code, Params, undefined) of
-                CountryCode when is_binary(CountryCode), byte_size(CountryCode) > 0 ->
-                    CountryCode;
-                _ ->
-                    maps:get(geoip_country_code, State, undefined)
-            end,
+        country_code => maps:get(geoip_country_code, State, undefined),
         guilds => Guilds
     },
     dispatch_validated(GuildIdResult, ChannelIdResult, Ctx, State).
@@ -72,7 +66,6 @@ extract_voice_params(Data) ->
         is_mobile => maps:get(<<"is_mobile">>, Data, false),
         latitude => maps:get(<<"latitude">>, Data, null),
         longitude => maps:get(<<"longitude">>, Data, null),
-        country_code => maps:get(<<"country_code">>, Data, undefined),
         p2p => maps:get(<<"p2p">>, Data, undefined)
     }.
 
