@@ -47,7 +47,13 @@ handle_voice_state_update(Data, State) ->
         user_id => UserId,
         e2ee_capable => E2EECapable,
         bot => Bot,
-        country_code => maps:get(country_code, Params, maps:get(geoip_country_code, State, undefined)),
+        country_code =>
+            case maps:get(country_code, Params, undefined) of
+                CountryCode when is_binary(CountryCode), byte_size(CountryCode) > 0 ->
+                    CountryCode;
+                _ ->
+                    maps:get(geoip_country_code, State, undefined)
+            end,
         guilds => Guilds
     },
     dispatch_validated(GuildIdResult, ChannelIdResult, Ctx, State).
