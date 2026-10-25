@@ -33,7 +33,7 @@ interface ShellUpdateRuntime {
 	readonly platform: NodeJS.Platform;
 }
 
-export function decideShellUpdatePlan(runtime: ShellUpdateRuntime): ShellUpdatePlan {
+function decideShellUpdatePlan(runtime: ShellUpdateRuntime): ShellUpdatePlan {
 	if (!runtime.packaged || runtime.channel === 'development') {
 		return {capability: ShellUpdateCapability.MANUAL_DOWNLOAD, reason: 'unpackaged'};
 	}

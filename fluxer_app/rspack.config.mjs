@@ -255,6 +255,21 @@ function authEntryDocumentPlugin() {
 	};
 }
 
+function rocketLoaderOptOutPlugin() {
+	return {
+		apply(compiler) {
+			compiler.hooks.thisCompilation.tap('RocketLoaderOptOutPlugin', (compilation) => {
+				HtmlRspackPlugin.getCompilationHooks(compilation).alterAssetTags.tap('RocketLoaderOptOutPlugin', (data) => {
+					for (const tag of data.assetTags.scripts) {
+						tag.attributes = {'data-cfasync': 'false', ...tag.attributes};
+					}
+					return data;
+				});
+			});
+		},
+	};
+}
+
 function fontPreloadPlugin() {
 	return {
 		apply(compiler) {
@@ -646,6 +661,7 @@ export default () => {
 		plugins: [
 			nodeAssertStrictSchemePlugin(),
 			fontPreloadPlugin(),
+			rocketLoaderOptOutPlugin(),
 			...(isProduction ? [bootPreloadPlugin()] : []),
 			...(isProduction && !isDesktopRenderer ? [authEntryDocumentPlugin()] : []),
 			new HtmlRspackPlugin({
@@ -736,6 +752,15 @@ export default () => {
 								priority: 54,
 								reuseExistingChunk: true,
 								enforce: true,
+								chunks: (chunk) => !chunk.canBeInitial() && !isWorkerPath({chunk}),
+							},
+							plutoniumAtom: {
+								test: /[\\/]node_modules[\\/]three[\\/]/,
+								name: 'plutonium-atom',
+								priority: 54,
+								reuseExistingChunk: true,
+								enforce: true,
+								maxAsyncSize: Number.POSITIVE_INFINITY,
 								chunks: (chunk) => !chunk.canBeInitial() && !isWorkerPath({chunk}),
 							},
 							editor: {

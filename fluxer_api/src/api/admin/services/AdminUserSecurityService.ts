@@ -201,10 +201,7 @@ export class AdminUserSecurityService {
 	}) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		await assertUserFlagUpdateAllowed(user, data.addFlags, data.removeFlags);
 		let previousFlags = 0n;
 		const updatedUser = await userRepository.updateFlags(userId, (flags) => {
@@ -257,10 +254,7 @@ export class AdminUserSecurityService {
 	}) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		await assertPremiumFlagUpdateAllowed(user, data.addFlags, data.removeFlags);
 		const newPremiumFlags = applyNumberFlagUpdates(user.premiumFlags, data.addFlags, data.removeFlags);
 		const updatedUser = await userRepository.patchUpsert(
@@ -292,10 +286,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository, botMfaMirror: botMfaMirrorService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
@@ -323,10 +314,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository, email: emailService} = this.deps.apiContext.services;
 		const {auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (!user.email) {
 			throw InputValidationError.fromCode('email', ValidationErrorCodes.USER_DOES_NOT_HAVE_AN_EMAIL_ADDRESS);
 		}
@@ -336,7 +324,7 @@ export class AdminUserSecurityService {
 			user_id: userId,
 			email: user.email,
 		});
-		await emailService.sendPasswordResetEmail(user.email, user.username, token, user.locale);
+		await emailService.send('password_reset', user.email, {resetToken: token}, user.locale);
 		await auditService.createAuditLog({
 			adminUserId,
 			targetType: 'user',
@@ -356,10 +344,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const {apiContext, auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		AuthUtility.assertNonBotUser(apiContext, user);
 		requireGrantedAdminACLs(acls, user.acls);
 		const token = createPasswordResetToken(await RandomUtils.randomString(64));
@@ -369,7 +354,7 @@ export class AdminUserSecurityService {
 		await userRepository.createPasswordResetToken({
 			token_: token,
 			user_id: userId,
-			email: null,
+			email: user.email ?? null,
 		});
 		await auditService.createAuditLog({
 			adminUserId,
@@ -393,10 +378,7 @@ export class AdminUserSecurityService {
 	): Promise<void> {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		requireGrantedAdminACLs(acls, user.acls);
 		await new RecoveryKitRepository().delete(userId);
 		await this.deps.auditService.createAuditLog({
@@ -417,10 +399,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const {apiContext, auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (!user.email) {
 			throw InputValidationError.fromCode('email', ValidationErrorCodes.USER_DOES_NOT_HAVE_AN_EMAIL_ADDRESS);
 		}
@@ -439,10 +418,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const {auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await userRepository.findUniqueAssert(userId);
 		const terminatedCount = await revokeAllAuthSessions(this.deps.apiContext.services, userId);
 		await auditService.createAuditLog({
 			adminUserId,
@@ -467,10 +443,7 @@ export class AdminUserSecurityService {
 		if (userId === adminUserId) {
 			throw new AccessDeniedError();
 		}
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		requireGrantedAdminACLs(acls, data.acls);
 		const updatedUser = await userRepository.patchUpsert(
 			userId,
@@ -502,10 +475,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const assigned = resolveAssignedTraits(user.traits ?? [], data.traits);
 		const traitSet = assigned.size > 0 ? assigned : null;
 		const updatedUser = await userRepository.patchUpsert(
@@ -537,10 +507,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const {auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await userRepository.findUniqueAssert(userId);
 		const credentials = visibleWebAuthnCredentials(await userRepository.listWebAuthnCredentials(userId));
 		await auditService.createAuditLog({
 			adminUserId,
@@ -563,10 +530,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository} = this.deps.apiContext.services;
 		const {apiContext, auditService} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await userRepository.findUniqueAssert(userId);
 		const credential = await userRepository.getWebAuthnCredential(userId, data.credential_id);
 		if (!credential) {
 			throw new UnknownUserError();
@@ -591,10 +555,7 @@ export class AdminUserSecurityService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService} = this.deps;
 		const userIdTyped = createUserID(userId);
-		const user = await userRepository.findUnique(userIdTyped);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		await userRepository.findUniqueAssert(userIdTyped);
 		const [activeSessions, tombstones] = await Promise.all([
 			userRepository.listAuthSessions(userIdTyped),
 			userRepository.listAuthSessionTombstones(userIdTyped),

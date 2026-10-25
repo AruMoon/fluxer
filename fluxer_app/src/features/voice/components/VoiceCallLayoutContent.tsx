@@ -346,19 +346,21 @@ export const VoiceCallLayoutContent = observer(function VoiceCallLayoutContent({
 															className={styles.iconMedium}
 															data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium"
 														/>
-													) : isParticipantsExpanded ? (
-														<CaretDownIcon
-															weight="bold"
-															className={styles.iconMedium}
-															data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--2"
-														/>
-													) : (
-														<CaretUpIcon
-															weight="bold"
-															className={styles.iconMedium}
-															data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--3"
-														/>
-													)}
+													) : null}
+													{!compact &&
+														(isParticipantsExpanded ? (
+															<CaretDownIcon
+																weight="bold"
+																className={styles.iconMedium}
+																data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--2"
+															/>
+														) : (
+															<CaretUpIcon
+																weight="bold"
+																className={styles.iconMedium}
+																data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--3"
+															/>
+														))}
 												</button>
 											</Tooltip>
 										</FocusRing>
@@ -472,19 +474,21 @@ export const VoiceCallLayoutContent = observer(function VoiceCallLayoutContent({
 														className={styles.iconMedium}
 														data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--4"
 													/>
-												) : isParticipantsExpanded ? (
-													<CaretDownIcon
-														weight="bold"
-														className={styles.iconMedium}
-														data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--5"
-													/>
-												) : (
-													<CaretUpIcon
-														weight="bold"
-														className={styles.iconMedium}
-														data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--6"
-													/>
-												)}
+												) : null}
+												{!compact &&
+													(isParticipantsExpanded ? (
+														<CaretDownIcon
+															weight="bold"
+															className={styles.iconMedium}
+															data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--5"
+														/>
+													) : (
+														<CaretUpIcon
+															weight="bold"
+															className={styles.iconMedium}
+															data-flx="voice.voice-call-layout-content.focus-layout-node.icon-medium--6"
+														/>
+													))}
 											</button>
 										</Tooltip>
 									</FocusRing>

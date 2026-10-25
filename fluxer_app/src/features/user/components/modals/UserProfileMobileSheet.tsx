@@ -60,9 +60,11 @@ import UserNote from '@app/features/user/state/UserNote';
 import UserProfile from '@app/features/user/state/UserProfile';
 import UserProfileMobile from '@app/features/user/state/UserProfileMobile';
 import Users from '@app/features/user/state/Users';
+import {canPerform} from '@app/features/user/utils/AccountGates';
 import {blockedDmConfirmModal, openDMChannelOrShowError} from '@app/features/user/utils/DMActionUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import * as ProfileDisplayUtils from '@app/features/user/utils/ProfileDisplayUtils';
+import {canOpenProfileEditor} from '@app/features/user/utils/ProfileEditAccess';
 import {
 	getProfileMembershipDisplayName,
 	resolveProfileGuildMembership,
@@ -73,6 +75,7 @@ import {SEND_FRIEND_REQUEST_DESCRIPTOR, UNBLOCK_USER_DESCRIPTOR} from '@app/feat
 import {shouldShowDiscriminator} from '@app/features/user/utils/UserTagUtils';
 import * as CallUtils from '@app/features/voice/utils/CallUtils';
 import {hasActiveDirectCallWithUser} from '@app/features/voice/utils/PrivateCallMenuUtils';
+import {TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';
 import {ME} from '@fluxer/constants/src/AppConstants';
 import {Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {
@@ -238,7 +241,8 @@ const UserProfileMobileSheetContent: React.FC<UserProfileMobileSheetContentProps
 		const relationshipType = relationship?.type;
 		const isBlocked = relationshipType === RelationshipTypes.BLOCKED;
 		const hasActiveDirectCall = hasActiveDirectCallWithUser(user.id);
-		const currentUserUnclaimed = !(Users.currentUser?.isClaimed() ?? true);
+		const canSendFriendRequest = canPerform(Users.currentUser, TierGatedActions.FRIEND_REQUEST).allowed;
+		const showEditProfile = canOpenProfileEditor(Users.currentUser);
 		const profileMembership = resolveProfileGuildMembership(profile, {
 			fallbackGuildId: guildId,
 			userId: user.id,
@@ -365,7 +369,7 @@ const UserProfileMobileSheetContent: React.FC<UserProfileMobileSheetContentProps
 		const renderRelationshipButton = () => {
 			const isFriendlyBot = user.bot && (user.flags & PublicUserFlags.FRIENDLY_BOT) === PublicUserFlags.FRIENDLY_BOT;
 			if (isCurrentUser || (user.bot && !isFriendlyBot)) return null;
-			if (RuntimeConfig.directMessagesDisabled && relationshipType !== RelationshipTypes.BLOCKED) {
+			if (RuntimeConfig.friendsDisabled && relationshipType !== RelationshipTypes.BLOCKED) {
 				return null;
 			}
 			if (relationshipType === RelationshipTypes.FRIEND) {
@@ -432,7 +436,7 @@ const UserProfileMobileSheetContent: React.FC<UserProfileMobileSheetContentProps
 					</button>
 				);
 			}
-			if (relationshipType === undefined && !currentUserUnclaimed && Users.currentUser?.verified !== false) {
+			if (relationshipType === undefined && canSendFriendRequest) {
 				return (
 					<button
 						type="button"
@@ -604,8 +608,7 @@ const UserProfileMobileSheetContent: React.FC<UserProfileMobileSheetContentProps
 														data-flx="user.user-profile-mobile-sheet.user-profile-mobile-sheet-content.badges-wrapper"
 													>
 														<UserProfileBadges
-															user={user}
-															profile={profile}
+															badges={profile.profileBadges}
 															isModal={true}
 															isMobile={true}
 															data-flx="user.user-profile-mobile-sheet.user-profile-mobile-sheet-content.user-profile-badges"
@@ -629,7 +632,7 @@ const UserProfileMobileSheetContent: React.FC<UserProfileMobileSheetContentProps
 												</div>
 											</div>
 											{isCurrentUser ? (
-												!currentUserUnclaimed && (
+												showEditProfile && (
 													<div
 														className={styles.actionButtonsContainer}
 														data-flx="user.user-profile-mobile-sheet.user-profile-mobile-sheet-content.action-buttons-container"

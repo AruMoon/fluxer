@@ -81,12 +81,12 @@ export const ThreadStarterMessage = observer(({message}: {message: Message}) => 
 	const reference = message.messageReference;
 	const resolution = MessageReferences.getMessageReference(reference?.channel_id ?? '', reference?.message_id ?? '');
 	const parent = reference?.channel_id ? Channels.getChannel(reference.channel_id) : undefined;
-	const starter =
-		resolution.state === MessageReferenceState.LOADED
-			? resolution.message
-			: resolution.state === MessageReferenceState.DELETED
-				? null
-				: message.referencedMessage;
+	let starter = message.referencedMessage;
+	if (resolution.state === MessageReferenceState.LOADED) {
+		starter = resolution.message;
+	} else if (resolution.state === MessageReferenceState.DELETED) {
+		starter = null;
+	}
 	if (starter && parent) {
 		return (
 			<div className={styles.starter} data-flx="threads.thread-starter-message.starter">

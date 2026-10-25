@@ -1,11 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-export const BRANDING_ASSET_FIELDS = ['icon_url', 'symbol_url', 'logo_url', 'wordmark_url', 'favicon_url'] as const;
+export const BRANDING_ASSET_FIELDS = [
+	'icon_url',
+	'symbol_url',
+	'logo_url',
+	'wordmark_url',
+	'favicon_url',
+	'favicon_dark_url',
+	'sign_in_backdrop_url',
+] as const;
 
 export type BrandingAssetField = (typeof BRANDING_ASSET_FIELDS)[number];
 
-const BRANDING_ASSET_REFERENCE = /^branding\/\d{1,20}\/(?:a_)?[0-9a-f]{8}\.[a-z0-9]{2,5}$/;
-const BRANDING_ASSET_PATH = /\/(branding\/\d{1,20}\/(?:a_)?[0-9a-f]{8}\.[a-z0-9]{2,5})$/;
+const BRANDING_ASSET_REFERENCE = /^branding(?:-backdrops)?\/\d{1,20}\/(?:a_)?[0-9a-f]{8}\.[a-z0-9]{2,5}$/;
+const BRANDING_ASSET_PATH = /\/(branding(?:-backdrops)?\/\d{1,20}\/(?:a_)?[0-9a-f]{8}\.[a-z0-9]{2,5})$/;
 
 function trimTrailingSlashes(value: string): string {
 	return value.replace(/\/+$/u, '');
@@ -15,7 +23,7 @@ export function isBrandingAssetReference(value: string): boolean {
 	return BRANDING_ASSET_REFERENCE.test(value);
 }
 
-export function brandingAssetReferenceFromOwnUrl(value: string, mediaEndpoint: string): string | null {
+function brandingAssetReferenceFromOwnUrl(value: string, mediaEndpoint: string): string | null {
 	const prefix = `${trimTrailingSlashes(mediaEndpoint)}/`;
 	if (!value.startsWith(prefix)) return null;
 	const remainder = value.slice(prefix.length);
@@ -64,4 +72,30 @@ export function mapBrandingAssets<T extends Partial<Record<BrandingAssetField, s
 		}
 	}
 	return next;
+}
+
+export function brandingAssetStorageKeys(
+	branding: Partial<Record<BrandingAssetField, string | null | undefined>>,
+): Set<string> {
+	const keys = new Set<string>();
+	for (const field of BRANDING_ASSET_FIELDS) {
+		const value = branding[field];
+		if (typeof value === 'string' && isBrandingAssetReference(value)) keys.add(brandingAssetStorageKey(value));
+	}
+	return keys;
+}
+
+export function releasedBrandingAssetReferences(
+	before: Partial<Record<BrandingAssetField, string | null | undefined>>,
+	after: Partial<Record<BrandingAssetField, string | null | undefined>>,
+): Array<string> {
+	const kept = brandingAssetStorageKeys(after);
+	const released = new Map<string, string>();
+	for (const field of BRANDING_ASSET_FIELDS) {
+		const value = before[field];
+		if (typeof value !== 'string' || !isBrandingAssetReference(value)) continue;
+		const key = brandingAssetStorageKey(value);
+		if (!kept.has(key) && !released.has(key)) released.set(key, value);
+	}
+	return [...released.values()];
 }

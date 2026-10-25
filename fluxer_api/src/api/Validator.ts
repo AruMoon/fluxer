@@ -11,7 +11,6 @@ import {
 import type {ValidationError} from '@fluxer/errors/src/domains/core/ValidationError';
 import {schemaMetadata} from '@fluxer/schema/src/SchemaMetadata';
 import type {Context, Env, Input, MiddlewareHandler, TypedResponse, ValidationTargets} from 'hono';
-import {getCookie} from 'hono/cookie';
 import {
 	type core,
 	type input,
@@ -78,11 +77,12 @@ function convertEmptyValuesToNull(obj: unknown, schema?: core.$ZodType, isRoot =
 }
 
 type HasUndefined<T> = undefined extends T ? true : false;
+type ValidatorTarget = 'json' | 'form' | 'query' | 'param';
 type Hook<
 	T extends ZodType,
 	E extends Env,
 	P extends string,
-	Target extends keyof ValidationTargets = keyof ValidationTargets,
+	Target extends ValidatorTarget = ValidatorTarget,
 	V extends Input = Input,
 	O = Record<string, unknown>,
 > = (
@@ -91,7 +91,7 @@ type Hook<
 	},
 	c: Context<E, P, V>,
 ) => Response | undefined | TypedResponse<O> | Promise<Response | undefined | TypedResponse<O>>;
-type PreHook<E extends Env, P extends string, Target extends keyof ValidationTargets, V extends Input> = (
+type PreHook<E extends Env, P extends string, Target extends ValidatorTarget, V extends Input> = (
 	value: unknown,
 	c: Context<E, P, V>,
 	target: Target,
@@ -103,7 +103,7 @@ type ValidatorOptions<
 	T extends ZodType,
 	E extends Env,
 	P extends string,
-	Target extends keyof ValidationTargets,
+	Target extends ValidatorTarget,
 	V extends Input,
 > = {
 	pre?: PreHook<E, P, Target, V>;
@@ -130,7 +130,7 @@ export function inputValidationErrorFromZodIssues(issues: Array<core.$ZodIssue>)
 
 export const Validator = <
 	T extends ZodType,
-	Target extends keyof ValidationTargets,
+	Target extends ValidatorTarget,
 	E extends Env,
 	P extends string,
 	In = input<T>,
@@ -177,11 +177,14 @@ export const Validator = <
 				formData.forEach((formValue, key) => {
 					const existingValue = form[key];
 					if (key.endsWith('[]')) {
-						const list = Array.isArray(existingValue)
-							? existingValue
-							: existingValue !== undefined
-								? [existingValue]
-								: [];
+						let list: Array<FormDataEntry>;
+						if (Array.isArray(existingValue)) {
+							list = existingValue;
+						} else if (existingValue !== undefined) {
+							list = [existingValue];
+						} else {
+							list = [];
+						}
 						list.push(formValue);
 						form[key] = list;
 					} else if (Array.isArray(existingValue)) {
@@ -203,14 +206,6 @@ export const Validator = <
 			case 'param':
 				value = c.req.param();
 				break;
-			case 'header':
-				value = c.req.header();
-				break;
-			case 'cookie':
-				value = getCookie(c);
-				break;
-			default:
-				value = {};
 		}
 		if (options.pre) {
 			value = await options.pre(value, c, target);

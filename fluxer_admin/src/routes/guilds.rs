@@ -3,7 +3,6 @@
 use crate::{
     api::{
         client::{AdminApiClient, ApiResultExt},
-        enforcement::api_error_message,
         generated::types::CommunityRemovalBasis,
     },
     middleware::{
@@ -135,12 +134,7 @@ async fn guild_detail(
         .flatten();
 
     let tq = to_tab_query(&query);
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
     let username_sign_in = state.account_identity(&client).await.is_username();
     let tab_body = if let Some(guild) = guild.as_ref() {
         guild_tabs::render(
@@ -193,10 +187,10 @@ async fn guild_detail_post(
     let form = match MultiValueForm::from_request(request).await {
         Some(form) => form,
         None => {
-            return flash::redirect_with_flash(
+            return flash::redirect_error(
+                config,
                 &format!("{base}/guilds/{guild_id}"),
-                FlashData::error("Invalid form data"),
-                config.secure_cookies(),
+                "Invalid form data",
             );
         }
     };
@@ -481,7 +475,7 @@ async fn remove_community(
         Ok(_) => FlashData::success("Community removed"),
         Err(error) => {
             tracing::warn!(%error, guild_id, "admin API request failed: remove community");
-            FlashData::error(api_error_message(&error).map_or_else(
+            FlashData::error(error.detail_message().map_or_else(
                 || "Failed to remove the community".to_owned(),
                 |message| format!("Failed to remove the community: {message}"),
             ))
@@ -521,12 +515,7 @@ async fn guild_tab(
     let config = state.config();
     let csrf_token = csrf::get_csrf_token(&request);
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
-    let admin_acls = auth
-        .0
-        .admin_user
-        .as_ref()
-        .map(|user| user.acls.as_slice())
-        .unwrap_or(&[]);
+    let admin_acls = auth.0.acls();
 
     let tq = to_tab_query(&query);
     if let Some(markup) = guild_tabs::render(

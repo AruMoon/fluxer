@@ -5,14 +5,17 @@ import type {GiftCodeDurationType} from '@app/api/database/types/PaymentTypes';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
 import {Logger} from '@app/api/Logger';
+import {getPaymentDisputeRepository} from '@app/api/middleware/ServiceSingletons';
 import {addGiftCodeDuration} from '@app/api/models/GiftCode';
 import type {User} from '@app/api/models/User';
+import {assertNoOpenPaymentDispute} from '@app/api/payment_disputes/PaymentDisputeReviews';
 import type {StoreEntitlementService} from '@app/api/store_billing/StoreEntitlementService';
 import type {ProductInfo, RecurringBillingCycle} from '@app/api/stripe/ProductRegistry';
 import {
 	buildGiftTrialMetadata,
 	getGiftTrialPaidUntil,
 	isGiftTrialRunning,
+	isPastStripeTrialLimit,
 } from '@app/api/stripe/StripeGiftTrialMetadata';
 import {mirrorSubscription} from '@app/api/stripe/StripeMirror';
 import {
@@ -112,6 +115,11 @@ function mapSchedulePhaseAddInvoiceItems(
 		);
 	return mapped.length > 0 ? mapped : null;
 }
+
+export type GiftTrialExtension =
+	| {kind: 'extended'; subscription: Stripe.Subscription}
+	| {kind: 'already_applied'}
+	| {kind: 'past_trial_limit'};
 
 export class StripeSubscriptionService {
 	constructor(
@@ -273,6 +281,7 @@ export class StripeSubscriptionService {
 		if (!user.premiumWillCancel) {
 			throw new StripeSubscriptionNotCancelingError();
 		}
+		await assertNoOpenPaymentDispute(getPaymentDisputeRepository(), user.id);
 		try {
 			let subscription = await this.stripe.subscriptions.retrieve(user.stripeSubscriptionId, {
 				expand: ['schedule'],
@@ -388,6 +397,7 @@ export class StripeSubscriptionService {
 		if (!user.stripeSubscriptionId) {
 			throw new StripeNoActiveSubscriptionError();
 		}
+		await assertNoOpenPaymentDispute(getPaymentDisputeRepository(), user.id);
 		try {
 			const subscription = await this.stripe.subscriptions.retrieve(user.stripeSubscriptionId, {
 				expand: ['schedule'],
@@ -516,6 +526,7 @@ export class StripeSubscriptionService {
 		if (!user.stripeSubscriptionId) {
 			throw new StripeNoActiveSubscriptionError();
 		}
+		await assertNoOpenPaymentDispute(getPaymentDisputeRepository(), user.id);
 		const lockKey = `list_price_switch_lock:${user.id}`;
 		const lockToken = await this.cacheService.acquireLock(
 			lockKey,
@@ -1168,7 +1179,7 @@ export class StripeSubscriptionService {
 		durationType: GiftCodeDurationType,
 		durationQuantity: number,
 		idempotencyKey: string,
-	): Promise<Stripe.Subscription | null> {
+	): Promise<GiftTrialExtension> {
 		if (!this.stripe || !user.stripeSubscriptionId) {
 			Logger.debug(
 				{
@@ -1199,11 +1210,11 @@ export class StripeSubscriptionService {
 		);
 		if (await this.cacheService.get<boolean>(appliedKey)) {
 			Logger.debug({userId: user.id, idempotencyKey}, 'Gift trial extension already applied (idempotent hit)');
-			return null;
+			return {kind: 'already_applied'};
 		}
 		if (await this.cacheService.get<boolean>(inflightKey)) {
 			Logger.debug({userId: user.id, idempotencyKey}, 'Gift trial extension in-flight; skipping duplicate');
-			return null;
+			return {kind: 'already_applied'};
 		}
 		await this.cacheService.set(inflightKey, true, seconds('1 minute'));
 		Logger.debug({userId: user.id, idempotencyKey, inflightKey}, 'Gift trial inflight sentinel set');
@@ -1221,7 +1232,7 @@ export class StripeSubscriptionService {
 		try {
 			if (await this.cacheService.get<boolean>(appliedKey)) {
 				Logger.debug({userId: user.id, idempotencyKey}, 'Gift trial extension already applied after lock acquisition');
-				return null;
+				return {kind: 'already_applied'};
 			}
 			const subscription = await this.stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 			Logger.debug(
@@ -1256,6 +1267,9 @@ export class StripeSubscriptionService {
 			const newTrialEnd = addGiftCodeDuration(baseDate, durationType, durationQuantity);
 			if (newTrialEnd === null) {
 				throw new StripeError('Gift duration must be greater than zero when extending subscription trial');
+			}
+			if (isPastStripeTrialLimit(newTrialEnd.getTime(), nowMs)) {
+				return {kind: 'past_trial_limit'};
 			}
 			const newTrialEndUnix = Math.floor(newTrialEnd.getTime() / 1000);
 			Logger.debug(
@@ -1306,7 +1320,7 @@ export class StripeSubscriptionService {
 				},
 				'Extended subscription with gift trial period',
 			);
-			return trialExtendedSubscription;
+			return {kind: 'extended', subscription: trialExtendedSubscription};
 		} catch (error: unknown) {
 			Logger.error(
 				{error, userId: user.id, subscriptionId: user.stripeSubscriptionId, idempotencyKey},

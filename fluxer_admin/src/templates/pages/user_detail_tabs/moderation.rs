@@ -20,7 +20,7 @@ use crate::{
                 FIELD_LABEL_CLASS, basis_fields, deletion_days_field, enforcement_fields,
                 field_label, internal_note_field, network_block_fields, required_mark,
             },
-            form::{checkbox, csrf_input, danger_button, form_actions, submit_button},
+            form::{Checkbox, csrf_input, danger_button, form_actions, submit_button},
             page_container::card_with_header,
         },
         pages::enforcement_decision::{
@@ -441,7 +441,13 @@ fn legacy_deletion_restriction(
                     div class="space-y-3" {
                         (internal_note_field("cancel-deletion", "Staff only. Saved in the audit log."))
                         p class=(FIELD_HELP_CLASS) { "The user is told by email that the deletion was cancelled." }
-                        (checkbox("confirm", "true", &confirmation, false, true))
+                        (Checkbox {
+                            name: "confirm",
+                            value: "true",
+                            label: &confirmation,
+                            checked: false,
+                            enabled: true,
+                        }.render())
                         (form_actions(danger_button("Cancel deletion")))
                     }
                 }
@@ -488,6 +494,9 @@ fn close_card(
                         },
                     }))
                     (deletion_days_field("close-days", self_hosted))
+                    @if self_hosted {
+                        (delete_immediately_fields())
+                    }
                     @if let Some(pending) = &user.pending_deletion_at {
                         input type="hidden" name="replace_pending_deletion_at" value=(pending);
                         p class=(FIELD_HELP_CLASS) { "This replaces the deletion already scheduled." }
@@ -499,10 +508,39 @@ fn close_card(
     }
 }
 
+fn delete_immediately_fields() -> Markup {
+    html! {
+        div class="space-y-2 rounded-lg border border-red-200 bg-red-50 p-3" {
+            (Checkbox {
+                name: "delete_immediately",
+                value: "true",
+                label: "Delete the account now instead",
+                checked: false,
+                enabled: true,
+            }.render())
+            p class=(FIELD_HELP_CLASS) {
+                "Skips the waiting period and sends no email. The account and its data are deleted \
+                 within a minute and cannot be restored."
+            }
+            div class="space-y-1" {
+                label for="close-delete-confirm" class=(FIELD_LABEL_CLASS) { "Type DELETE to confirm" }
+                input type="text" id="close-delete-confirm" name="delete_immediately_confirm"
+                    autocomplete="off" class=(FIELD_INPUT_CLASS);
+            }
+        }
+    }
+}
+
 fn remove_evidence_field() -> Markup {
     html! {
         div class="space-y-1" {
-            (checkbox("remove_evidence", "true", "Remove these messages", false, true))
+            (Checkbox {
+                name: "remove_evidence",
+                value: "true",
+                label: "Remove these messages",
+                checked: false,
+                enabled: true,
+            }.render())
             p class=(FIELD_HELP_CLASS) { "Removes the messages listed above after they are saved as evidence." }
         }
     }

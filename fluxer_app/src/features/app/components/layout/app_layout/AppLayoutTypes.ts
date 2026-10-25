@@ -7,6 +7,7 @@ export const NagbarType = {
 	CONNECTION: 'connection',
 	CORRUPTED_INSTALLATION: 'corrupted-installation',
 	SCHEDULED_MAINTENANCE: 'scheduled-maintenance',
+	INSTANCE_NOTICE: 'instance-notice',
 	UNCLAIMED_ACCOUNT: 'unclaimed-account',
 	EMAIL_VERIFICATION: 'email-verification',
 	ACCOUNT_LIMITED: 'account-limited',
@@ -46,6 +47,7 @@ export interface NagbarConditions {
 	canShowConnection: boolean;
 	canShowCorruptedInstallation: boolean;
 	canShowScheduledMaintenance: boolean;
+	canShowInstanceNotice: boolean;
 	userIsUnclaimed: boolean;
 	userNeedsVerification: boolean;
 	canShowAccountLimited: boolean;

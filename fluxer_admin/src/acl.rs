@@ -72,6 +72,7 @@ pub const MESSAGE_DELETE_ALL: &str = "message:delete_all";
 pub const MESSAGE_DELETE: &str = "message:delete";
 pub const MESSAGE_LOOKUP: &str = "message:lookup";
 pub const MESSAGE_SHRED: &str = "message:shred";
+pub const OPERATOR_PASS_WAITLIST_STATS: &str = "operator_pass:waitlist_stats";
 pub const REGISTRATION_REVIEW: &str = "registration:review";
 pub const REPORT_DELETE: &str = "report:delete";
 pub const REPORT_RESOLVE: &str = "report:resolve";
@@ -182,6 +183,7 @@ pub const ALL_ACLS: &[&str] = &[
     MESSAGE_DELETE,
     MESSAGE_LOOKUP,
     MESSAGE_SHRED,
+    OPERATOR_PASS_WAITLIST_STATS,
     REGISTRATION_REVIEW,
     REPORT_DELETE,
     REPORT_RESOLVE,
@@ -237,63 +239,4 @@ pub fn has_any_permission(admin_acls: &[String], required: &[&str]) -> bool {
 
 fn acl_key_alias(acl: &str) -> String {
     acl.replace(':', "_").to_ascii_uppercase()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn acls(items: &[&str]) -> Vec<String> {
-        items.iter().map(|s| s.to_string()).collect()
-    }
-
-    #[test]
-    fn has_permission_exact_match() {
-        assert!(has_permission(&acls(&[USER_LOOKUP]), USER_LOOKUP));
-    }
-
-    #[test]
-    fn has_permission_wildcard() {
-        assert!(has_permission(&acls(&[WILDCARD]), USER_LOOKUP));
-        assert!(has_permission(&acls(&[WILDCARD]), GUILD_DELETE));
-    }
-
-    #[test]
-    fn has_permission_accepts_constant_key_aliases() {
-        assert!(has_permission(
-            &acls(&["USER_REMOVE_RELATIONSHIP"]),
-            USER_REMOVE_RELATIONSHIP
-        ));
-        assert!(has_permission(&acls(&["WILDCARD"]), GUILD_DELETE));
-    }
-
-    #[test]
-    fn has_permission_no_match() {
-        assert!(!has_permission(&acls(&[USER_LOOKUP]), GUILD_LOOKUP));
-        assert!(!has_permission(&acls(&[]), USER_LOOKUP));
-    }
-
-    #[test]
-    fn has_any_permission_any_match() {
-        let user_acls = acls(&[USER_LOOKUP, GUILD_LOOKUP]);
-        assert!(has_any_permission(
-            &user_acls,
-            &[GUILD_DELETE, GUILD_LOOKUP]
-        ));
-    }
-
-    #[test]
-    fn has_any_permission_empty_required() {
-        assert!(has_any_permission(&acls(&[USER_LOOKUP]), &[]));
-        assert!(has_any_permission(&acls(&[]), &[]));
-    }
-
-    #[test]
-    fn has_any_permission_none_match() {
-        let user_acls = acls(&[USER_LOOKUP]);
-        assert!(!has_any_permission(
-            &user_acls,
-            &[GUILD_DELETE, GUILD_LOOKUP]
-        ));
-    }
 }

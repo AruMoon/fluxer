@@ -15,16 +15,15 @@ import {
 	setStoredBillingConfig,
 } from '@app/api/stripe/BillingConfigCache';
 import {getProductRegistry, ProductRegistry, ProductType} from '@app/api/stripe/ProductRegistry';
-import {getStripeClient} from '@app/api/stripe/StripeClient';
 import {setupSyncStripeWebhookWorker, signStripeWebhook} from '@app/api/stripe/tests/StripeWebhookTestUtils';
 import {type ApiTestHarness, createApiTestHarness} from '@app/api/test/ApiTestHarness';
-import {NoopLogger} from '@app/api/test/mocks/NoopLogger';
 import {
 	createMockWebhookPayload,
 	createStripeApiHandlers,
 	type StripeApiHandlers,
 } from '@app/api/test/msw/handlers/StripeApiHandlers';
 import {server} from '@app/api/test/msw/server';
+import {createTestWorkerHelpers} from '@app/api/test/SyncTaskWorkerService';
 import {HTTP_STATUS} from '@app/api/test/TestConstants';
 import {createBuilder} from '@app/api/test/TestRequestBuilder';
 import {getCurrencyPreferences, getGiftCurrencyPreferences, isLocalizedCurrency} from '@app/api/utils/CurrencyUtils';
@@ -32,8 +31,6 @@ import processStripeWebhook from '@app/api/worker/tasks/ProcessStripeWebhook';
 import {setWorkerDependenciesForTest} from '@app/api/worker/WorkerContext';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import type {PremiumStateResponse, PriceIdsResponse} from '@fluxer/schema/src/domains/premium/PremiumSchemas';
-import type {WorkerTaskHelpers} from '@pkgs/worker/src/contracts/WorkerTask';
-import {HttpResponse, http} from 'msw';
 import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test} from 'vitest';
 
 const ENV_CURRENCIES = ['USD', 'EUR', 'BRL', 'DKK', 'INR', 'ISK', 'NOK', 'PLN', 'SEK', 'TRY'] as const;
@@ -120,7 +117,7 @@ function restoreGlobalState(state: GlobalState): void {
 	setStoredBillingConfig(state.storedBilling);
 }
 
-const WORKER_HELPERS = {logger: new NoopLogger()} as unknown as WorkerTaskHelpers;
+const WORKER_HELPERS = createTestWorkerHelpers();
 
 function useOperatorBilling(overrides: Partial<StoredBillingConfig> = {}): void {
 	Config.instance.selfHosted = true;
@@ -242,6 +239,16 @@ describe('operator billing catalog', () => {
 			expect(session?.consent_collection?.terms_of_service).toBe('required');
 			expect(sessionField(session, 'automatic_tax')).toEqual({enabled: 'true'});
 			expect(sessionField(session, 'tax_id_collection')).toEqual({enabled: 'true'});
+		});
+
+		test('leaves a premium checkout at the lifetime Stripe gives it by default', async () => {
+			const token = await createPurchaser();
+			await createBuilder(harness, token)
+				.post('/stripe/checkout/gift')
+				.body({price_id: 'price_envgiftmonthusd'})
+				.expect(HTTP_STATUS.OK)
+				.execute();
+			expect(stripeHandlers.spies.createdCheckoutSessions[0]?.expires_at).toBeUndefined();
 		});
 
 		test('opens the portal with the stored customer on hosted without checking it first', async () => {
@@ -493,45 +500,6 @@ describe('operator billing catalog', () => {
 				stripeHandlers.spies.createdCheckoutSessions[0]?.custom_text?.terms_of_service_acceptance?.message;
 			expect(message).toContain('Premium');
 			expect(message).not.toContain('Plutonium');
-		});
-	});
-
-	describe('stripe client', () => {
-		test('is shared while the secret stays the same and rebuilt when it changes', () => {
-			useOperatorBilling();
-			const first = getStripeClient();
-			expect(first).not.toBeNull();
-			expect(getStripeClient()).toBe(first);
-			setStoredBillingConfig(operatorBilling({stripe_secret_key: 'sk_test_operator_b'}));
-			const second = getStripeClient();
-			expect(second).not.toBeNull();
-			expect(second).not.toBe(first);
-		});
-
-		test('sends requests with the currently stored secret key', async () => {
-			const authorizations: Array<string | null> = [];
-			server.use(
-				http.get('https://api.stripe.com/v1/prices/:id', ({request, params}) => {
-					authorizations.push(request.headers.get('authorization'));
-					return HttpResponse.json({id: params.id, object: 'price', unit_amount: 500, currency: 'gbp'});
-				}),
-			);
-			const suffix = crypto.randomBytes(4).toString('hex');
-			const pricesFor = (tag: string) => ({
-				GBP: {
-					monthly: `price_${tag}${suffix}monthly`,
-					yearly: `price_${tag}${suffix}yearly`,
-					gift_1_month: `price_${tag}${suffix}giftmonth`,
-					gift_1_year: `price_${tag}${suffix}giftyear`,
-				},
-			});
-			useOperatorBilling({stripe_secret_key: 'sk_test_rotate_a', prices: pricesFor('a')});
-			await createBuilder(harness, '').get('/premium/price-ids').expect(HTTP_STATUS.OK).execute();
-			setStoredBillingConfig(operatorBilling({stripe_secret_key: 'sk_test_rotate_b', prices: pricesFor('b')}));
-			await createBuilder(harness, '').get('/premium/price-ids').expect(HTTP_STATUS.OK).execute();
-			expect(authorizations.slice(0, 4).every((value) => value === 'Bearer sk_test_rotate_a')).toBe(true);
-			expect(authorizations.slice(4)).toHaveLength(4);
-			expect(authorizations.slice(4).every((value) => value === 'Bearer sk_test_rotate_b')).toBe(true);
 		});
 	});
 

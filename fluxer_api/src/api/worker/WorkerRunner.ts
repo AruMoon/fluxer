@@ -250,10 +250,7 @@ export class WorkerRunner {
 				if (!this.running) {
 					break;
 				}
-				const messages = await consumer.fetch({
-					max_messages: this.concurrency - this.inFlightJobs.size,
-					idle_heartbeat: 5000,
-				});
+				const messages = await consumer.fetch({max_messages: this.concurrency - this.inFlightJobs.size});
 				this.consumerMessages = messages;
 				if (!this.running) {
 					messages.stop();

@@ -19,7 +19,7 @@
 }
 
 .viewFullButton {
-	text-align: left;
+	text-align: start;
 	color: var(--text-link);
 	font-size: 0.75rem;
 	line-height: 1rem;

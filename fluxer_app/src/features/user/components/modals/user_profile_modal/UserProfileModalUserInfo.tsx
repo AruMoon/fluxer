@@ -65,8 +65,7 @@ export const UserInfo: React.FC<UserInfoProps> = observer(({user, profile, guild
 						</div>
 						<div className={userProfileModalStyles.badgesWrapper} data-flx="user.user-profile-modal.user-info.div--8">
 							<UserProfileBadges
-								user={user}
-								profile={profile}
+								badges={profile.profileBadges}
 								isModal={true}
 								isMobile={false}
 								data-flx="user.user-profile-modal.user-info.user-profile-badges"

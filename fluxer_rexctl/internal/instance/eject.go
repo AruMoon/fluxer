@@ -1,0 +1,165 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+package instance
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io/fs"
+	"maps"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/engine"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/envfile"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
+)
+
+type EjectOptions struct {
+	Rexctl          string
+	SendAdminImport func() error
+	RemoveBootUnit  func() error
+}
+
+func EjectCheck(inst *Instance) error {
+	if err := inst.Managed(); err != nil {
+		return err
+	}
+	switch {
+	case inst.State.Upgrade != nil:
+		return &AdoptError{Msg: "An upgrade is still in progress.", Fix: "Run rexctl upgrade to finish it, then run rexctl eject again."}
+	case inst.State.Pending != nil:
+		return &AdoptError{Msg: "A settings change is still in progress.", Fix: "Run rexctl doctor to finish it, then run rexctl eject again."}
+	}
+	return nil
+}
+
+func Eject(inst *Instance, o EjectOptions) error {
+	if err := EjectCheck(inst); err != nil {
+		return err
+	}
+	s := inst.State
+	if a := s.AdminImport; a != nil && a.SentAt == "" && len(a.Values) > 0 && o.SendAdminImport != nil {
+		if err := o.SendAdminImport(); err != nil {
+			return err
+		}
+	}
+	env, err := inst.Environment()
+	if err != nil {
+		return err
+	}
+	f := envfile.New(inst.Path(EnvFileName))
+	for _, k := range slices.Sorted(maps.Keys(env)) {
+		f.Set(k, env[k])
+	}
+	f.Set("COMPOSE_PROJECT_NAME", s.Project)
+	f.Set("COMPOSE_FILE", composeFileList(inst))
+	if err := f.Save(); err != nil {
+		return err
+	}
+	if o.RemoveBootUnit != nil {
+		if err := o.RemoveBootUnit(); err != nil {
+			return err
+		}
+	}
+	s.Ejected = &Ejected{At: time.Now().UTC().Truncate(time.Second), Rexctl: o.Rexctl}
+	s.UpdatedAt = time.Now().UTC().Truncate(time.Second)
+	return s.Save(inst.StatePath())
+}
+
+func composeFileList(inst *Instance) string {
+	var rel []string
+	for _, f := range inst.ComposeFiles() {
+		if r, err := filepath.Rel(inst.Dir, f); err == nil && !strings.HasPrefix(r, "..") {
+			f = r
+		}
+		rel = append(rel, f)
+	}
+	return strings.Join(rel, string(os.PathListSeparator))
+}
+
+func importEjected(ctx context.Context, dir string, e *engine.Engine, s *State, dry bool) (*State, *ImportReport, error) {
+	r := &ImportReport{Source: SourceEjected, Dir: dir, Project: s.Project, Mine: map[string]string{}}
+	if e != nil && s.Engine.ID != "" && e.ID != "" && e.ID != s.Engine.ID {
+		return nil, nil, otherEngine(s.Engine.Kind, string(e.Kind))
+	}
+	custom := readCustom(dir)
+	if what := customProblem(custom); what != "" {
+		return nil, nil, refusal(fmt.Sprintf("remove %s from %s", what, CustomCompose))
+	}
+	set, err := releaseSet(dir, s.Release)
+	if err != nil {
+		return nil, nil, err
+	}
+	envPath := filepath.Join(dir, EnvFileName)
+	data, err := os.ReadFile(envPath)
+	haveEnv := err == nil
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return nil, nil, err
+	}
+	if haveEnv {
+		env, deduped, err := parseEnv(data)
+		if err != nil {
+			return nil, nil, err
+		}
+		r.DedupedEnv = deduped
+		changes, _, err := compareEnv(set, custom, s, env)
+		if err != nil {
+			return nil, nil, err
+		}
+		applyChanges(s, changes)
+		for _, c := range changes {
+			r.Changed = append(r.Changed, c.Key)
+		}
+		for _, k := range slices.Sorted(maps.Keys(s.Settings)) {
+			if removedFromEnv(k, env) {
+				delete(s.Settings, k)
+				r.Changed = append(r.Changed, k)
+			}
+		}
+		if s.AdminImport != nil {
+			r.AdminKeys = slices.Sorted(maps.Keys(s.AdminImport.Values))
+		}
+	}
+	for _, name := range slices.Sorted(maps.Keys(s.Rendered)) {
+		data, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil || stack.Hash(data) == s.Rendered[name] {
+			continue
+		}
+		r.KeepAsMine = append(r.KeepAsMine, name)
+		if !dry {
+			kept, err := KeepEdited(&Instance{Dir: dir, State: s}, name)
+			if err != nil {
+				return nil, nil, err
+			}
+			r.Mine[name] = kept
+		}
+		s.Rendered[name] = stack.Hash(data)
+	}
+	if dry {
+		return nil, r, nil
+	}
+	if haveEnv {
+		if err := copyPrivate(envPath, filepath.Join(dir, StateDirName, ReleasesDir, s.Release, EjectedEnvFile)); err != nil {
+			return nil, nil, err
+		}
+	}
+	s.Ejected = nil
+	pin(s, e)
+	if err := finishImport(dir, s); err != nil {
+		return nil, nil, err
+	}
+	return s, r, nil
+}
+
+func removedFromEnv(key string, env map[string]string) bool {
+	if isRawVar(key) {
+		_, ok := env[key]
+		return !ok
+	}
+	return false
+}

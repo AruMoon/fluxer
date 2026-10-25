@@ -9,7 +9,7 @@ const buildInfoSchema = v.object({
 class BuildInfoInvariantError extends Error {
 	constructor(issues: string) {
 		super(
-			`Invalid build info: ${issues}. PUBLIC_BUILD_VERSION and PUBLIC_RELEASE_CHANNEL are injected by rspack at build time and by fluxer_app/vitest.config.ts test.env under test. PUBLIC_RELEASE_CHANNEL must be stable, canary or development.`,
+			`Invalid build info: ${issues}. PUBLIC_BUILD_VERSION and PUBLIC_RELEASE_CHANNEL are injected by rspack at build time. PUBLIC_RELEASE_CHANNEL must be stable, canary or development.`,
 		);
 		this.name = 'BuildInfoInvariantError';
 	}

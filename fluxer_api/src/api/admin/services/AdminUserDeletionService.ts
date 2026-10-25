@@ -54,7 +54,6 @@ import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidat
 import {NoPendingDeletionError} from '@fluxer/errors/src/domains/core/NoPendingDeletionError';
 import {EnforcementDecisionOwnsStateError} from '@fluxer/errors/src/domains/moderation/EnforcementDecisionOwnsStateError';
 import {ReportAlreadyResolvedError} from '@fluxer/errors/src/domains/moderation/ReportAlreadyResolvedError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {
 	AdminUserDeletionCancelRequest,
 	AdminUserDeletionScheduleRequest,
@@ -154,7 +153,7 @@ export class AdminUserDeletionService {
 		actor: EnforcementActor,
 	): Promise<{user: User; skippedNetworks: Array<SkippedNetwork>}> {
 		const {basis} = request;
-		const user = await this.requireUser(userId);
+		const user = await this.deps.apiContext.services.users.findUniqueAssert(userId);
 		if (
 			user.pendingDeletionAt &&
 			(!request.replace_pending_deletion_at ||
@@ -179,7 +178,11 @@ export class AdminUserDeletionService {
 				);
 			}
 		}
-		const days = resolveDeletionDays(basis.type, request.days_until_deletion);
+		const immediate = request.immediate === true;
+		if (immediate && !Config.instance.selfHosted) {
+			throw InputValidationError.create('immediate', 'Immediate deletion is only available on self-hosted instances');
+		}
+		const days = immediate ? 0 : resolveDeletionDays(basis.type, request.days_until_deletion);
 		const scheduledAt = new Date();
 		const pendingDeletionAt = new Date(scheduledAt);
 		pendingDeletionAt.setDate(pendingDeletionAt.getDate() + days);
@@ -219,7 +222,10 @@ export class AdminUserDeletionService {
 		await this.cancelSubscription(user, actor.adminUserId);
 		await this.deps.storeEntitlementService.revokeForBannedUser(userId);
 		const notificationSent =
-			basis.type === 'enforcement' ? null : await this.sendScheduledEmail(user, basis.type, pendingDeletionAt);
+			basis.type === 'enforcement' || immediate
+				? null
+				: await this.sendScheduledEmail(user, basis.type, pendingDeletionAt);
+		const notificationSentValue = notificationSent ? 'true' : 'false';
 		await this.deps.auditService.createAuditLog({
 			adminUserId: actor.adminUserId,
 			targetType: 'user',
@@ -231,10 +237,11 @@ export class AdminUserDeletionService {
 				['days', days.toString()],
 				['reason_code', closed.deletionReasonCode?.toString() ?? ''],
 				['pending_deletion_at', pendingDeletionAt.toISOString()],
+				...(immediate ? ([['immediate', 'true']] as Array<[string, string]>) : []),
 				...describePendingDeletion(user, 'replaced'),
 				...(recorded
 					? [...decisionAuditMetadata(recorded.decision), ...networkBlockAuditMetadata(recorded)]
-					: ([['notification_sent', notificationSent ? 'true' : 'false']] as Array<[string, string]>)),
+					: ([['notification_sent', notificationSentValue]] as Array<[string, string]>)),
 			]),
 		});
 		const decision = recorded?.decision ?? null;
@@ -247,12 +254,19 @@ export class AdminUserDeletionService {
 			ips: knownIps,
 		});
 		await propagateUserUpdate(this.deps.userUpdateDeps, user, closed);
+		if (immediate) {
+			await this.deps.apiContext.services.worker.addJob('userProcessPendingDeletion', {
+				userId: userId.toString(),
+				deletionReasonCode: closed.deletionReasonCode ?? BASIS_DELETION_REASONS.housekeeping,
+				pendingDeletionAt: pendingDeletionAt.toISOString(),
+			});
+		}
 		return {user: closed, skippedNetworks: recorded?.skippedNetworks ?? []};
 	}
 
 	async cancelAccountDeletion(userId: UserID, data: AdminUserDeletionCancelRequest, actor: EnforcementActor) {
 		const {cache} = this.deps.apiContext.services;
-		const user = await this.requireUser(userId);
+		const user = await this.deps.apiContext.services.users.findUniqueAssert(userId);
 		if (!user.pendingDeletionAt) {
 			throw new NoPendingDeletionError();
 		}
@@ -285,14 +299,6 @@ export class AdminUserDeletionService {
 		});
 		await emitAdminAction(actor.adminUserId, userId, 'cancel_deletion');
 		return {user: await mapUserToAdminResponse(cancelled, cache, actor.acls)};
-	}
-
-	private async requireUser(userId: UserID): Promise<User> {
-		const user = await this.deps.apiContext.services.users.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
-		return user;
 	}
 
 	private async writeClosure(
@@ -340,8 +346,8 @@ export class AdminUserDeletionService {
 		return trySendAdminNotification(
 			() =>
 				basis === 'holder_request'
-					? emailService.sendAccountDeletionRequestedEmail(email, user.username, date, user.locale)
-					: emailService.sendAccountDeletionInactivityEmail(email, user.username, date, user.locale),
+					? emailService.send('account_deletion_scheduled_requested', email, {deletionDate: date}, user.locale)
+					: emailService.send('account_deletion_scheduled_inactivity', email, {deletionDate: date}, user.locale),
 			{action: 'schedule_deletion', targetId: user.id.toString()},
 		);
 	}
@@ -350,10 +356,10 @@ export class AdminUserDeletionService {
 		const {email: emailService} = this.deps.apiContext.services;
 		const email = user.email;
 		if (!email) return;
-		await trySendAdminNotification(
-			() => emailService.sendAccountDeletionCancelledEmail(email, user.username, user.locale),
-			{action: 'cancel_deletion', targetId: user.id.toString()},
-		);
+		await trySendAdminNotification(() => emailService.send('account_deletion_cancelled', email, {}, user.locale), {
+			action: 'cancel_deletion',
+			targetId: user.id.toString(),
+		});
 	}
 
 	private async banIdentifiers(

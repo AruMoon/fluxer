@@ -284,12 +284,12 @@ function alignNode(node: Node, format: MarkdownHlFormat, ctx: AlignContext): voi
 			return;
 		}
 		case 'Strong': {
-			const delimiter = ctx.source.startsWith('**', ctx.pos)
-				? '**'
-				: ctx.source.startsWith('__', ctx.pos)
-					? '__'
-					: null;
-			if (delimiter == null) {
+			let delimiter: '**' | '__';
+			if (ctx.source.startsWith('**', ctx.pos)) {
+				delimiter = '**';
+			} else if (ctx.source.startsWith('__', ctx.pos)) {
+				delimiter = '__';
+			} else {
 				ctx.failed = true;
 				return;
 			}

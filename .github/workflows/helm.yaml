@@ -5,13 +5,17 @@ on:
   pull_request:
     paths:
       - deploy/helm/**
-      - deploy/self-hosting/Caddyfile
+      - fluxer_rexctl/internal/stack/files/Caddyfile
+      - fluxer_rexctl/internal/stack/files/docker-compose.yml
+      - deploy/generate-seaweedfs-init.py
       - .github/workflows/helm.yaml
   push:
     branches: [main]
     paths:
       - deploy/helm/**
-      - deploy/self-hosting/Caddyfile
+      - fluxer_rexctl/internal/stack/files/Caddyfile
+      - fluxer_rexctl/internal/stack/files/docker-compose.yml
+      - deploy/generate-seaweedfs-init.py
       - .github/workflows/helm.yaml
 
 permissions:
@@ -44,6 +48,24 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+
+      - name: Generate the chart Caddyfile and check freshness
+        run: |
+          set -euo pipefail
+          cp fluxer_rexctl/internal/stack/files/Caddyfile "$CHART/files/Caddyfile"
+          if ! git diff --exit-code -- "$CHART/files/Caddyfile"; then
+            echo "::error::Regenerate the chart Caddyfile with: cp fluxer_rexctl/internal/stack/files/Caddyfile deploy/helm/fluxer/files/Caddyfile"
+            exit 1
+          fi
+
+      - name: Generate the Compose initializer and check freshness
+        run: |
+          set -euo pipefail
+          python3 deploy/generate-seaweedfs-init.py
+          if ! git diff --exit-code -- fluxer_rexctl/internal/stack/files/docker-compose.yml; then
+            echo "::error::Regenerate the Compose initializer with: python3 deploy/generate-seaweedfs-init.py"
+            exit 1
+          fi
 
       - name: Install Helm and kubeconform
         env:

@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+//go:build windows
+
+package instance
+
+func (i *Instance) OwnerUID() (int, bool) { return 0, false }

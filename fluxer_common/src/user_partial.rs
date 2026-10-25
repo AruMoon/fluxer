@@ -4,8 +4,12 @@ use crate::user_flags::{USER_FLAG_STAFF, visible_user_flags};
 use serde::{Deserialize, Serialize};
 
 pub const FLUXER_SYSTEM_USER_ID: i64 = 0;
-pub const FLUXER_SYSTEM_USERNAME: &str = "Fluxer";
 pub const FLUXER_SYSTEM_DISCRIMINATOR: i32 = 0;
+const UPSTREAM_INSTANCE_NAME: &str = "Fluxer";
+
+pub fn default_instance_name() -> String {
+    UPSTREAM_INSTANCE_NAME.to_owned()
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiUserPartial {
@@ -40,7 +44,7 @@ pub struct UserPartialFields {
 impl From<UserPartialFields> for ApiUserPartial {
     fn from(partial: UserPartialFields) -> Self {
         if partial.user_id == FLUXER_SYSTEM_USER_ID {
-            return fluxer_system_user();
+            return fluxer_system_user(partial.username);
         }
         Self {
             id: partial.user_id.to_string(),
@@ -57,10 +61,10 @@ impl From<UserPartialFields> for ApiUserPartial {
     }
 }
 
-pub fn fluxer_system_user() -> ApiUserPartial {
+pub fn fluxer_system_user(instance_name: String) -> ApiUserPartial {
     ApiUserPartial {
         id: FLUXER_SYSTEM_USER_ID.to_string(),
-        username: FLUXER_SYSTEM_USERNAME.to_owned(),
+        username: instance_name,
         discriminator: format!("{:04}", FLUXER_SYSTEM_DISCRIMINATOR),
         global_name: None,
         avatar: None,

@@ -114,6 +114,11 @@ export const GuildFeatureSchema = withOpenApiType(
 				'ANNOUNCEMENT_CHANNELS_DISABLED',
 				'Guild cannot publish announcement messages or gain new followers',
 			],
+			[
+				GuildFeatures.VISITS_ENABLED,
+				'VISITS_ENABLED',
+				'People with an invite or a discovery listing can read channels that @everyone can see without joining',
+			],
 		],
 		'A guild feature flag',
 	),
@@ -208,6 +213,10 @@ export const GuildResponse = z.object({
 			),
 		{experiment: 'channel_threads'},
 	).optional(),
+	visiting: withSchemaMetadata(
+		z.literal(true).describe('Present and true when the requesting user is visiting the guild without being a member'),
+		{experiment: 'guild_visits'},
+	).optional(),
 });
 
 export type GuildResponse = z.infer<typeof GuildResponse>;
@@ -227,6 +236,15 @@ export const GuildPartialResponse = GuildResponse.pick({
 	embed_splash_width: true,
 	embed_splash_height: true,
 	features: true,
+}).extend({
+	visits_enabled: withSchemaMetadata(
+		z
+			.boolean()
+			.describe(
+				'Whether opening this invite starts a visit instead of a join for the requesting user. Omitted for a caller outside the guild visits experiment',
+			),
+		{experiment: 'guild_visits'},
+	).optional(),
 });
 
 export type GuildPartialResponse = z.infer<typeof GuildPartialResponse>;
@@ -272,6 +290,7 @@ export interface Guild {
 	readonly message_history_cutoff?: string | null;
 	readonly joined_at?: string;
 	readonly unavailable?: boolean;
+	readonly visiting?: boolean;
 	readonly unavailable_hidden?: boolean;
 	readonly member_count?: number;
 	readonly online_count?: number;

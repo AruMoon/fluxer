@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type {
-	EmailTemplateVariables,
-	ReporterOutcome,
-	ReportReceivedTargetKind,
-} from '@pkgs/email/src/email_i18n/EmailI18nTypes';
-import type {IEmailService} from '@pkgs/email/src/IEmailService';
+import type {EmailSendParams, IBulkEmailSession, IEmailService} from '@pkgs/email/src/IEmailService';
+import {OPERATOR_PASS_TERMS_VERSION} from '@pkgs/email/src/operator_pass_terms/OperatorPassTerms';
 
 export interface SentEmailRecord {
 	to: string;
@@ -21,6 +17,13 @@ function stringMetadata(variables: Record<string, string | null>): Record<string
 export class TestEmailService implements IEmailService {
 	private readonly sentEmails: Array<SentEmailRecord> = [];
 
+	async openBulkSession(): Promise<IBulkEmailSession> {
+		return {
+			send: (templateKey, email, params, locale) => this.send(templateKey, email, params, locale),
+			close: async () => {},
+		};
+	}
+
 	listSentEmails(): Array<SentEmailRecord> {
 		return [...this.sentEmails];
 	}
@@ -29,225 +32,260 @@ export class TestEmailService implements IEmailService {
 		this.sentEmails.length = 0;
 	}
 
-	async sendPasswordResetEmail(
+	send<K extends keyof EmailSendParams>(
+		templateKey: K,
 		email: string,
-		_username: string,
-		resetToken: string,
-		_locale?: string | null,
+		params: EmailSendParams[K],
+		locale: string | null = null,
 	): Promise<boolean> {
-		return this.record(email, 'password_reset', {token: resetToken});
+		return this.handlers[templateKey](email, params, locale);
 	}
 
-	async sendEmailVerification(
-		email: string,
-		_username: string,
-		verificationToken: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'email_verification', {token: verificationToken});
-	}
-
-	async sendIpAuthorizationEmail(
-		email: string,
-		_username: string,
-		authorizationToken: string,
-		ipAddress: string,
-		location: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'ip_authorization', {token: authorizationToken, ip: ipAddress, location});
-	}
-
-	async sendSelfDeletionScheduledEmail(
-		email: string,
-		_username: string,
-		deletionDate: Date,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'self_deletion_scheduled', {deletion_date: deletionDate.toISOString()});
-	}
-
-	async sendAccountDeletionRequestedEmail(
-		email: string,
-		_username: string,
-		deletionDate: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'account_deletion_scheduled_requested', {deletion_date: deletionDate});
-	}
-
-	async sendAccountDeletionInactivityEmail(
-		email: string,
-		_username: string,
-		deletionDate: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'account_deletion_scheduled_inactivity', {deletion_date: deletionDate});
-	}
-
-	async sendAccountDeletionCancelledEmail(email: string, _username: string, _locale?: string | null): Promise<boolean> {
-		return this.record(email, 'account_deletion_cancelled');
-	}
-
-	async sendEnforcementNoticeEmail(
-		email: string,
-		variables: EmailTemplateVariables['enforcement_notice'],
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'enforcement_notice', stringMetadata(variables));
-	}
-
-	async sendEnforcementEndedEmail(
-		email: string,
-		variables: EmailTemplateVariables['enforcement_ended'],
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'enforcement_ended', stringMetadata(variables));
-	}
-
-	async sendInactivityWarningEmail(
-		email: string,
-		_username: string,
-		deletionDate: Date,
-		lastActiveDate: Date,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'inactivity_warning', {
-			deletion_date: deletionDate.toISOString(),
-			last_active_date: lastActiveDate.toISOString(),
-		});
-	}
-
-	async sendHarvestCompletedEmail(
-		email: string,
-		_username: string,
-		downloadUrl: string,
-		totalMessages: number,
-		fileSize: number,
-		expiresAt: Date,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'harvest_completed', {
-			download_url: downloadUrl,
-			total_messages: totalMessages.toString(10),
-			file_size: fileSize.toString(10),
-			expires_at: expiresAt.toISOString(),
-		});
-	}
-
-	async sendGiftChargebackNotification(email: string, _username: string, _locale?: string | null): Promise<boolean> {
-		return this.record(email, 'gift_chargeback_notification');
-	}
-
-	async sendReportResolvedEmail(
-		email: string,
-		_username: string,
-		reportId: string,
-		publicComment: string,
-		outcome: ReporterOutcome,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'report_resolved', {report_id: reportId, public_comment: publicComment, outcome});
-	}
-
-	async sendDsaReportResolvedEmail(
-		email: string,
-		reportId: string,
-		publicComment: string,
-		outcome: ReporterOutcome,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'dsa_report_resolved', {report_id: reportId, public_comment: publicComment, outcome});
-	}
-
-	async sendReportReceivedEmail(
-		email: string,
-		reportId: string,
-		targetKind: ReportReceivedTargetKind,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'report_received', {report_id: reportId, target_kind: targetKind});
-	}
-
-	async sendDsaReportVerificationCode(
-		email: string,
-		code: string,
-		expiresAt: Date,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'dsa_report_verification', {code, expires_at: expiresAt.toISOString()});
-	}
-
-	async sendPasswordChangeVerification(
-		email: string,
-		_username: string,
-		code: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'password_change_verification', {code});
-	}
-
-	async sendMfaBackupCodesVerification(
-		email: string,
-		_username: string,
-		code: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'mfa_backup_codes_view', {code});
-	}
-
-	async sendEmailChangeOriginal(
-		email: string,
-		_username: string,
-		code: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'email_change_original', {code});
-	}
-
-	async sendEmailChangeNew(email: string, _username: string, code: string, _locale?: string | null): Promise<boolean> {
-		return this.record(email, 'email_change_new', {code});
-	}
-
-	async sendEmailChangeRevert(
-		email: string,
-		_username: string,
-		newEmail: string,
-		token: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'email_change_revert', {token, new_email: newEmail});
-	}
-
-	async sendDonationMagicLink(
-		email: string,
-		token: string,
-		manageUrl: string,
-		expiresAt: Date,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'donation_magic_link', {
-			token,
-			manage_url: manageUrl,
-			expires_at: expiresAt.toISOString(),
-		});
-	}
-
-	async sendDonationConfirmation(
-		email: string,
-		amountCents: number,
-		currency: string,
-		interval: string,
-		manageUrl: string,
-		_locale?: string | null,
-	): Promise<boolean> {
-		return this.record(email, 'donation_confirmation', {
-			amount: (amountCents / 100).toString(),
-			currency: currency.toUpperCase(),
-			interval,
-			manage_url: manageUrl,
-		});
-	}
+	private readonly handlers: {
+		[K in keyof EmailSendParams]: (
+			email: string,
+			params: EmailSendParams[K],
+			locale: string | null,
+		) => Promise<boolean>;
+	} = {
+		password_change_verification: async (email, {code}) => {
+			return this.record(email, 'password_change_verification', {code});
+		},
+		mfa_backup_codes_view: async (email, {code}) => {
+			return this.record(email, 'mfa_backup_codes_view', {code});
+		},
+		sign_in_code: async (email, {code, expiresAt, requester}) => {
+			return this.record(email, 'sign_in_code', {code, expires_at: expiresAt.toISOString(), ...requester});
+		},
+		sign_up_code: async (email, {code, expiresAt, requester}) => {
+			return this.record(email, 'sign_up_code', {code, expires_at: expiresAt.toISOString(), ...requester});
+		},
+		email_verification_code: async (email, {code, expiresAt}) => {
+			return this.record(email, 'email_verification_code', {code, expires_at: expiresAt.toISOString()});
+		},
+		reauth_code: async (email, {code, expiresAt}) => {
+			return this.record(email, 'reauth_code', {code, expires_at: expiresAt.toISOString()});
+		},
+		email_change_original: async (email, {code}) => {
+			return this.record(email, 'email_change_original', {code});
+		},
+		email_change_new: async (email, {code}) => {
+			return this.record(email, 'email_change_new', {code});
+		},
+		password_reset: async (email, {resetToken, ipAddress, location}) => {
+			return this.record(email, 'password_reset', {
+				token: resetToken,
+				...(ipAddress ? {ip: ipAddress} : {}),
+				...(location ? {location} : {}),
+			});
+		},
+		email_verification: async (email, {verificationToken}) => {
+			return this.record(email, 'email_verification', {token: verificationToken});
+		},
+		ip_authorization: async (email, {authorizationToken, ipAddress, location}) => {
+			return this.record(email, 'ip_authorization', {token: authorizationToken, ip: ipAddress, location});
+		},
+		email_change_revert: async (email, {newEmail, token}) => {
+			return this.record(email, 'email_change_revert', {token, new_email: newEmail});
+		},
+		registration_approved: async (email, _params) => {
+			return this.record(email, 'registration_approved');
+		},
+		registration_pending: async (email, {reviewUrl}) => {
+			return this.record(email, 'registration_pending', {review_url: reviewUrl});
+		},
+		self_deletion_scheduled: async (email, {deletionDate}) => {
+			return this.record(email, 'self_deletion_scheduled', {deletion_date: deletionDate.toISOString()});
+		},
+		account_deletion_scheduled_requested: async (email, {deletionDate}) => {
+			return this.record(email, 'account_deletion_scheduled_requested', {deletion_date: deletionDate});
+		},
+		account_deletion_scheduled_inactivity: async (email, {deletionDate}) => {
+			return this.record(email, 'account_deletion_scheduled_inactivity', {deletion_date: deletionDate});
+		},
+		account_deletion_cancelled: async (email, _params) => {
+			return this.record(email, 'account_deletion_cancelled');
+		},
+		inactivity_warning: async (email, {deletionDate, lastActiveDate}) => {
+			return this.record(email, 'inactivity_warning', {
+				deletion_date: deletionDate.toISOString(),
+				last_active_date: lastActiveDate.toISOString(),
+			});
+		},
+		enforcement_notice: async (email, variables) => {
+			return this.record(email, 'enforcement_notice', stringMetadata(variables));
+		},
+		enforcement_ended: async (email, variables) => {
+			return this.record(email, 'enforcement_ended', stringMetadata(variables));
+		},
+		report_resolved: async (email, {reportId, publicComment, outcome}) => {
+			return this.record(email, 'report_resolved', {report_id: reportId, public_comment: publicComment, outcome});
+		},
+		dsa_report_resolved: async (email, {reportId, publicComment, outcome}) => {
+			return this.record(email, 'dsa_report_resolved', {report_id: reportId, public_comment: publicComment, outcome});
+		},
+		report_received: async (email, {reportId, targetKind}) => {
+			return this.record(email, 'report_received', {report_id: reportId, target_kind: targetKind});
+		},
+		dsa_report_verification: async (email, {code, expiresAt}) => {
+			return this.record(email, 'dsa_report_verification', {code, expires_at: expiresAt.toISOString()});
+		},
+		donation_magic_link: async (email, {manageUrl, expiresAt}) => {
+			return this.record(email, 'donation_magic_link', {
+				manage_url: manageUrl,
+				expires_at: expiresAt.toISOString(),
+			});
+		},
+		donation_confirmation: async (email, {amountCents, currency, interval, manageUrl}) => {
+			return this.record(email, 'donation_confirmation', {
+				amount: (amountCents / 100).toString(),
+				currency: currency.toUpperCase(),
+				interval,
+				manage_url: manageUrl,
+			});
+		},
+		harvest_completed: async (email, {downloadUrl, totalMessages, fileSize, expiresAt}) => {
+			return this.record(email, 'harvest_completed', {
+				download_url: downloadUrl,
+				total_messages: totalMessages.toString(10),
+				file_size: fileSize.toString(10),
+				expires_at: expiresAt.toISOString(),
+			});
+		},
+		bulk_message_deletion_completed: async (email, totals) => {
+			return this.record(email, 'bulk_message_deletion_completed', {
+				message_count: totals.message_count.toString(10),
+				channel_count: totals.channel_count.toString(10),
+			});
+		},
+		gift_chargeback_notification: async (email, _params) => {
+			return this.record(email, 'gift_chargeback_notification');
+		},
+		operator_pass_welcome: async (email, params) => {
+			return this.record(email, 'operator_pass_welcome', {
+				labs_invite_url: params.labsInviteUrl,
+				invoice_number: params.invoiceNumber ?? '',
+				delivered_at: params.deliveredAt.toISOString(),
+				wall_name: params.wallName ?? '',
+				pass_count: String(params.passCount),
+			});
+		},
+		operator_pass_purchase_confirmation: async (email, params) => {
+			return this.record(email, 'operator_pass_purchase_confirmation', {
+				invoice_number: params.invoiceNumber ?? '',
+				order_date: params.orderDate.toISOString(),
+				quantity: String(params.quantity),
+				amount_minor: String(params.amountMinor),
+				currency: params.currency,
+				withdrawal_days: params.withdrawalDays === null ? '' : String(params.withdrawalDays),
+				withdrawal_ends_on: params.withdrawalEndsOn ?? '',
+				waiver_consent_at: params.waiverConsentAt?.toISOString() ?? '',
+				wall_name: params.wallName ?? '',
+				unit_amount_minor: String(params.unitAmountMinor),
+				payment_method: params.paymentMethod ?? '',
+				consent_text: params.consentText ?? '',
+				country_consent: params.countryConsent ? 'yes' : 'no',
+				terms_version: OPERATOR_PASS_TERMS_VERSION,
+				attachment: 'application/pdf',
+			});
+		},
+		operator_pass_withdrawal_receipt: async (email, params) => {
+			return this.record(email, 'operator_pass_withdrawal_receipt', {
+				cancellation: String(params.cancellation),
+				name: params.name,
+				received_at: params.receivedAt.toISOString(),
+				invoice_number: params.invoiceNumber ?? '',
+				order_date: params.orderDate.toISOString(),
+				amount_minor: String(params.amountMinor),
+				currency: params.currency,
+				last_pass: String(params.lastPass),
+				has_donation: String(params.hasDonation),
+				refund_via_dispute: String(params.refundViaDispute),
+			});
+		},
+		operator_pass_offer_received: async (email, params) => {
+			return this.record(email, 'operator_pass_offer_received', {
+				sender_name: params.senderName,
+				arrives_at: params.arrivesAt?.toISOString() ?? '',
+			});
+		},
+		operator_pass_offer_accepted: async (email, params) => {
+			return this.record(email, 'operator_pass_offer_accepted', {
+				recipient_name: params.recipientName,
+				remaining_count: String(params.remainingCount),
+			});
+		},
+		operator_pass_offer_ended: async (email, params) => {
+			return this.record(email, 'operator_pass_offer_ended', {other_name: params.otherName, ended: params.ended});
+		},
+		operator_pass_revoked: async (email, params) => {
+			return this.record(email, 'operator_pass_revoked', {
+				cause: params.cause,
+				last_pass: params.lastPass ? 'yes' : 'no',
+			});
+		},
+		operator_pass_removal_notice: async (email, params) => {
+			return this.record(email, 'operator_pass_removal_notice', {
+				rule: params.rule,
+				facts: params.facts,
+				reply_by: params.replyBy.toISOString(),
+			});
+		},
+		operator_pass_wall_hidden: async (email, params) => {
+			return this.record(email, 'operator_pass_wall_hidden', {
+				reason: params.reason,
+				note: params.note,
+			});
+		},
+		operator_pass_wall_name_replaced: async (email, params) => {
+			return this.record(email, 'operator_pass_wall_name_replaced', {
+				target: params.target,
+				shown: params.shown,
+				reason: params.reason,
+				note: params.note,
+			});
+		},
+		operator_pass_perks_removed: async (email, params) => {
+			return this.record(email, 'operator_pass_perks_removed', {
+				rule: params.rule,
+				facts: params.facts,
+				automated: String(params.automated),
+				until: params.until?.toISOString() ?? '',
+			});
+		},
+		payment_dispute_warning: async (email, params) => {
+			return this.record(email, 'payment_dispute_warning', {
+				product: params.product,
+				invoice_number: params.invoiceNumber ?? '',
+				amount_minor: String(params.amountMinor),
+				currency: params.currency,
+				warning_date: params.warningDate.toISOString(),
+			});
+		},
+		payment_dispute_review_alert: async (email, params) => {
+			return this.record(email, 'payment_dispute_review_alert', {
+				dispute_id: params.disputeId,
+				product: params.product,
+				purchaser_id: params.purchaserId,
+				reason: params.reason,
+				blockers: params.blockers.join(','),
+			});
+		},
+		operator_pass_waitlist_verification: async (email, params) => {
+			return this.record(email, 'operator_pass_waitlist_verification', {
+				confirm_url: params.confirmUrl,
+			});
+		},
+		operator_pass_sale_open: async (email, params) => {
+			return this.record(email, 'operator_pass_sale_open', {
+				checkout_url: params.checkoutUrl,
+				price_formatted: params.priceFormatted,
+				price_rises_at: params.priceRisesAt.toISOString(),
+				unsubscribe_url: params.unsubscribeUrl,
+				unsubscribe_page_url: params.unsubscribePageUrl,
+			});
+		},
+	};
 
 	private record(to: string, type: string, metadata: Record<string, string> = {}): boolean {
 		this.sentEmails.push({to, type, timestamp: new Date(), metadata});

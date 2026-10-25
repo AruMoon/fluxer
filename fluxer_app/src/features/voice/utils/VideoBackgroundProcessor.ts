@@ -2,11 +2,7 @@
 
 import {Logger} from '@app/features/platform/utils/AppLogger';
 import {getBackgroundMediaObjectURL} from '@app/features/theme/utils/BackgroundImageDB';
-import VoiceSettings, {
-	type BackgroundImage,
-	BLUR_BACKGROUND_ID,
-	NONE_BACKGROUND_ID,
-} from '@app/features/voice/state/VoiceSettings';
+import VoiceSettings, {BLUR_BACKGROUND_ID, NONE_BACKGROUND_ID} from '@app/features/voice/state/VoiceSettings';
 import {
 	type CameraVideoProcessorHandle,
 	type CameraVideoProcessorOptions,
@@ -22,7 +18,6 @@ const logger = new Logger('VideoBackgroundProcessor');
 
 export interface BackgroundProcessorOptions {
 	backgroundImageId?: string;
-	backgroundImages?: Array<BackgroundImage>;
 }
 
 export interface AppliedBackgroundProcessor {
@@ -128,7 +123,7 @@ async function resolveBackgroundEffectConfig(
 	if (backgroundImageId === BLUR_BACKGROUND_ID) {
 		return {mode: CameraBackgroundMode.BLUR, blurStrength};
 	}
-	const backgroundImages = options?.backgroundImages ?? VoiceSettings.getBackgroundImages();
+	const backgroundImages = VoiceSettings.getBackgroundImages();
 	const hasImage = backgroundImages.some((image) => image.id === backgroundImageId);
 	if (!hasImage) {
 		throw new Error(`Custom camera background is not present in the saved media list: ${backgroundImageId}`);

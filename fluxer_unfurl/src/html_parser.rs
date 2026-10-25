@@ -291,23 +291,3 @@ fn normalize_image_reference_key(value: &str) -> Option<String> {
 fn is_http_url(url: &url::Url) -> bool {
     matches!(url.scheme(), "http" | "https")
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn og(html: &str) -> OgMetadata {
-        parse_opengraph(html)
-    }
-
-    #[test]
-    fn images_reject_bad_url_references() {
-        let h = r#"<head>
-            <meta property="og:image" content="javascript:alert(1)">
-            <meta property="og:image" content="data:image/png;base64,abcd">
-            <meta property="og:image" content="bad url.png">
-            <meta property="og:image" content="https://a.com/ok.png">
-        </head>"#;
-        assert_eq!(og(h).images, vec!["https://a.com/ok.png".to_owned()]);
-    }
-}

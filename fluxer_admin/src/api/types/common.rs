@@ -2,6 +2,12 @@
 
 use serde::{Deserialize, Deserializer, Serialize};
 
+use crate::api::generated::types::AccountTierSchema;
+
+fn default_true() -> bool {
+    true
+}
+
 pub fn deserialize_discriminator<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> {
     let v: serde_json::Value = Deserialize::deserialize(d)?;
     match v {
@@ -104,7 +110,17 @@ pub struct AdminUser {
     pub premium_grace_ends_at: Option<String>,
     pub premium_lifetime_sequence: Option<i32>,
     #[serde(default)]
+    pub profile_badges: Vec<AdminProfileBadge>,
+    #[serde(default)]
     pub has_totp: bool,
+    #[serde(default = "default_true")]
+    pub has_password: bool,
+    #[serde(default = "default_true")]
+    pub claimed: bool,
+    #[serde(default)]
+    pub account_tier: Option<AccountTierSchema>,
+    #[serde(default)]
+    pub date_of_birth_required: bool,
     #[serde(default)]
     pub authenticator_types: Vec<i32>,
     pub temp_banned_until: Option<String>,
@@ -124,6 +140,28 @@ pub struct AdminUser {
     pub last_active_ip: Option<String>,
     pub last_active_ip_reverse: Option<String>,
     pub last_active_location: Option<String>,
+}
+
+pub fn account_tier_label(tier: AccountTierSchema) -> &'static str {
+    match tier {
+        AccountTierSchema::Unclaimed => "Unclaimed",
+        AccountTierSchema::Unverified => "Unverified",
+        AccountTierSchema::Verified => "Verified",
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct AdminProfileBadge {
+    pub kind: String,
+    pub label: String,
+    pub asset: Option<String>,
+    #[serde(default)]
+    pub small_asset: Option<String>,
+    #[serde(default)]
+    pub aspect_ratio: Option<f64>,
+    pub caption: Option<String>,
+    pub href: Option<String>,
+    pub suppressed: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

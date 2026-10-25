@@ -4,6 +4,7 @@ import {Config} from '@app/api/Config';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import {getCachedInstancePremiumMode} from '@app/api/limits/InstancePremiumModeCache';
 import type {User} from '@app/api/models/User';
+import {isEnforcementReasonCode} from '@fluxer/constants/src/EnforcementReasons';
 import {
 	PREMIUM_GRACE_PERIOD_DAYS,
 	PREMIUM_PAYMENT_RECOVERY_GRACE_DAYS,
@@ -17,6 +18,14 @@ import {snowflakeToDate} from '@fluxer/snowflake/src/Snowflake';
 
 export function isSsoUserWithoutPassword(user: Pick<User, 'traits' | 'passwordHash'>): boolean {
 	return user.passwordHash === null && user.traits.has('sso');
+}
+
+export function isSsoLinkedUser(user: Pick<User, 'traits'>): boolean {
+	return user.traits.has('sso');
+}
+
+export function isEnforcementDeletion(user: Pick<User, 'enforcementDecisionId' | 'deletionReasonCode'>): boolean {
+	return user.enforcementDecisionId !== null || isEnforcementReasonCode(user.deletionReasonCode);
 }
 
 export function isAccountClosed(user: Pick<User, 'flags' | 'deletionStartedAt'>): boolean {

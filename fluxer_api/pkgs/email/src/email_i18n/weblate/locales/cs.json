@@ -1,94 +1,464 @@
 {
 	"account_deletion_cancelled": {
-		"subject": "Smazání vašeho účtu {product_name} bylo zrušeno",
-		"body": "Dobrý den, {username},\n\nNaplánované smazání vašeho účtu {product_name} bylo zrušeno. Váš účet nebude smazán.\n\n{safety_email, select, null {Máte-li jakékoli dotazy, kontaktujte správce této instance.} other {Máte-li jakékoli dotazy, kontaktujte {safety_email}.}}\n\n– Tým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože bylo zrušeno smazání vašeho účtu {product_name}.",
+		"intro": "Zrušili jsme naplánované smazání vašeho účtu {product_name}.",
+		"note": "{reply, select, yes {Pokud jste to neudělali vy, odpovězte na tento e-mail.} other {Pokud jste to neudělali vy, kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš účet {product_name} nebude smazán"
 	},
 	"account_deletion_scheduled_inactivity": {
-		"subject": "Váš účet {product_name} bude smazán kvůli neaktivitě",
-		"body": "Dobrý den, {username},\n\nVáš účet {product_name} byl dlouho neaktivní, a proto jsme jeho smazání naplánovali na {deletion_date}.\n\nPokud si chcete účet ponechat, přihlaste se před tímto datem. {support_email, select, null {Pokud máte dotazy, kontaktujte správce této instance.} other {Pokud máte dotazy, kontaktujte {support_email}.}}\n\nTým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože váš účet {product_name} byl dlouho neaktivní.",
+		"intro": "Váš účet {product_name} byl dlouho neaktivní, proto ho {deletion_date} smažeme.",
+		"note": "{reply, select, yes {Pokud si ho chcete ponechat, přihlaste se do té doby. Máte otázky? Odpovězte na tento e-mail.} other {Pokud si ho chcete ponechat, přihlaste se do té doby. Pokud máte otázky, kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš neaktivní účet {product_name} bude smazán"
 	},
 	"account_deletion_scheduled_requested": {
-		"subject": "Smazání vašeho účtu {product_name} je naplánováno",
-		"body": "Dobrý den, {username},\n\nNa vaši žádost jsme naplánovali smazání vašeho účtu {product_name} na {deletion_date}.\n\nPokud si chcete účet ponechat, přihlaste se před {deletion_date}. {safety_email, select, null {Pokud tato žádost nepochází od vás, kontaktujte správce této instance.} other {Pokud tato žádost nepochází od vás, kontaktujte {safety_email}.}}\n\nTým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože bylo požádáno o smazání vašeho účtu {product_name}.",
+		"intro": "Podle vaší žádosti smažeme váš účet {product_name} {deletion_date}.",
+		"note": "{reply, select, yes {Pokud si ho chcete ponechat, přihlaste se do té doby. Pokud jste o to nežádali, odpovězte na tento e-mail.} other {Pokud si ho chcete ponechat, přihlaste se do té doby. Pokud jste o to nežádali, kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš účet {product_name} bude smazán {deletion_date}"
+	},
+	"bulk_message_deletion_completed": {
+		"footer_reason": "Tento e-mail jste obdrželi, protože bylo pro váš účet {product_name} vyžádáno smazání zpráv.",
+		"intro": "Dokončili jsme mazání vašich zpráv. Odstranili jsme {message_count, plural, =0 {0 zpráv} one {# zprávu} few {# zprávy} many {# zpráv} other {# zpráv}} z {channel_count, plural, =0 {0 míst} one {# místa} few {# míst} many {# míst} other {# míst}}.",
+		"note": "{reply, select, yes {Pokud jste o to nežádali, hned si změňte heslo a odpovězte na tento e-mail.} other {Pokud jste o to nežádali, hned si změňte heslo a kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Dokončili jsme mazání vašich zpráv z {product_name}"
 	},
 	"donation_confirmation": {
-		"subject": "Děkujeme za váš dar pro {product_name}",
-		"body": "Dobrý den,\n\nDěkujeme za váš dar pro {product_name}! Váš {interval, select,\n  month {opakovaný dar}\n  year {opakovaný dar}\n  other {jednorázový dar}\n} byl úspěšně {interval, select,\n  month {nastaven}\n  year {nastaven}\n  other {zpracován}\n}.\n\nPodrobnosti o daru:\nČástka: {amount} {interval, select,\n  month {měsíčně}\n  year {ročně}\n  other {}\n}\n\nStripe vám brzy pošle samostatné potvrzení platby s fakturou v PDF. Obsahuje všechny platební údaje a lze ho použít pro daňové účely.\n\nPomocí tohoto odkazu si můžete kdykoli prohlédnout historii svých darů, stáhnout faktury {interval, select,\n  month {a spravovat nebo zrušit předplatné}\n  year {a spravovat nebo zrušit předplatné}\n  other {a spravovat budoucí dary}\n}:\n\n{manageUrl}\n\nVaše podpora pomáhá udržovat {product_name} v chodu. Děkujeme!\n\n– Tým {product_name}"
+		"amount_label": "Částka",
+		"amount_value": "{interval, select, month {{amount} měsíčně} year {{amount} ročně} other {{amount}}}",
+		"cta": "{interval, select, month {Spravovat nebo zrušit} year {Spravovat nebo zrušit} other {Spravovat dary}}",
+		"currency_label": "Měna",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste pod touto e-mailovou adresou poslali dar na {product_name}.",
+		"intro": "{interval, select, month {Váš měsíční dar pro {product_name} je nastaven.} year {Váš roční dar pro {product_name} je nastaven.} other {Obdrželi jsme váš dar pro {product_name}.}}",
+		"lead": "Stripe vám pošle samostatnou účtenku s fakturou.",
+		"signoff": "Tým {product_name}",
+		"subject": "Děkujeme za váš dar pro {product_name}"
 	},
 	"donation_magic_link": {
-		"subject": "Spravujte své dary pro {product_name}",
-		"body": "Dobrý den,\n\nKliknutím na odkaz níže otevřete portál pro dárce:\n\n{manageUrl}\n\nNa portálu můžete spravovat předplatná, stahovat faktury a prohlížet si historii svých darů.\n\nPlatnost tohoto odkazu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste si tento odkaz nevyžádali, můžete tento e-mail bez obav ignorovat.\n\n– Tým {product_name}"
+		"cta": "Spravovat dary",
+		"expiry": "Tento odkaz vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože byl pro tuto e-mailovou adresu vyžádán odkaz na portál pro dárce.",
+		"intro": "Pomocí tohoto odkazu můžete spravovat své dary a stahovat faktury.",
+		"note": "Pokud jste o tento odkaz nežádali, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Spravujte své dary pro {product_name}"
 	},
 	"dsa_report_resolved": {
+		"about": "{target, select, message_community {Jde o vaše nahlášení zprávy v kanálu #{channelName} v komunitě „{communityName}“, odeslané {reportedAt, date, long}.} message_dm {Jde o vaše nahlášení zprávy v přímé konverzaci, odeslané {reportedAt, date, long}.} message {Jde o vaše nahlášení zprávy, odeslané {reportedAt, date, long}.} user {Jde o vaše nahlášení účtu „{username}“, odeslané {reportedAt, date, long}.} community {Jde o vaše nahlášení komunity „{communityName}“, odeslané {reportedAt, date, long}.} other {Jde o nahlášení, které jste odeslali {reportedAt, date, long}.}}",
+		"comment_label": "Poznámka od našeho týmu",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste podali nahlášení podle nařízení o digitálních službách na {product_name}.",
+		"intro": "{outcome, select, removed {Nahlášený obsah jsme odstranili, protože porušoval naše pravidla.} restricted {Nahlášený účet porušil naše pravidla, a proto jsme zakročili. Jak jsme zakročili, nesdělujeme.} action_taken {To, co jste nahlásili, porušilo naše pravidla, a proto jsme zakročili. Jak jsme zakročili, nesdělujeme.} no_violation {To, co jste nahlásili, naše pravidla neporušuje, proto jsme to ponechali beze změny.} other {Vaše nahlášení jsme uzavřeli.}}",
+		"note": "{reply, select, yes {Pokud nesouhlasíte, odpovězte na tento e-mail do 60 dnů.} other {{appeals_email, select, null {} other {Pokud nesouhlasíte, napište do 60 dnů na <mail>{appeals_email}</mail> a uveďte ID nahlášení.}}}}{appeals_email, select, null {} other { V EU se také můžete obrátit na certifikovaný <dsa>subjekt pro mimosoudní řešení sporů</dsa> nebo podat stížnost koordinátorovi digitálních služeb ve své zemi.}}",
+		"report_label": "ID nahlášení",
+		"signoff": "Tým {product_name}",
 		"subject": "Rozhodli jsme o vašem nahlášení na {product_name}",
-		"body": "Dobrý den,\n\nPosoudili jsme vaše nahlášení (ID: {reportId}).\n\n{outcome, select, removed {Nahlášený obsah jsme odstranili, protože porušoval naše pravidla.} restricted {Zjistili jsme, že nahlášený účet porušil naše pravidla, a omezili jsme ho. Nesdělujeme, jaké opatření jsme vůči jinému účtu přijali, protože jde o osobní údaje jeho majitele.} action_taken {Zjistili jsme, že nahlášený obsah nebo účet porušil naše pravidla, a přijali jsme opatření. Nesdělujeme, jaké opatření jsme vůči jinému účtu přijali, protože jde o osobní údaje jeho majitele.} no_violation {Zjistili jsme, že nahlášený obsah nebo účet naše pravidla neporušuje, a proto jsme vše ponechali beze změny.} other {Vaše nahlášení jsme uzavřeli.}}{hasComment, select, yes {\n\nPoznámka od našeho týmu: {publicComment}} other {}}{appeals_email, select, null {} other {\n\nPokud nesouhlasíte, napište do 60 dnů na {appeals_email} a uveďte ID nahlášení. Pokud se nacházíte v EU, můžete věc také předložit certifikovanému subjektu pro mimosoudní řešení sporů nebo podat stížnost koordinátorovi digitálních služeb ve své zemi.}}\n\nTým {product_name}"
+		"thanks": "{outcome, select, removed {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} restricted {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} action_taken {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} other {Děkujeme, že jste nám dali vědět.}}"
 	},
 	"dsa_report_verification": {
-		"subject": "Ověřte svůj e-mail pro nahlášení podle DSA",
-		"body": "Dobrý den,\n\nPomocí ověřovacího kódu níže odešlete své nahlášení podle nařízení o digitálních službách na {product_name}:\n\n{code}\n\nPlatnost tohoto kódu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste si tento kód nevyžádali, můžete tento e-mail ignorovat.\n\n– Bezpečnostní tým {product_name}"
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla zadána do formuláře nahlášení podle nařízení o digitálních službách na {product_name}.",
+		"intro": "Pomocí tohoto kódu odešlete {product_name} své nahlášení podle nařízení o digitálních službách.",
+		"note": "Pokud jste o to nežádali, můžete tento e-mail ignorovat.",
+		"signoff": "Bezpečnostní tým {product_name}",
+		"subject": "Váš kód {product_name} pro nahlášení podle DSA"
 	},
 	"email_change_new": {
-		"subject": "Ověřte svou novou e-mailovou adresu pro {product_name}",
-		"body": "Dobrý den, {username},\n\nZadáním tohoto kódu v aplikaci ověříte svou novou e-mailovou adresu pro {product_name}:\n\n{code}\n\nPlatnost tohoto kódu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste si tento kód nevyžádali, můžete tento e-mail ignorovat.\n\n– Tým {product_name}"
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla zadána jako nová e-mailová adresa pro účet {product_name}.",
+		"intro": "Zadejte tento kód v aplikaci a potvrďte svou novou e-mailovou adresu.",
+		"note": "Pokud jste o to nežádali, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte svou novou e-mailovou adresu pro {product_name}"
 	},
 	"email_change_original": {
-		"subject": "Potvrďte změnu e-mailové adresy pro {product_name}",
-		"body": "Dobrý den, {username},\n\nObdrželi jsme žádost o změnu e-mailové adresy vašeho účtu {product_name}.\n\nZměnu potvrďte zadáním tohoto kódu v aplikaci:\n\n{code}\n\nPlatnost tohoto kódu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste o tuto změnu nežádali, ihned svůj účet zabezpečte.\n\n– Tým {product_name}"
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože někdo požádal o změnu e-mailové adresy vašeho účtu {product_name}.",
+		"intro": "Pokud chcete změnit e-mailovou adresu svého účtu {product_name}, zadejte tento kód v aplikaci.",
+		"note": "Pokud jste o to nežádali, hned si změňte heslo.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte změnu e-mailové adresy pro {product_name}"
 	},
 	"email_change_revert": {
-		"subject": "Vaše e-mailová adresa pro {product_name} byla změněna",
-		"body": "Dobrý den, {username},\n\nE-mailová adresa vašeho účtu {product_name} byla změněna na {newEmail}.\n\nPokud jste tuto změnu provedli vy, nemusíte nic dělat. Pokud ne, můžete ji vrátit zpět a zabezpečit svůj účet pomocí tohoto odkazu:\n\n{revertUrl}\n\nTím se obnoví vaše předchozí e-mailová adresa, budete odhlášeni ze všech zařízení, vypne se vícefaktorové ověřování a budete muset nastavit nové heslo.\n\n– Bezpečnostní tým {product_name}"
+		"cta": "Vrátit zpět a zabezpečit účet",
+		"footer_reason": "Tento e-mail jste obdrželi, protože to byla e-mailová adresa vašeho účtu {product_name} před změnou.",
+		"intro": "E-mailová adresa vašeho účtu {product_name} byla změněna.",
+		"lead": "Pokud jste to nebyli vy, vraťte změnu zpět a zabezpečte svůj účet.",
+		"new_email_label": "Nová e-mailová adresa",
+		"note": "Tím se obnoví vaše předchozí e-mailová adresa, budete všude odhlášeni, vypne se dvoufaktorové ověřování a budete vyzváni k nastavení nového hesla.",
+		"signoff": "Bezpečnostní tým {product_name}",
+		"subject": "E-mailová adresa vašeho účtu {product_name} byla změněna"
 	},
 	"email_verification": {
-		"subject": "Ověřte svou e-mailovou adresu pro {product_name}",
-		"body": "Dobrý den, {username},\n\nKliknutím na odkaz níže ověřte e-mailovou adresu svého účtu {product_name}:\n\n{verifyUrl}\n\nPokud jste si účet {product_name} nevytvořili, můžete tento e-mail bez obav ignorovat.\n\nTento odkaz je platný 24 hodin.\n\n– Tým {product_name}"
+		"cta": "Potvrdit e-mailovou adresu",
+		"expiry": "Tento odkaz vyprší za 24 hodin.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla použita pro účet {product_name}.",
+		"intro": "Potvrďte tuto e-mailovou adresu a dokončete nastavení svého účtu {product_name}.",
+		"note": "Pokud jste si účet {product_name} nevytvořili, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte svou e-mailovou adresu pro {product_name}"
+	},
+	"email_verification_code": {
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla přidána k účtu {product_name}.",
+		"intro": "Zadejte tento kód v aplikaci a potvrďte svou e-mailovou adresu.",
+		"note": "Tento kód nikomu nesdělujte. Zaměstnanci {product_name} o něj nikdy nepožádají. Pokud jste tuto e-mailovou adresu k účtu nepřidali, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš potvrzovací kód pro e-mail {product_name}"
 	},
 	"enforcement_ended": {
-		"subject": "{outcome, select, reversed {Zrušili jsme rozhodnutí týkající se vašeho účtu {product_name}} other {Omezení vašeho účtu {product_name} skončilo}}",
-		"body": "Dobrý den, {username},\n\n{outcome, select, reversed {{decision_id, select, null {Znovu jsme posoudili rozhodnutí týkající se vašeho účtu a zrušili ho.} other {Znovu jsme posoudili rozhodnutí {decision_id} a zrušili ho.}} Omlouváme se za potíže.} other {{decision_id, select, null {Ukončili jsme omezení vašeho účtu.} other {Ukončili jsme omezení uložené rozhodnutím {decision_id}.}}}}{restores_access, select, yes { Můžete se znovu přihlásit a používat {product_name}.} other {}}{statement, select, null {} other {\n\nPoznámka od našeho týmu: {statement}}}{content_removed, select, yes {\n\nOdstraněný obsah nelze obnovit.} other {}}\n\nTým {product_name}"
+		"content_removed": "{content_removed, select, yes {Odstraněný obsah nelze obnovit.} other {}}",
+		"footer_reason": "Tento e-mail jste obdrželi, protože se změnilo rozhodnutí týkající se vašeho účtu {product_name}.",
+		"intro": "{outcome, select, reversed {{decision_id, select, null {Znovu jsme posoudili rozhodnutí týkající se vašeho účtu a zrušili ho.} other {Znovu jsme posoudili rozhodnutí {decision_id} a zrušili ho.}} Omlouváme se za potíže.} other {{decision_id, select, null {Ukončili jsme omezení vašeho účtu.} other {Ukončili jsme omezení uložené rozhodnutím {decision_id}.}}}}{restores_access, select, yes { Můžete se znovu přihlásit a používat {product_name}.} other {}}",
+		"signoff": "Tým {product_name}",
+		"statement": "{statement, select, null {} other {Poznámka od našeho týmu: {statement}}}",
+		"subject": "{outcome, select, reversed {Zrušili jsme rozhodnutí týkající se vašeho účtu {product_name}} other {Omezení vašeho účtu {product_name} skončilo}}"
 	},
 	"enforcement_notice": {
+		"appeal_body": "{appeals_email, select, null {} other {{reply, select, yes {Pokud si myslíte, že jsme se spletli, odpovězte na tento e-mail do {appeal_deadline}.} other {Pokud si myslíte, že jsme se spletli, napište do {appeal_deadline} na <mail>{appeals_email}</mail> a uveďte ID rozhodnutí.}} Odvolání je zdarma a každé posoudí člověk.}}",
+		"appeal_title": "Jak se odvolat",
+		"decision_label": "ID rozhodnutí",
+		"effects": "{effects}",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jsme rozhodli o vašem účtu {product_name}.",
+		"how_body": "{how_we_decided}",
+		"how_title": "Jak jsme rozhodli",
+		"intro": "{summary}",
+		"redress": "{redress, select, null {} other {{redress}}}",
+		"rule_label": "Pravidlo",
+		"signoff": "Tým {product_name}",
+		"statement": "{statement, select, null {} other {Poznámka od našeho týmu: {statement}}}",
 		"subject": "{neutral, select, yes {Informace o vašem účtu {product_name}} other {{kind_label, select, warning {Varování týkající se vašeho účtu {product_name}} suspension {Váš účet {product_name} je pozastaven} ban {Váš účet {product_name} je zablokován} closure {Váš účet {product_name} je zrušen} feature_limit {Některé funkce vašeho účtu {product_name} jsou omezeny} content_removal {Odstranili jsme vaše zprávy na {product_name}} profile_reset {Resetovali jsme část vašeho profilu {product_name}} community_removal {Odstranili jsme vaši komunitu na {product_name}} bot {Informace o vašem botovi na {product_name}} other {Informace o vašem účtu {product_name}}}}}",
-		"body": "Dobrý den, {username},\n\n{summary}\n\n{effects}\n\nProč\nPravidlo: {rule_title}{rule_url, select, null {} other { ({rule_url})}}\n{facts}{statement, select, null {} other {\n\nPoznámka od našeho týmu: {statement}}}\n\nJak jsme rozhodli\n{how_we_decided}{appeals_email, select, null {} other {\n\nJak se odvolat\nPokud si myslíte, že jsme udělali chybu, napište na {appeals_email} do {appeal_deadline}. Pokud můžete, pište z e-mailové adresy svého účtu a uveďte ID rozhodnutí. Odvolání je zdarma a každé posoudí člověk.{redress, select, null {} other {\n\n{redress}}}}}\n\nID rozhodnutí: {decision_id}\n\nTým {product_name}"
+		"why_body": "{facts}",
+		"why_title": "Proč"
 	},
 	"gift_chargeback_notification": {
-		"subject": "Výhody z uplatněného dárku byly odstraněny",
-		"body": "Dobrý den, {username},\n\nDárkový kód, který jste uplatnili, původně zaplatil někdo jiný. Tato platba byla následně vrácena na základě reklamace (chargeback).\n\nProto jsme odebrali výhody, které váš účet získal při uplatnění dárku.\n\n{support_email, select, null {Pokud se domníváte, že jde o chybu, kontaktujte správce této instance a uveďte všechny dostupné podrobnosti o dárkovém kódu a o tom, kdy jste ho uplatnili.} other {Pokud se domníváte, že jde o chybu, kontaktujte náš tým podpory a uveďte všechny dostupné podrobnosti o dárkovém kódu a o tom, kdy jste ho uplatnili.}}\n\n– Tým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože z vašeho účtu {product_name} byly odebrány výhody.",
+		"intro": "Platba za dárkový kód, který jste uplatnili, byla stornována, proto jsme z vašeho účtu odebrali výhody, které přidal.",
+		"note": "{reply, select, yes {Pokud si myslíte, že jde o omyl, odpovězte na tento e-mail a napište nám, co o dárkovém kódu víte.} other {Pokud si myslíte, že jde o omyl, kontaktujte správce této instance a napište jim, co o dárkovém kódu víte.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Odebrali jsme výhody z dárku {product_name}, který jste uplatnili"
 	},
 	"harvest_completed": {
-		"subject": "Export vašich dat z {product_name} je připraven ke stažení",
-		"body": "Dobrý den, {username},\n\nExport vašich dat je připraven.\n\nOdkaz ke stažení:\n{downloadUrl}\n\nPočet zahrnutých zpráv: {totalMessages, number}\nVelikost souboru: {fileSizeMB, number} MB\n\nPlatnost tohoto odkazu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\n{support_email, select, null {Pokud jste si tento export nevyžádali, okamžitě si změňte heslo a kontaktujte správce této instance.} other {Pokud jste si tento export nevyžádali, okamžitě si změňte heslo a kontaktujte náš tým podpory.}}\n\n– Tým {product_name}"
+		"cta": "Stáhnout data",
+		"expiry": "Stáhněte si ho do {expiresAt, date, long}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože byl pro váš účet {product_name} vyžádán export dat.",
+		"intro": "Export vašich dat z {product_name} je připraven ke stažení.",
+		"messages": "{totalMessages, number}",
+		"messages_label": "Zprávy",
+		"note": "{reply, select, yes {Pokud jste o tento export nežádali, hned si změňte heslo a odpovězte na tento e-mail.} other {Pokud jste o tento export nežádali, hned si změňte heslo a kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"size": "{fileSizeMB, number} MB",
+		"size_label": "Velikost souboru",
+		"subject": "Export vašich dat z {product_name} je připraven"
 	},
 	"inactivity_warning": {
-		"subject": "Váš účet {product_name} bude smazán kvůli neaktivitě",
-		"body": "Dobrý den, {username},\n\nOd {lastActiveDate, date, full} jsme na vašem účtu {product_name} nezaznamenali žádnou aktivitu.\n\nPokud se nepřihlásíte do {deletionDate, date, full} v {deletionDate, time, short}, váš účet bude kvůli neaktivitě trvale smazán.\n\nPřihlaste se zde:\n{loginUrl}\n\n{support_email, select, null {Pokud jste {product_name} v poslední době používali, ihned kontaktujte správce této instance.} other {Pokud jste {product_name} v poslední době používali, ihned kontaktujte náš tým podpory.}}\n\n– Tým {product_name}"
+		"cta": "Přihlásit se do {product_name}",
+		"footer_reason": "Tento e-mail jste obdrželi, protože váš účet {product_name} byl dlouho neaktivní.",
+		"intro": "Váš účet {product_name} je neaktivní od {lastActiveDate, date, long}. Přihlaste se do {deletionDate, date, long}, jinak ho smažeme.",
+		"note": "{reply, select, yes {Pokud jste {product_name} nedávno používali, odpovězte na tento e-mail.} other {Pokud jste {product_name} nedávno používali, kontaktujte správce této instance.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Přihlaste se, abyste si ponechali účet {product_name}"
 	},
 	"ip_authorization": {
-		"subject": "Povolit přihlášení z nové IP adresy",
-		"body": "Dobrý den, {username},\n\nZaznamenali jsme pokus o přihlášení k vašemu účtu {product_name} z nové IP adresy:\n\nIP adresa: {ipAddress}\nPoloha: {location}\n\nPokud jste to byli vy, povolte tuto IP adresu kliknutím na odkaz níže:\n\n{authUrl}\n\nPokud jste se nepokoušeli přihlásit, ihned si změňte heslo.\n\nTento odkaz je platný 30 minut.\n\n– Tým {product_name}"
+		"cta": "Povolit tuto IP adresu",
+		"expiry": "Tento odkaz vyprší za 30 minut.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože se někdo pokusil přihlásit k vašemu účtu {product_name} z nové IP adresy.",
+		"intro": "Někdo se pokusil přihlásit k vašemu účtu {product_name} z nové IP adresy.",
+		"ip_label": "IP adresa",
+		"lead": "Pokud jste to byli vy, povolte tuto IP adresu.",
+		"location_label": "Poloha",
+		"note": "Pokud jste to nebyli vy, hned si změňte heslo.",
+		"signoff": "Tým {product_name}",
+		"subject": "Povolte přihlášení do {product_name} z nové IP adresy"
 	},
 	"mfa_backup_codes_view": {
-		"subject": "Potvrďte přístup k záložním kódům pro {product_name}",
-		"body": "Dobrý den, {username},\n\nObdrželi jsme žádost o zobrazení záložních kódů vašeho účtu {product_name}.\n\nŽádost potvrďte zadáním tohoto kódu v aplikaci:\n\n{code}\n\nPlatnost tohoto kódu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste o to nežádali, někdo může mít přístup k vašemu účtu. Okamžitě si změňte heslo.\n\n– Tým {product_name}"
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože někdo požádal o zobrazení záložních kódů vašeho účtu {product_name}.",
+		"intro": "Pokud chcete zobrazit záložní kódy pro {product_name}, zadejte tento kód v aplikaci.",
+		"note": "Pokud jste o to nežádali, může mít k vašemu účtu přístup někdo jiný. Hned si změňte heslo.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte přístup k záložním kódům pro {product_name}"
+	},
+	"operator_pass_offer_accepted": {
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste předali Operator Pass na {product_name}.",
+		"intro": "{recipientName} přijal(a) Operator Pass, který jste předali, a už ho má na svém účtu.",
+		"note": "{remainingCount, plural, =0 {Nezbývá vám žádný Operator Pass, takže váš odznak i záznam na zdi zmizely.} =1 {Zbývá vám # Operator Pass.} one {Zbývá vám # Operator Pass.} few {Zbývají vám # Operator Passy.} many {Zbývá vám # Operator Passu.} other {Zbývá vám # Operator Passů.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "{recipientName} přijal(a) váš {product_name} Operator Pass"
+	},
+	"operator_pass_offer_ended": {
+		"footer_reason": "Tento e-mail jste obdrželi kvůli nabídce Operator Pass na {product_name}.",
+		"intro": "{ended, select, withdrawn {Účet {otherName} vzal svou nabídku Operator Pass zpět.} declined {Účet {otherName} odmítl váš Operator Pass. Pořád je váš a můžete ho nabídnout někomu jinému.} other {Nabídka Operator Pass s účtem {otherName} byla zrušena, protože se změnil pass nebo jeho platba.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "{ended, select, withdrawn {Nabídka Operator Pass byla vzata zpět} declined {Vaše nabídka Operator Pass byla odmítnuta} other {Nabídka Operator Pass byla zrušena}}"
+	},
+	"operator_pass_offer_received": {
+		"cta": "Zobrazit nabídku",
+		"footer_reason": "Tento e-mail jste obdrželi, protože vám někdo nabídl Operator Pass na {product_name}.",
+		"intro": "{senderName} vám chce předat jeden ze svých Operator Passů.",
+		"lead": "Přijměte ho nebo odmítněte v {product_name}. Pokud ho přijmete, dorazí {arrivesAt, date, long}.",
+		"signoff": "Tým {product_name}",
+		"subject": "{senderName} vám chce předat Operator Pass"
+	},
+	"operator_pass_perks_removed": {
+		"appeal_body": "{reply, select, yes {Do 60 dnů odpovězte na tento e-mail a napište nám, proč nesouhlasíte.} other {Do 60 dnů kontaktujte správce této instance a napište jim, proč nesouhlasíte.}} Je to zdarma a posoudí to někdo, kdo toto rozhodnutí nedělal.",
+		"appeal_title": "Jak se odvolat",
+		"automated_text": "{automated, select, yes {Najít to nám pomohly automatizované nástroje. Rozhodl člověk z našeho týmu.} other {Rozhodl člověk z našeho týmu bez automatizovaných nástrojů.}}",
+		"facts_label": "Skutečnosti, ze kterých jsme vycházeli",
+		"footer_reason": "Tento e-mail jste obdrželi kvůli rozhodnutí o Operator Pass na vašem účtu {product_name}.",
+		"ground": "§ 8 podmínek Operator Pass",
+		"ground_label": "Právní základ",
+		"intro": "{scope, select, permanent {Výhody Operator Pass jsme vám odebrali natrvalo.} other {Výhody Operator Pass jsme vám odebrali do {until, date, long}. Pak se vrátí i s původním datem odznaku.}} Patří sem váš záznam na zdi, odznak, #operators a role Operator. Váš účet {product_name} pozastaven není.",
+		"redress": "Můžete se také obrátit na certifikovaný <dsa>subjekt pro mimosoudní řešení sporů</dsa> nebo na soud. Pokud jste spotřebitel, můžete spor předložit švédské Národní radě pro spotřebitelské spory (<arn>ARN</arn>) a my se řízení zúčastníme.",
+		"refund": "{scope, select, permanent {Dokud toto rozhodnutí platí, nemůžete Operator Pass znovu koupit ani dostat. } other {}}Za odebrané výhody se peníze nevracejí. Pokud vám ještě trvá právo na odstoupení od smlouvy, toto rozhodnutí vám ho nebere.",
+		"rule_label": "Pravidlo",
+		"signoff": "Tým {product_name}",
+		"subject": "Odebrali jsme vám výhody {product_name} Operator Pass"
+	},
+	"operator_pass_purchase_confirmation": {
+		"bonus_heading": "Bonus navíc",
+		"bonus_line": "Dokud komunitu Fluxer Labs provozujeme, získáte v ní také roli Operator a #operators. Bonus není součástí ceny a může se změnit nebo skončit.",
+		"consent_heading": "Váš souhlas",
+		"consent_line": "Při placení {waiverConsentAt, date, long} jste zaškrtli políčko „{consentText}“",
+		"currency_label": "Měna",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste si zakoupili Operator Pass na {product_name}.",
+		"included_heading": "Co získáte",
+		"included_pass_on": "Každý pass lze předat jednou.",
+		"included_perks": "Nárok na místo na zdi Operators, kdykoli budete chtít, a doživotní odznak Operator, dokud provozujeme {product_name}.",
+		"intro": "Děkujeme za objednávku. Tento e-mail slouží jako doklad o nákupu a podmínky Operator Pass, které jste přijali (verze {termsVersion}), najdete v příloze jako PDF.",
+		"order_date_label": "Datum objednávky",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Číslo objednávky",
+		"payment_label": "Platba",
+		"price_label": "Celkem",
+		"price_value": "{priceFormatted}, zaplaceno jednorázově",
+		"product_label": "Produkt",
+		"product_value": "{quantity, plural, one {{product_name} Operator Pass} few {# {product_name} Operator Passy} many {# {product_name} Operator Passu} other {# {product_name} Operator Passů}}",
+		"seller": "Prodávající: Fluxer Platform AB, 559537-3993, <mail>{sellerEmail}</mail>",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrzení o nákupu {product_name} Operator Pass",
+		"terms_link": "Podmínky Operator Pass",
+		"unit_price_label": "Cena za pass",
+		"wall_status": "{wallOptOut, select, yes {Rozhodli jste se, že na zdi nebudete. Své jméno na zeď můžete kdykoli přidat ve svém <settings>nastavení</settings>.} other {Na zdi jste uvedeni jako {wallName}. Můžete to změnit nebo zeď opustit ve svém <settings>nastavení</settings>.}}",
+		"withdrawal_cancel_until": "{quantity, plural, =1 {Nákup můžete zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} few {Každý pass můžete zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} many {Každý pass můžete zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} other {Každý pass můžete zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.}} Použijte tlačítko Zrušit vedle passu ve svém <settings>nastavení</settings>.",
+		"withdrawal_heading": "Právo na odstoupení od smlouvy",
+		"withdrawal_rule_cancel_until": "{quantity, plural, =1 {Pravidlo platné ve vaší zemi nahrazuje políčko, které jste zaškrtli, takže nákup můžete i tak zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} few {Pravidlo platné ve vaší zemi nahrazuje políčko, které jste zaškrtli, takže každý pass můžete i tak zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} many {Pravidlo platné ve vaší zemi nahrazuje políčko, které jste zaškrtli, takže každý pass můžete i tak zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.} other {Pravidlo platné ve vaší zemi nahrazuje políčko, které jste zaškrtli, takže každý pass můžete i tak zrušit do {withdrawalEndsOn, date, long} a dostat zpět celou částku.}} Použijte tlačítko Zrušit vedle passu ve svém <settings>nastavení</settings>.",
+		"withdrawal_waived": "{quantity, plural, =1 {Vaše právo na odstoupení od smlouvy skončilo, když jsme vám podle vaší žádosti dodali pass.} other {Vaše právo na odstoupení od smlouvy skončilo, když jsme vám podle vaší žádosti dodali passy.}}"
+	},
+	"operator_pass_removal_notice": {
+		"facts_label": "Skutečnosti, ze kterých jsme vycházeli",
+		"footer_reason": "Tento e-mail jste obdrželi kvůli rozhodnutí o Operator Pass na vašem účtu {product_name}.",
+		"ground": "§ 8 podmínek Operator Pass",
+		"ground_label": "Právní základ",
+		"intro": "Hodláme vám Operator Pass natrvalo odebrat. Než rozhodneme, máte na odpověď {replyDays, plural, one {# den} few {# dny} many {# dne} other {# dní}}.",
+		"next": "Pokud se k tomu rozhodneme, pošleme vám e-mailem rozhodnutí a informace, jak se proti němu odvolat. Pokud jste spotřebitel, můžete spor o odebrání předložit také švédské Národní radě pro spotřebitelské spory (<arn>ARN</arn>) a my se řízení zúčastníme.",
+		"reply": "{reply, select, yes {Odpovězte na tento e-mail a napište nám vše, co bychom měli vědět.} other {Kontaktujte správce této instance a napište jim vše, co bychom měli vědět.}} Než rozhodneme, každou odpověď si přečte člověk z našeho týmu. Do té doby zůstávají váš záznam na zdi, odznak, #operators i role Operator beze změny.",
+		"rule_label": "Pravidlo",
+		"signoff": "Tým {product_name}",
+		"subject": "Hodláme vám odebrat {product_name} Operator Pass"
+	},
+	"operator_pass_revoked": {
+		"footer_reason": "Tento e-mail jste obdrželi, protože na vašem účtu {product_name} skončil Operator Pass.",
+		"intro": "{cause, select, dispute {Platba za Operator Pass, který jste dostali, byla stornována v rámci platebního sporu, takže pass skončil.} withdrawal {Kupující od nákupu Operator Pass, který jste dostali, odstoupil, takže pass skončil.} other {Platba za Operator Pass, který jste dostali, byla vrácena, takže pass skončil.}} Nesouvisí to s ničím, co jste udělali.",
+		"note": "{lastPass, select, yes {Byl to váš poslední pass, takže váš odznak i záznam na zdi zmizely.} other {Vaše ostatní passy zůstávají.}}",
+		"signoff": "Tým {product_name}",
+		"subject": "Operator Pass na vašem účtu {product_name} skončil"
+	},
+	"operator_pass_sale_open": {
+		"cta": "Získejte Operator Pass",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste se zapsali do pořadníku na Operator Pass. Je to poslední e-mail, který vám o passu pošleme.",
+		"included_bonus": "Dokud komunitu Fluxer Labs provozujeme, získáte v ní také roli Operator a #operators. Bonus není součástí ceny.",
+		"included_perks": "Nárok na místo na zdi Operators, kdykoli budete chtít, a doživotní odznak Operator, dokud provozujeme {product_name}.",
+		"intro": "Chtěli jste vědět, až bude Operator Pass v prodeji. Teď už je.",
+		"price_label": "Zaváděcí cena",
+		"price_value": "{priceFormatted}, placeno jednorázově, do {priceEndsOn, date, long}",
+		"signoff": "Tým {product_name}",
+		"subject": "{product_name} Operator Pass je v prodeji",
+		"terms_link": "Podmínky Operator Pass",
+		"unsubscribe": "Odhlásit odběr"
+	},
+	"operator_pass_waitlist_verification": {
+		"cta": "Zapsat se do pořadníku",
+		"expiry": "Tento odkaz vyprší za 48 hodin.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla zadána do pořadníku na Operator Pass na webových stránkách {product_name}.",
+		"intro": "Potvrďte tuto e-mailovou adresu a zapište se do pořadníku na Operator Pass. Napíšeme vám jen jednou, až bude pass v prodeji.",
+		"note": "Pokud jste o to nežádali, tento e-mail ignorujte a už se vám neozveme.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte zápis do pořadníku na {product_name} Operator Pass"
+	},
+	"operator_pass_wall_hidden": {
+		"appeal_body": "{reply, select, yes {Do 60 dnů odpovězte na tento e-mail a napište nám, proč nesouhlasíte.} other {Do 60 dnů kontaktujte správce této instance a napište jim, proč nesouhlasíte.}} Je to zdarma a posoudí to někdo, kdo toto rozhodnutí nedělal.",
+		"appeal_title": "Jak se odvolat",
+		"automated_text": "Rozhodl člověk z našeho týmu bez automatizovaných nástrojů.",
+		"facts_label": "Skutečnosti, ze kterých jsme vycházeli",
+		"footer_reason": "Tento e-mail jste obdrželi kvůli rozhodnutí o vašem záznamu na zdi Operators v {product_name}.",
+		"ground": "§ 8 podmínek Operator Pass",
+		"ground_label": "Právní základ",
+		"intro": "Váš záznam jsme prozatím stáhli ze zdi Operators. Vaše passy i odznak zůstávají a nic se neodebírá ani nevrací.",
+		"next": "Pokud ho znovu zobrazíme nebo vaše odvolání uspěje, váš záznam se vrátí se stejnou velikostí i umístěním.",
+		"reason_label": "Důvod",
+		"reason_value": "{reason, select, impersonation {Vydává se za někoho jiného} rights {Používá jméno nebo obrázek bez práv k nim} age_suitability {Není vhodné pro mladší uživatele} other {Porušuje pravidla komunity}}",
+		"redress": "Můžete se také obrátit na certifikovaný <dsa>subjekt pro mimosoudní řešení sporů</dsa> nebo na soud. Pokud jste spotřebitel, můžete spor předložit švédské Národní radě pro spotřebitelské spory (<arn>ARN</arn>) a my se řízení zúčastníme.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš záznam jsme prozatím stáhli ze zdi Operators v {product_name}"
+	},
+	"operator_pass_wall_name_replaced": {
+		"appeal_body": "{reply, select, yes {Do 60 dnů odpovězte na tento e-mail a napište nám, proč nesouhlasíte.} other {Do 60 dnů kontaktujte správce této instance a napište jim, proč nesouhlasíte.}} Je to zdarma a posoudí to někdo, kdo toto rozhodnutí nedělal.",
+		"appeal_title": "Jak se odvolat",
+		"automated_text": "Rozhodl člověk z našeho týmu bez automatizovaných nástrojů.",
+		"facts_label": "Skutečnosti, ze kterých jsme vycházeli",
+		"footer_reason": "Tento e-mail jste obdrželi kvůli rozhodnutí o vašem záznamu na zdi Operators v {product_name}.",
+		"ground": "§ 2.1 podmínek Operator Pass",
+		"ground_label": "Právní základ",
+		"intro": "{target, select, avatar {Váš avatar pro zeď Operators jsme zamítli.} both {Vaše jméno a avatar pro zeď Operators jsme zamítli.} other {Vaše jméno pro zeď Operators jsme zamítli.}} {shown, select, previous {Zeď ponechává vaši poslední schválenou verzi.} username {Dokud nepošlete nové, zeď ukazuje vaše uživatelské jméno a výchozí avatar.} other {Dokud nepošlete nové, zeď ukazuje slovo Operator a výchozí avatar.}} Místo, velikost i odznak si ponecháte a nic se neodebírá ani nevrací.",
+		"next": "Nové jméno nebo avatar můžete kdykoli poslat ve svém <settings>nastavení</settings>.",
+		"reason_label": "Důvod",
+		"reason_value": "{reason, select, impersonation {Vydává se za někoho jiného} rights {Používá jméno nebo obrázek bez práv k nim} age_suitability {Není vhodné pro mladší uživatele} other {Porušuje pravidla komunity}}",
+		"redress": "Můžete se také obrátit na certifikovaný <dsa>subjekt pro mimosoudní řešení sporů</dsa> nebo na soud. Pokud jste spotřebitel, můžete spor předložit švédské Národní radě pro spotřebitelské spory (<arn>ARN</arn>) a my se řízení zúčastníme.",
+		"signoff": "Tým {product_name}",
+		"subject": "Zamítli jsme vaše jméno nebo avatar pro zeď Operators v {product_name}"
+	},
+	"operator_pass_welcome": {
+		"badge_line": "Váš odznak je na vašem profilu. Skrýt ho můžete ve svém <settings>nastavení</settings>.",
+		"cta": "Otevřít Fluxer Labs",
+		"delivered_label": "Doručeno",
+		"delivered_value": "{deliveredAt, date, long}",
+		"footer_reason": "Tento e-mail jste obdrželi, protože k vašemu účtu {product_name} byl přidán Operator Pass.",
+		"intro": "Váš Operator Pass je aktivní. Děkujeme, že podporujete {product_name}.",
+		"labs_line": "Ve Fluxer Labs získáte roli Operator a #operators. Tento bonus platí, dokud Fluxer Labs provozujeme.",
+		"order_number_label": "Číslo objednávky",
+		"pass_count_label": "Operator Passy",
+		"signoff": "{founderName} a tým {product_name}",
+		"subject": "Váš {product_name} Operator Pass je aktivní",
+		"terms_link": "Podmínky Operator Pass",
+		"wall_line": "{wallOptOut, select, yes {Rozhodli jste se, že na zdi Operators nebudete. Své jméno můžete kdykoli přidat ve svém <settings>nastavení</settings>.} other {Na zdi Operators jste uvedeni jako {wallName} a vaše jméno a avatar se zobrazí, jakmile je zkontrolujeme. Můžete to změnit nebo zeď opustit ve svém <settings>nastavení</settings>.}}"
+	},
+	"operator_pass_withdrawal_receipt": {
+		"cta": "Spravovat dar",
+		"currency_label": "Měna",
+		"donation": "Měsíční dar, který jste přidali při placení, je samostatný a běží dál. Můžete ho kdykoli zrušit.",
+		"footer_reason": "{cancellation, select, yes {Tento e-mail jste obdrželi, protože jste zrušili nákup Operator Pass na {product_name}.} other {Tento e-mail jste obdrželi, protože jste odstoupili od smlouvy o nákupu Operator Pass na {product_name}.}}",
+		"intro": "{cancellation, select, yes {Vaši žádost o zrušení jsme obdrželi {receivedAt, date, long} v {receivedAt, time, short}.} other {Vaše odstoupení od smlouvy jsme obdrželi {receivedAt, date, long} v {receivedAt, time, short}.}}",
+		"name_label": "Jméno",
+		"note": "Tento e-mail si uschovejte jako potvrzení.",
+		"order_date_label": "Datum objednávky",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Číslo objednávky",
+		"refund": "{refundViaDispute, select, yes {Vaše banka u tohoto nákupu nejdřív otevřela platební spor, proto jsme spor přijali a banka vám vrátí celou částku {amountFormatted}.} other {Zahájili jsme vrácení celé částky {amountFormatted} na váš platební prostředek a peníze dostanete do 14 dnů.}} {lastPass, select, yes {Pass skončil a s ním i váš odznak, záznam na zdi a bonus.} other {Pass skončil. Vaše ostatní passy zůstávají.}}",
+		"refund_label": "Vrácená částka",
+		"signoff": "Tým {product_name}",
+		"subject": "{cancellation, select, yes {Váš {product_name} Operator Pass je zrušen} other {Obdrželi jsme vaše odstoupení od smlouvy o {product_name} Operator Pass}}"
 	},
 	"password_change_verification": {
-		"subject": "Potvrďte změnu hesla k účtu {product_name}",
-		"body": "Dobrý den, {username},\n\nObdrželi jsme žádost o změnu hesla k vašemu účtu {product_name}.\n\nZměnu potvrďte zadáním tohoto kódu v aplikaci:\n\n{code}\n\nPlatnost tohoto kódu vyprší dne {expiresAt, date, full} v {expiresAt, time, short}.\n\nPokud jste o to nežádali, někdo může mít přístup k vašemu účtu. Okamžitě si změňte heslo a zapněte dvoufaktorové ověřování.\n\n– Tým {product_name}"
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože někdo požádal o změnu hesla k vašemu účtu {product_name}.",
+		"intro": "Pokud chcete změnit heslo k účtu {product_name}, zadejte tento kód v aplikaci.",
+		"note": "Pokud jste o to nežádali, může mít k vašemu účtu přístup někdo jiný. Hned si změňte heslo a zapněte dvoufaktorové ověřování.",
+		"signoff": "Tým {product_name}",
+		"subject": "Potvrďte změnu hesla k účtu {product_name}"
 	},
 	"password_reset": {
-		"subject": "Obnovte své heslo k účtu {product_name}",
-		"body": "Dobrý den, {username},\n\nPožádali jste o obnovení hesla k účtu {product_name}. Pomocí odkazu níže si nastavte nové heslo:\n\n{resetUrl}\n\nPokud jste o to nežádali, můžete tento e-mail bez obav ignorovat.\n\nTento odkaz je platný 1 hodinu.\n\n– Tým {product_name}"
+		"cta": "Nastavit nové heslo",
+		"expiry": "Tento odkaz vyprší za 1 hodinu.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože bylo požádáno o obnovení hesla pro váš účet {product_name}.",
+		"intro": "Požádali jste o obnovení hesla k účtu {product_name}.",
+		"ip_label": "IP adresa",
+		"location_label": "Poloha",
+		"note": "Pokud jste o to nežádali, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Obnovte své heslo k účtu {product_name}"
+	},
+	"payment_dispute_warning": {
+		"amount_label": "Rozporovaná částka",
+		"appeal_body": "{reply, select, yes {Odpovězte na tento e-mail a napište nám proč.} other {{appeals_email, select, null {Kontaktujte správce této instance a vysvětlete jim proč.} other {Napište na <mail>{appeals_email}</mail> a vysvětlete nám proč.}}}} Věc znovu posoudí člověk, který toto rozhodnutí nedělal, a pokud byl spor oprávněný, proti vašemu účtu nijak nezakročíme.",
+		"appeal_title": "Pokud si myslíte, že jsme se spletli",
+		"currency_label": "Měna",
+		"deadline_body": "Pokud spor nestáhnete do {warningDate, date, long} a skončí tím, že vám budou peníze vráceny, váš účet {product_name} natrvalo smažeme. Smazaný účet nelze obnovit. Pokud váš účet zrušíme, nebudete moci ani vytvářet či používat jiné účty {product_name}.",
+		"deadline_label": "Spor stáhněte před datem",
+		"deadline_value": "{warningDate, date, long}",
+		"footer_reason": "Tento e-mail jste obdrželi kvůli platebnímu sporu týkajícímu se vašeho účtu {product_name}.",
+		"ground": "{product, select, plutonium {§ 4.4 podmínek služby} other {§ 9 podmínek Operator Pass}}",
+		"ground_label": "Právní základ",
+		"intro": "U své banky nebo vydavatele karty jste rozporovali {product, select, plutonium {platbu za Plutonium} other {platbu za Operator Pass}}. Člověk z našeho týmu spor posoudil podle našich podmínek a shledal ho neoprávněným.",
+		"next_body": "Pokud jste tuto platbu provedli vy, můžete banku nebo vydavatele karty požádat o stažení sporu. Pokud bude spor stažen nebo skončí, aniž by vám byly peníze vráceny, s vaším účtem se nic nestane. Dokud spor neskončí, nemůžete na {product_name} nic kupovat.{privacy_email, select, null {} other { O kopii svých dat můžete kdykoli požádat na adrese <mail>{privacy_email}</mail>.}}",
+		"next_title": "Co bude dál",
+		"order_date_label": "Datum objednávky",
+		"order_date_value": "{orderDate, date, long}",
+		"order_number_label": "Číslo objednávky",
+		"signoff": "Tým {product_name}",
+		"subject": "K vašemu platebnímu sporu na {product_name}",
+		"why_body": "Platbu jste provedli vy nebo někdo, komu jste to dovolili, naúčtovali jsme správnou částku, {product, select, plutonium {Plutonium bylo poskytnuto podle popisu} other {Operator Pass byl dodán podle popisu}}, platbu jsme vám nevrátili a lhůta pro odstoupení od smlouvy už v době rozporování uplynula.",
+		"why_title": "Proč jsme ho shledali neoprávněným"
+	},
+	"reauth_code": {
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože změna ve vašem účtu {product_name} vyžadovala potvrzovací kód.",
+		"intro": "Zadejte tento kód v aplikaci a potvrďte, že jste to vy, než provedete změnu účtu.",
+		"note": "Tento kód nikomu nesdělujte. Zaměstnanci {product_name} o něj nikdy nepožádají. Pokud jste o něj nežádali, může váš účet používat někdo jiný. Odhlaste se ze všech relací a zkontrolujte zabezpečení účtu.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš potvrzovací kód pro {product_name}"
+	},
+	"registration_approved": {
+		"cta": "Přihlásit se do {product_name}",
+		"footer_reason": "Tento e-mail jste obdrželi, protože tato adresa byla použita pro účet {product_name}.",
+		"intro": "Vaše registrace na {product_name} byla schválena. Nyní se můžete přihlásit.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš účet na {product_name} byl schválen"
+	},
+	"registration_pending": {
+		"cta": "Zkontrolovat čekající registrace",
+		"footer_reason": "Tento e-mail jste obdrželi, protože můžete schvalovat nové účty na {product_name}.",
+		"intro": "Nové účty v {product_name} čekají na schválení.",
+		"signoff": "Tým {product_name}",
+		"subject": "Nové registrace čekají na schválení v {product_name}"
 	},
 	"report_received": {
-		"subject": "Obdrželi jsme vaše nahlášení na {product_name}",
-		"body": "Dobrý den,\n\nObdrželi jsme vaše nahlášení podle nařízení o digitálních službách, které se týká {targetKind, select, message {zprávy} user {účtu} guild {komunity} other {obsahu}} na {product_name}.\n\nID nahlášení: {reportId}\n\nNáš bezpečnostní tým vaše nahlášení přezkoumá a jakmile rozhodneme, napíšeme vám na tuto adresu. Tento e-mail si uschovejte pro své záznamy.\n\n– Bezpečnostní tým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste podali nahlášení podle nařízení o digitálních službách na {product_name}.",
+		"intro": "Obdrželi jsme vaše nahlášení podle nařízení o digitálních službách, které se týká {targetKind, select, message {zprávy} user {účtu} guild {komunity} other {obsahu}} na {product_name}.",
+		"next": "Jakmile rozhodneme, napíšeme vám na tuto adresu.",
+		"report_label": "ID nahlášení",
+		"signoff": "Bezpečnostní tým {product_name}",
+		"subject": "Obdrželi jsme vaše nahlášení na {product_name}"
 	},
 	"report_resolved": {
+		"about": "{target, select, message_community {Jde o vaše nahlášení zprávy v kanálu #{channelName} v komunitě „{communityName}“, odeslané {reportedAt, date, long}.} message_dm {Jde o vaše nahlášení zprávy v přímé konverzaci, odeslané {reportedAt, date, long}.} message {Jde o vaše nahlášení zprávy, odeslané {reportedAt, date, long}.} user {Jde o vaše nahlášení účtu „{username}“, odeslané {reportedAt, date, long}.} community {Jde o vaše nahlášení komunity „{communityName}“, odeslané {reportedAt, date, long}.} other {Jde o nahlášení, které jste odeslali {reportedAt, date, long}.}}",
+		"comment_label": "Poznámka od našeho týmu",
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste odeslali nahlášení na {product_name}.",
+		"intro": "{outcome, select, removed {Nahlášený obsah jsme odstranili, protože porušoval naše pravidla.} restricted {Nahlášený účet porušil naše pravidla, a proto jsme zakročili. Jak jsme zakročili, nesdělujeme.} action_taken {To, co jste nahlásili, porušilo naše pravidla, a proto jsme zakročili. Jak jsme zakročili, nesdělujeme.} no_violation {To, co jste nahlásili, naše pravidla neporušuje, proto jsme to ponechali beze změny.} other {Vaše nahlášení jsme uzavřeli.}}",
+		"note": "{reply, select, yes {Pokud nesouhlasíte, odpovězte na tento e-mail do 60 dnů.} other {{appeals_email, select, null {} other {Pokud nesouhlasíte, napište do 60 dnů na <mail>{appeals_email}</mail> a uveďte ID nahlášení.}}}}{appeals_email, select, null {} other { V EU se také můžete obrátit na certifikovaný <dsa>subjekt pro mimosoudní řešení sporů</dsa> nebo podat stížnost koordinátorovi digitálních služeb ve své zemi.}}",
+		"report_label": "ID nahlášení",
+		"signoff": "Tým {product_name}",
 		"subject": "Vaše nahlášení na {product_name} bylo přezkoumáno",
-		"body": "Dobrý den, {username},\n\nPosoudili jsme vaše nahlášení (ID: {reportId}).\n\n{outcome, select, removed {Nahlášený obsah jsme odstranili, protože porušoval naše pravidla.} restricted {Zjistili jsme, že nahlášený účet porušil naše pravidla, a omezili jsme ho. Nesdělujeme, jaké opatření jsme vůči jinému účtu přijali, protože jde o osobní údaje jeho majitele.} action_taken {Zjistili jsme, že nahlášený obsah nebo účet porušil naše pravidla, a přijali jsme opatření. Nesdělujeme, jaké opatření jsme vůči jinému účtu přijali, protože jde o osobní údaje jeho majitele.} no_violation {Zjistili jsme, že nahlášený obsah nebo účet naše pravidla neporušuje, a proto jsme vše ponechali beze změny.} other {Vaše nahlášení jsme uzavřeli.}}{hasComment, select, yes {\n\nPoznámka od našeho týmu: {publicComment}} other {}}{appeals_email, select, null {} other {\n\nPokud nesouhlasíte, napište do 60 dnů na {appeals_email} a uveďte ID nahlášení. Pokud se nacházíte v EU, můžete věc také předložit certifikovanému subjektu pro mimosoudní řešení sporů nebo podat stížnost koordinátorovi digitálních služeb ve své zemi.}}\n\nTým {product_name}"
+		"thanks": "{outcome, select, removed {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} restricted {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} action_taken {Děkujeme za nahlášení. Díky nahlášením, jako je to vaše, zůstává {product_name} bezpečný pro všechny.} other {Děkujeme, že jste nám dali vědět.}}"
 	},
 	"self_deletion_scheduled": {
-		"subject": "Smazání vašeho účtu {product_name} je naplánováno",
-		"body": "Dobrý den, {username},\n\nPožádali jste o smazání svého účtu {product_name}. Trvalé smazání je naplánováno na:\n\n{deletionDate, date, full} v {deletionDate, time, short}\n\nPokud jste o smazání nežádali, přihlaste se ke svému účtu a smazání zrušte. Doporučujeme také změnit heslo, abyste svůj účet zabezpečili.\n\n– Tým {product_name}"
+		"footer_reason": "Tento e-mail jste obdrželi, protože jste požádali o smazání svého účtu {product_name}.",
+		"intro": "Podle vaší žádosti smažeme váš účet {product_name} {deletionDate, date, long}.",
+		"note": "Pokud jste o to nežádali, přihlaste se do té doby, čímž smazání zrušíte, a změňte si heslo.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš účet {product_name} bude smazán {deletionDate, date, long}"
+	},
+	"sign_in_code": {
+		"device_label": "Zařízení",
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože někdo požádal o přihlášení do {product_name} pomocí této adresy.",
+		"intro": "Pomocí tohoto kódu se přihlaste do {product_name}.",
+		"location_label": "Požadováno z",
+		"note": "Tento kód nikomu nesdělujte. Zaměstnanci {product_name} o něj nikdy nepožádají. Pokud jste se nepokusili přihlásit, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš přihlašovací kód k {product_name}"
+	},
+	"sign_up_code": {
+		"device_label": "Zařízení",
+		"expiry": "Tento kód vyprší za {minutes, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}.",
+		"footer_reason": "Tento e-mail jste obdrželi, protože někdo požádal o vytvoření účtu {product_name} s touto adresou.",
+		"intro": "Pomocí tohoto kódu dokončete vytvoření účtu {product_name}.",
+		"location_label": "Požadováno z",
+		"note": "Tento kód nikomu nesdělujte. Zaměstnanci {product_name} o něj nikdy nepožádají. Pokud jste se nepokusili vytvořit účet, můžete tento e-mail ignorovat.",
+		"signoff": "Tým {product_name}",
+		"subject": "Váš kód pro registraci do {product_name}"
 	}
 }

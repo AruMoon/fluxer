@@ -13,19 +13,13 @@ import {Tooltip} from '@app/features/ui/tooltip/Tooltip';
 import {FluxerTagChangeModal} from '@app/features/user/components/modals/FluxerTagChangeModal';
 import styles from '@app/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection.module.css';
 import type {User} from '@app/features/user/models/User';
+import {accountGateReason} from '@app/features/user/utils/AccountGatePresentation';
+import type {AccountGateResult} from '@app/features/user/utils/AccountGates';
 import {msg} from '@lingui/core/macro';
 import {Trans, useLingui} from '@lingui/react/macro';
-import {CrownIcon} from '@phosphor-icons/react';
+import {AtomIcon} from '@phosphor-icons/react';
 import {observer} from 'mobx-react-lite';
 
-const CLAIM_YOUR_ACCOUNT_TO_CHANGE_YOUR_USERNAME_DESCRIPTOR = msg({
-	message: 'Claim your account to change your username',
-	comment: 'Label in the username section.',
-});
-const VERIFY_YOUR_EMAIL_TO_CHANGE_YOUR_USERNAME_DESCRIPTOR = msg({
-	message: 'Verify your email to change your username',
-	comment: 'Label in the username section.',
-});
 const CUSTOMIZE_YOUR_TAG_TO_YOUR_LIKING_WITH_DESCRIPTOR = msg({
 	message: 'Customize your tag ({discriminatorLabel}) to your liking with {premiumProductName}',
 	comment:
@@ -38,12 +32,11 @@ const GET_TO_CUSTOMIZE_YOUR_TAG_DESCRIPTOR = msg({
 });
 
 interface UsernameSectionProps {
-	isClaimed: boolean;
-	isEmailVerified: boolean;
+	profileGate: AccountGateResult;
 	user: User;
 }
 
-export const UsernameSection = observer(({isClaimed, isEmailVerified, user}: UsernameSectionProps) => {
+export const UsernameSection = observer(({profileGate, user}: UsernameSectionProps) => {
 	const {i18n} = useLingui();
 	const hasCustomDiscriminator = isLimitToggleEnabled(
 		{feature_custom_discriminator: LimitResolver.resolve({key: 'feature_custom_discriminator', fallback: 0})},
@@ -56,24 +49,10 @@ export const UsernameSection = observer(({isClaimed, isEmailVerified, user}: Use
 				<Trans>Username</Trans>
 			</div>
 			<div className={styles.actions} data-flx="user.my-profile-tab.username-section.actions">
-				{!isClaimed ? (
-					<Tooltip
-						text={i18n._(CLAIM_YOUR_ACCOUNT_TO_CHANGE_YOUR_USERNAME_DESCRIPTOR)}
-						data-flx="user.my-profile-tab.username-section.tooltip"
-					>
+				{!profileGate.allowed ? (
+					<Tooltip text={accountGateReason(i18n, profileGate)} data-flx="user.my-profile-tab.username-section.tooltip">
 						<div data-flx="user.my-profile-tab.username-section.div--2">
 							<Button variant="primary" small disabled data-flx="user.my-profile-tab.username-section.button">
-								<Trans>Change username</Trans>
-							</Button>
-						</div>
-					</Tooltip>
-				) : !isEmailVerified ? (
-					<Tooltip
-						text={i18n._(VERIFY_YOUR_EMAIL_TO_CHANGE_YOUR_USERNAME_DESCRIPTOR)}
-						data-flx="user.my-profile-tab.username-section.tooltip--2"
-					>
-						<div data-flx="user.my-profile-tab.username-section.div--3">
-							<Button variant="primary" small disabled data-flx="user.my-profile-tab.username-section.button--2">
 								<Trans>Change username</Trans>
 							</Button>
 						</div>
@@ -114,11 +93,7 @@ export const UsernameSection = observer(({isClaimed, isEmailVerified, user}: Use
 							aria-label={i18n._(GET_TO_CUSTOMIZE_YOUR_TAG_DESCRIPTOR, {premiumProductName: getPremiumProductName()})}
 							data-flx="user.my-profile-tab.username-section.premium-button.open"
 						>
-							<CrownIcon
-								weight="fill"
-								size={remFromPx(18)}
-								data-flx="user.my-profile-tab.username-section.crown-icon"
-							/>
+							<AtomIcon weight="fill" size={remFromPx(18)} data-flx="user.my-profile-tab.username-section.atom-icon" />
 						</button>
 					</Tooltip>
 				)}

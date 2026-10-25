@@ -343,6 +343,37 @@ const COMPOSE_A_NEW_DIRECT_MESSAGE_DESCRIPTOR = msg({
 	message: 'Compose a new direct message',
 	comment: 'Windows jump-list task description (tooltip text) for the New direct message action.',
 });
+const TRAY_ACCOUNTS_DESCRIPTOR = msg({
+	message: 'Accounts',
+	comment: 'Tray and dock menu submenu title listing every signed-in account.',
+});
+const TRAY_CHOOSE_ACCOUNT_DESCRIPTOR = msg({
+	message: 'Choose an account…',
+	comment: 'Tray and dock menu item that opens the full-screen account picker.',
+});
+const TRAY_ACCOUNT_WITH_HOST_DESCRIPTOR = msg({
+	message: '{name} ({host})',
+	comment:
+		'Tray menu account item when the signed-in accounts are on more than one instance. {name} is the account name, {host} is the instance address.',
+});
+const TRAY_ACCOUNT_NUMBERED_DESCRIPTOR = msg({
+	message: 'Account {number}',
+	comment:
+		'Tray and dock menu account item while streamer mode hides personal information. {number} is the account position in the list, such as 2.',
+});
+const TRAY_ACCOUNT_WITH_MENTIONS_DESCRIPTOR = msg({
+	message: '{label} · {count}',
+	comment:
+		'Tray menu account item with unread mentions. {label} is the account name, {count} is the number of mentions.',
+});
+const JUMP_LIST_CHOOSE_ACCOUNT_DESCRIPTOR = msg({
+	message: 'Choose an account',
+	comment: 'Windows jump-list task title. Opens the full-screen account picker.',
+});
+const JUMP_LIST_CHOOSE_ACCOUNT_DESCRIPTION_DESCRIPTOR = msg({
+	message: 'Switch to another signed-in account',
+	comment: 'Windows jump-list task description (tooltip text) for the Choose an account action.',
+});
 const OPEN_NOTIFICATION_DESCRIPTOR = msg({
 	message: 'Open',
 	comment:
@@ -545,6 +576,13 @@ const NATIVE_MESSAGES: Record<string, NativeMessage> = {
 	'desktop.jumpList.openSettingsDescription': OPEN_SETTINGS_2_DESCRIPTOR,
 	'desktop.jumpList.newDirectMessage': NEW_DIRECT_MESSAGE_DESCRIPTOR,
 	'desktop.jumpList.newDirectMessageDescription': COMPOSE_A_NEW_DIRECT_MESSAGE_DESCRIPTOR,
+	'desktop.jumpList.chooseAccount': JUMP_LIST_CHOOSE_ACCOUNT_DESCRIPTOR,
+	'desktop.jumpList.chooseAccountDescription': JUMP_LIST_CHOOSE_ACCOUNT_DESCRIPTION_DESCRIPTOR,
+	'desktop.tray.accounts': TRAY_ACCOUNTS_DESCRIPTOR,
+	'desktop.tray.chooseAccount': TRAY_CHOOSE_ACCOUNT_DESCRIPTOR,
+	'desktop.tray.accountWithHost': TRAY_ACCOUNT_WITH_HOST_DESCRIPTOR,
+	'desktop.tray.accountWithMentions': TRAY_ACCOUNT_WITH_MENTIONS_DESCRIPTOR,
+	'desktop.tray.accountNumbered': TRAY_ACCOUNT_NUMBERED_DESCRIPTOR,
 	'desktop.notifications.open': OPEN_NOTIFICATION_DESCRIPTOR,
 	'desktop.themes.addLocalFiles': ADD_LOCAL_FILES_DESCRIPTOR,
 	'desktop.themes.importFolder': IMPORT_FOLDER_DESCRIPTOR,

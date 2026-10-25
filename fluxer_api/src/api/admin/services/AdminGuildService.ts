@@ -56,6 +56,7 @@ export class AdminGuildService {
 		});
 		this.updateService = new AdminGuildUpdateService({
 			guildRepository: deps.guildRepository,
+			discoveryRepository: deps.discoveryRepository,
 			entityAssetService: deps.entityAssetService,
 			auditService: deps.auditService,
 			updatePropagator: this.updatePropagator,

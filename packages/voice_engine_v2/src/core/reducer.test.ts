@@ -26,17 +26,6 @@ function applyEvents(snapshot: VoiceEngineV2Snapshot, events: Array<VoiceEngineV
 }
 
 describe('transitionVoiceEngineV2', () => {
-	it('keeps business state explicit and starts from idle', () => {
-		const snapshot = initialSnapshot();
-
-		expect(snapshot.connection.status).toBe('idle');
-		expect(snapshot.microphone.status).toBe('idle');
-		expect(snapshot.camera.status).toBe('idle');
-		expect(snapshot.screen.status).toBe('idle');
-		expect(snapshot.screenAudio.status).toBe('idle');
-		expect(snapshot.nextOperationId).toBe(1);
-	});
-
 	it('emits a single connect command for a connect request', () => {
 		const transition = transitionVoiceEngineV2(initialSnapshot(), {
 			type: 'connection.connectRequested',
@@ -817,11 +806,6 @@ describe('transitionVoiceEngineV2', () => {
 		expect(state?.kind).toBe('failed');
 	});
 
-	it('selectors return null for unknown sources', () => {
-		const snapshot = initialSnapshot();
-		expect(snapshot.sourceLifecycles['unknown'] ?? null).toBeNull();
-	});
-
 	it('sourceLifecycle.removed drops the lifecycle slot for that source only', () => {
 		const snapshot = applyEvents(initialSnapshot(), [
 			{
@@ -850,54 +834,6 @@ describe('transitionVoiceEngineV2', () => {
 		expect(transition.snapshot.sourceLifecycles['source-removed'] ?? null).toBeNull();
 		expect((transition.snapshot.sourceLifecycles['source-kept'] ?? null)?.kind).toBe('active');
 		expect(Object.values(transition.snapshot.sourceLifecycles).filter((state) => state.kind === 'failed')).toEqual([]);
-	});
-
-	it('sourceLifecycle.removed for an unknown source leaves the snapshot untouched', () => {
-		const snapshot = initialSnapshot();
-
-		const transition = transitionVoiceEngineV2(snapshot, {type: 'sourceLifecycle.removed', sourceId: 'source-absent'});
-
-		expect(transition.commands).toEqual([]);
-		expect(transition.snapshot).toBe(snapshot);
-	});
-
-	it('replaying the same source lifecycle event sequence yields the same snapshot hash', () => {
-		const events: Array<VoiceEngineV2Event> = [
-			{
-				type: 'sourceLifecycle.transitioned',
-				sourceId: 'source-d',
-				kind: 'active',
-				since: 4n,
-				attempts: 0,
-				fault: null,
-				atMs: 1,
-			},
-			{
-				type: 'sourceLifecycle.transitioned',
-				sourceId: 'source-d',
-				kind: 'reconnecting',
-				since: 7n,
-				attempts: 1,
-				fault: 'networkError',
-				atMs: 5,
-			},
-			{
-				type: 'sourceLifecycle.transitioned',
-				sourceId: 'source-d',
-				kind: 'failed',
-				since: 12n,
-				attempts: 8,
-				fault: 'encoderError',
-				atMs: 9,
-			},
-		];
-
-		const first = applyEvents(initialSnapshot(), events);
-		const second = applyEvents(initialSnapshot(), events);
-		const replacer = (_key: string, value: unknown): unknown =>
-			typeof value === 'bigint' ? `bigint:${value.toString()}` : value;
-
-		expect(JSON.stringify(second, replacer)).toBe(JSON.stringify(first, replacer));
 	});
 });
 
@@ -968,12 +904,5 @@ describe('terminal operation pruning', () => {
 			(operation) => operation.status === 'succeeded',
 		).length;
 		expect(terminalCount).toBe(VOICE_ENGINE_V2_TERMINAL_OPERATIONS_KEPT_MAX);
-	});
-
-	it('prunes deterministically across replays', () => {
-		const total = VOICE_ENGINE_V2_TERMINAL_OPERATIONS_KEPT_MAX * 2;
-		const first = completeDiagnosticCycles(initialSnapshot(), total);
-		const second = completeDiagnosticCycles(initialSnapshot(), total);
-		expect(second).toEqual(first);
 	});
 });

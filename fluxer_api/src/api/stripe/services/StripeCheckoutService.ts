@@ -5,7 +5,9 @@ import {Config} from '@app/api/Config';
 import {getContentMessage} from '@app/api/content_i18n/ContentI18n';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import {Logger} from '@app/api/Logger';
+import {getPaymentDisputeRepository} from '@app/api/middleware/ServiceSingletons';
 import type {User} from '@app/api/models/User';
+import {assertNoOpenPaymentDispute} from '@app/api/payment_disputes/PaymentDisputeReviews';
 import type {StoreEntitlementService} from '@app/api/store_billing/StoreEntitlementService';
 import {getBillingBranding} from '@app/api/stripe/BillingBranding';
 import {getEffectiveBillingConfig, isCurrentCatalogPriceId} from '@app/api/stripe/BillingConfigCache';
@@ -23,9 +25,11 @@ import {
 	getSubscriptionStartDate,
 } from '@app/api/stripe/StripeSubscriptionPeriod';
 import {extractId} from '@app/api/stripe/StripeUtils';
+import {resolvePurchaseEligibility} from '@app/api/user/AccountTier';
 import {shiftGiftExtensionPastPremiumUntil} from '@app/api/user/GiftExtensionShift';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {type Currency, isLocalizedCurrency, shouldDisableAdaptivePricing} from '@app/api/utils/CurrencyUtils';
+import {type PurchaseBlockedReason, PurchaseBlockedReasons} from '@fluxer/constants/src/AccountTierConstants';
 import {isEuEeaCountryCode} from '@fluxer/constants/src/EuropeanEconomicArea';
 import {PremiumFlags, UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
 import {PurchaseEmailVerificationRequiredError} from '@fluxer/errors/src/domains/auth/EmailVerificationRequiredError';
@@ -35,14 +39,16 @@ import {StripeInvalidProductConfigurationError} from '@fluxer/errors/src/domains
 import {StripeInvalidProductError} from '@fluxer/errors/src/domains/payment/StripeInvalidProductError';
 import {StripeNoPurchaseHistoryError} from '@fluxer/errors/src/domains/payment/StripeNoPurchaseHistoryError';
 import {StripePaymentNotAvailableError} from '@fluxer/errors/src/domains/payment/StripePaymentNotAvailableError';
+import {PurchaseReceiptEmailRequiredError} from '@fluxer/errors/src/domains/user/PurchaseReceiptEmailRequiredError';
 import {UnclaimedAccountCannotMakePurchasesError} from '@fluxer/errors/src/domains/user/UnclaimedAccountCannotMakePurchasesError';
 import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
+import type {FluxerError} from '@fluxer/errors/src/FluxerError';
 import type {CheckoutPaymentMethod} from '@fluxer/schema/src/domains/premium/GiftCodeSchemas';
 import type {PriceIdsResponse} from '@fluxer/schema/src/domains/premium/PremiumSchemas';
 import type {ICacheService} from '@pkgs/cache/src/ICacheService';
 import type Stripe from 'stripe';
 
-export const EU_WITHDRAWAL_WAIVER_TEXT_VERSION = '2026-04-23';
+export const EU_WITHDRAWAL_WAIVER_TEXT_VERSION = '2026-10-12';
 
 type CheckoutSessionCreateParams = Stripe.Checkout.SessionCreateParams;
 type CheckoutSessionMode = CheckoutSessionCreateParams['mode'];
@@ -96,6 +102,25 @@ interface EuWithdrawalWaiverContext {
 	acceptedAt: Date | null;
 	effectiveCountryCode: string | null;
 	required: boolean;
+}
+
+const PURCHASE_BLOCKED_ERRORS: Record<PurchaseBlockedReason, () => FluxerError> = {
+	[PurchaseBlockedReasons.UNCLAIMED]: () => new UnclaimedAccountCannotMakePurchasesError(),
+	[PurchaseBlockedReasons.EMAIL_UNVERIFIED]: () => new PurchaseEmailVerificationRequiredError(),
+	[PurchaseBlockedReasons.NO_RECEIPT_EMAIL]: () => new PurchaseReceiptEmailRequiredError(),
+};
+
+export function assertUserCanPurchase(
+	user: User,
+	{needsReceiptEmail = true}: {needsReceiptEmail?: boolean} = {},
+): void {
+	const eligibility = resolvePurchaseEligibility(user);
+	if (!eligibility.allowed && (needsReceiptEmail || eligibility.blocked !== PurchaseBlockedReasons.NO_RECEIPT_EMAIL)) {
+		throw PURCHASE_BLOCKED_ERRORS[eligibility.blocked]();
+	}
+	if (user.premiumFlags & PremiumFlags.PURCHASE_DISABLED) {
+		throw new PremiumPurchaseBlockedError('purchase_disabled');
+	}
 }
 
 export class StripeCheckoutService {
@@ -287,7 +312,8 @@ export class StripeCheckoutService {
 		if (user.premiumType === UserPremiumTypes.LIFETIME && isRecurringSubscription) {
 			throw new PremiumPurchaseBlockedError('lifetime');
 		}
-		this.validateUserCanPurchase(user);
+		assertUserCanPurchase(user);
+		await assertNoOpenPaymentDispute(getPaymentDisputeRepository(), user.id);
 		if (isRecurringSubscription) {
 			const storeEntitlement = await this.storeEntitlementService?.getActiveStoreEntitlement(user.id);
 			if (storeEntitlement) {
@@ -608,18 +634,6 @@ export class StripeCheckoutService {
 			gift_1_month_amount_minor: gift1MonthPrice?.unitAmountMinor ?? null,
 			gift_1_year_amount_minor: gift1YearPrice?.unitAmountMinor ?? null,
 		};
-	}
-
-	validateUserCanPurchase(user: User): void {
-		if (user.isUnclaimedAccount()) {
-			throw new UnclaimedAccountCannotMakePurchasesError();
-		}
-		if (!user.emailVerified) {
-			throw new PurchaseEmailVerificationRequiredError();
-		}
-		if (user.premiumFlags & PremiumFlags.PURCHASE_DISABLED) {
-			throw new PremiumPurchaseBlockedError('purchase_disabled');
-		}
 	}
 
 	private async getStripePriceSummary(priceId: string | null): Promise<StripePriceSummary | null> {

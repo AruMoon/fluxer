@@ -7,7 +7,7 @@ license = "AGPL-3.0-or-later"
 [dependencies]
 anyhow = "1.0.104"
 aws-config = "1.12.0"
-aws-sdk-s3 = { version = "1.148.0", default-features = false, features = ["default-https-client", "http-1x", "rt-tokio", "sigv4a"] }
+aws-sdk-s3 = { version = "1.148.0", default-features = false, features = ["default-https-client", "http-1x", "rt-tokio"] }
 base64 = "0.23.1"
 brotli = "8.0.2"
 chrono = "0.4.45"
@@ -22,4 +22,4 @@ tar = "0.4.46"
 tempfile = "3.27.0"
 tokio = { version = "1.53.1", features = ["fs", "io-util", "macros", "process", "rt-multi-thread", "signal", "sync", "time"] }
 walkdir = "2.5.0"
-zip = { version = "9.0.4", default-features = false, features = ["deflate"] }
+zip = { version = "9.0.5", default-features = false, features = ["deflate"] }

@@ -32,7 +32,12 @@ const MAIN_APP_OUTPUT_FILE_NAME = `${MAIN_APP_ENTRY_NAME}.js`;
 const MAIN_APP_OUTPUT_FILE_DEFINE = '__FLUXER_MAIN_APP_OUTPUT_FILE__';
 const MAIN_BOOTSTRAP_SOURCE = path.join(SRC_DIR, 'main', 'Bootstrap.ts');
 const MAIN_APP_SOURCE = path.join(SRC_DIR, 'main', 'index.ts');
+const SPLASH_WINDOW_SOURCE = path.join(SRC_DIR, 'main', 'SplashWindow.ts');
 const DESKTOP_TSCONFIG = path.join(ROOT_DIR, 'tsconfig.json');
+const APP_SRC_DIR = path.join(MONOREPO_ROOT, 'fluxer_app', 'src');
+const ACCOUNT_ENGINE_SOURCE = path.join(SRC_DIR, 'engine', 'AccountEngineMain.ts');
+const ACCOUNT_ENGINE_CORE_SOURCE = path.join(APP_SRC_DIR, 'features', 'account_engine', 'core', 'index.ts');
+const ACCOUNT_ENGINE_OUTPUT_FILE_NAME = 'AccountEngine.cjs';
 const requireModule = createRequire(import.meta.url);
 const isProduction =
 	process.env.NODE_ENV === 'production' ||
@@ -702,6 +707,7 @@ async function buildMain() {
 		MAIN_APP_SOURCE,
 		path.join(DIST_DIR, 'main', MAIN_APP_OUTPUT_FILE_NAME),
 	);
+	assertSplashBundleOwnership(result.metafile);
 	console.log('Main process build complete.');
 }
 
@@ -720,6 +726,42 @@ function assertMainProcessEntryOutput(metafile, entryPoint, expectedOutput) {
 		.map(([outputPath]) => path.resolve(ROOT_DIR, outputPath));
 	if (actualOutputs.length !== 1 || actualOutputs[0] !== expectedOutput) {
 		throw new MainProcessBuildOutputError(entryPoint, expectedOutput, actualOutputs);
+	}
+}
+
+function entryOutputInputs(metafile, entryPoint) {
+	const outputs = Object.entries(metafile.outputs);
+	const start = outputs.find(
+		([, output]) => output.entryPoint != null && path.resolve(ROOT_DIR, output.entryPoint) === entryPoint,
+	);
+	const inputs = new Set();
+	const seen = new Set();
+	const queue = start == null ? [] : [start[0]];
+	while (queue.length > 0) {
+		const outputPath = queue.shift();
+		if (seen.has(outputPath) || metafile.outputs[outputPath] == null) {
+			continue;
+		}
+		seen.add(outputPath);
+		const output = metafile.outputs[outputPath];
+		for (const input of Object.keys(output.inputs)) {
+			inputs.add(path.resolve(ROOT_DIR, input));
+		}
+		for (const imported of output.imports) {
+			queue.push(imported.path);
+		}
+	}
+	return inputs;
+}
+
+function assertSplashBundleOwnership(metafile) {
+	if (!entryOutputInputs(metafile, MAIN_BOOTSTRAP_SOURCE).has(SPLASH_WINDOW_SOURCE)) {
+		throw new Error(`${MAIN_BOOTSTRAP_ENTRY_NAME}.js no longer bundles ${SPLASH_WINDOW_SOURCE}`);
+	}
+	if (entryOutputInputs(metafile, MAIN_APP_SOURCE).has(SPLASH_WINDOW_SOURCE)) {
+		throw new Error(
+			`${MAIN_APP_OUTPUT_FILE_NAME} reaches ${SPLASH_WINDOW_SOURCE}, so the splash would load twice with two copies of its state. Talk to the splash through ModuleBootHandoff instead.`,
+		);
 	}
 }
 
@@ -823,6 +865,41 @@ function preloadBuildOptions(entryFileName, outputFileName) {
 	};
 }
 
+export function accountEngineBuildOptions({outfile, minify = isProduction, sourcemap = true} = {}) {
+	return {
+		entryPoints: [ACCOUNT_ENGINE_SOURCE],
+		bundle: true,
+		platform: 'node',
+		target: 'node22',
+		format: 'cjs',
+		outfile: outfile ?? path.join(DIST_DIR, 'engine', ACCOUNT_ENGINE_OUTPUT_FILE_NAME),
+		minify,
+		sourcemap,
+		external: ['@fluxer/gateway-socket'],
+		tsconfig: DESKTOP_TSCONFIG,
+		alias: {'@fluxer/account-engine-core': ACCOUNT_ENGINE_CORE_SOURCE},
+		plugins: [
+			{
+				name: 'fluxer-app-source',
+				setup(build) {
+					build.onResolve({filter: /^@app\//}, (args) => ({
+						path: path.join(APP_SRC_DIR, `${args.path.slice('@app/'.length)}.ts`),
+					}));
+				},
+			},
+		],
+		define: {
+			'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+		},
+	};
+}
+
+async function buildAccountEngine() {
+	console.log('Building account engine...');
+	await esbuild.build(accountEngineBuildOptions());
+	console.log('Account engine build complete.');
+}
+
 async function buildPreload() {
 	console.log('Building preload scripts...');
 	await Promise.all([
@@ -896,6 +973,7 @@ async function build() {
 	cleanDistDirectory(options);
 	fs.mkdirSync(path.join(DIST_DIR, 'main'), {recursive: true});
 	fs.mkdirSync(path.join(DIST_DIR, 'preload'), {recursive: true});
+	fs.mkdirSync(path.join(DIST_DIR, 'engine'), {recursive: true});
 	if (!options.useSharedRenderer) {
 		copyRendererIntoDist();
 	}
@@ -903,7 +981,7 @@ async function build() {
 	if (modulesEnabled) {
 		prunePackedRendererModules();
 	}
-	await Promise.all([buildMain(), buildPreload()]);
+	await Promise.all([buildMain(), buildPreload(), buildAccountEngine()]);
 	copySplashAssets();
 	writeBuildInfo();
 	fs.rmSync(BUILD_IN_PROGRESS_FILE, {force: true});
@@ -946,7 +1024,9 @@ function writeBuildInfo() {
 	);
 }
 
-build().catch((error) => {
-	console.error('Build failed:', error);
-	process.exit(1);
-});
+if (process.argv[1] != null && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {
+	build().catch((error) => {
+		console.error('Build failed:', error);
+		process.exit(1);
+	});
+}

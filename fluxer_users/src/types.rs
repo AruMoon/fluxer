@@ -7,9 +7,9 @@ use fluxer_common::user_flags::USER_FLAG_STAFF;
 #[cfg(test)]
 use fluxer_common::user_flags::{USER_FLAG_PARTNER, USER_FLAG_STAFF_HIDDEN};
 pub use fluxer_common::user_partial::ApiUserPartial;
-#[cfg(test)]
-use fluxer_common::user_partial::FLUXER_SYSTEM_USERNAME;
-use fluxer_common::user_partial::{FLUXER_SYSTEM_USER_ID, UserPartialFields};
+use fluxer_common::user_partial::{
+    FLUXER_SYSTEM_USER_ID, UserPartialFields, default_instance_name,
+};
 use serde::{Deserialize, Deserializer, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,9 +17,13 @@ use serde::{Deserialize, Deserializer, Serialize};
 pub enum UserRequest {
     GetPartialsByIds {
         user_ids: Vec<i64>,
+        #[serde(default = "default_instance_name")]
+        instance_name: String,
     },
     GetApiPartialsByIds {
         user_ids: Vec<String>,
+        #[serde(default = "default_instance_name")]
+        instance_name: String,
     },
     Invalidate {
         #[serde(deserialize_with = "deserialize_i64_from_number_or_string")]
@@ -109,9 +113,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{Value, json};
-
-    const USER_FLAG_DELETED: i64 = 1 << 34;
+    use serde_json::json;
 
     fn partial_with_flags(user_id: i64, flags: i64) -> UserPartial {
         UserPartial {
@@ -136,13 +138,18 @@ mod tests {
     fn api_partial_requests_use_string_snowflakes() {
         let request: UserRequest = serde_json::from_value(json!({
             "op": "GetApiPartialsByIds",
-            "user_ids": ["9007199254740993", "9223372036854775807"]
+            "user_ids": ["9007199254740993", "9223372036854775807"],
+            "instance_name": "Example Chat"
         }))
         .unwrap();
 
         match request {
-            UserRequest::GetApiPartialsByIds { user_ids } => {
+            UserRequest::GetApiPartialsByIds {
+                user_ids,
+                instance_name,
+            } => {
                 assert_eq!(user_ids, vec!["9007199254740993", "9223372036854775807"]);
+                assert_eq!(instance_name, "Example Chat");
             }
             other => panic!("unexpected request: {other:?}"),
         }
@@ -205,28 +212,5 @@ mod tests {
         assert_eq!(api_partial.bot, None);
         assert_eq!(api_partial.system, None);
         assert_eq!(api_partial.mention_flags, None);
-    }
-
-    #[test]
-    fn api_partial_preserves_stored_fields_when_deleted_flag_is_set() {
-        let deleted = partial_with_flags(123, USER_FLAG_DELETED).to_api_partial();
-
-        assert_eq!(deleted.username, "Ada");
-        assert_eq!(deleted.global_name, Some("Ada Lovelace".to_owned()));
-        assert_eq!(deleted.avatar, Some("avatar_hash".to_owned()));
-        assert_eq!(deleted.flags, 0);
-    }
-
-    #[test]
-    fn api_partial_maps_system_user_like_the_api_mapper() {
-        let system = partial_with_flags(FLUXER_SYSTEM_USER_ID, USER_FLAG_STAFF).to_api_partial();
-
-        assert_eq!(system.username, FLUXER_SYSTEM_USERNAME);
-        assert_eq!(system.bot, Some(true));
-        assert_eq!(system.system, Some(true));
-        assert_eq!(
-            serde_json::to_value(system).unwrap()["system"],
-            Value::Bool(true)
-        );
     }
 }

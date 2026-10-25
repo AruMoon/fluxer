@@ -1,11 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import InstanceSnapshotStore, {type RuntimeConfigSnapshot} from '@app/features/app/state/InstanceSnapshotStore';
+import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import {AuthRouteLoadError} from '@app/features/auth/flow/AuthRouteLoadError';
 import {AuthShellLoadingState} from '@app/features/auth/flow/AuthShellLoadingState';
-import {AuthRuntimeTarget, AuthRuntimeTargetProvider} from '@app/features/auth/state/AuthRuntimeTarget';
+import {useAuthLayoutContext} from '@app/features/auth/state/AuthLayoutContext';
+import {
+	AuthRuntimeTarget,
+	AuthRuntimeTargetProvider,
+	useAuthRuntimeTarget,
+} from '@app/features/auth/state/AuthRuntimeTarget';
+import {Logger} from '@app/features/platform/utils/AppLogger';
 import {getElectronAPI, isDesktop} from '@app/features/ui/utils/NativeUtils';
-import {type ReactNode, useCallback, useEffect, useReducer, useState} from 'react';
+import {observer} from 'mobx-react-lite';
+import {type ReactNode, useCallback, useEffect, useLayoutEffect, useReducer, useState} from 'react';
+
+const logger = new Logger('AuthRuntimeTargetBoundary');
 
 const AuthRuntimeResolutionStatus = Object.freeze({
 	LOADING: 'loading',
@@ -147,6 +157,13 @@ function browserAuthDocumentOrigin(): string {
 
 async function resolveBrowserAuthRuntime(signal: AbortSignal): Promise<RuntimeConfigSnapshot> {
 	const resolution = await InstanceSnapshotStore.resolve({input: browserAuthDocumentOrigin(), signal});
+	if (RuntimeConfig.getSnapshotOrNull() === null) {
+		try {
+			RuntimeConfig.applySnapshot(resolution.snapshot);
+		} catch (error) {
+			logger.warn('Failed to activate the instance this page belongs to:', error);
+		}
+	}
 	return resolution.snapshot;
 }
 
@@ -171,6 +188,10 @@ export async function warmAuthRuntimeTarget(signal: AbortSignal): Promise<Runtim
 	return runtime;
 }
 
+export async function readyBrowserAuthRuntime(signal: AbortSignal): Promise<RuntimeConfigSnapshot> {
+	return readWarmBrowserAuthRuntime()?.runtime ?? (await resolveBrowserAuthRuntime(signal));
+}
+
 function readWarmDesktopAuthRuntime(): {readonly runtime: RuntimeConfigSnapshot | null} | null {
 	return readWarmAuthRuntime(true);
 }
@@ -182,6 +203,16 @@ function readWarmBrowserAuthRuntime(): {readonly runtime: RuntimeConfigSnapshot}
 	}
 	return {runtime: warm.runtime};
 }
+
+const AuthBrandSnapshotReporter = observer(function AuthBrandSnapshotReporter() {
+	const {snapshot} = useAuthRuntimeTarget();
+	const {setBrandSnapshot} = useAuthLayoutContext();
+	useLayoutEffect(() => {
+		setBrandSnapshot(snapshot);
+	}, [setBrandSnapshot, snapshot]);
+	useLayoutEffect(() => () => setBrandSnapshot(null), [setBrandSnapshot]);
+	return null;
+});
 
 function ResolvedDesktopAuthRuntimeTargetBoundary({
 	snapshot,
@@ -196,6 +227,7 @@ function ResolvedDesktopAuthRuntimeTargetBoundary({
 			target={target}
 			data-flx="auth.flow.auth-runtime-target-boundary.resolved-desktop-auth-runtime-target-boundary.auth-runtime-target-provider"
 		>
+			<AuthBrandSnapshotReporter data-flx="auth.flow.auth-runtime-target-boundary.auth-brand-snapshot-reporter" />
 			{children}
 		</AuthRuntimeTargetProvider>
 	);
@@ -208,12 +240,13 @@ function ResolvedBrowserAuthRuntimeTargetBoundary({
 	readonly snapshot: RuntimeConfigSnapshot;
 	readonly children: ReactNode;
 }) {
-	const [target] = useState(() => AuthRuntimeTarget.forBrowserDocument(snapshot));
+	const [target] = useState(() => AuthRuntimeTarget.forFixedInstance(snapshot));
 	return (
 		<AuthRuntimeTargetProvider
 			target={target}
 			data-flx="auth.flow.auth-runtime-target-boundary.resolved-browser-auth-runtime-target-boundary.auth-runtime-target-provider"
 		>
+			<AuthBrandSnapshotReporter data-flx="auth.flow.auth-runtime-target-boundary.auth-brand-snapshot-reporter" />
 			{children}
 		</AuthRuntimeTargetProvider>
 	);

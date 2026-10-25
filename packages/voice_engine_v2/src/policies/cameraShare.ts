@@ -6,9 +6,9 @@ import type {
 	VoiceEngineV2Error,
 } from '@fluxer/voice_engine_v2/src/protocol/types';
 
-export type VoiceEngineV2CameraEncodingPlanAction = 'noop' | 'updateEncoding' | 'republish' | 'reject';
+type VoiceEngineV2CameraEncodingPlanAction = 'noop' | 'updateEncoding' | 'republish' | 'reject';
 
-export type VoiceEngineV2CameraEncodingPlanReason =
+type VoiceEngineV2CameraEncodingPlanReason =
 	| 'unchanged'
 	| 'effectsOrEncodingChanged'
 	| 'deviceChanged'
@@ -46,7 +46,7 @@ function invalidCameraEncodingPlan(
 	};
 }
 
-export function applyVoiceEngineV2CameraEncodingOptions(
+function applyVoiceEngineV2CameraEncodingOptions(
 	current: VoiceEngineV2CameraOptions,
 	update: VoiceEngineV2CameraEncodingOptions,
 ): VoiceEngineV2CameraOptions {

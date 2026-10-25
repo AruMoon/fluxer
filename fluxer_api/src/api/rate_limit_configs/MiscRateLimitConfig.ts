@@ -12,6 +12,10 @@ export const MiscRateLimitConfigs = {
 		bucket: 'instance:setup:account_identity',
 		config: {limit: 10, windowMs: ms('1 minute')},
 	} as RouteRateLimitConfig,
+	INSTANCE_SETUP_TOKEN_CHECK: {
+		bucket: 'instance:setup:token_check',
+		config: {limit: 10, windowMs: ms('1 minute')},
+	} as RouteRateLimitConfig,
 	IP_GEO_LOOKUP: {
 		bucket: 'ip:geo_lookup',
 		config: {limit: 30, windowMs: ms('1 minute')},

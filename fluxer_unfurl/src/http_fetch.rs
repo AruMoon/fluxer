@@ -175,7 +175,7 @@ where
     Err(anyhow::anyhow!("too many redirects"))
 }
 
-async fn read_body(resp: reqwest::Response, max_bytes: usize) -> anyhow::Result<Vec<u8>> {
+pub async fn read_body(resp: reqwest::Response, max_bytes: usize) -> anyhow::Result<Vec<u8>> {
     let mut buf = Vec::with_capacity(max_bytes.min(64 * 1024));
     let mut stream = resp;
 

@@ -3,7 +3,9 @@
 import type {ApiContext} from '@app/api/ApiContext';
 import {mapUserToAdminResponse} from '@app/api/admin/models/UserTypes';
 import type {AdminAuditService} from '@app/api/admin/services/AdminAuditService';
+import {confirmEmailOwnership} from '@app/api/auth/EmailOwnership';
 import {createUserID, type UserID} from '@app/api/BrandedTypes';
+import {LocalDate} from '@app/api/database/LocalDate';
 import type {EnforcementDecisionRow} from '@app/api/database/types/EnforcementTypes';
 import type {EnforcementActor} from '@app/api/enforcement/EnforcementActor';
 import {decisionAuditMetadata, type EnforcementDecisionService} from '@app/api/enforcement/EnforcementDecisionService';
@@ -11,21 +13,27 @@ import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository'
 import {GuildMemberSearchIndexService} from '@app/api/guild/services/member/GuildMemberSearchIndexService';
 import type {DiscriminatorService} from '@app/api/infrastructure/DiscriminatorService';
 import type {EntityAssetService, PreparedAssetUpload} from '@app/api/infrastructure/EntityAssetService';
+import {getEmailDeliveryState} from '@app/api/instance/AccountsConfigCache';
 import {Logger} from '@app/api/Logger';
-import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
+import {getInstanceConfigRepository, getKVAccountDeletionQueue} from '@app/api/middleware/ServiceSingletons';
 import type {User} from '@app/api/models/User';
 import {enqueueStripeCustomerEmailSync} from '@app/api/stripe/StripeCustomer';
 import {
 	type PartialUserChangePropagationDeps,
 	propagateUserUpdate,
 } from '@app/api/user/services/PartialUserChangePropagation';
+import {clearPendingDeletion} from '@app/api/user/services/PendingDeletionCoordinator';
 import {assertNoDiscriminatorChange, reserveUsername, type UsernameReservation} from '@app/api/user/UniqueUsernames';
 import {USERNAME_MODE_DISCRIMINATOR} from '@app/api/user/UserTag';
+import {BELOW_MINIMUM_AGE_TRAIT, DOB_DEFERRED_TRAIT} from '@app/api/user/UserTraits';
+import {EmailDeliveryStates} from '@fluxer/constants/src/AccountConfigConstants';
+import {DeletionReasons} from '@fluxer/constants/src/Core';
+import {isPlausibleDateOfBirth} from '@fluxer/constants/src/RegionalMinimumAge';
+import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {AccessDeniedError} from '@fluxer/errors/src/domains/core/AccessDeniedError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {TagAlreadyTakenError} from '@fluxer/errors/src/domains/user/TagAlreadyTakenError';
-import {UnknownUserError} from '@fluxer/errors/src/domains/user/UnknownUserError';
 import type {
 	AdminUserClearFieldsRequest,
 	ChangeDobRequest,
@@ -36,7 +44,6 @@ import type {
 	UserProfileField,
 	VerifyUserEmailRequest,
 } from '@fluxer/schema/src/domains/admin/AdminUserSchemas';
-import {types} from 'cassandra-driver';
 
 interface AdminUserProfileServiceDeps {
 	apiContext: ApiContext;
@@ -59,6 +66,15 @@ function profileValues(user: User, fields: ReadonlyArray<UserProfileField>): Map
 	return new Map(fields.flatMap((field) => (current[field] ? [[field, current[field]] as const] : [])));
 }
 
+function isPlausibleAdminDateOfBirth(value: string): boolean {
+	const [year, month, day] = value.split('-').map(Number);
+	const now = new Date();
+	return isPlausibleDateOfBirth(
+		{year: year!, month: month!, day: day!},
+		{year: now.getUTCFullYear(), month: now.getUTCMonth() + 1, day: now.getUTCDate()},
+	);
+}
+
 export class AdminUserProfileService {
 	private readonly searchIndexService: GuildMemberSearchIndexService;
 
@@ -68,10 +84,7 @@ export class AdminUserProfileService {
 
 	async clearUserFields(userId: UserID, {fields, basis}: AdminUserClearFieldsRequest, actor: EnforcementActor) {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const resetFields = [...new Set(fields)];
 		let updatedUser = user;
 		const clear = async () => {
@@ -144,10 +157,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (data.bot && user.acls.size > 0) {
 			throw new AccessDeniedError();
 		}
@@ -179,10 +189,7 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		if (data.system && !user.isBot) {
 			throw InputValidationError.fromCode(
 				'system',
@@ -213,16 +220,10 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
-		const updatedUser = await userRepository.patchUpsert(
-			userId,
-			{email_verified: true, email_bounced: false},
-			user.toRow(),
-		);
+		const user = await userRepository.findUniqueAssert(userId);
+		const updatedUser = await confirmEmailOwnership(this.deps.apiContext, user);
 		await propagateUserUpdate(userUpdateDeps, user, updatedUser);
+		await enqueueStripeCustomerEmailSync(this.deps.apiContext.services.worker, user, updatedUser);
 		await auditService.createAuditLog({
 			adminUserId,
 			targetType: 'user',
@@ -249,10 +250,7 @@ export class AdminUserProfileService {
 		} = this.deps.apiContext.services;
 		const {discriminatorService, auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const uniqueUsernames = !user.isBot && (await getInstanceConfigRepository().usesUniqueUsernames());
 		if (uniqueUsernames) {
 			assertNoDiscriminatorChange(data.discriminator, user.discriminator);
@@ -323,15 +321,12 @@ export class AdminUserProfileService {
 		} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
+		const user = await userRepository.findUniqueAssert(userId);
 		const updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
 				email: data.email,
-				email_verified: false,
+				email_verified: getEmailDeliveryState() !== EmailDeliveryStates.ON,
 			},
 			user.toRow(),
 		);
@@ -382,17 +377,28 @@ export class AdminUserProfileService {
 		const {users: userRepository, cache: cacheService} = this.deps.apiContext.services;
 		const {auditService, userUpdateDeps} = this.deps;
 		const userId = createUserID(data.user_id);
-		const user = await userRepository.findUnique(userId);
-		if (!user) {
-			throw new UnknownUserError();
-		}
-		const updatedUser = await userRepository.patchUpsert(
+		const user = await userRepository.findUniqueAssert(userId);
+		const traits = user.traits;
+		traits.delete(DOB_DEFERRED_TRAIT);
+		const clearedBelowMinimumAge = traits.delete(BELOW_MINIMUM_AGE_TRAIT);
+		let updatedUser = await userRepository.patchUpsert(
 			userId,
 			{
-				date_of_birth: types.LocalDate.fromString(data.date_of_birth),
+				date_of_birth: LocalDate.fromString(data.date_of_birth),
+				traits: traits.size > 0 ? traits : null,
 			},
 			user.toRow(),
 		);
+		if (clearedBelowMinimumAge && updatedUser.deletionReasonCode === DeletionReasons.BELOW_MINIMUM_AGE) {
+			updatedUser = await userRepository.updateDeletionSchedule(updatedUser, {
+				flags: updatedUser.flags & ~UserFlags.DELETED,
+				pending_deletion_at: null,
+				deletion_reason_code: null,
+				deletion_public_reason: null,
+				deletion_audit_log_reason: null,
+			});
+			await clearPendingDeletion({userId, deletionQueue: getKVAccountDeletionQueue()});
+		}
 		await propagateUserUpdate(userUpdateDeps, user, updatedUser);
 		await auditService.createAuditLog({
 			adminUserId,
@@ -403,6 +409,8 @@ export class AdminUserProfileService {
 			metadata: new Map([
 				['old_dob', user.dateOfBirth ?? 'null'],
 				['new_dob', data.date_of_birth],
+				['cleared_below_minimum_age', clearedBelowMinimumAge ? 'true' : 'false'],
+				['outside_plausible_range', isPlausibleAdminDateOfBirth(data.date_of_birth) ? 'false' : 'true'],
 			]),
 		});
 		return {

@@ -10,6 +10,7 @@ import type {
 	MessageID,
 	UserID,
 } from '@app/api/BrandedTypes';
+import type {LocalDate} from '@app/api/database/LocalDate';
 import type {LocaleCode} from '@fluxer/constants/src/Locales';
 import type {GuildFolderIcon, MentionReplyPreference} from '@fluxer/constants/src/UserConstants';
 import type {types} from 'cassandra-driver';
@@ -44,7 +45,7 @@ export interface UserRow {
 	accent_color: number | null;
 	timezone: string | null;
 	timezone_privacy_flags: number | null;
-	date_of_birth: types.LocalDate | null;
+	date_of_birth: LocalDate | null;
 	locale: string | null;
 	flags: bigint | null;
 	premium_flags?: number | null;
@@ -586,6 +587,11 @@ export interface UserByStripeSubscriptionIdRow {
 	user_id: UserID;
 }
 
+export interface UserByAclRow {
+	acl: string;
+	user_id: UserID;
+}
+
 export interface UserByLastActiveIpRow {
 	last_active_ip: string;
 	user_id: UserID;
@@ -615,6 +621,7 @@ export const USER_BY_STRIPE_SUBSCRIPTION_ID_COLUMNS = [
 	'stripe_subscription_id',
 	'user_id',
 ] as const satisfies ReadonlyArray<keyof UserByStripeSubscriptionIdRow>;
+export const USER_BY_ACL_COLUMNS = ['acl', 'user_id'] as const satisfies ReadonlyArray<keyof UserByAclRow>;
 export const USER_BY_LAST_ACTIVE_IP_COLUMNS = [
 	'last_active_ip',
 	'user_id',

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import {requireEmailVerified} from '@app/api/auth/EmailVerificationUtils';
 import {createEmojiID, type MessageID, type UserID} from '@app/api/BrandedTypes';
 import type {ChannelRepository} from '@app/api/channel/ChannelRepository';
 import type {AuthenticatedChannel} from '@app/api/channel/services/AuthenticatedChannel';
@@ -186,7 +185,6 @@ export class MessageReactionService {
 		if (!message) throw new UnknownMessageError();
 		const requestingUser = await this.userRepository.findUnique(userId);
 		if (requestingUser) {
-			requireEmailVerified(requestingUser, 'reaction');
 			assertAccountNotLimited(requestingUser);
 		}
 		const guildFeatures = guild?.features ?? null;

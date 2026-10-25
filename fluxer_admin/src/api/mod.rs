@@ -20,6 +20,8 @@ pub mod instance_config;
 pub mod jobs;
 pub mod limit_config;
 pub mod messages;
+pub mod operator_pass;
+pub mod payment_disputes;
 pub mod reports;
 pub mod search;
 pub mod system;

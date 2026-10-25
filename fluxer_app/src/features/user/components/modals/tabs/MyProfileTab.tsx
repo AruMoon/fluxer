@@ -5,6 +5,7 @@ import {UnclaimedAccountAlert} from '@app/features/app/components/dialogs/compon
 import {SettingsSection} from '@app/features/app/components/dialogs/shared/SettingsSection';
 import {SettingsTabContainer} from '@app/features/app/components/dialogs/shared/SettingsTabLayout';
 import {useFormSubmit} from '@app/features/app/hooks/useFormSubmit';
+import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import {LimitResolver} from '@app/features/app/utils/LimitResolverAdapter';
 import {isLimitToggleEnabled} from '@app/features/app/utils/LimitUtils';
 import type {FlatEmoji} from '@app/features/emoji/types/EmojiTypes';
@@ -18,6 +19,9 @@ import {convertMarkdownToSegments} from '@app/features/messaging/utils/MarkdownT
 import type {MentionSegment} from '@app/features/messaging/utils/TextareaSegmentManager';
 import Permission from '@app/features/permissions/state/Permission';
 import {Logger} from '@app/features/platform/utils/AppLogger';
+import {OperatorPassHoldingsSection} from '@app/features/premium/components/operator_pass/OperatorPassHoldingsSection';
+import OperatorPassHoldings from '@app/features/premium/state/OperatorPassHoldings';
+import {hasOperatorPassProfileBadge, isOperatorPassAvailable} from '@app/features/premium/utils/OperatorPassUtils';
 import {getPremiumProductName, shouldShowPremiumFeatures} from '@app/features/premium/utils/PremiumUtils';
 import * as ToastCommands from '@app/features/ui/commands/ToastCommands';
 import * as UnsavedChangesCommands from '@app/features/ui/commands/UnsavedChangesCommands';
@@ -37,6 +41,7 @@ import {
 import {BannerUploader} from '@app/features/user/components/modals/tabs/my_profile_tab/BannerUploader';
 import {BIO_MARKDOWN_PARSER_FLAGS, BioEditor} from '@app/features/user/components/modals/tabs/my_profile_tab/BioEditor';
 import {UsernameSection} from '@app/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection';
+import {OperatorPassWallSettings} from '@app/features/user/components/modals/tabs/my_profile_tab/OperatorPassWallSettings';
 import {PerGuildPremiumUpsell} from '@app/features/user/components/modals/tabs/my_profile_tab/PerGuildPremiumUpsell';
 import {PremiumBadgeSettings} from '@app/features/user/components/modals/tabs/my_profile_tab/PremiumBadgeSettings';
 import {
@@ -57,6 +62,8 @@ import {ProfilePreview} from '@app/features/user/components/profile/ProfilePrevi
 import {PRONOUNS_DESCRIPTOR} from '@app/features/user/components/settings_utils/section_registry/SharedDescriptors';
 import type {Profile} from '@app/features/user/models/Profile';
 import Users from '@app/features/user/state/Users';
+import {accountGateReason} from '@app/features/user/utils/AccountGatePresentation';
+import {canPerform} from '@app/features/user/utils/AccountGates';
 import {ACCOUNT_LIMITED_NOTICE_DESCRIPTOR} from '@app/features/user/utils/AccountLimitUtils';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import {
@@ -67,6 +74,7 @@ import {
 } from '@app/features/user/utils/UserMessageDescriptors';
 import {setMeaningfulFormValue} from '@app/lib/forms/MeaningfulFormValue';
 import {type RemoteFormResetReason, useRemoteFormReset} from '@app/lib/forms/RemoteFormReset';
+import {AccountTiers, AccountVerificationNeeds, TierGatedActions} from '@fluxer/constants/src/AccountTierConstants';
 import {Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {GuildMemberProfileFlags} from '@fluxer/constants/src/GuildConstants';
 import {ProfileFieldPrivacyFlags, UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
@@ -92,11 +100,11 @@ const WARNING_YOU_HAVE_UNSAVED_CHANGES_PLEASE_SAVE_YOUR_DESCRIPTOR = msg({
 	comment: 'Warning text in the my profile tab. Keep the tone plain and specific.',
 });
 const VERIFY_YOUR_EMAIL_BEFORE_EDITING_THIS_COMMUNITY_PROFILE_DESCRIPTOR = msg({
-	message: 'Verify your email before editing this community profile. You can still preview it here.',
+	message: 'Confirm your email before editing this community profile. You can still preview it here.',
 	comment: 'Description text in the my profile tab.',
 });
 const VERIFY_YOUR_EMAIL_BEFORE_EDITING_YOUR_PROFILE_YOU_DESCRIPTOR = msg({
-	message: 'Verify your email before editing your profile. You can still preview it here.',
+	message: 'Confirm your email before editing your profile. You can still preview it here.',
 	comment: 'Description text in the my profile tab.',
 });
 const EDIT_YOUR_PROFILE_APPEARANCE_AND_SEE_A_LIVE_DESCRIPTOR = msg({
@@ -113,20 +121,21 @@ const PROFILE_CUSTOMIZATION_FOR_DESCRIPTOR = msg({
 });
 
 const VERIFY_YOUR_EMAIL_TO_EDIT_THIS_COMMUNITY_PROFILE_DESCRIPTOR = msg({
-	message: 'Verify your email to edit this community profile',
+	message: 'Confirm your email to edit this community profile',
 	comment: 'Label in the my profile tab.',
 });
 const VERIFY_YOUR_EMAIL_TO_EDIT_YOUR_PROFILE_DESCRIPTOR = msg({
-	message: 'Verify your email to edit your profile',
+	message: 'Confirm your email to edit your profile',
 	comment: 'Label in the my profile tab.',
 });
 const VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_COMMUNITY_NICKNAME_DESCRIPTOR = msg({
-	message: 'Verify your email before changing your community nickname, avatar, banner, bio, pronouns, or accent color.',
+	message:
+		'Confirm your email before changing your community nickname, avatar, banner, bio, pronouns, or accent color.',
 	comment: 'Description text in the my profile tab. Keep the tone plain and specific.',
 });
 const VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_USERNAME_DISPLAY_DESCRIPTOR = msg({
 	message:
-		'Verify your email before changing your username, display name, avatar, banner, bio, pronouns, time zone, or {premiumProductName} badge privacy.',
+		'Confirm your email before changing your username, display name, avatar, banner, bio, pronouns, time zone, or {premiumProductName} badge privacy.',
 	comment: 'Label in the my profile tab.',
 });
 
@@ -185,6 +194,9 @@ interface FormInputs {
 	premium_badge_timestamp_hidden?: boolean;
 	premium_badge_masked?: boolean;
 	premium_badge_sequence_hidden?: boolean;
+	operator_pass_badge_hidden?: boolean;
+	operator_pass_badge_timestamp_hidden?: boolean;
+	operator_pass_badge_count_hidden?: boolean;
 }
 
 interface ProfileRemoteValues {
@@ -242,10 +254,10 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 	const flashTrigger = unsavedChangesState.flashTriggers[MY_PROFILE_TAB_ID] || 0;
 	const [lastFlashTrigger, setLastFlashTrigger] = useState(0);
 	const [ariaAnnouncement, setAriaAnnouncement] = useState('');
-	const isClaimed = user?.isClaimed() ?? false;
-	const isProfileEmailLocked = isClaimed && user?.verified === false;
+	const profileGate = canPerform(user, TierGatedActions.PROFILE_CUSTOMIZE);
+	const isProfileEmailLocked = !profileGate.allowed && profileGate.need === AccountVerificationNeeds.CONFIRM_EMAIL;
 	const isProfileAccountLimited = user?.accountLimited === true;
-	const isProfileCustomizationLocked = isProfileEmailLocked || isProfileAccountLimited;
+	const isProfileCustomizationLocked = !profileGate.allowed || isProfileAccountLimited;
 	const form = useForm<FormInputs>({
 		defaultValues: {
 			bio: null,
@@ -259,6 +271,9 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 			premium_badge_timestamp_hidden: user?.premiumBadgeTimestampHidden ?? false,
 			premium_badge_masked: user?.premiumBadgeMasked ?? false,
 			premium_badge_sequence_hidden: user?.premiumBadgeSequenceHidden ?? false,
+			operator_pass_badge_hidden: user?.operatorPassBadgeHidden ?? false,
+			operator_pass_badge_timestamp_hidden: user?.operatorPassBadgeTimestampHidden ?? false,
+			operator_pass_badge_count_hidden: user?.operatorPassBadgeCountHidden ?? false,
 		},
 	});
 	const updateBioFromMarkdown = useCallback(
@@ -309,6 +324,9 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 			premium_badge_timestamp_hidden: user.premiumBadgeTimestampHidden ?? false,
 			premium_badge_masked: user.premiumBadgeMasked ?? false,
 			premium_badge_sequence_hidden: user.premiumBadgeSequenceHidden ?? false,
+			operator_pass_badge_hidden: user.operatorPassBadgeHidden ?? false,
+			operator_pass_badge_timestamp_hidden: user.operatorPassBadgeTimestampHidden ?? false,
+			operator_pass_badge_count_hidden: user.operatorPassBadgeCountHidden ?? false,
 		};
 		if (isPerGuildProfile) {
 			if (!activeProfileData?.guildMemberProfile) return null;
@@ -516,6 +534,9 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 						premium_badge_timestamp_hidden: user.premiumBadgeTimestampHidden ?? false,
 						premium_badge_masked: user.premiumBadgeMasked ?? false,
 						premium_badge_sequence_hidden: user.premiumBadgeSequenceHidden ?? false,
+						operator_pass_badge_hidden: user.operatorPassBadgeHidden ?? false,
+						operator_pass_badge_timestamp_hidden: user.operatorPassBadgeTimestampHidden ?? false,
+						operator_pass_badge_count_hidden: user.operatorPassBadgeCountHidden ?? false,
 					},
 					{avatar: savedAvatar, banner: savedBanner},
 				);
@@ -546,6 +567,24 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 				if (data.premium_badge_sequence_hidden !== undefined && !data.premium_badge_masked) {
 					updateData.premium_badge_sequence_hidden = data.premium_badge_sequence_hidden;
 				}
+				if (
+					data.operator_pass_badge_hidden !== undefined &&
+					data.operator_pass_badge_hidden !== (user?.operatorPassBadgeHidden ?? false)
+				) {
+					updateData.operator_pass_badge_hidden = data.operator_pass_badge_hidden;
+				}
+				if (
+					data.operator_pass_badge_timestamp_hidden !== undefined &&
+					data.operator_pass_badge_timestamp_hidden !== (user?.operatorPassBadgeTimestampHidden ?? false)
+				) {
+					updateData.operator_pass_badge_timestamp_hidden = data.operator_pass_badge_timestamp_hidden;
+				}
+				if (
+					data.operator_pass_badge_count_hidden !== undefined &&
+					data.operator_pass_badge_count_hidden !== (user?.operatorPassBadgeCountHidden ?? false)
+				) {
+					updateData.operator_pass_badge_count_hidden = data.operator_pass_badge_count_hidden;
+				}
 				const newUser = await UserCommands.update(updateData);
 				UserProfileCommands.clearCurrentUserProfiles();
 				const savedBio = newUser.bio || null;
@@ -562,6 +601,11 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 						premium_badge_timestamp_hidden: newUser.premium_badge_timestamp_hidden ?? false,
 						premium_badge_masked: newUser.premium_badge_masked ?? false,
 						premium_badge_sequence_hidden: newUser.premium_badge_sequence_hidden ?? false,
+						operator_pass_badge_hidden: newUser.operator_pass_badge_hidden ?? user?.operatorPassBadgeHidden ?? false,
+						operator_pass_badge_timestamp_hidden:
+							newUser.operator_pass_badge_timestamp_hidden ?? user?.operatorPassBadgeTimestampHidden ?? false,
+						operator_pass_badge_count_hidden:
+							newUser.operator_pass_badge_count_hidden ?? user?.operatorPassBadgeCountHidden ?? false,
 					},
 					{
 						avatar: createGlobalProfileAssetRemoteState({
@@ -674,19 +718,34 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 		};
 	}, []);
 	if (!user) return null;
-	const hasLifetimePremium = user.premiumType === UserPremiumTypes.LIFETIME;
+	const hasLifetimePremium = user.premiumType === UserPremiumTypes.LIFETIME && !RuntimeConfig.isSelfHosted();
+	const hasOperatorPassBadge = hasOperatorPassProfileBadge(user);
+	const holdsPassesWithoutBadge = !hasOperatorPassBadge && (OperatorPassHoldings.passes?.passes.length ?? 0) > 0;
 	const guilds = Guilds.getGuilds();
 	const selectedGuild = selectedGuildId ? guilds.find((g) => g.id === selectedGuildId) : null;
 	const isPerGuildProfileCustomizationDisabled = isPerGuildProfile && !hasPerGuildProfiles;
 	const isAvatarCustomizationDisabled = isProfileCustomizationLocked || isPerGuildProfileCustomizationDisabled;
 	const isPronounsDisabled = isProfileCustomizationLocked;
-	const profileCustomizationDescription = isProfileEmailLocked
-		? isPerGuildProfile
-			? i18n._(VERIFY_YOUR_EMAIL_BEFORE_EDITING_THIS_COMMUNITY_PROFILE_DESCRIPTOR)
-			: i18n._(VERIFY_YOUR_EMAIL_BEFORE_EDITING_YOUR_PROFILE_YOU_DESCRIPTOR)
-		: isProfileAccountLimited
-			? i18n._(ACCOUNT_LIMITED_NOTICE_DESCRIPTOR)
-			: i18n._(EDIT_YOUR_PROFILE_APPEARANCE_AND_SEE_A_LIVE_DESCRIPTOR);
+	let profileCustomizationDescription: string;
+	if (isProfileEmailLocked) {
+		if (isPerGuildProfile) {
+			profileCustomizationDescription = i18n._(VERIFY_YOUR_EMAIL_BEFORE_EDITING_THIS_COMMUNITY_PROFILE_DESCRIPTOR);
+		} else {
+			profileCustomizationDescription = i18n._(VERIFY_YOUR_EMAIL_BEFORE_EDITING_YOUR_PROFILE_YOU_DESCRIPTOR);
+		}
+	} else if (!profileGate.allowed) {
+		profileCustomizationDescription = accountGateReason(i18n, profileGate);
+	} else if (isProfileAccountLimited) {
+		profileCustomizationDescription = i18n._(ACCOUNT_LIMITED_NOTICE_DESCRIPTOR);
+	} else {
+		profileCustomizationDescription = i18n._(EDIT_YOUR_PROFILE_APPEARANCE_AND_SEE_A_LIVE_DESCRIPTOR);
+	}
+	let profileVerificationDescriptor = VERIFY_YOUR_EMAIL_BEFORE_EDITING_YOUR_PROFILE_YOU_DESCRIPTOR;
+	if (isPerGuildProfile) {
+		profileVerificationDescriptor = VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_COMMUNITY_NICKNAME_DESCRIPTOR;
+	} else if (showPremiumFeatures) {
+		profileVerificationDescriptor = VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_USERNAME_DISPLAY_DESCRIPTOR;
+	}
 	const hasAvatar =
 		!avatarAsset.hasCleared &&
 		(avatarAsset.hasAsset || (!avatarAsset.isDirty && Boolean(profileRemoteValues?.avatar.hasCustomAsset)));
@@ -711,7 +770,7 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 				{ariaAnnouncement}
 			</output>
 			<SettingsTabContainer data-flx="user.my-profile-tab.my-profile-tab-component.settings-tab-container">
-				{!isClaimed && (
+				{profileGate.tier === AccountTiers.UNCLAIMED && (
 					<UnclaimedAccountAlert data-flx="user.my-profile-tab.my-profile-tab-component.unclaimed-account-alert" />
 				)}
 				<Form
@@ -745,13 +804,9 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 								}
 								data-flx="user.my-profile-tab.my-profile-tab-component.email-verification-alert"
 							>
-								{isPerGuildProfile
-									? i18n._(VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_COMMUNITY_NICKNAME_DESCRIPTOR)
-									: showPremiumFeatures
-										? i18n._(VERIFY_YOUR_EMAIL_BEFORE_CHANGING_YOUR_USERNAME_DISPLAY_DESCRIPTOR, {
-												premiumProductName: getPremiumProductName(),
-											})
-										: i18n._(VERIFY_YOUR_EMAIL_BEFORE_EDITING_YOUR_PROFILE_YOU_DESCRIPTOR)}
+								{!isPerGuildProfile && showPremiumFeatures
+									? i18n._(profileVerificationDescriptor, {premiumProductName: getPremiumProductName()})
+									: i18n._(profileVerificationDescriptor)}
 							</EmailVerificationAlert>
 						)}
 						{isLoadingProfile ? (
@@ -769,8 +824,7 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 								<div className={styles.formColumn} data-flx="user.my-profile-tab.my-profile-tab-component.form-column">
 									{!isPerGuildProfile && (
 										<UsernameSection
-											isClaimed={isClaimed}
-											isEmailVerified={user.verified !== false}
+											profileGate={profileGate}
 											user={user}
 											data-flx="user.my-profile-tab.my-profile-tab-component.username-section"
 										/>
@@ -936,6 +990,9 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 											premium_badge_timestamp_hidden: form.watch('premium_badge_timestamp_hidden'),
 											premium_badge_masked: form.watch('premium_badge_masked'),
 											premium_badge_sequence_hidden: form.watch('premium_badge_sequence_hidden'),
+											operator_pass_badge_hidden: form.watch('operator_pass_badge_hidden'),
+											operator_pass_badge_timestamp_hidden: form.watch('operator_pass_badge_timestamp_hidden'),
+											operator_pass_badge_count_hidden: form.watch('operator_pass_badge_count_hidden'),
 										}}
 										ignoreGuildAvatarInPreview={isPerGuildProfile && avatarAsset.mode === 'inherit'}
 										ignoreGuildBannerInPreview={isPerGuildProfile && bannerAsset.mode === 'inherit'}
@@ -948,8 +1005,14 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 							</div>
 						)}
 					</SettingsSection>
-					{hasPremium && !isPerGuildProfile && (
+					{(hasPremium || hasOperatorPassBadge) && !isPerGuildProfile && (
 						<PremiumBadgeSettings
+							hasPremium={hasPremium}
+							hasOperatorPassBadge={hasOperatorPassBadge}
+							operatorPassBadgeHidden={form.watch('operator_pass_badge_hidden') ?? false}
+							operatorPassBadgeTimestampHidden={form.watch('operator_pass_badge_timestamp_hidden') ?? false}
+							operatorPassBadgeCountHidden={form.watch('operator_pass_badge_count_hidden') ?? false}
+							operatorPassSince={user.operatorPassSince}
 							premiumBadgeHidden={form.watch('premium_badge_hidden') ?? false}
 							premiumBadgeTimestampHidden={form.watch('premium_badge_timestamp_hidden') ?? false}
 							premiumBadgeMasked={form.watch('premium_badge_masked') ?? false}
@@ -961,6 +1024,12 @@ const MyProfileTabComponent = observer(function MyProfileTabComponent({
 							premiumLifetimeSequence={user.premiumLifetimeSequence}
 							data-flx="user.my-profile-tab.my-profile-tab-component.premium-badge-settings"
 						/>
+					)}
+					{isOperatorPassAvailable() && !isPerGuildProfile && holdsPassesWithoutBadge && (
+						<OperatorPassWallSettings data-flx="user.my-profile-tab.my-profile-tab-component.operator-pass-wall-settings" />
+					)}
+					{isOperatorPassAvailable() && !isPerGuildProfile && (
+						<OperatorPassHoldingsSection data-flx="user.my-profile-tab.my-profile-tab-component.operator-pass-holdings" />
 					)}
 				</Form>
 			</SettingsTabContainer>

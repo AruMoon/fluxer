@@ -12,9 +12,9 @@ import ThreadGuilds from '@app/features/threads/state/ThreadGuilds';
 import * as D from '@app/features/threads/utils/ThreadMessageDescriptors';
 import * as ContextMenuCommands from '@app/features/ui/commands/ContextMenuCommands';
 import FocusRing from '@app/features/ui/focus_ring/FocusRing';
+import {CaretRightIcon} from '@app/features/ui/icons/DirectionalIcons';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import {useLingui} from '@lingui/react/macro';
-import {CaretRightIcon} from '@phosphor-icons/react';
 import {observer} from 'mobx-react-lite';
 
 export const MessageThreadChip = observer(({message}: {message: Message}) => {
@@ -23,11 +23,12 @@ export const MessageThreadChip = observer(({message}: {message: Message}) => {
 	const thread = ChannelThreads.getThread(message.id);
 	if (!thread || thread.parentId !== message.channelId || !ThreadGuilds.isActive(thread.guildId)) return null;
 	const lastMessage = thread.lastMessageId ? Messages.getMessage(thread.id, thread.lastMessageId) : undefined;
-	const preview = lastMessage
-		? `${NicknameUtils.getNickname(lastMessage.author, thread.guildId, thread.id)}: ${buildMessageNotificationBody(lastMessage, i18n)}`
-		: thread.messageCount === 0
-			? i18n._(D.NO_RECENT_MESSAGES_DESCRIPTOR)
-			: null;
+	let preview: string | null = null;
+	if (lastMessage) {
+		preview = `${NicknameUtils.getNickname(lastMessage.author, thread.guildId, thread.id)}: ${buildMessageNotificationBody(lastMessage, i18n)}`;
+	} else if (thread.messageCount === 0) {
+		preview = i18n._(D.NO_RECENT_MESSAGES_DESCRIPTOR);
+	}
 	return (
 		<FocusRing offset={-2} data-flx="threads.message-thread-chip.focus-ring">
 			<button

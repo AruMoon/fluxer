@@ -76,22 +76,27 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
 	}
 	return (
 		<section id={id} className={clsx(styles.section, className)} data-flx="app.settings-section.section">
-			<div className={styles.sectionHeader} data-flx="app.settings-section.section-header">
-				<div className={styles.sectionTitleRow} data-flx="app.settings-section.section-title-row">
-					<h3 className={styles.sectionTitle} data-flx="app.settings-section.section-title">
-						{title}
-					</h3>
-					{linkButton}
-					{actions ? (
-						<div className={styles.sectionActions} data-flx="app.settings-section.section-actions">
-							{actions}
-						</div>
+			<div
+				className={clsx(styles.sectionHeader, actions && styles.sectionHeaderWithActions)}
+				data-flx="app.settings-section.section-header"
+			>
+				<div className={styles.sectionHeaderText} data-flx="app.settings-section.section-header-text">
+					<div className={styles.sectionTitleRow} data-flx="app.settings-section.section-title-row">
+						<h3 className={styles.sectionTitle} data-flx="app.settings-section.section-title">
+							{title}
+						</h3>
+						{linkButton}
+					</div>
+					{description ? (
+						<p className={styles.sectionDescription} data-flx="app.settings-section.section-description">
+							{description}
+						</p>
 					) : null}
 				</div>
-				{description ? (
-					<p className={styles.sectionDescription} data-flx="app.settings-section.section-description">
-						{description}
-					</p>
+				{actions ? (
+					<div className={styles.sectionActions} data-flx="app.settings-section.section-actions">
+						{actions}
+					</div>
 				) : null}
 			</div>
 			<div className={styles.sectionContent} data-flx="app.settings-section.section-content">

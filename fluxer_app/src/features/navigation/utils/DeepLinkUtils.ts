@@ -257,7 +257,7 @@ export function isInternalChannelHost(host: string): boolean {
 	if (webAppHost && normalizedHost === webAppHost) {
 		return true;
 	}
-	return OFFICIAL_INTERNAL_APP_HOSTS.includes(normalizedHost);
+	return !RuntimeConfig.isSelfHosted() && OFFICIAL_INTERNAL_APP_HOSTS.includes(normalizedHost);
 }
 
 export function parseChannelUrl(url: string): string | null {

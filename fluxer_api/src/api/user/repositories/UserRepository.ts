@@ -155,6 +155,10 @@ export class UserRepository {
 		return this.lookupRepo.findByStripeCustomerId(stripeCustomerId);
 	}
 
+	async listUserIdsWithAcl(acl: string): Promise<Array<UserID>> {
+		return this.lookupRepo.listUserIdsWithAcl(acl);
+	}
+
 	async listUserIdsByLastActiveIp(
 		lastActiveIp: string,
 		limit: number,
@@ -192,6 +196,10 @@ export class UserRepository {
 		return result ?? {last_active_at: null, last_active_ip: null};
 	}
 
+	async indexUserAcls(user: User): Promise<void> {
+		return this.accountRepo.indexUserAcls(user);
+	}
+
 	async deleteUserSecondaryIndices(userId: UserID): Promise<void> {
 		return this.accountRepo.deleteUserSecondaryIndices(userId);
 	}
@@ -217,8 +225,8 @@ export class UserRepository {
 		return this.settingsRepo.findSettings(userId);
 	}
 
-	async upsertSettings(settings: UserSettingsRow): Promise<UserSettings> {
-		return this.settingsRepo.upsertSettings(settings);
+	async upsertSettings(settings: UserSettingsRow, base?: UserSettingsRow): Promise<UserSettings> {
+		return this.settingsRepo.upsertSettings(settings, base);
 	}
 
 	async deleteUserSettings(userId: UserID): Promise<void> {
@@ -487,10 +495,6 @@ export class UserRepository {
 		return this.channelRepo.listPrivateChannelSummaries(userId);
 	}
 
-	async deleteAllPrivateChannels(userId: UserID): Promise<void> {
-		return this.channelRepo.deleteAllPrivateChannels(userId);
-	}
-
 	async findExistingDmState(user1Id: UserID, user2Id: UserID): Promise<Channel | null> {
 		return this.channelRepo.findExistingDmState(user1Id, user2Id);
 	}
@@ -505,10 +509,6 @@ export class UserRepository {
 
 	async isDmChannelOpen(userId: UserID, channelId: ChannelID): Promise<boolean> {
 		return this.channelRepo.isDmChannelOpen(userId, channelId);
-	}
-
-	async openDmForUser(userId: UserID, channelId: ChannelID, isGroupDm?: boolean): Promise<void> {
-		return this.channelRepo.openDmForUser(userId, channelId, isGroupDm);
 	}
 
 	async openPrivateChannelForUser(userId: UserID, channel: Channel): Promise<void> {
@@ -682,21 +682,7 @@ export class UserRepository {
 		return this.pushSubscriptionRepository.deleteAllPushSubscriptions(userId);
 	}
 
-	async createPayment(data: {
-		checkout_session_id: string;
-		user_id: UserID;
-		price_id: string;
-		product_type: string;
-		status: string;
-		is_gift: boolean;
-		created_at: Date;
-		purchase_geoip_country_code?: string | null;
-		purchase_client_country_code?: string | null;
-		eu_withdrawal_waiver_required?: boolean;
-		eu_withdrawal_waiver_accepted?: boolean;
-		eu_withdrawal_waiver_accepted_at?: Date | null;
-		eu_withdrawal_waiver_text_version?: string | null;
-	}): Promise<void> {
+	async createPayment(data: Parameters<PaymentRepository['createPayment']>[0]): Promise<void> {
 		return this.paymentRepository.createPayment(data);
 	}
 

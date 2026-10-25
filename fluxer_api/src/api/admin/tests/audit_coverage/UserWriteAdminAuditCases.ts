@@ -10,6 +10,7 @@ import {
 	createUniqueEmail,
 	createUniqueUsername,
 	generateTotpCode,
+	setUserACLs,
 	type TestAccount,
 } from '@app/api/auth/tests/AuthTestUtils';
 import {
@@ -342,6 +343,22 @@ export const UserWriteAdminAuditCases: ReadonlyArray<AdminAuditCoverageCase> = [
 	},
 	{
 		method: 'POST',
+		route: '/admin/users',
+		async prepare() {
+			const username = createUniqueUsername('created');
+			return {
+				request: {path: '/admin/users', body: {username, email: createUniqueEmail('created')}},
+				expected: {
+					action: 'create_user',
+					targetType: 'user',
+					targetId: expect.any(String),
+					metadata: {username, admin: 'false'},
+				},
+			};
+		},
+	},
+	{
+		method: 'POST',
 		route: '/admin/users/:user_id/password-reset-link',
 		async prepare({harness}) {
 			const target = await createTestAccount(harness);
@@ -358,6 +375,22 @@ export const UserWriteAdminAuditCases: ReadonlyArray<AdminAuditCoverageCase> = [
 					targetType: 'user',
 					targetId: target.userId,
 					metadata: {},
+				},
+			};
+		},
+	},
+	{
+		method: 'POST',
+		route: '/admin/users/:user_id/sign-in-link',
+		async prepare({harness}) {
+			const target = await setUserACLs(harness, await createTestAccount(harness), [AdminACLs.WILDCARD]);
+			return {
+				request: {path: `/admin/users/${target.userId}/sign-in-link`, operator: true},
+				expected: {
+					action: 'create_sign_in_link',
+					targetType: 'user',
+					targetId: target.userId,
+					metadata: {via: 'rexctl'},
 				},
 			};
 		},
@@ -644,7 +677,12 @@ export const UserWriteAdminAuditCases: ReadonlyArray<AdminAuditCoverageCase> = [
 					action: 'change_dob',
 					targetType: 'user',
 					targetId: target.userId,
-					metadata: {old_dob: (await loadUser(target)).dateOfBirth!, new_dob: '1995-06-15'},
+					metadata: {
+						old_dob: (await loadUser(target)).dateOfBirth!,
+						new_dob: '1995-06-15',
+						cleared_below_minimum_age: 'false',
+						outside_plausible_range: 'false',
+					},
 				},
 			};
 		},

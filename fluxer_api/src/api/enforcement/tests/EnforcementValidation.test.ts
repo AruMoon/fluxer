@@ -222,7 +222,9 @@ describe('Enforcement decision validation', () => {
 			decisionBody({source: 'report', report_ids: [reportId], evidence}),
 		);
 		const decision = await getDecision(harness, staff, decisionId);
-		expect(decision.notice.how_we_decided[0]).toBe('We reviewed this after a report.');
+		expect(decision.notice.how_we_decided[0]).toBe(
+			'We reviewed this after a report, and a person on our team made the decision.',
+		);
 	});
 
 	test('a decision needs evidence or a note to the user', async () => {
