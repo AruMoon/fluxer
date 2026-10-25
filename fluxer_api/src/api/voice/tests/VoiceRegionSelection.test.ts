@@ -14,12 +14,12 @@ function createRegionAvailability({
 	id,
 	latitude,
 	longitude,
-	isDefault = false,
+	isDefault,
 }: {
 	id: string;
 	latitude: number;
 	longitude: number;
-	isDefault?: boolean;
+	isDefault: boolean;
 }): VoiceRegionAvailability {
 	return {
 		id,
