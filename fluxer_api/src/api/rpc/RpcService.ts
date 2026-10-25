@@ -408,14 +408,13 @@ export class RpcService {
 					{type: 'voice_get_token', guildId: request.guild_id, channelId: request.channel_id, userId: request.user_id},
 					'RPC voice_get_token received',
 				);
-				const serverGeoip = request.client_ip !== undefined ? await lookupGeoip(request.client_ip) : null;
 				const result = await this.requireVoiceService().getVoiceToken({
 					guildId: request.guild_id !== undefined ? createGuildID(request.guild_id) : undefined,
 					channelId: createChannelID(request.channel_id),
 					userId: createUserID(request.user_id),
 					connectionId: request.connection_id,
 					region: request.rtc_region,
-					regionCountryCode: serverGeoip?.countryCode ?? undefined,
+					regionCountryCode: request.country_code ?? undefined,
 					latitude: request.latitude,
 					longitude: request.longitude,
 					canSpeak: request.can_speak,
