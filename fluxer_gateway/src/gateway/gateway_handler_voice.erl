@@ -24,14 +24,13 @@
 
 -spec handle_voice_state_update(pid(), map(), state()) -> ws_result().
 handle_voice_state_update(Pid, Data, State) ->
-    VoiceData = Data,
     case should_queue_voice_update(Pid) of
         false ->
-            log_voice_update(Pid, VoiceData, direct),
-            process_voice_update(Pid, VoiceData, State);
+            log_voice_update(Pid, Data, direct),
+            process_voice_update(Pid, Data, State);
         true ->
-            log_voice_update(Pid, VoiceData, queued),
-            queue_voice_update(Pid, VoiceData),
+            log_voice_update(Pid, Data, queued),
+            queue_voice_update(Pid, Data),
             {ok, ensure_voice_queue_timer(State)}
     end.
 
