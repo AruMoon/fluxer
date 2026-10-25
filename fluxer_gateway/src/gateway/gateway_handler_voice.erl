@@ -24,7 +24,7 @@
 
 -spec handle_voice_state_update(pid(), map(), state()) -> ws_result().
 handle_voice_state_update(Pid, Data, State) ->
-    VoiceData = maps:remove(<<"client_ip">>, Data),
+    VoiceData = Data,
     case should_queue_voice_update(Pid) of
         false ->
             log_voice_update(Pid, VoiceData, direct),
