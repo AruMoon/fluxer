@@ -25,11 +25,11 @@ get_dm_voice_token_and_create_state(Req) ->
     Latitude = maps:get(latitude, Req),
     Longitude = maps:get(longitude, Req),
     State = maps:get(state, Req),
-    TokenReq0 = voice_utils:build_voice_token_rpc_request(
+    TokenReq = voice_utils:build_voice_token_rpc_request(
         null, ChannelId, UserId, null, Latitude, Longitude
     ),
     Region = dm_voice_state:resolve_call_region(ChannelId, State),
-    ReqWithRegion = voice_utils:add_rtc_region_to_request(TokenReq0, Region),
+    ReqWithRegion = voice_utils:add_rtc_region_to_request(TokenReq, Region),
     logger:debug(
         "dm_voice_token_create_request: user_id=~p channel_id=~p rtc_region=~p",
         [UserId, ChannelId, Region]
