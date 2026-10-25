@@ -66,9 +66,9 @@ get_voice_token(ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude) -
 -spec get_voice_token(
     integer(), integer(), binary(), pid(), term(), term(), binary() | undefined | null
 ) -> ok | error.
-get_voice_token(ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude, ClientIP) ->
+get_voice_token(ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude, CountryCode) ->
     dm_voice_token:get_voice_token(
-        ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude, ClientIP
+        ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude, CountryCode
     ).
 
 -spec disconnect_voice_user(integer(), dm_state()) -> {reply, map(), dm_state()}.
