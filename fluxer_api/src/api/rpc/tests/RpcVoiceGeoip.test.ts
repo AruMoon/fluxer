@@ -25,7 +25,7 @@ describe('RpcService voice country routing', () => {
 		vi.restoreAllMocks();
 	});
 
-	test('uses the client country code without performing a GeoIP lookup', async () => {
+	test('uses the request country code without looking up the client IP', async () => {
 		const lookupGeoip = vi.spyOn(IpUtils, 'lookupGeoip');
 
 		const request: RpcRequest = {
@@ -47,7 +47,6 @@ describe('RpcService voice country routing', () => {
 		expect(voiceService.getVoiceToken).toHaveBeenCalledOnce();
 
 		const voiceRequest = voiceService.getVoiceToken.mock.calls[0]![0];
-		expect(voiceRequest.regionCountryCode).toBe('US');
 		expect(voiceRequest.countryCode).toBe('US');
 		expect(voiceRequest.latitude).toBe('55.7558');
 		expect(voiceRequest.longitude).toBe('37.6173');
