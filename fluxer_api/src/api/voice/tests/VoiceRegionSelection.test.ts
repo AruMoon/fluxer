@@ -432,15 +432,15 @@ describe('VoiceRegionSelection', () => {
 	it('selects one of multiple accessible regions configured for the country', () => {
 		const regions = [
 			{
-				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5}),
+				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5, isDefault: false}),
 				countryCodes: ['DE'],
 			},
 			{
-				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10}),
+				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10, isDefault: false}),
 				countryCodes: ['DE'],
 			},
 			{
-				...createRegionAvailability({id: 'warsaw', latitude: 52, longitude: 21}),
+				...createRegionAvailability({id: 'warsaw', latitude: 52, longitude: 21, isDefault: false}),
 				countryCodes: ['PL'],
 			},
 		];
@@ -458,12 +458,12 @@ describe('VoiceRegionSelection', () => {
 	it('ignores inaccessible regions when multiple regions match the country', () => {
 		const regions = [
 			{
-				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5}),
+				...createRegionAvailability({id: 'eu-west', latitude: 50, longitude: 5, isDefault: false}),
 				countryCodes: ['DE'],
 				isAccessible: false,
 			},
 			{
-				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10}),
+				...createRegionAvailability({id: 'eu-central', latitude: 51, longitude: 10, isDefault: false}),
 				countryCodes: ['DE'],
 			},
 		];
