@@ -66,7 +66,6 @@ extract_voice_params(Data) ->
         is_mobile => maps:get(<<"is_mobile">>, Data, false),
         latitude => maps:get(<<"latitude">>, Data, null),
         longitude => maps:get(<<"longitude">>, Data, null),
-        client_ip => maps:get(<<"client_ip">>, Data, undefined),
         p2p => maps:get(<<"p2p">>, Data, undefined)
     }.
 
@@ -279,7 +278,6 @@ handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, CountryCode, State) ->
         is_mobile => maps:get(is_mobile, Params),
         latitude => maps:get(latitude, Params),
         longitude => maps:get(longitude, Params),
-        client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
         bot => Bot,
         p2p => maps:get(p2p, Params),
@@ -288,7 +286,7 @@ handle_dm_connect(ChId, Params, SId, UserId, E2EE, Bot, CountryCode, State) ->
     StWithPid = State#{session_pid => self()},
     Result = dm_voice:voice_state_update(Request, StWithPid),
     handle_dm_connect_result(
-        Result, ChId, Params, SId, UserId, State
+        Result, ChId, Params#{country_code => CountryCode}, SId, UserId, State
     ).
 
 -spec handle_dm_connect_result(
@@ -356,11 +354,10 @@ log_dm_info(Tag, UserId, SId, ChId, Params) ->
 spawn_voice_token_fetch(ChId, UserId, SId, Params) ->
     Lat = maps:get(latitude, Params),
     Lon = maps:get(longitude, Params),
-    ClientIP = maps:get(client_ip, Params, undefined),
     SessionPid = self(),
     spawn(fun() ->
         dm_voice:get_voice_token(
-            ChId, UserId, SId, SessionPid, Lat, Lon, ClientIP
+            ChId, UserId, SId, SessionPid, Lat, Lon, maps:get(country_code, Params, undefined)
         )
     end).
 
@@ -513,7 +510,6 @@ build_guild_request(ChId, Params, UserId, SId, E2EE, Bot, CountryCode) ->
         is_mobile => maps:get(is_mobile, Params),
         latitude => maps:get(latitude, Params),
         longitude => maps:get(longitude, Params),
-        client_ip => maps:get(client_ip, Params, undefined),
         e2ee_capable => E2EE,
         bot => Bot,
         p2p => maps:get(p2p, Params),

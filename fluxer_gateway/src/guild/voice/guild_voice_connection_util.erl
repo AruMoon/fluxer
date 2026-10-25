@@ -61,10 +61,6 @@ build_context(Request0) ->
         longitude => Coord(maps:get(longitude, Request, undefined)),
         e2ee_capable => Norm(maps:get(e2ee_capable, Request, false)),
         bot => Norm(maps:get(bot, Request, false)),
-        client_ip =>
-            guild_voice_connection_normalize:normalize_optional_binary(
-                maps:get(client_ip, Request, undefined)
-            ),
         p2p => maps:get(p2p, Request, undefined),
         country_code => maps:get(country_code, Request, undefined)
     }.

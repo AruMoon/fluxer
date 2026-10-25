@@ -24,12 +24,10 @@ get_dm_voice_token_and_create_state(Req) ->
     ChannelId = maps:get(channel_id, Req),
     Latitude = maps:get(latitude, Req),
     Longitude = maps:get(longitude, Req),
-    ClientIP = maps:get(client_ip, Req, undefined),
     State = maps:get(state, Req),
-    TokenReq0 = voice_utils:build_voice_token_rpc_request(
+    TokenReq = voice_utils:build_voice_token_rpc_request(
         null, ChannelId, UserId, null, Latitude, Longitude
     ),
-    TokenReq = voice_utils:add_client_ip_to_request(TokenReq0, ClientIP),
     Region = dm_voice_state:resolve_call_region(ChannelId, State),
     ReqWithRegion = voice_utils:add_rtc_region_to_request(TokenReq, Region),
     logger:debug(
@@ -272,34 +270,17 @@ maybe_spawn_join_call(true, _ChId, _UserId, _VS, _SessId, _State) ->
     ok.
 
 -spec get_voice_token(integer(), integer(), binary(), pid(), term(), term()) -> ok | error.
-get_voice_token(ChannelId, UserId, _SessionId, SessionPid, Latitude, Longitude) ->
-    Req = voice_utils:build_voice_token_rpc_request(
-        null, ChannelId, UserId, null, Latitude, Longitude
-    ),
-    Region = dm_voice_state:resolve_call_region(ChannelId),
-    ReqWithRegion = voice_utils:add_rtc_region_to_request(Req, Region),
-    case rpc_client:call(ReqWithRegion) of
-        {ok, Data} ->
-            handle_get_voice_token_ok(Data, UserId, ChannelId, SessionPid);
-        {error, {rpc_error, _Status, Body}} ->
-            handle_get_token_rpc_error(UserId, ChannelId, Body, SessionPid);
-        {error, Reason} ->
-            logger:warning(
-                "dm_voice_get_voice_token_error: user_id=~p channel_id=~p reason=~p",
-                [UserId, ChannelId, Reason]
-            ),
-            SessionPid ! {voice_error, voice_token_failed},
-            error
-    end.
+get_voice_token(ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude) ->
+    get_voice_token(ChannelId, UserId, SessionId, SessionPid, Latitude, Longitude, undefined).
 
 -spec get_voice_token(
     integer(), integer(), binary(), pid(), term(), term(), binary() | undefined | null
 ) -> ok | error.
-get_voice_token(ChannelId, UserId, _SessionId, SessionPid, Latitude, Longitude, ClientIP) ->
+get_voice_token(ChannelId, UserId, _SessionId, SessionPid, Latitude, Longitude, CountryCode) ->
     Req0 = voice_utils:build_voice_token_rpc_request(
         null, ChannelId, UserId, null, Latitude, Longitude
     ),
-    Req = voice_utils:add_client_ip_to_request(Req0, ClientIP),
+    Req = voice_p2p:add_to_token_request(Req0, sfu, CountryCode),
     Region = dm_voice_state:resolve_call_region(ChannelId),
     ReqWithRegion = voice_utils:add_rtc_region_to_request(Req, Region),
     case rpc_client:call(ReqWithRegion) of

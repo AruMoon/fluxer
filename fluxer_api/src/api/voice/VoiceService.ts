@@ -35,7 +35,6 @@ interface GetVoiceTokenParams {
 	userId: UserID;
 	connectionId?: string;
 	region?: string;
-	regionCountryCode?: string;
 	latitude?: string;
 	longitude?: string;
 	canSpeak?: boolean;
@@ -170,7 +169,7 @@ export class VoiceService {
 			serverEndpoint = resolvedPinnedServer.endpoint;
 		}
 		const countryRegionId = selectCountryVoiceRegionId({
-			countryCode: params.regionCountryCode,
+			countryCode: params.countryCode,
 			mode: regionPreference.mode,
 			accessibleRegions,
 			selectionKey,
