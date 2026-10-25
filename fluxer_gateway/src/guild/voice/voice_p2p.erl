@@ -154,18 +154,21 @@ to_sfu(VoiceState) ->
         <<"version">> => voice_state_utils:voice_state_version(VoiceState) + 1
     }.
 
--spec add_to_token_request(map(), join_decision(), binary() | undefined) -> map().
+-spec add_to_token_request(map(), join_decision(), binary() | undefined | null) -> map().
 add_to_token_request(Request, {p2p, Role, ParticipantCount}, CountryCode) ->
     WithP2p = Request#{
         <<"p2p">> => true,
         <<"p2p_initiator">> => Role =:= initiator,
         <<"p2p_participant_count">> => ParticipantCount
     },
-    case CountryCode of
-        Code when is_binary(Code) -> WithP2p#{<<"country_code">> => Code};
-        _ -> WithP2p
-    end;
-add_to_token_request(Request, _Decision, _CountryCode) ->
+    add_country_code_to_token_request(WithP2p, CountryCode);
+add_to_token_request(Request, _Decision, CountryCode) ->
+    add_country_code_to_token_request(Request, CountryCode).
+
+-spec add_country_code_to_token_request(map(), binary() | undefined | null) -> map().
+add_country_code_to_token_request(Request, CountryCode) when is_binary(CountryCode) ->
+    Request#{<<"country_code">> => CountryCode};
+add_country_code_to_token_request(Request, _CountryCode) ->
     Request.
 
 -spec grant(map()) -> token_grant() | sfu.
