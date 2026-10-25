@@ -5,22 +5,12 @@ import * as IpUtils from '@app/api/utils/IpUtils';
 import type {RpcRequest} from '@fluxer/schema/src/domains/rpc/RpcSchemas';
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
 
-describe('RpcService voice GeoIP', () => {
-	const TEST_CLIENT_IP = '203.0.113.10';
-
+describe('RpcService voice country routing', () => {
 	let voiceService: {
 		getVoiceToken: ReturnType<typeof vi.fn>;
 	};
 
 	let rpcService: RpcService;
-
-	const mockGeoipResult = {
-		countryCode: 'SE',
-		normalizedIp: TEST_CLIENT_IP,
-		city: null,
-		region: null,
-		countryName: 'Sweden',
-	};
 
 	beforeEach(() => {
 		voiceService = {
@@ -35,17 +25,17 @@ describe('RpcService voice GeoIP', () => {
 		vi.restoreAllMocks();
 	});
 
-	test('derives country code from client IP before calling VoiceService', async () => {
-		const lookupGeoip = vi.spyOn(IpUtils, 'lookupGeoip').mockResolvedValue(mockGeoipResult);
+	test('uses the client country code without performing a GeoIP lookup', async () => {
+		const lookupGeoip = vi.spyOn(IpUtils, 'lookupGeoip');
 
 		const request: RpcRequest = {
 			type: 'voice_get_token',
 			guild_id: 1n,
 			channel_id: 2n,
 			user_id: 3n,
-			client_ip: TEST_CLIENT_IP,
 			latitude: '55.7558',
 			longitude: '37.6173',
+			country_code: 'US',
 		};
 
 		await rpcService.handleRpcRequest({
@@ -53,42 +43,13 @@ describe('RpcService voice GeoIP', () => {
 			requestCache: undefined as never,
 		});
 
-		expect(lookupGeoip).toHaveBeenCalledOnce();
-		expect(lookupGeoip).toHaveBeenCalledWith(TEST_CLIENT_IP);
-
+		expect(lookupGeoip).not.toHaveBeenCalled();
 		expect(voiceService.getVoiceToken).toHaveBeenCalledOnce();
 
 		const voiceRequest = voiceService.getVoiceToken.mock.calls[0]![0];
-
-		expect(voiceRequest.regionCountryCode).toBe('SE');
+		expect(voiceRequest.regionCountryCode).toBe('US');
+		expect(voiceRequest.countryCode).toBe('US');
 		expect(voiceRequest.latitude).toBe('55.7558');
 		expect(voiceRequest.longitude).toBe('37.6173');
-	});
-
-	test('does not use client country code', async () => {
-		vi.spyOn(IpUtils, 'lookupGeoip').mockResolvedValue(mockGeoipResult);
-
-		const request = {
-			type: 'voice_get_token',
-			guild_id: 1n,
-			channel_id: 2n,
-			user_id: 3n,
-			client_ip: TEST_CLIENT_IP,
-			latitude: '55.7558',
-			longitude: '37.6173',
-			country_code: 'US',
-		} as unknown as RpcRequest;
-
-		await rpcService.handleRpcRequest({
-			request,
-			requestCache: undefined as never,
-		});
-
-		expect(voiceService.getVoiceToken).toHaveBeenCalledOnce();
-
-		const voiceRequest = voiceService.getVoiceToken.mock.calls[0]![0];
-
-		expect(voiceRequest.regionCountryCode).toBe('SE');
-		expect(voiceRequest.regionCountryCode).not.toBe('US');
 	});
 });
