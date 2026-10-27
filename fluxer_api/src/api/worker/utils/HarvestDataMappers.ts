@@ -303,6 +303,11 @@ export function buildUserDataJson(params: UserDataJsonParams) {
 				client_os: clientInfo.os,
 				client_user_agent: session.clientUserAgent,
 				client_platform: clientInfo.platform,
+				app_platform: session.appPlatform,
+				app_version: session.appVersion,
+				app_release_channel: session.appReleaseChannel,
+				app_build_number: session.appBuildNumber,
+				app_beta_number: session.appBetaNumber,
 			};
 		}),
 		relationships: relationships.map((rel) => ({
@@ -525,6 +530,7 @@ export function buildUserDataJson(params: UserDataJsonParams) {
 			release_year: event.release_year ?? null,
 			release_tag: event.release_tag ?? null,
 			pass_count: event.pass_count ?? null,
+			first_pass_at: event.first_pass_at?.toISOString() ?? null,
 		})),
 		operator_pass_purchases: operatorPassPurchases.map((purchase) => ({
 			checkout_session_id: purchase.checkout_session_id,

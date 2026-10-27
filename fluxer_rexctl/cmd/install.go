@@ -3,9 +3,11 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"maps"
 	"net"
 	"net/netip"
@@ -60,18 +62,20 @@ type installFlags struct {
 }
 
 type installer struct {
-	answers *setup.Answers
-	storage *storageChoice
-	app     *App
-	c       *cobra.Command
-	f       *installFlags
-	dir     string
-	host    *host.Info
-	engine  *engine.Engine
-	found   *engine.Engine
-	findErr error
-	ran     map[string]bool
-	plan    []string
+	answers      *setup.Answers
+	storage      *storageChoice
+	app          *App
+	c            *cobra.Command
+	f            *installFlags
+	dir          string
+	host         *host.Info
+	engine       *engine.Engine
+	found        *engine.Engine
+	findErr      error
+	ran          map[string]bool
+	plan         []string
+	offered      bool
+	lowPortsSaid bool
 }
 
 func newInstallCmd(app *App) *cobra.Command {
@@ -100,11 +104,9 @@ func newInstallCmd(app *App) *cobra.Command {
 	fl.BoolVar(&f.TakeOver, "take-over", false, "take over Fluxer data found on this machine")
 	fl.BoolVar(&f.DeleteOld, "delete-old-data", false, "delete Fluxer data found on this machine and start fresh")
 	fl.StringVar(&f.Project, "project", defaultProject, "name for this instance's containers and volumes")
-	fl.IntVar(&f.VoiceTCPPort, "voice-tcp-port", 0, "the TCP port for voice and video")
-	fl.IntVar(&f.VoiceUDPPort, "voice-udp-port", 0, "the UDP port for voice and video")
-	for _, name := range []string{"project", "voice-tcp-port", "voice-udp-port"} {
-		_ = fl.MarkHidden(name)
-	}
+	fl.IntVar(&f.VoiceTCPPort, "voice-tcp-port", 0, "TCP port for voice and video, for running more than one instance on a host")
+	fl.IntVar(&f.VoiceUDPPort, "voice-udp-port", 0, "UDP port for voice and video, for running more than one instance on a host")
+	_ = fl.MarkHidden("project")
 	confirmFlag(c, &f.Confirm)
 	f.Setup.bind(c)
 	f.Storage.bind(c)
@@ -165,11 +167,16 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 		if in.runChecks(ctx, checks.Preinstall, "engine", "podman-subids", "windows-linux-containers") {
 			return notReady()
 		}
+	} else {
+		in.ran["engine"], in.ran["podman-subids"], in.ran["windows-linux-containers"] = true, true, true
+	}
+	if err := in.offerProxy(); err != nil {
+		return err
+	}
+	if in.engine != nil {
 		if err := in.preparePodman(ctx); err != nil {
 			return err
 		}
-	} else {
-		in.ran["engine"], in.ran["podman-subids"], in.ran["windows-linux-containers"] = true, true, true
 	}
 	if err := app.UI.Ask(c, ui.Field{
 		Flag:     "domain",
@@ -180,6 +187,7 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 		return err
 	}
 	f.Domain = normaliseDomain(f.Domain)
+	in.resolveVoicePorts(ctx)
 	if in.runChecks(ctx, checks.Preinstall) {
 		return notReady()
 	}
@@ -215,7 +223,11 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 		if err := in.write(ctx, inst, *deleteOld); err != nil {
 			return err
 		}
-		return in.start(ctx, inst)
+		if err := in.start(ctx, inst); err != nil {
+			return err
+		}
+		in.proxyNote()
+		return nil
 	})
 }
 
@@ -278,10 +290,8 @@ func validateInstallFlags(f *installFlags) error {
 			return ui.Usage(fmt.Sprintf("%s isn't an IP address.", f.VoiceIP))
 		}
 	}
-	if f.BehindProxy {
-		if _, _, err := net.SplitHostPort(f.Bind); err != nil {
-			return ui.Usage("Pass --bind as an address and port, like 127.0.0.1:8080.")
-		}
+	if f.BehindProxy && validateBind(f.Bind) != nil {
+		return ui.Usage("Pass --bind as an address and port, like 127.0.0.1:8080.")
 	}
 	for _, p := range []int{f.VoiceTCPPort, f.VoiceUDPPort} {
 		if p < 0 || p > 65535 {
@@ -301,6 +311,13 @@ func validateInstallFlags(f *installFlags) error {
 		if err := validateDomain(f.Domain); err != nil {
 			return ui.Usage(err.Error())
 		}
+	}
+	return nil
+}
+
+func validateBind(v string) error {
+	if _, _, err := net.SplitHostPort(v); err != nil {
+		return setupInputError("Enter an address and port, like 127.0.0.1:8080.")
 	}
 	return nil
 }
@@ -434,8 +451,8 @@ func (in *installer) ensureEngine(ctx context.Context) error {
 }
 
 func dockerInstalled() bool {
-	if _, err := exec.LookPath("docker"); err == nil {
-		return true
+	if path, err := exec.LookPath("docker"); err == nil {
+		return !podmanDockerWrapper(path)
 	}
 	switch runtime.GOOS {
 	case "windows":
@@ -446,6 +463,23 @@ func dockerInstalled() bool {
 		return fileExists("/Applications/Docker.app") || (home != "" && fileExists(filepath.Join(home, "Applications", "Docker.app")))
 	}
 	return false
+}
+
+func podmanDockerWrapper(path string) bool {
+	if runtime.GOOS != "linux" {
+		return false
+	}
+	if target, err := filepath.EvalSymlinks(path); err == nil && filepath.Base(target) == "podman" {
+		return true
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	head := make([]byte, 512)
+	n, _ := io.ReadFull(f, head)
+	return bytes.HasPrefix(head[:n], []byte("#!")) && bytes.Contains(head[:n], []byte("podman"))
 }
 
 func (in *installer) startPodman(ctx context.Context) error {
@@ -535,19 +569,123 @@ func (in *installer) allowLowPorts(ctx context.Context) error {
 	if in.f.BehindProxy || !host.LowPortsBlocked(in.engine.Rootless) {
 		return nil
 	}
-	ok, err := in.consent("setup-podman", in.f.SetupPodman, "Let Podman use ports 80 and 443 under this account?")
-	if err != nil || !ok {
+	if !in.lowPortsSaid {
+		in.app.UI.Info("Rootless Podman needs this to serve Fluxer on ports 80 and 443.")
+	}
+	ok, err := in.consent("setup-podman", in.f.SetupPodman, "Let programs that don't run as root use ports 80 and up on this machine?")
+	if err != nil {
 		return err
 	}
+	if !ok {
+		return ui.Refused("Fluxer can't serve HTTPS from rootless Podman without ports 80 and 443.", "Run rexctl install --behind-proxy to use your own reverse proxy instead.")
+	}
 	if in.f.DryRun {
-		in.plan = append(in.plan, "Let Podman use ports 80 and 443.")
+		in.plan = append(in.plan, "Let programs that don't run as root use ports 80 and up.")
 		return nil
 	}
 	if err := host.AllowLowPorts(ctx); err != nil {
-		return ui.Wrap(err, "Couldn't let Podman use ports 80 and 443.", "Run rexctl install --verbose to see why.")
+		return ui.Wrap(err, "Couldn't open ports 80 and up to programs that don't run as root.", "Run rexctl install --verbose to see why.")
 	}
-	in.app.UI.OK("Let Podman use ports 80 and 443.")
+	in.app.UI.OK("Programs that don't run as root can use ports 80 and up.")
 	return nil
+}
+
+type proxyHint struct {
+	Interactive bool
+	Decided     bool
+	Busy        []int
+	Owner       string
+	LowPorts    string
+}
+
+func (h proxyHint) offer() (reason string, def bool, ok bool) {
+	if !h.Interactive || h.Decided {
+		return "", false, false
+	}
+	if len(h.Busy) > 0 {
+		nums := make([]string, len(h.Busy))
+		for i, n := range h.Busy {
+			nums[i] = strconv.Itoa(n)
+		}
+		subject := fmt.Sprintf("Port %s on this machine is", nums[0])
+		if len(nums) > 1 {
+			subject = fmt.Sprintf("Ports %s on this machine are", ui.JoinAnd(nums))
+		}
+		switch {
+		case checks.ContainerOwner(h.Owner):
+			return subject + " already in use by a container.", true, true
+		case h.Owner != "":
+			return fmt.Sprintf("%s already in use by %s.", subject, h.Owner), true, true
+		}
+		return subject + " already in use.", true, true
+	}
+	if h.LowPorts != "" {
+		return fmt.Sprintf("Rootless %s can't use ports 80 and 443 without a change to this machine.", h.LowPorts), false, true
+	}
+	return "", false, false
+}
+
+func (in *installer) proxyHint() proxyHint {
+	h := proxyHint{
+		Interactive: in.app.UI.Interactive(),
+		Decided:     in.f.BehindProxy || in.c.Flags().Changed("behind-proxy") || in.c.Flags().Changed("bind"),
+	}
+	if !h.Interactive || h.Decided {
+		return h
+	}
+	sameOwner := true
+	for _, port := range []int{80, 443} {
+		used, owner, err := host.PortInUse("tcp", port)
+		if err != nil || !used {
+			continue
+		}
+		if len(h.Busy) == 0 {
+			h.Owner = owner
+		} else if owner != h.Owner {
+			sameOwner = false
+		}
+		h.Busy = append(h.Busy, port)
+	}
+	if !sameOwner {
+		h.Owner = ""
+	}
+	if in.engine != nil && host.LowPortsBlocked(in.engine.Rootless) {
+		h.LowPorts = in.engine.Kind.Name()
+	}
+	return h
+}
+
+func (in *installer) offerProxy() error {
+	h := in.proxyHint()
+	reason, def, ok := h.offer()
+	if !ok {
+		return nil
+	}
+	in.offered, in.lowPortsSaid = true, len(h.Busy) == 0
+	in.app.UI.Info("%s", reason)
+	yes, err := in.app.UI.Confirm("Use your own reverse proxy in front of Fluxer?", def)
+	if err != nil || !yes {
+		return err
+	}
+	if err := in.app.UI.Ask(in.c, ui.Field{
+		Flag:     "bind",
+		Title:    "Which address should your proxy connect to?",
+		Value:    &in.f.Bind,
+		Validate: validateBind,
+	}); err != nil {
+		return err
+	}
+	in.f.BehindProxy = true
+	in.plan = append(in.plan, fmt.Sprintf("Serve Fluxer over plain HTTP on %s for your reverse proxy.", in.f.Bind))
+	return nil
+}
+
+func (in *installer) proxyNote() {
+	if !in.offered || !in.f.BehindProxy {
+		return
+	}
+	in.app.UI.Info("Set up your proxy to forward https://%s to http://%s.", normaliseDomain(in.f.Domain), in.f.Bind)
+	in.app.UI.Info("See https://docs.fluxer.app/operator/reverse-proxy/ for what your proxy needs to do.")
 }
 
 func (in *installer) installDocker(ctx context.Context) error {
@@ -606,6 +744,84 @@ func (in *installer) settings() map[string]string {
 	}
 	if in.f.VoiceUDPPort > 0 {
 		out[stack.VoiceUDPPortKey] = strconv.Itoa(in.f.VoiceUDPPort)
+	}
+	return out
+}
+
+func (in *installer) resolveVoicePorts(ctx context.Context) {
+	tcpSet := in.f.VoiceTCPPort > 0
+	udpSet := in.f.VoiceUDPPort > 0
+	if tcpSet && udpSet {
+		return
+	}
+	pub := in.publishedPorts(ctx)
+	free := func(number int, proto string) bool {
+		if number < 1 || number > 65535 {
+			return false
+		}
+		used, _, err := host.PortInUse(proto, number)
+		if err != nil || used {
+			return false
+		}
+		return !pub[host.Port{Number: number, Proto: proto}]
+	}
+	switch {
+	case !tcpSet && !udpSet:
+		tcp, udp := pickVoicePair(free)
+		if tcp == 0 || tcp == 7881 {
+			return
+		}
+		in.f.VoiceTCPPort, in.f.VoiceUDPPort = tcp, udp
+		in.announceVoicePorts(tcp, udp)
+	case !tcpSet:
+		for tcp := 7881; tcp <= 65535; tcp += 2 {
+			if tcp != in.f.VoiceUDPPort && free(tcp, "tcp") {
+				in.f.VoiceTCPPort = tcp
+				return
+			}
+		}
+	case !udpSet:
+		for udp := 7882; udp <= 65535; udp += 2 {
+			if udp != in.f.VoiceTCPPort && free(udp, "udp") {
+				in.f.VoiceUDPPort = udp
+				return
+			}
+		}
+	}
+}
+
+func pickVoicePair(free func(number int, proto string) bool) (int, int) {
+	for tcp, udp := 7881, 7882; tcp <= 65533 && udp <= 65534; tcp, udp = tcp+2, udp+2 {
+		if free(tcp, "tcp") && free(udp, "udp") {
+			return tcp, udp
+		}
+	}
+	return 0, 0
+}
+
+func (in *installer) announceVoicePorts(tcp, udp int) {
+	msg := fmt.Sprintf("Ports 7881 and 7882 are already in use, so this instance will use %d and %d for voice and video.", tcp, udp)
+	in.plan = append(in.plan, msg)
+	if !in.f.DryRun {
+		in.app.UI.Info("%s", msg)
+	}
+}
+
+func (in *installer) publishedPorts(ctx context.Context) map[host.Port]bool {
+	out := map[host.Port]bool{}
+	e := in.engine
+	if e == nil {
+		e = in.found
+	}
+	if e == nil {
+		return out
+	}
+	owners, err := e.PublishedHostPorts(ctx)
+	if err != nil {
+		return out
+	}
+	for _, o := range owners {
+		out[host.Port{Number: o.Number, Proto: o.Proto}] = true
 	}
 	return out
 }

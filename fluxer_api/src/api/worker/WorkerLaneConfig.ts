@@ -103,6 +103,8 @@ const LANE_CONFIG = {
 			'backfillThreadSearch',
 			'backfillPasskeyTrait',
 			'backfillUserAclIndex',
+			'backfillDeletedUsers',
+			'backfillHiddenProfileBadges',
 			'syncDiscoveryIndex',
 			'syncUrlBlocklists',
 			'syncFileShaBlocklists',

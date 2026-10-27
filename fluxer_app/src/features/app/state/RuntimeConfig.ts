@@ -55,6 +55,7 @@ import type {
 	InstanceAppPublic,
 	InstanceCommunity,
 	InstanceFeatures,
+	InstanceGuildBadge,
 	InstanceNotice,
 	InstanceServices,
 	InstanceSso as InstanceSsoConfig,
@@ -682,6 +683,7 @@ class RuntimeConfig {
 			features: resolution.snapshot.features,
 			appPublic: resolution.snapshot.appPublic,
 			notice: resolution.snapshot.notice,
+			guildBadges: resolution.snapshot.guildBadges,
 		});
 		this.activeRuntime = {...runtime, snapshot: usable};
 		this.lifecycleGeneration = nextLifecycleGeneration(this.lifecycleGeneration);
@@ -737,6 +739,7 @@ class RuntimeConfig {
 					: null,
 				direct_messages_disabled: config.policy.direct_messages_disabled,
 				friends_disabled: config.policy.friends_disabled,
+				personal_notes_enabled: config.policy.personal_notes_enabled,
 				guild_create_access: config.policy.guild_create_access,
 			},
 			services: {
@@ -892,12 +895,20 @@ class RuntimeConfig {
 		return this.community.friends_disabled ?? this.community.direct_messages_disabled;
 	}
 
+	get personalNotesEnabled(): boolean {
+		return this.community.personal_notes_enabled ?? true;
+	}
+
 	get dmPickerAvailable(): boolean {
 		return !this.directMessagesDisabled && !this.friendsDisabled;
 	}
 
 	get instanceNotice(): InstanceNotice | null {
 		return this.activeRuntime?.snapshot.notice ?? null;
+	}
+
+	get guildBadges(): ReadonlyArray<InstanceGuildBadge> {
+		return this.activeRuntime?.snapshot.guildBadges ?? [];
 	}
 
 	get gifEnabled(): boolean {

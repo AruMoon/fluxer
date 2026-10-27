@@ -1429,11 +1429,54 @@
 					"type": "boolean"
 				},
 				{
+					"name": "app_platform",
+					"type": "text"
+				},
+				{
+					"name": "app_version",
+					"type": "text"
+				},
+				{
+					"name": "app_release_channel",
+					"type": "text"
+				},
+				{
+					"name": "app_build_number",
+					"type": "int"
+				},
+				{
+					"name": "app_beta_number",
+					"type": "int"
+				},
+				{
 					"name": "version",
 					"type": "int"
 				}
 			],
 			"primary_key": "((session_id_hash))",
+			"options": ""
+		},
+		{
+			"name": "auth_sessions_by_app_channel",
+			"columns": [
+				{
+					"name": "app_platform",
+					"type": "text"
+				},
+				{
+					"name": "app_release_channel",
+					"type": "text"
+				},
+				{
+					"name": "session_id_hash",
+					"type": "blob"
+				},
+				{
+					"name": "user_id",
+					"type": "bigint"
+				}
+			],
+			"primary_key": "((app_platform, app_release_channel), session_id_hash)",
 			"options": ""
 		},
 		{
@@ -6118,6 +6161,10 @@
 					"type": "set<text>"
 				},
 				{
+					"name": "badge_ids",
+					"type": "set<bigint>"
+				},
+				{
 					"name": "verification_level",
 					"type": "int"
 				},
@@ -7985,6 +8032,10 @@
 				{
 					"name": "pass_count",
 					"type": "int"
+				},
+				{
+					"name": "first_pass_at",
+					"type": "timestamp"
 				}
 			],
 			"primary_key": "((user_id), occurred_at, event_id)",
@@ -9913,6 +9964,14 @@
 				},
 				{
 					"name": "traits",
+					"type": "set<text>"
+				},
+				{
+					"name": "badge_ids",
+					"type": "set<bigint>"
+				},
+				{
+					"name": "hidden_profile_badges",
 					"type": "set<text>"
 				},
 				{

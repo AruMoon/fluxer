@@ -33,6 +33,7 @@ import {
 	type InstanceCommunity,
 	type InstanceDomainMigration,
 	type InstanceFeatures,
+	type InstanceGuildBadge,
 	type InstanceNotice,
 	type InstanceRegistration,
 	type InstanceServices,
@@ -74,6 +75,7 @@ export interface RuntimeConfigSnapshot extends RuntimeConfigIdentity {
 	readonly agePolicy: InstanceAgePolicy | null;
 	readonly domainMigration: InstanceDomainMigration | null;
 	readonly notice: InstanceNotice | null;
+	readonly guildBadges: ReadonlyArray<InstanceGuildBadge>;
 }
 
 export class InvalidRuntimeConfigSnapshotError extends Error {
@@ -363,6 +365,8 @@ function readCommunity(value: unknown): InstanceCommunity {
 		),
 		direct_messages_disabled: readBoolean(source, 'direct_messages_disabled', 'community.direct_messages_disabled'),
 		guild_create_access: readOptionalBoolean(source, 'guild_create_access', 'community.guild_create_access') ?? true,
+		personal_notes_enabled:
+			readOptionalBoolean(source, 'personal_notes_enabled', 'community.personal_notes_enabled') ?? true,
 	};
 	const friendsDisabled = readOptionalBoolean(source, 'friends_disabled', 'community.friends_disabled');
 	if (friendsDisabled !== undefined) {
@@ -559,6 +563,26 @@ function readNotice(value: unknown): InstanceNotice | null {
 	};
 }
 
+function readGuildBadges(value: unknown): Array<InstanceGuildBadge> {
+	if (value === undefined) {
+		return [];
+	}
+	if (!Array.isArray(value)) {
+		invalid('guildBadges', 'must be an array');
+	}
+	return value.map((entry, index) => {
+		const path = `guildBadges[${index}]`;
+		const source = readRecord(entry, path);
+		return {
+			id: readNonEmptyString(source, 'id', `${path}.id`),
+			name: readNonEmptyString(source, 'name', `${path}.name`),
+			description: readNullableNonEmptyString(source, 'description', `${path}.description`),
+			asset_url: readNonEmptyString(source, 'asset_url', `${path}.asset_url`),
+			href: readNullableAbsoluteHttpUrl(source, 'href', `${path}.href`),
+		};
+	});
+}
+
 export function requireRuntimeConfigSnapshot(value: unknown): RuntimeConfigSnapshot {
 	const source = readRecord(value, 'root');
 	return {
@@ -588,5 +612,6 @@ export function requireRuntimeConfigSnapshot(value: unknown): RuntimeConfigSnaps
 		agePolicy: readAgePolicy(source.agePolicy),
 		domainMigration: parseInstanceDomainMigration(source.domainMigration),
 		notice: readNotice(source.notice),
+		guildBadges: readGuildBadges(source.guildBadges),
 	};
 }

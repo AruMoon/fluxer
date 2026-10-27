@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {getContentMessage} from '@app/api/content_i18n/ContentI18n';
+import type {CustomBadgeDefinition} from '@app/api/instance/InstanceConfigRepository';
 import {Logger} from '@app/api/Logger';
 import type {VisiblePremiumBadge} from '@app/api/user/profile_badges/PremiumBadgeMasking';
 import {
@@ -9,18 +10,9 @@ import {
 	PROFILE_BADGE_ASSETS,
 } from '@app/api/user/profile_badges/ProfileBadgeAssets';
 import {getVisionaryNumberTag} from '@app/api/user/profile_badges/VisionaryNumberTags';
+import type {ProfileBadgeKind} from '@fluxer/constants/src/BadgeConstants';
 import {UserFlags, UserPremiumTypes} from '@fluxer/constants/src/UserConstants';
 import {getDateFormatter} from '@fluxer/date_utils/src/DateFormatterCache';
-
-export type ProfileBadgeKind =
-	| 'staff'
-	| 'partner'
-	| 'bug_hunter'
-	| 'operator_pass'
-	| 'visionary'
-	| 'visionary_number'
-	| 'plutonium'
-	| 'premium';
 
 export interface ProfileBadgeEnvironment {
 	selfHosted: boolean;
@@ -29,6 +21,8 @@ export interface ProfileBadgeEnvironment {
 	premiumName: string;
 	premiumInfoUrl: string | null;
 	marketingUrl: string;
+	mediaUrl: string;
+	customBadges: ReadonlyArray<CustomBadgeDefinition>;
 }
 
 export interface VisibleOperatorPass {
@@ -117,7 +111,7 @@ export const PROFILE_BADGE_REGISTRY: ReadonlyArray<ProfileBadgeDefinition> = [
 		kind: 'bug_hunter',
 		asset: PROFILE_BADGE_ASSETS.bug_hunter,
 		availability: 'hosted',
-		href: marketing('help/report-bug'),
+		href: () => 'https://www.youtube.com/watch?v=ez8m4PXksQs',
 		qualify: flagBadge(UserFlags.BUG_HUNTER, (view) =>
 			getContentMessage('profile_badge.bug_hunter', view.locale, {product_name: view.environment.productName}),
 		),
@@ -142,6 +136,7 @@ export const PROFILE_BADGE_REGISTRY: ReadonlyArray<ProfileBadgeDefinition> = [
 			}
 			if (stacked) {
 				lines.push(getContentMessage('profile_badge.operator_pass_count', view.locale, {count}));
+				lines.push(getContentMessage('profile_badge.operator_pass_recognition', view.locale));
 			}
 			let label: string;
 			if (sinceDate && stacked) {

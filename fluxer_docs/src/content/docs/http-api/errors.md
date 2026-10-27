@@ -235,6 +235,7 @@ These are the values of the top-level `code`, and the [OpenAPI document](/http-a
 | `IP_BAN_LINKED_TO_DECISION` | This network block belongs to an enforcement decision |
 | `MAX_ACTIVE_THREADS` | This community has reached its active thread limit of {count} |
 | `MAX_APPLICATIONS` | You've reached the maximum of {limit} applications |
+| `MAX_BADGES` | You've reached the maximum of {count} badges for this type |
 | `MAX_BOOKMARKS` | You've reached the maximum of {count} bookmarks |
 | `MAX_CATEGORY_CHANNELS` | You've reached the maximum of {count} category channels |
 | `MAX_EMOJIS` | You've reached the maximum of {count} emojis |
@@ -280,13 +281,13 @@ These are the values of the top-level `code`, and the [OpenAPI document](/http-a
 | `PASSKEY_AUTHENTICATION_FAILED` | Passkey authentication failed |
 | `PASSWORD_REQUIRED_TO_CLAIM` | Set a password to keep this account |
 | `PASSWORD_SIGN_IN_REQUIRED` | Sign in to this account with its password |
+| `PERSONAL_NOTES_DISABLED` | Personal notes are turned off on this instance |
 | `PREMIUM_PURCHASE_BLOCKED` | No active subscription |
 | `PREVIEW_MUST_BE_JPEG` | Preview must be JPEG |
 | `PROCESSING_FAILED` | We couldn't process the request |
 | `PROFILE_EMAIL_VERIFICATION_REQUIRED` | Email verification is required for this action |
 | `PUBLISHED_MESSAGE_EDIT_RATE_LIMITED` | This published message has reached its editing limit |
 | `PURCHASE_EMAIL_VERIFICATION_REQUIRED` | Email verification is required for this action |
-| `PURCHASE_RECEIPT_EMAIL_REQUIRED` | Purchases need an email address to send receipts to, and this account doesn't have one |
 | `RATE_LIMITED` | You're being rate limited |
 | `REACTION_EMAIL_VERIFICATION_REQUIRED` | Email verification is required for this action |
 | `REGISTRATION_CLOSED` | Registration is closed on this instance |
@@ -353,6 +354,7 @@ These are the values of the top-level `code`, and the [OpenAPI document](/http-a
 | `UNCLAIMED_ACCOUNT_CANNOT_SUBMIT_REPORTS` | Claim your account to submit reports |
 | `UNKNOWN_ACCOUNT_HANDOFF` | This sign-up link has expired or was already used |
 | `UNKNOWN_APPLICATION` | Unknown application |
+| `UNKNOWN_BADGE` | Badge wasn't found |
 | `UNKNOWN_CHANNEL` | Channel wasn't found |
 | `UNKNOWN_EMOJI` | Unknown emoji |
 | `UNKNOWN_ENFORCEMENT_DECISION` | Unknown enforcement decision |

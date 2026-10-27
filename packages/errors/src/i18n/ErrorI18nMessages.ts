@@ -13,8 +13,6 @@ export const ERROR_I18N_MESSAGES = {
 	'account.unclaimed_cannot_join_calls': 'Claim your account to start or join calls.',
 	'account.unclaimed_cannot_join_group_dms': 'Claim your account to join group chats.',
 	'account.unclaimed_cannot_join_voice': 'Claim your account to join voice channels.',
-	'account.purchase_receipt_email_required':
-		"Purchases need an email address to send receipts to, and this account doesn't have one.",
 	'account.unclaimed_cannot_make_purchases': 'Claim your account to make purchases.',
 	'account.unclaimed_cannot_send_direct_messages': 'Claim your account to send direct messages.',
 	'account.unclaimed_cannot_send_friend_requests': 'Claim your account to send friend requests.',
@@ -445,6 +443,7 @@ export const ERROR_I18N_MESSAGES = {
 	'friends_and_dms.already_friends': "You're already friends with this user.",
 	'friends_and_dms.direct_messages_disabled': 'Direct messages are disabled on this instance.',
 	'friends_and_dms.friends_disabled': 'Friend requests are disabled on this instance.',
+	'friends_and_dms.personal_notes_disabled': 'Personal notes are turned off on this instance.',
 	'friends_and_dms.new_conversations_limited': "You can't start new conversations right now. Please try again later.",
 	'friends_and_dms.bots_cannot_send_friend_requests': "Bots can't send friend requests.",
 	'friends_and_dms.cannot_add_yourself_to_group_dm': "You can't add yourself to a group DM.",
@@ -544,6 +543,8 @@ export const ERROR_I18N_MESSAGES = {
 	'misc.invalid_snowflake': 'Invalid snowflake.',
 	'misc_limits.max_applications_reached':
 		"You've reached the maximum of {limit, plural, one {# application} other {# applications}}.",
+	'misc_limits.max_badges_reached':
+		"You've reached the maximum of {count, plural, one {# badge} other {# badges}} for this type.",
 	'misc_limits.max_bookmarks_reached':
 		"You've reached the maximum of {count, plural, one {# bookmark} other {# bookmarks}}.",
 	'misc_limits.max_category_channels_reached':
@@ -677,6 +678,7 @@ export const ERROR_I18N_MESSAGES = {
 	'tos_and_age.must_agree_to_tos_and_privacy': 'You need to accept the terms of service to create an account.',
 	'tos_and_age.must_be_minimum_age':
 		'You must be at least {minAge, plural, one {# year} other {# years}} old to create an account.',
+	'unknown_entities.unknown_badge': "Badge wasn't found.",
 	'unknown_entities.unknown_channel': "Channel wasn't found.",
 	'unknown_entities.unknown_forum_tag': "Tag wasn't found.",
 	'unknown_entities.unknown_guild': "Community wasn't found.",

@@ -16,6 +16,7 @@ import (
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/engine"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/host"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/instance"
+	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/release"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/setup"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/stack"
 	"github.com/fluxerapp/fluxer/fluxer_rexctl/internal/ui"
@@ -86,6 +87,10 @@ func takeoverDir(ctx context.Context, app *App, dir string, opts takeoverOptions
 	if opts.DryRun {
 		if opts.Then != "" && len(report.KeepAsMine) == 0 {
 			u.Info("%s", opts.Then)
+			if e != nil {
+				legacy := &instance.Instance{Dir: dir, State: &instance.State{Project: report.Project, Images: instance.Images{Refs: report.Images}}}
+				printSpace(ctx, app, legacy, e, embeddedRefs(), &upgradeFlags{}, release.Short(stack.Embedded().Release))
+			}
 		}
 		u.Info("Dry run. Nothing changed.")
 		return nil, nil, nil
@@ -142,6 +147,9 @@ func describeTakeover(u *ui.UI, r *instance.ImportReport) {
 		u.Info("You manage the instance in %s yourself. rexctl takes it back with the settings in its .env file.", r.Dir)
 	} else {
 		u.Info("Found a Fluxer instance in %s.", r.Dir)
+	}
+	if r.Release != "" {
+		u.Info("Your instance now runs Fluxer %s. rexctl takes it over on that release.", release.Short(r.Release))
 	}
 	u.Info("After this, rexctl manages it. Fluxer keeps running as it is, and your data and secrets stay.")
 	for _, f := range r.CustomFiles {

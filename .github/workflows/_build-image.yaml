@@ -54,7 +54,7 @@ jobs:
         id: vars
         env:
           GH_TOKEN: ${{ github.token }}
-          FLUXER_BUILD_VERSION: ${{ inputs['build-version'] }}
+          BUILD_VERSION: ${{ inputs['build-version'] }}
         run: >-
           tools/ci/run.sh resolve-calver
           --github-output

@@ -10,8 +10,8 @@ import {createGuildID, createInviteCode, createUserID} from '@app/api/BrandedTyp
 import {loadSigningKey} from '@app/api/bluesky/BlueskyOAuthService';
 import {Config} from '@app/api/Config';
 import {enqueueEndUnassignedGuildVisits} from '@app/api/guild/visits/GuildVisitLifecycle';
-import {brandingAssetStorageKey, resolveBrandingAsset} from '@app/api/instance/BrandingAssetReferences';
 import {resolveEffectiveSmtpConfig, type StoredEmailSmtpConfig} from '@app/api/instance/EmailDelivery';
+import {assetStorageKey, resolveBrandingAsset} from '@app/api/instance/InstanceAssetReferences';
 import {
 	type InstanceAttachmentDecayEffectiveConfig,
 	type InstanceConfigRepository,
@@ -102,7 +102,7 @@ async function queueReleasedBrandingAssets(references: ReadonlyArray<string>): P
 	const queue = getAssetDeletionQueue();
 	for (const reference of references) {
 		await queue.queueDeletion({
-			s3Key: brandingAssetStorageKey(reference),
+			s3Key: assetStorageKey(reference),
 			cdnUrl: resolveBrandingAsset(reference, Config.endpoints.media),
 			reason: 'branding_asset_released',
 		});
@@ -282,6 +282,7 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 			direct_messages_disabled: policy.direct_messages_disabled,
 			direct_messages_locked: policy.direct_messages_locked,
 			friends_disabled: policy.friends_disabled,
+			personal_notes_enabled: policy.personal_notes_enabled,
 			guild_create_access: policy.guild_create_access,
 			premium_mode: policy.premium_mode,
 			services: {
@@ -1284,6 +1285,7 @@ function planInstancePolicyPatch(
 	const friendsDisabled = policy.friends_disabled ?? patch.direct_messages_disabled;
 	updateChangedPolicyField(patch, current, 'friends_disabled', friendsDisabled);
 	updateChangedPolicyField(patch, current, 'guild_create_access', policy.guild_create_access);
+	updateChangedPolicyField(patch, current, 'personal_notes_enabled', policy.personal_notes_enabled);
 
 	for (const field of ['gif_enabled', 'youtube_enabled', 'bluesky_enabled'] as const) {
 		const value = policy.services?.[field];
@@ -1295,7 +1297,7 @@ function planInstancePolicyPatch(
 function updateChangedPolicyField(
 	patch: Partial<InstancePolicyConfig>,
 	current: InstancePolicyConfig,
-	key: 'friends_disabled' | 'guild_create_access',
+	key: 'friends_disabled' | 'guild_create_access' | 'personal_notes_enabled',
 	value: boolean | undefined,
 ): void {
 	if (value !== undefined && value !== current[key]) patch[key] = value;

@@ -7,6 +7,8 @@ import bulkDeleteMessagesForUsers from '@app/api/worker/tasks/admin_bulk/BulkDel
 import bulkScheduleUserDeletion from '@app/api/worker/tasks/admin_bulk/BulkScheduleUserDeletion';
 import bulkUpdateGuildFeatures from '@app/api/worker/tasks/admin_bulk/BulkUpdateGuildFeatures';
 import bulkUpdateUserFlags from '@app/api/worker/tasks/admin_bulk/BulkUpdateUserFlags';
+import backfillDeletedUsers from '@app/api/worker/tasks/BackfillDeletedUsers';
+import backfillHiddenProfileBadges from '@app/api/worker/tasks/BackfillHiddenProfileBadges';
 import backfillPasskeyTrait from '@app/api/worker/tasks/BackfillPasskeyTrait';
 import backfillUserAclIndex from '@app/api/worker/tasks/BackfillUserAclIndex';
 import batchGuildAuditLogMessageDeletes from '@app/api/worker/tasks/BatchGuildAuditLogMessageDeletes';
@@ -90,6 +92,8 @@ export const workerTasks: Record<WorkerTaskName, WorkerTaskHandler> = {
 	repairThreadIndexes,
 	syncThreadSearchDocument,
 	backfillThreadSearch,
+	backfillDeletedUsers,
+	backfillHiddenProfileBadges,
 	backfillPasskeyTrait,
 	backfillUserAclIndex,
 	batchGuildAuditLogMessageDeletes,

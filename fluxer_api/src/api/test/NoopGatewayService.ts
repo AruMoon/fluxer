@@ -67,6 +67,7 @@ function createDummyGuildResponse(params: {guildId: GuildID; userId: UserID}): G
 		afk_channel_id: null,
 		afk_timeout: 60,
 		features: [],
+		badge_ids: [],
 		verification_level: 0,
 		mfa_level: 0,
 		nsfw_level: 0,
@@ -285,7 +286,11 @@ export class NoopGatewayService implements IGatewayService {
 		if (!userHighest || !this.roleOutranks(userHighest, targetRole)) {
 			return false;
 		}
-		return userId === targetUserId || this.checkTargetMember({guildId, userId, targetUserId});
+		return (
+			userId === targetUserId ||
+			guild.ownerId === targetUserId ||
+			this.checkTargetMember({guildId, userId, targetUserId})
+		);
 	}
 
 	async canManageRole(params: {guildId: GuildID; userId: UserID; roleId: RoleID}): Promise<boolean> {

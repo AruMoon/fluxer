@@ -5,10 +5,13 @@ import type {OperatorPassRemovalRow, OperatorPassRow} from '@app/api/database/ty
 import type {IGatewayService} from '@app/api/infrastructure/IGatewayService';
 import {Logger} from '@app/api/Logger';
 import type {User} from '@app/api/models/User';
+import {
+	loadOperatorPassRecognition,
+	type OperatorPassRecognition,
+} from '@app/api/operator_pass/OperatorPassRecognition';
 import type {OperatorPassRepository} from '@app/api/operator_pass/OperatorPassRepository';
 import {operatorPassNow} from '@app/api/operator_pass/OperatorPassSchedule';
 import {
-	isOperatorPassBadgeHidden,
 	isOperatorPassCountHidden,
 	isOperatorPassTimestampHidden,
 } from '@app/api/user/profile_badges/PremiumBadgeMasking';
@@ -29,6 +32,7 @@ export interface OperatorPassHolder {
 export interface OperatorPassEntitlementState {
 	pass: OperatorPassRow | null;
 	removal: OperatorPassRemovalRow | null;
+	recognition?: OperatorPassRecognition | null;
 }
 
 function parseOperatorPassSource(value: string): OperatorPassSource {
@@ -57,13 +61,13 @@ export function resolveOperatorPassHolder(
 		return null;
 	}
 	const {pass} = state;
-	if (!pass || pass.paused_at != null) {
+	if (!pass || pass.paused_at != null || state.recognition === null) {
 		return null;
 	}
 	return {
-		since: pass.granted_at,
+		since: state.recognition?.since ?? pass.granted_at,
 		source: parseOperatorPassSource(pass.source),
-		count: Math.max(1, pass.pass_count ?? 1),
+		count: state.recognition?.count ?? Math.max(1, pass.pass_count ?? 1),
 	};
 }
 
@@ -76,7 +80,11 @@ export async function loadOperatorPassEntitlementState(
 	userId: UserID,
 ): Promise<OperatorPassEntitlementState> {
 	const [pass, removal] = await Promise.all([repository.findOperatorPass(userId), repository.findRemoval(userId)]);
-	return {pass, removal};
+	const recognition =
+		pass && pass.paused_at == null && !isOperatorPassRemovalActive(removal)
+			? await loadOperatorPassRecognition(repository, userId, pass)
+			: null;
+	return {pass, removal, recognition};
 }
 
 export async function dispatchOperatorPassUserUpdate(
@@ -111,7 +119,7 @@ export function operatorPassPrivateFields(
 > {
 	return {
 		operator_pass_since: holder?.since.toISOString() ?? null,
-		operator_pass_badge_hidden: isOperatorPassBadgeHidden(user.premiumFlags),
+		operator_pass_badge_hidden: user.hiddenProfileBadges.has('operator_pass'),
 		operator_pass_badge_timestamp_hidden: isOperatorPassTimestampHidden(user.premiumFlags),
 		operator_pass_badge_count_hidden: isOperatorPassCountHidden(user.premiumFlags),
 	};
@@ -131,7 +139,7 @@ export function profileOperatorPassSince(params: {
 	const holder = resolveOperatorPassHolder(state);
 	if (
 		!holder ||
-		(!isOwner && (isOperatorPassBadgeHidden(user.premiumFlags) || isOperatorPassTimestampHidden(user.premiumFlags)))
+		(!isOwner && (user.hiddenProfileBadges.has('operator_pass') || isOperatorPassTimestampHidden(user.premiumFlags)))
 	) {
 		return null;
 	}
