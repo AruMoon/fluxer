@@ -66,6 +66,7 @@ function createVoiceServer({
 		longitude,
 		isActive: true,
 		softConnectionLimit,
+		notes: null,
 		restrictions: {
 			vipOnly: false,
 			requiredGuildFeatures: new Set(),

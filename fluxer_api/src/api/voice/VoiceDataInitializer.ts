@@ -58,6 +58,7 @@ export class VoiceDataInitializer {
 					longitude: null,
 					isActive: true,
 					softConnectionLimit: null,
+					notes: null,
 					restrictions: {
 						vipOnly: false,
 						requiredGuildFeatures: new Set(),

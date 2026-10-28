@@ -237,6 +237,7 @@ export class AdminVoiceService {
 			endpoint: data.endpoint,
 			isActive: data.is_active ?? true,
 			softConnectionLimit: data.soft_connection_limit ?? null,
+			notes: data.notes ?? null,
 			apiKey: data.api_key ?? null,
 			apiSecret: data.api_secret ?? null,
 			latitude: data.latitude ?? null,
@@ -275,6 +276,7 @@ export class AdminVoiceService {
 		if (data.longitude !== undefined) updates.longitude = data.longitude;
 		if (data.is_active !== undefined) updates.isActive = data.is_active;
 		if (data.soft_connection_limit !== undefined) updates.softConnectionLimit = data.soft_connection_limit;
+		if (data.notes !== undefined) updates.notes = data.notes;
 		updates.restrictions = patchVoiceRestrictions(existing.restrictions, data);
 		updates.updatedAt = new Date();
 		await voiceRepository.upsertServer(updates);
@@ -347,6 +349,7 @@ export class AdminVoiceService {
 			longitude: server.longitude ?? null,
 			is_active: server.isActive,
 			soft_connection_limit: server.softConnectionLimit ?? null,
+			notes: server.notes,
 			vip_only: server.restrictions.vipOnly,
 			required_guild_features: Array.from(server.restrictions.requiredGuildFeatures),
 			allowed_guild_ids: allowedGuildIds,
