@@ -1581,6 +1581,11 @@ msgstr "{fifteenMinutes} minuter"
 msgid "{folderName} folder"
 msgstr "Mappen {folderName}"
 
+#. Helper line under the role icon buttons in the community role editor. formats is a list of image types such as PNG, JPEG, WebP. minimumSize is an image size such as 32×32px. maxSize is a file size such as 256 KB.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "{formats}. At least {minimumSize}, up to {maxSize}."
+msgstr "{formats}. Minst {minimumSize}, högst {maxSize}."
+
 #. Helper text in an asset upload source modal. formats is a formatted list of accepted file types; maxSize is a formatted file size; minimumSize is a minimum image size; aspectRatio is a formatted aspect ratio.
 #: src/features/expressions/utils/AssetUploadHintCopy.ts
 msgid "{formats}. Max {maxSize}. Minimum: {minimumSize} ({aspectRatio})"
@@ -4075,6 +4080,11 @@ msgstr "Efter 14 dagar raderas ditt konto permanent"
 msgid "After date"
 msgstr "Efter datum"
 
+#. Shown above the single sign-on button when confirming it's you. Signing in can leave the page, and the person repeats the action afterwards.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "After you sign in, try the action again."
+msgstr "Försök med åtgärden igen när du har loggat in."
+
 #: src/features/auth/components/modals/AccountDeleteModal.tsx
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Efter att ditt konto har raderats kommer du inte att kunna radera meddelandena du har skickat"
@@ -4771,7 +4781,9 @@ msgid "Animated icons are not supported when creating a new community. Use a sta
 msgstr "Animerade ikoner stöds inte när du skapar en ny community. Använd en statisk bild."
 
 #. Description text in the edit group modal.
+#. Error under the role icon buttons when the picked image is animated.
 #: src/features/channel/components/modals/EditGroupModal.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Animated icons are not supported. Use a static image."
 msgstr "Animerade ikoner stöds inte. Använd en statisk bild."
 
@@ -8370,6 +8382,11 @@ msgstr "Välj bakgrund"
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "Välj antingen guild_id eller channel_id, inte båda."
 
+#. Button in the role icon field that opens the emoji picker. Keep it short.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Choose emoji"
+msgstr "Välj emoji"
+
 #. Second install step on a Mac. File and Add to Dock are the names of the Safari menu items, use the names macOS shows in this language.
 #: src/features/app/domain_migration/DomainMovedStepsModal.tsx
 msgid "Choose File, then Add to Dock."
@@ -9899,6 +9916,11 @@ msgstr "Bekräftelse eller dubbelklick för att ansluta till röstkanaler i comm
 msgid "Conflicts with {conflictLabel}"
 msgstr "Konflikter med {conflictLabel}"
 
+#. Button in account settings that connects the account to single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Connect"
+msgstr "Anslut"
+
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 msgid "Connect a camera and try again."
 msgstr "Anslut en kamera och försök igen."
@@ -10152,7 +10174,11 @@ msgstr "Snabbmenyer kan öppnas med vänsterklick (på knappar) eller högerklic
 msgid "Continue"
 msgstr "Fortsätt"
 
+#. Shown on the web page after an SSO sign-in that started in the mobile app. productName is the app name.
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Continue in the {productName} app."
+msgstr "Fortsätt i {productName}-appen."
+
 #: src/features/auth/flow/DesktopDeepLinkPrompt.tsx
 msgid "Continue in the desktop app."
 msgstr "Fortsätt i skrivbordsappen."
@@ -10830,6 +10856,11 @@ msgstr "Kunde inte stänga DM-konversationen"
 #: src/features/auth/flow/auth_login_core/useDesktopHandoffFlow.ts
 msgid "Couldn't complete sign-in. Try again."
 msgstr "Kunde inte slutföra inloggningen. Försök igen."
+
+#. Error title shown when starting to connect single sign-on from account settings fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Couldn't connect single sign-on"
+msgstr "Det gick inte att ansluta enkel inloggning"
 
 #. Auth error shown when connecting to an instance fails, in the instance selector or when sign-in cannot reach the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -11770,6 +11801,11 @@ msgstr "Beskär förhandsvisning"
 msgid "Crop profile banner"
 msgstr "Beskär profilbanner"
 
+#. Modal title for cropping a role icon before upload.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Crop role icon"
+msgstr "Beskär rollikon"
+
 #. Error modal body shown when a cropped community image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #. Error modal body shown when a cropped image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/hooks/useGuildImageAssetField.tsx
@@ -11853,6 +11889,16 @@ msgstr "Aktuell träff"
 #: src/features/voice/components/voice_connection_status/shared.ts
 msgid "Current ping:"
 msgstr "Aktuell ping:"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an emoji, also read out after an emoji is picked. emojiName is the emoji short name such as :shield:. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, {emojiName}"
+msgstr "Nuvarande rollikon, {emojiName}"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an uploaded image, also read out after an image is added. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, uploaded image"
+msgstr "Nuvarande rollikon, uppladdad bild"
 
 #: src/features/user/components/modals/tabs/DevicesTab.tsx
 msgid "Current session"
@@ -14172,6 +14218,11 @@ msgstr "Dra för att flytta gruppikonen och använd skrollhjulet eller nyp för 
 #: src/features/expressions/components/modals/AssetCropModal.tsx
 msgid "Drag to reposition your invite background and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels (16:9)."
 msgstr "Dra för att flytta din inbjudningsbakgrund och använd skrollhjulet eller nyp för att zooma. Den rekommenderade minimistorleken är {minimumWidth}×{minimumHeight} pixlar (16:9)."
+
+#. Description in the role icon crop modal. minimumWidth and minimumHeight are pixel dimensions for the recommended image size.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Drag to reposition your role icon and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels."
+msgstr "Dra för att flytta rollikonen och använd skrollhjulet eller nyp för att zooma. Rekommenderad minimistorlek är {minimumWidth}×{minimumHeight} pixlar."
 
 #. Desktop setting description under the dark taskbar badge toggle on Windows.
 #: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
@@ -21064,6 +21115,11 @@ msgstr "Låter dig återställa ditt lösenord om du glömmer det."
 #: src/features/permissions/system/components/MacPermissionPrompt.tsx
 msgid "Lets you share your screen or a window."
 msgstr "Låter dig dela din skärm eller ett fönster."
+
+#. Description of the account settings row that connects the account to the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Lets you sign in to this account with {providerName}."
+msgstr "Gör att du kan logga in på det här kontot med {providerName}."
 
 #: src/features/ui/components/form/UsernameValidationRules.tsx
 msgid "Letters (a-z, A-Z), numbers (0-9), and underscores (_) only"
@@ -29216,6 +29272,7 @@ msgstr "Ta bort från URL-baserade GIF-favoriter"
 
 #: src/features/channel/components/modals/EditGroupModal.tsx
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateShared.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Remove icon"
 msgstr "Ta bort ikon"
 
@@ -30552,6 +30609,16 @@ msgstr "Roll borttagen"
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx
 msgid "Role deleted successfully"
 msgstr "Rollen har tagits bort"
+
+#. Label of the role icon field in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Role icon"
+msgstr "Rollikon"
+
+#. Accessible label read by screen readers for the small icon next to a member name. roleName is the name of the community role the icon belongs to.
+#: src/features/guild/components/RoleIcon.tsx
+msgid "Role icon, {roleName}"
+msgstr "Rollikon, {roleName}"
 
 #. Label of the role name input in the community role editor.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx
@@ -33613,6 +33680,11 @@ msgstr "Inloggningsmetoder"
 msgid "Sign-in page"
 msgstr "Inloggningssida"
 
+#. SSO callback page error shown when the person cancelled the sign-in at their sign-in provider.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Sign-in was cancelled."
+msgstr "Inloggningen avbröts."
+
 #. Aria label on the signal-strength icon shown while the first latency sample is still pending.
 #: src/features/voice/components/SignalStrengthIcon.tsx
 msgid "Signal strength loading"
@@ -33702,8 +33774,10 @@ msgstr "Enkelt lager"
 msgid "Single line"
 msgstr "Enkel rad"
 
-#. Heading of the single sign-on panel when the admin has not named the sign-in provider.
+#. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
+#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Single sign-on"
 msgstr "Enkel inloggning"
 
@@ -37187,8 +37261,10 @@ msgstr "Filen är {fileSize}, vilket är över gränsen på {maxSize}. Animerade
 msgid "This file is larger than {size}. Choose a smaller one."
 msgstr "Filen är större än {size}. Välj en mindre fil."
 
+#. Error under the role icon buttons when the picked file has an unsupported type. formats is a list such as PNG, JPEG, WebP.
 #. Error when a branding image has an unsupported file type in the setup wizard. formats is a list such as PNG, JPEG, WebP.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "This file type is not supported. Supported types are {formats}."
 msgstr "Filtypen stöds inte. Filtyper som stöds är {formats}."
 
@@ -37249,6 +37325,11 @@ msgstr "Den här överlämningskoden har gått ut. Skapa en ny för att fortsät
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
 msgid "This image could not be loaded after saving. Press \"Continue\" to try again, or choose a different file."
 msgstr "Den här bilden kunde inte laddas efter att den sparats. Tryck på \"Fortsätt\" för att försöka igen, eller välj en annan fil."
+
+#. Error under the role icon buttons when the picked image or emoji could not be used.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "This image could not be loaded. Try another one."
+msgstr "Bilden kunde inte läsas in. Prova en annan."
 
 #. Error modal body shown when an animated image fails to decode during cropping.
 #: src/features/messaging/components/modals/ImageCropModal.tsx
@@ -37349,6 +37430,8 @@ msgid "This is disabled"
 msgstr "Det här är inaktiverat"
 
 #. Label in the messages tab.
+#. Sample message text in the role icon preview of the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/user/components/modals/tabs/appearance_tab/MessagesTab.tsx
 msgid "This is how messages appear"
 msgstr "Så här visas meddelanden"
@@ -39886,6 +39969,11 @@ msgstr "Ladda upp ett anpassat ljud som spelas automatiskt när du går med i en
 msgid "Upload a file"
 msgstr "Ladda upp en fil"
 
+#. Helper text under the role icon label in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload an image or pick an emoji. Members get the icon of their highest role that has one."
+msgstr "Ladda upp en bild eller välj en emoji. Bredvid en medlems namn visas ikonen från medlemmens högsta roll som har en ikon."
+
 #: src/features/theme_settings/components/AssetsSection.tsx
 msgid "Upload assets"
 msgstr "Ladda upp resurser"
@@ -39947,6 +40035,7 @@ msgid "Upload icon"
 msgstr "Ladda upp ikon"
 
 #. Button label for uploading a webhook avatar image.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Upload image"
 msgstr "Ladda upp bild"
@@ -39970,6 +40059,11 @@ msgstr "Ladda upp nya emojier och klistermärken och hantera dina egna skapelser
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx
 msgid "Upload preview frames for screen shares."
 msgstr "Ladda upp förhandsvisningsbilder för skärmdelningar."
+
+#. Accessible label of the empty role icon tile in the community role editor. Clicking it opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload role icon"
+msgstr "Ladda upp rollikon"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
@@ -43200,6 +43294,11 @@ msgstr "Du loggar in med en kod som skickas till din e-post. Ett lösenord är v
 msgid "You sign in with this username. Pick one you will remember."
 msgstr "Du loggar in med det här användarnamnet. Välj ett du kommer att komma ihåg."
 
+#. Error shown when the person confirmed it's them by signing in to a different account than the one they are using.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "You signed in to a different account. Sign in with the account you're using here."
+msgstr "Du loggade in på ett annat konto. Logga in med kontot du använder här."
+
 #. Voice chat status tooltip for the current user. A moderator deafened them so they cannot hear voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
@@ -43567,6 +43666,11 @@ msgstr "Ditt konto har länkats. Du kan nu stänga den här fliken och återgå 
 #: src/features/user/components/RecoveryKitReminderGate.tsx
 msgid "Your account has no email address. If you forget your password, a recovery kit is the only way back in. It only takes a minute."
 msgstr "Ditt konto saknar e-postadress. Om du glömmer ditt lösenord är en återställningsnyckel det enda sättet att komma tillbaka. Det tar bara en minut."
+
+#. Toast shown after the account was connected to single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your account is connected to single sign-on."
+msgstr "Ditt konto är anslutet till enkel inloggning."
 
 #. Settings alert for an unclaimed account on an instance where people sign in with a username.
 #: src/features/user/utils/AccountGatePresentation.tsx
@@ -43976,6 +44080,16 @@ msgstr "Ditt privata utrymme för tankar och påminnelser"
 msgid "Your profile privacy is limited, so some people still won't see this connection even when Everyone is enabled."
 msgstr "Din profils synlighet är begränsad, så vissa personer kan fortfarande inte se den här anslutningen även när ”Alla” är aktiverat."
 
+#. SSO callback page error shown when the sign-in provider asks the person to sign in or give consent again.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider needs you to sign in again."
+msgstr "Din leverantör vill att du loggar in igen."
+
+#. SSO callback page error shown when the sign-in provider sent back any other error.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider reported an error."
+msgstr "Din leverantör rapporterade ett fel."
+
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/components/settings_utils/search_index/GiftInventoryIndex.ts
 msgid "Your purchased gifts"
@@ -44016,6 +44130,16 @@ msgstr "Din skärmdelning kunde inte publiceras med en kompatibel videokodek, s�
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "Your setup token stopped working. Enter it again."
 msgstr "Din konfigurationstoken slutade fungera. Ange den igen."
+
+#. Explanation shown in place of the single sign-on description when the instance requires single sign-on but cannot connect to its sign-in provider right now.
+#: src/features/auth/flow/AuthSsoPanel.tsx
+msgid "Your sign-in provider is unavailable. Try again later."
+msgstr "Din inloggningsleverantör är inte tillgänglig. Försök igen senare."
+
+#. Description of the password row in account settings when the instance requires single sign-on and the sign-in provider manages the account's email and password.
+#: src/features/user/components/modals/tabs/account_security_tab/AccountTab.tsx
+msgid "Your sign-in provider manages your email and password."
+msgstr "Din e-postadress och ditt lösenord hanteras av din inloggningsleverantör."
 
 #. Subtitle under the preview-paused overlay reassuring the user that the screen share is still live for others.
 #: src/features/voice/components/voice_participant_tile/shared.ts
@@ -44109,6 +44233,11 @@ msgstr "Temats CSS är för stort för att delas. Minska storleken och försök 
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Your themes"
 msgstr "Dina teman"
+
+#. Tooltip on the disabled Change username button when the sign-in provider sets usernames. Keep the tone plain and specific.
+#: src/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection.tsx
+msgid "Your username comes from your sign-in provider."
+msgstr "Ditt användarnamn kommer från din inloggningsleverantör."
 
 #. Success toast after removing a community vanity invite URL.
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx

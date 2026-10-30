@@ -1581,6 +1581,11 @@ msgstr "{fifteenMinutes} minučių"
 msgid "{folderName} folder"
 msgstr "Aplankas {folderName}"
 
+#. Helper line under the role icon buttons in the community role editor. formats is a list of image types such as PNG, JPEG, WebP. minimumSize is an image size such as 32×32px. maxSize is a file size such as 256 KB.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "{formats}. At least {minimumSize}, up to {maxSize}."
+msgstr "{formats}. Ne mažiau kaip {minimumSize}, iki {maxSize}."
+
 #. Helper text in an asset upload source modal. formats is a formatted list of accepted file types; maxSize is a formatted file size; minimumSize is a minimum image size; aspectRatio is a formatted aspect ratio.
 #: src/features/expressions/utils/AssetUploadHintCopy.ts
 msgid "{formats}. Max {maxSize}. Minimum: {minimumSize} ({aspectRatio})"
@@ -4075,6 +4080,11 @@ msgstr "Po 14 dienų jūsų paskyra bus visam laikui ištrinta"
 msgid "After date"
 msgstr "Po datos"
 
+#. Shown above the single sign-on button when confirming it's you. Signing in can leave the page, and the person repeats the action afterwards.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "After you sign in, try the action again."
+msgstr "Prisijungęs pabandyk veiksmą dar kartą."
+
 #: src/features/auth/components/modals/AccountDeleteModal.tsx
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Ištrynus paskyrą, išsiųstų žinučių ištrinti nebegalėsite"
@@ -4771,7 +4781,9 @@ msgid "Animated icons are not supported when creating a new community. Use a sta
 msgstr "Animuotų piktogramų negalima naudoti kuriant naują bendruomenę. Naudokite statinį paveikslėlį."
 
 #. Description text in the edit group modal.
+#. Error under the role icon buttons when the picked image is animated.
 #: src/features/channel/components/modals/EditGroupModal.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Animated icons are not supported. Use a static image."
 msgstr "Animuotos piktogramos nepalaikomos. Naudokite statinį paveikslėlį."
 
@@ -8370,6 +8382,11 @@ msgstr "Pasirinkite foną"
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "Pasirinkite „guild_id“ arba „channel_id“, bet ne abu."
 
+#. Button in the role icon field that opens the emoji picker. Keep it short.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Choose emoji"
+msgstr "Pasirinkti jaustuką"
+
 #. Second install step on a Mac. File and Add to Dock are the names of the Safari menu items, use the names macOS shows in this language.
 #: src/features/app/domain_migration/DomainMovedStepsModal.tsx
 msgid "Choose File, then Add to Dock."
@@ -9899,6 +9916,11 @@ msgstr "Patvirtinimas arba dvigubas spustelėjimas prisijungiant prie bendruomen
 msgid "Conflicts with {conflictLabel}"
 msgstr "Kertasi su „{conflictLabel}“"
 
+#. Button in account settings that connects the account to single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Connect"
+msgstr "Susieti"
+
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 msgid "Connect a camera and try again."
 msgstr "Prijunkite kamerą ir bandykite dar kartą."
@@ -10152,7 +10174,11 @@ msgstr "Kontekstiniai meniu atidaromi kairiuoju pelės mygtuku (ant mygtukų) ar
 msgid "Continue"
 msgstr "Tęsti"
 
+#. Shown on the web page after an SSO sign-in that started in the mobile app. productName is the app name.
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Continue in the {productName} app."
+msgstr "Tęsk programėlėje {productName}."
+
 #: src/features/auth/flow/DesktopDeepLinkPrompt.tsx
 msgid "Continue in the desktop app."
 msgstr "Tęsti darbalaukio programėlėje."
@@ -10830,6 +10856,11 @@ msgstr "Nepavyko uždaryti tiesioginio pokalbio"
 #: src/features/auth/flow/auth_login_core/useDesktopHandoffFlow.ts
 msgid "Couldn't complete sign-in. Try again."
 msgstr "Nepavyko prisijungti. Bandykite dar kartą."
+
+#. Error title shown when starting to connect single sign-on from account settings fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Couldn't connect single sign-on"
+msgstr "Nepavyko susieti vienkartinio prisijungimo"
 
 #. Auth error shown when connecting to an instance fails, in the instance selector or when sign-in cannot reach the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -11770,6 +11801,11 @@ msgstr "Apkarpymo peržiūra"
 msgid "Crop profile banner"
 msgstr "Apkarpyti profilio reklamjuostę"
 
+#. Modal title for cropping a role icon before upload.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Crop role icon"
+msgstr "Apkarpyti vaidmens piktogramą"
+
 #. Error modal body shown when a cropped community image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #. Error modal body shown when a cropped image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/hooks/useGuildImageAssetField.tsx
@@ -11853,6 +11889,16 @@ msgstr "Dabartinis atitikmuo"
 #: src/features/voice/components/voice_connection_status/shared.ts
 msgid "Current ping:"
 msgstr "Dabartinis ping:"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an emoji, also read out after an emoji is picked. emojiName is the emoji short name such as :shield:. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, {emojiName}"
+msgstr "Dabartinė vaidmens piktograma, {emojiName}"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an uploaded image, also read out after an image is added. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, uploaded image"
+msgstr "Dabartinė vaidmens piktograma, įkeltas paveikslėlis"
 
 #: src/features/user/components/modals/tabs/DevicesTab.tsx
 msgid "Current session"
@@ -14172,6 +14218,11 @@ msgstr "Vilkite, kad pakeistumėte grupės piktogramos padėtį, ir priartinkite
 #: src/features/expressions/components/modals/AssetCropModal.tsx
 msgid "Drag to reposition your invite background and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels (16:9)."
 msgstr "Vilkite, kad pakeistumėte kvietimo fono padėtį, ir priartinkite pelės ratuku arba suglausdami pirštus. Rekomenduojamas minimalus dydis yra {minimumWidth}×{minimumHeight} pikselių (16:9)."
+
+#. Description in the role icon crop modal. minimumWidth and minimumHeight are pixel dimensions for the recommended image size.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Drag to reposition your role icon and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels."
+msgstr "Vilkite, kad pakeistumėte vaidmens piktogramos padėtį, ir priartinkite pelės ratuku arba suglausdami pirštus. Rekomenduojamas minimalus dydis yra {minimumWidth}×{minimumHeight} pikselių."
 
 #. Desktop setting description under the dark taskbar badge toggle on Windows.
 #: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
@@ -21065,6 +21116,11 @@ msgstr "Leidžia atkurti slaptažodį, jei jį pamiršite."
 #: src/features/permissions/system/components/MacPermissionPrompt.tsx
 msgid "Lets you share your screen or a window."
 msgstr "Leidžia bendrinti jūsų ekraną arba langą."
+
+#. Description of the account settings row that connects the account to the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Lets you sign in to this account with {providerName}."
+msgstr "Leidžia prisijungti prie šios paskyros per {providerName}."
 
 #: src/features/ui/components/form/UsernameValidationRules.tsx
 msgid "Letters (a-z, A-Z), numbers (0-9), and underscores (_) only"
@@ -29217,6 +29273,7 @@ msgstr "Pašalinti iš mėgstamiausių GIF (tik URL)"
 
 #: src/features/channel/components/modals/EditGroupModal.tsx
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateShared.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Remove icon"
 msgstr "Pašalinti piktogramą"
 
@@ -30553,6 +30610,16 @@ msgstr "Vaidmuo ištrintas"
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx
 msgid "Role deleted successfully"
 msgstr "Vaidmuo sėkmingai ištrintas"
+
+#. Label of the role icon field in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Role icon"
+msgstr "Vaidmens piktograma"
+
+#. Accessible label read by screen readers for the small icon next to a member name. roleName is the name of the community role the icon belongs to.
+#: src/features/guild/components/RoleIcon.tsx
+msgid "Role icon, {roleName}"
+msgstr "Vaidmens piktograma, {roleName}"
 
 #. Label of the role name input in the community role editor.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx
@@ -33614,6 +33681,11 @@ msgstr "Prisijungimo būdai"
 msgid "Sign-in page"
 msgstr "Prisijungimo puslapis"
 
+#. SSO callback page error shown when the person cancelled the sign-in at their sign-in provider.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Sign-in was cancelled."
+msgstr "Prisijungimas atšauktas."
+
 #. Aria label on the signal-strength icon shown while the first latency sample is still pending.
 #: src/features/voice/components/SignalStrengthIcon.tsx
 msgid "Signal strength loading"
@@ -33703,8 +33775,10 @@ msgstr "Vienas sluoksnis"
 msgid "Single line"
 msgstr "Viena eilutė"
 
-#. Heading of the single sign-on panel when the admin has not named the sign-in provider.
+#. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
+#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Single sign-on"
 msgstr "Vienkartinis prisijungimas"
 
@@ -37188,8 +37262,10 @@ msgstr "Šis failas yra {fileSize}, viršijantis {maxSize} limitą. Animuoti lip
 msgid "This file is larger than {size}. Choose a smaller one."
 msgstr "Šis failas didesnis nei {size}. Pasirinkite mažesnį."
 
+#. Error under the role icon buttons when the picked file has an unsupported type. formats is a list such as PNG, JPEG, WebP.
 #. Error when a branding image has an unsupported file type in the setup wizard. formats is a list such as PNG, JPEG, WebP.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "This file type is not supported. Supported types are {formats}."
 msgstr "Šis failo tipas nepalaikomas. Palaikomi tipai: {formats}."
 
@@ -37250,6 +37326,11 @@ msgstr "Šis perdavimo kodas nebegalioja. Norėdami tęsti, sugeneruokite naują
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
 msgid "This image could not be loaded after saving. Press \"Continue\" to try again, or choose a different file."
 msgstr "Nepavyko įkelti šio paveikslėlio po išsaugojimo. Paspauskite „Tęsti“, kad bandytumėte dar kartą, arba pasirinkite kitą failą."
+
+#. Error under the role icon buttons when the picked image or emoji could not be used.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "This image could not be loaded. Try another one."
+msgstr "Nepavyko įkelti šio paveikslėlio. Pabandykite kitą."
 
 #. Error modal body shown when an animated image fails to decode during cropping.
 #: src/features/messaging/components/modals/ImageCropModal.tsx
@@ -37350,6 +37431,8 @@ msgid "This is disabled"
 msgstr "Tai išjungta"
 
 #. Label in the messages tab.
+#. Sample message text in the role icon preview of the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/user/components/modals/tabs/appearance_tab/MessagesTab.tsx
 msgid "This is how messages appear"
 msgstr "Štai kaip atrodo žinutės"
@@ -39887,6 +39970,11 @@ msgstr "Įkelkite pasirinktinį garsą, kuris automatiškai leidžiamas, kai pri
 msgid "Upload a file"
 msgstr "Įkelti failą"
 
+#. Helper text under the role icon label in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload an image or pick an emoji. Members get the icon of their highest role that has one."
+msgstr "Įkelkite paveikslėlį arba pasirinkite jaustuką. Prie nario vardo rodoma aukščiausio jo vaidmens, turinčio piktogramą, piktograma."
+
 #: src/features/theme_settings/components/AssetsSection.tsx
 msgid "Upload assets"
 msgstr "Įkelti išteklius"
@@ -39948,6 +40036,7 @@ msgid "Upload icon"
 msgstr "Įkelti piktogramą"
 
 #. Button label for uploading a webhook avatar image.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Upload image"
 msgstr "Įkelti paveikslėlį"
@@ -39971,6 +40060,11 @@ msgstr "Įkelkite naujų jaustukų ir lipdukų bei tvarkykite savo kūrinius."
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx
 msgid "Upload preview frames for screen shares."
 msgstr "Įkelkite ekrano bendrinimo peržiūros kadrus."
+
+#. Accessible label of the empty role icon tile in the community role editor. Clicking it opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload role icon"
+msgstr "Įkelti vaidmens piktogramą"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
@@ -43201,6 +43295,11 @@ msgstr "Prisijungiate naudodami kodą, išsiųstą jūsų el. paštu. Slaptažod
 msgid "You sign in with this username. Pick one you will remember."
 msgstr "Prisijunkite naudodami šį vartotojo vardą. Pasirinkite tokį, kurį atsiminsite."
 
+#. Error shown when the person confirmed it's them by signing in to a different account than the one they are using.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "You signed in to a different account. Sign in with the account you're using here."
+msgstr "Prisijungei prie kitos paskyros. Prisijunk paskyra, kurią naudoji čia."
+
 #. Voice chat status tooltip for the current user. A moderator deafened them so they cannot hear voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
@@ -43568,6 +43667,11 @@ msgstr "Jūsų paskyra sėkmingai susieta. Dabar galite uždaryti šį skirtuką
 #: src/features/user/components/RecoveryKitReminderGate.tsx
 msgid "Your account has no email address. If you forget your password, a recovery kit is the only way back in. It only takes a minute."
 msgstr "Jūsų paskyroje nėra el. pašto adreso. Jei pamiršite slaptažodį, atsigavimo rinkinys yra vienintelis būdas grįžti. Tai užtruks tik minutę."
+
+#. Toast shown after the account was connected to single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your account is connected to single sign-on."
+msgstr "Tavo paskyra susieta su vienkartiniu prisijungimu."
 
 #. Settings alert for an unclaimed account on an instance where people sign in with a username.
 #: src/features/user/utils/AccountGatePresentation.tsx
@@ -43977,6 +44081,16 @@ msgstr "Jūsų privati erdvė mintims ir priminimams"
 msgid "Your profile privacy is limited, so some people still won't see this connection even when Everyone is enabled."
 msgstr "Jūsų profilio privatumas yra ribotas, todėl net jei nustatyta „Visi“, kai kurie žmonės vis tiek nematys šio ryšio."
 
+#. SSO callback page error shown when the sign-in provider asks the person to sign in or give consent again.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider needs you to sign in again."
+msgstr "Tavo teikėjas prašo prisijungti iš naujo."
+
+#. SSO callback page error shown when the sign-in provider sent back any other error.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider reported an error."
+msgstr "Tavo teikėjas pranešė apie klaidą."
+
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/components/settings_utils/search_index/GiftInventoryIndex.ts
 msgid "Your purchased gifts"
@@ -44017,6 +44131,16 @@ msgstr "Jūsų ekrano bendrinimas negalėjo būti paskelbtas naudojant suderinam
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "Your setup token stopped working. Enter it again."
 msgstr "Jūsų sąrankos žetonas nebeveikia. Įveskite jį dar kartą."
+
+#. Explanation shown in place of the single sign-on description when the instance requires single sign-on but cannot connect to its sign-in provider right now.
+#: src/features/auth/flow/AuthSsoPanel.tsx
+msgid "Your sign-in provider is unavailable. Try again later."
+msgstr "Tavo prisijungimo teikėjas nepasiekiamas. Bandyk dar kartą vėliau."
+
+#. Description of the password row in account settings when the instance requires single sign-on and the sign-in provider manages the account's email and password.
+#: src/features/user/components/modals/tabs/account_security_tab/AccountTab.tsx
+msgid "Your sign-in provider manages your email and password."
+msgstr "Tavo el. paštą ir slaptažodį tvarko tavo prisijungimo teikėjas."
 
 #. Subtitle under the preview-paused overlay reassuring the user that the screen share is still live for others.
 #: src/features/voice/components/voice_participant_tile/shared.ts
@@ -44110,6 +44234,11 @@ msgstr "Jūsų temos CSS per didelis, kad būtų galima bendrinti. Apkarpykite j
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Your themes"
 msgstr "Jūsų temos"
+
+#. Tooltip on the disabled Change username button when the sign-in provider sets usernames. Keep the tone plain and specific.
+#: src/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection.tsx
+msgid "Your username comes from your sign-in provider."
+msgstr "Tavo naudotojo vardą nustato tavo prisijungimo teikėjas."
 
 #. Success toast after removing a community vanity invite URL.
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx

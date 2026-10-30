@@ -545,6 +545,11 @@ const SsoConfigResponse = z.object({
 	scope: z.string().nullable(),
 	allowed_domains: SsoAllowedDomainsSchema,
 	auto_provision: z.boolean(),
+	username_from_provider: z
+		.boolean()
+		.describe(
+			"Each SSO sign-in sets the username from the provider, and people can't change it in Fluxer. Only on username instances",
+		),
 	redirect_uri: z.string().nullable(),
 	groups_claim: SsoGroupsClaimSchema.nullable(),
 	group_role_mappings: SsoGroupRoleMappingsSchema,
@@ -828,6 +833,9 @@ export const InstanceConfigResponse = z.object({
 	media: InstanceMediaResponse,
 	billing: InstanceBillingResponse,
 	notice: InstanceNoticeSchema.nullable().describe('Notice shown to everyone on the instance, or null'),
+	warnings: z
+		.array(z.string())
+		.describe('Problems the save found that did not stop it. Always empty outside a save response'),
 });
 
 export type InstanceConfigResponse = z.infer<typeof InstanceConfigResponse>;
@@ -905,8 +913,20 @@ export const InstanceConfigUpdateRequest = z.object({
 			scope: z.string().nullish(),
 			allowed_domains: SsoAllowedDomainsSchema.optional(),
 			auto_provision: z.boolean().optional(),
+			username_from_provider: z
+				.boolean()
+				.optional()
+				.describe(
+					"Each SSO sign-in sets the username from the provider, and people can't change it in Fluxer. Only on username instances",
+				),
 			groups_claim: SsoGroupsClaimSchema.nullish(),
 			group_role_mappings: SsoGroupRoleMappingsSchema.optional(),
+			migrate_identities: z
+				.boolean()
+				.optional()
+				.describe(
+					'Only for a save that changes the issuer while accounts are linked to the old one. True moves those links to the new issuer, false leaves them on the old one. Applies to this save only and is never stored',
+				),
 		})
 		.nullish(),
 	app_public: AppPublicConfigUpdateRequest.nullish(),
@@ -1526,6 +1546,8 @@ const AdminGuildRoleSummarySchema = z.object({
 	permissions: PermissionStringType.describe('The role permissions bitfield'),
 	hoist: z.boolean(),
 	mentionable: z.boolean(),
+	icon: z.string().nullable().describe('The hash of the role icon image, or null'),
+	unicode_emoji: z.string().nullable().describe('The Unicode emoji used as the role icon, or null'),
 });
 const AdminLookupGuildSchema = z.object({
 	id: SnowflakeStringType,

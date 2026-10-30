@@ -1971,10 +1971,12 @@ type IdentifierFirstModeSchema string
 type InstanceBillingResponse struct {
 	AutomaticTax                  *bool                               `json:"automatic_tax"`
 	BillingActive                 bool                                `json:"billing_active"`
+	BillingEmails                 *bool                               `json:"billing_emails"`
 	CatalogMode                   BillingCatalogModeSchema            `json:"catalog_mode"`
 	CountryCurrencies             *map[string]string                  `json:"country_currencies"`
 	DefaultCurrency               *PremiumCurrency                    `json:"default_currency"`
 	EffectiveAutomaticTax         bool                                `json:"effective_automatic_tax"`
+	EffectiveBillingEmails        bool                                `json:"effective_billing_emails"`
 	EffectiveEnabled              bool                                `json:"effective_enabled"`
 	EffectiveTaxIdCollection      bool                                `json:"effective_tax_id_collection"`
 	EffectiveTermsConsentRequired bool                                `json:"effective_terms_consent_required"`
@@ -1994,6 +1996,7 @@ type InstanceBillingResponse struct {
 // InstanceBillingUpdateRequest defines model for InstanceBillingUpdateRequest.
 type InstanceBillingUpdateRequest struct {
 	AutomaticTax         *bool                                    `json:"automatic_tax,omitempty"`
+	BillingEmails        *bool                                    `json:"billing_emails,omitempty"`
 	CountryCurrencies    *BillingCountryCurrenciesSchema          `json:"country_currencies,omitempty"`
 	DefaultCurrency      *PremiumCurrency                         `json:"default_currency,omitempty"`
 	Enabled              *bool                                    `json:"enabled,omitempty"`
@@ -2232,8 +2235,14 @@ type InstanceConfigResponse struct {
 		Scope       *string `json:"scope"`
 		TokenUrl    *string `json:"token_url"`
 		UserinfoUrl *string `json:"userinfo_url"`
+
+		// UsernameFromProvider Each SSO sign-in sets the username from the provider, and people can't change it in Fluxer. Only on username instances
+		UsernameFromProvider bool `json:"username_from_provider"`
 	} `json:"sso"`
 	VoiceP2p VoiceP2pConfigResponse `json:"voice_p2p"`
+
+	// Warnings Problems the save found that did not stop it. Always empty outside a save response
+	Warnings []string `json:"warnings"`
 }
 
 // InstanceConfigResponseIntegrationsEmailEffectiveProvider Deprecated, use delivery
@@ -2423,9 +2432,15 @@ type InstanceConfigUpdateRequest struct {
 		GroupsClaim *string `json:"groups_claim,omitempty"`
 		Issuer      *string `json:"issuer,omitempty"`
 		JwksUrl     *string `json:"jwks_url,omitempty"`
-		Scope       *string `json:"scope,omitempty"`
-		TokenUrl    *string `json:"token_url,omitempty"`
-		UserinfoUrl *string `json:"userinfo_url,omitempty"`
+
+		// MigrateIdentities Only for a save that changes the issuer while accounts are linked to the old one. True moves those links to the new issuer, false leaves them on the old one. Applies to this save only and is never stored
+		MigrateIdentities *bool   `json:"migrate_identities,omitempty"`
+		Scope             *string `json:"scope,omitempty"`
+		TokenUrl          *string `json:"token_url,omitempty"`
+		UserinfoUrl       *string `json:"userinfo_url,omitempty"`
+
+		// UsernameFromProvider Each SSO sign-in sets the username from the provider, and people can't change it in Fluxer. Only on username instances
+		UsernameFromProvider *bool `json:"username_from_provider,omitempty"`
 	} `json:"sso,omitempty"`
 	VoiceP2p *VoiceP2pConfigUpdateRequest `json:"voice_p2p,omitempty"`
 }

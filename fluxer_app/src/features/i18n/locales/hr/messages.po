@@ -1581,6 +1581,11 @@ msgstr "{fifteenMinutes} minuta"
 msgid "{folderName} folder"
 msgstr "Mapa {folderName}"
 
+#. Helper line under the role icon buttons in the community role editor. formats is a list of image types such as PNG, JPEG, WebP. minimumSize is an image size such as 32×32px. maxSize is a file size such as 256 KB.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "{formats}. At least {minimumSize}, up to {maxSize}."
+msgstr "{formats}. Najmanje {minimumSize}, najviše {maxSize}."
+
 #. Helper text in an asset upload source modal. formats is a formatted list of accepted file types; maxSize is a formatted file size; minimumSize is a minimum image size; aspectRatio is a formatted aspect ratio.
 #: src/features/expressions/utils/AssetUploadHintCopy.ts
 msgid "{formats}. Max {maxSize}. Minimum: {minimumSize} ({aspectRatio})"
@@ -4075,6 +4080,11 @@ msgstr "Nakon 14 dana vaš će račun biti trajno izbrisan"
 msgid "After date"
 msgstr "Nakon datuma"
 
+#. Shown above the single sign-on button when confirming it's you. Signing in can leave the page, and the person repeats the action afterwards.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "After you sign in, try the action again."
+msgstr "Nakon prijave ponovno pokušaj radnju."
+
 #: src/features/auth/components/modals/AccountDeleteModal.tsx
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Nakon brisanja računa više nećete moći izbrisati poruke koje ste poslali"
@@ -4771,7 +4781,9 @@ msgid "Animated icons are not supported when creating a new community. Use a sta
 msgstr "Animirane ikone nisu podržane prilikom stvaranja nove zajednice. Koristite statičnu sliku."
 
 #. Description text in the edit group modal.
+#. Error under the role icon buttons when the picked image is animated.
 #: src/features/channel/components/modals/EditGroupModal.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Animated icons are not supported. Use a static image."
 msgstr "Animirane ikone nisu podržane. Koristite statičnu sliku."
 
@@ -8370,6 +8382,11 @@ msgstr "Odaberite pozadinu"
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "Odaberite guild_id ili channel_id, ne oboje."
 
+#. Button in the role icon field that opens the emoji picker. Keep it short.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Choose emoji"
+msgstr "Odaberi emoji"
+
 #. Second install step on a Mac. File and Add to Dock are the names of the Safari menu items, use the names macOS shows in this language.
 #: src/features/app/domain_migration/DomainMovedStepsModal.tsx
 msgid "Choose File, then Add to Dock."
@@ -9899,6 +9916,11 @@ msgstr "Potvrda ili dvostruki klik za pridruživanje glasovnim kanalima zajednic
 msgid "Conflicts with {conflictLabel}"
 msgstr "U sukobu s {conflictLabel}"
 
+#. Button in account settings that connects the account to single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Connect"
+msgstr "Poveži"
+
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 msgid "Connect a camera and try again."
 msgstr "Povežite kameru i pokušajte ponovno."
@@ -10152,7 +10174,11 @@ msgstr "Kontekstni izbornici mogu se otvoriti lijevim klikom (na gumbe) ili desn
 msgid "Continue"
 msgstr "Nastavi"
 
+#. Shown on the web page after an SSO sign-in that started in the mobile app. productName is the app name.
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Continue in the {productName} app."
+msgstr "Nastavi u aplikaciji {productName}."
+
 #: src/features/auth/flow/DesktopDeepLinkPrompt.tsx
 msgid "Continue in the desktop app."
 msgstr "Nastavi u desktop aplikaciji."
@@ -10830,6 +10856,11 @@ msgstr "Nije moguće zatvoriti izravnu poruku"
 #: src/features/auth/flow/auth_login_core/useDesktopHandoffFlow.ts
 msgid "Couldn't complete sign-in. Try again."
 msgstr "Nije moguće dovršiti prijavu. Pokušajte ponovno."
+
+#. Error title shown when starting to connect single sign-on from account settings fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Couldn't connect single sign-on"
+msgstr "Jedinstvenu prijavu nije moguće povezati"
 
 #. Auth error shown when connecting to an instance fails, in the instance selector or when sign-in cannot reach the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -11770,6 +11801,11 @@ msgstr "Pretpregled obrezivanja"
 msgid "Crop profile banner"
 msgstr "Obreži naslovnu sliku profila"
 
+#. Modal title for cropping a role icon before upload.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Crop role icon"
+msgstr "Obreži ikonu uloge"
+
 #. Error modal body shown when a cropped community image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #. Error modal body shown when a cropped image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/hooks/useGuildImageAssetField.tsx
@@ -11853,6 +11889,16 @@ msgstr "Trenutno podudaranje"
 #: src/features/voice/components/voice_connection_status/shared.ts
 msgid "Current ping:"
 msgstr "Trenutni ping:"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an emoji, also read out after an emoji is picked. emojiName is the emoji short name such as :shield:. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, {emojiName}"
+msgstr "Trenutačna ikona uloge, {emojiName}"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an uploaded image, also read out after an image is added. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, uploaded image"
+msgstr "Trenutačna ikona uloge, učitana slika"
 
 #: src/features/user/components/modals/tabs/DevicesTab.tsx
 msgid "Current session"
@@ -14172,6 +14218,11 @@ msgstr "Povucite za premještanje ikone grupe i koristite kotačić miša ili pr
 #: src/features/expressions/components/modals/AssetCropModal.tsx
 msgid "Drag to reposition your invite background and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels (16:9)."
 msgstr "Povucite za premještanje pozadine pozivnice i koristite kotačić miša ili prste za zumiranje. Preporučena minimalna veličina je {minimumWidth}×{minimumHeight} piksela (16:9)."
+
+#. Description in the role icon crop modal. minimumWidth and minimumHeight are pixel dimensions for the recommended image size.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Drag to reposition your role icon and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels."
+msgstr "Povucite za premještanje ikone uloge i koristite kotačić miša ili prste za zumiranje. Preporučena minimalna veličina je {minimumWidth}×{minimumHeight} piksela."
 
 #. Desktop setting description under the dark taskbar badge toggle on Windows.
 #: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
@@ -21064,6 +21115,11 @@ msgstr "Omogućuje vam poništavanje lozinke ako je zaboravite."
 #: src/features/permissions/system/components/MacPermissionPrompt.tsx
 msgid "Lets you share your screen or a window."
 msgstr "Omogućuje dijeljenje zaslona ili prozora."
+
+#. Description of the account settings row that connects the account to the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Lets you sign in to this account with {providerName}."
+msgstr "Omogućuje ti prijavu u ovaj račun putem {providerName}."
 
 #: src/features/ui/components/form/UsernameValidationRules.tsx
 msgid "Letters (a-z, A-Z), numbers (0-9), and underscores (_) only"
@@ -29216,6 +29272,7 @@ msgstr "Ukloni iz favorita GIF-ova pohranjenih putem URL-a"
 
 #: src/features/channel/components/modals/EditGroupModal.tsx
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateShared.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Remove icon"
 msgstr "Ukloni ikonu"
 
@@ -30552,6 +30609,16 @@ msgstr "Uloga izbrisana"
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx
 msgid "Role deleted successfully"
 msgstr "Uloga je uspješno izbrisana"
+
+#. Label of the role icon field in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Role icon"
+msgstr "Ikona uloge"
+
+#. Accessible label read by screen readers for the small icon next to a member name. roleName is the name of the community role the icon belongs to.
+#: src/features/guild/components/RoleIcon.tsx
+msgid "Role icon, {roleName}"
+msgstr "Ikona uloge, {roleName}"
 
 #. Label of the role name input in the community role editor.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx
@@ -33613,6 +33680,11 @@ msgstr "Nač"
 msgid "Sign-in page"
 msgstr "Stranica za prijavu"
 
+#. SSO callback page error shown when the person cancelled the sign-in at their sign-in provider.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Sign-in was cancelled."
+msgstr "Prijava je otkazana."
+
 #. Aria label on the signal-strength icon shown while the first latency sample is still pending.
 #: src/features/voice/components/SignalStrengthIcon.tsx
 msgid "Signal strength loading"
@@ -33702,8 +33774,10 @@ msgstr "Jednoslojno"
 msgid "Single line"
 msgstr "Jedan redak"
 
-#. Heading of the single sign-on panel when the admin has not named the sign-in provider.
+#. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
+#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Single sign-on"
 msgstr "Jedinstvena prijava"
 
@@ -37187,8 +37261,10 @@ msgstr "Ova datoteka ima {fileSize}, što je iznad ograničenja od {maxSize}. An
 msgid "This file is larger than {size}. Choose a smaller one."
 msgstr "Ova je datoteka veća od {size}. Odaberite manju."
 
+#. Error under the role icon buttons when the picked file has an unsupported type. formats is a list such as PNG, JPEG, WebP.
 #. Error when a branding image has an unsupported file type in the setup wizard. formats is a list such as PNG, JPEG, WebP.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "This file type is not supported. Supported types are {formats}."
 msgstr "Ova vrsta datoteke nije podržana. Podržane vrste su {formats}."
 
@@ -37249,6 +37325,11 @@ msgstr "Ovaj je kod za prijenos istekao. Generirajte novi za nastavak."
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
 msgid "This image could not be loaded after saving. Press \"Continue\" to try again, or choose a different file."
 msgstr "Ova se slika nije mogla učitati nakon spremanja. Pritisni \"Nastavi\" za ponovni pokušaj ili odaberi drugu datoteku."
+
+#. Error under the role icon buttons when the picked image or emoji could not be used.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "This image could not be loaded. Try another one."
+msgstr "Ova se slika nije mogla učitati. Pokušajte s drugom."
 
 #. Error modal body shown when an animated image fails to decode during cropping.
 #: src/features/messaging/components/modals/ImageCropModal.tsx
@@ -37349,6 +37430,8 @@ msgid "This is disabled"
 msgstr "Ovo je onemogućeno"
 
 #. Label in the messages tab.
+#. Sample message text in the role icon preview of the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/user/components/modals/tabs/appearance_tab/MessagesTab.tsx
 msgid "This is how messages appear"
 msgstr "Ovako izgledaju poruke"
@@ -39886,6 +39969,11 @@ msgstr "Učitajte prilagođeni zvuk koji se automatski reproducira kada se pridr
 msgid "Upload a file"
 msgstr "Učitaj datoteku"
 
+#. Helper text under the role icon label in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload an image or pick an emoji. Members get the icon of their highest role that has one."
+msgstr "Učitajte sliku ili odaberite emoji. Uz ime člana prikazuje se ikona njegove najviše uloge koja ima ikonu."
+
 #: src/features/theme_settings/components/AssetsSection.tsx
 msgid "Upload assets"
 msgstr "Učitaj resurse"
@@ -39947,6 +40035,7 @@ msgid "Upload icon"
 msgstr "Učitaj ikonu"
 
 #. Button label for uploading a webhook avatar image.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Upload image"
 msgstr "Učitaj sliku"
@@ -39970,6 +40059,11 @@ msgstr "Prenesite nove emojije i naljepnice te upravljajte vlastitim kreacijama.
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx
 msgid "Upload preview frames for screen shares."
 msgstr "Prenosi slike pregleda za dijeljenje zaslona."
+
+#. Accessible label of the empty role icon tile in the community role editor. Clicking it opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload role icon"
+msgstr "Učitaj ikonu uloge"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
@@ -43200,6 +43294,11 @@ msgstr "Prijavljujete se kodom poslanim na vašu e-poštu. Lozinka nije obavezna
 msgid "You sign in with this username. Pick one you will remember."
 msgstr "Prijavljuješ se ovim korisničkim imenom. Odaberi ono kojeg ćeš se sjetiti."
 
+#. Error shown when the person confirmed it's them by signing in to a different account than the one they are using.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "You signed in to a different account. Sign in with the account you're using here."
+msgstr "Prijavio si se na drugi račun. Prijavi se računom koji ovdje koristiš."
+
 #. Voice chat status tooltip for the current user. A moderator deafened them so they cannot hear voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
@@ -43567,6 +43666,11 @@ msgstr "Vaš je račun uspješno povezan. Sada možete zatvoriti ovu karticu i v
 #: src/features/user/components/RecoveryKitReminderGate.tsx
 msgid "Your account has no email address. If you forget your password, a recovery kit is the only way back in. It only takes a minute."
 msgstr "Tvoj račun nema pridruženu e-adresu. Ako zaboraviš lozinku, komplet za oporavak jedini je način da se vratiš. Potrebna je samo minuta."
+
+#. Toast shown after the account was connected to single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your account is connected to single sign-on."
+msgstr "Tvoj je račun povezan s jedinstvenom prijavom."
 
 #. Settings alert for an unclaimed account on an instance where people sign in with a username.
 #: src/features/user/utils/AccountGatePresentation.tsx
@@ -43976,6 +44080,16 @@ msgstr "Vaš privatni prostor za misli i podsjetnike"
 msgid "Your profile privacy is limited, so some people still won't see this connection even when Everyone is enabled."
 msgstr "Vaše postavke privatnosti profila su ograničene, pa čak i kada je odabrano \"Svi\", neki ljudi neće vidjeti ovu vezu."
 
+#. SSO callback page error shown when the sign-in provider asks the person to sign in or give consent again.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider needs you to sign in again."
+msgstr "Tvoj pružatelj traži da se ponovno prijaviš."
+
+#. SSO callback page error shown when the sign-in provider sent back any other error.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider reported an error."
+msgstr "Tvoj pružatelj prijavio je pogrešku."
+
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/components/settings_utils/search_index/GiftInventoryIndex.ts
 msgid "Your purchased gifts"
@@ -44016,6 +44130,16 @@ msgstr "Vaše dijeljenje zaslona nije se moglo objaviti s kompatibilnim video ko
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "Your setup token stopped working. Enter it again."
 msgstr "Vaš token za postavljanje više ne radi. Unesite ga ponovno."
+
+#. Explanation shown in place of the single sign-on description when the instance requires single sign-on but cannot connect to its sign-in provider right now.
+#: src/features/auth/flow/AuthSsoPanel.tsx
+msgid "Your sign-in provider is unavailable. Try again later."
+msgstr "Tvoj davatelj prijave nije dostupan. Pokušaj ponovno kasnije."
+
+#. Description of the password row in account settings when the instance requires single sign-on and the sign-in provider manages the account's email and password.
+#: src/features/user/components/modals/tabs/account_security_tab/AccountTab.tsx
+msgid "Your sign-in provider manages your email and password."
+msgstr "Tvoj davatelj prijave upravlja tvojom e-poštom i lozinkom."
 
 #. Subtitle under the preview-paused overlay reassuring the user that the screen share is still live for others.
 #: src/features/voice/components/voice_participant_tile/shared.ts
@@ -44109,6 +44233,11 @@ msgstr "CSS vaše teme je prevelik za dijeljenje. Smanjite ga i pokušajte ponov
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Your themes"
 msgstr "Tvoje teme"
+
+#. Tooltip on the disabled Change username button when the sign-in provider sets usernames. Keep the tone plain and specific.
+#: src/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection.tsx
+msgid "Your username comes from your sign-in provider."
+msgstr "Tvoje korisničko ime dolazi od tvog davatelja prijave."
 
 #. Success toast after removing a community vanity invite URL.
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx

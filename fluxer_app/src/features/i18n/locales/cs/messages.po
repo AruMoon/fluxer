@@ -1581,6 +1581,11 @@ msgstr "{fifteenMinutes} minut"
 msgid "{folderName} folder"
 msgstr "Složka {folderName}"
 
+#. Helper line under the role icon buttons in the community role editor. formats is a list of image types such as PNG, JPEG, WebP. minimumSize is an image size such as 32×32px. maxSize is a file size such as 256 KB.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "{formats}. At least {minimumSize}, up to {maxSize}."
+msgstr "{formats}. Alespoň {minimumSize}, nejvýše {maxSize}."
+
 #. Helper text in an asset upload source modal. formats is a formatted list of accepted file types; maxSize is a formatted file size; minimumSize is a minimum image size; aspectRatio is a formatted aspect ratio.
 #: src/features/expressions/utils/AssetUploadHintCopy.ts
 msgid "{formats}. Max {maxSize}. Minimum: {minimumSize} ({aspectRatio})"
@@ -4075,6 +4080,11 @@ msgstr "Po 14 dnech bude váš účet trvale smazán"
 msgid "After date"
 msgstr "Po datu"
 
+#. Shown above the single sign-on button when confirming it's you. Signing in can leave the page, and the person repeats the action afterwards.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "After you sign in, try the action again."
+msgstr "Po přihlášení zkus akci znovu."
+
 #: src/features/auth/components/modals/AccountDeleteModal.tsx
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Po smazání účtu už nebudete moci smazat zprávy, které jste odeslali"
@@ -4771,7 +4781,9 @@ msgid "Animated icons are not supported when creating a new community. Use a sta
 msgstr "Animované ikony nejsou podporovány při vytváření nové komunity. Použijte statický obrázek."
 
 #. Description text in the edit group modal.
+#. Error under the role icon buttons when the picked image is animated.
 #: src/features/channel/components/modals/EditGroupModal.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Animated icons are not supported. Use a static image."
 msgstr "Animované ikony nejsou podporovány. Použijte statický obrázek."
 
@@ -8370,6 +8382,11 @@ msgstr "Vybrat pozadí"
 msgid "Choose either guild_id or channel_id, not both."
 msgstr "Zvolte buď guild_id, nebo channel_id, ne obojí."
 
+#. Button in the role icon field that opens the emoji picker. Keep it short.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Choose emoji"
+msgstr "Vybrat emoji"
+
 #. Second install step on a Mac. File and Add to Dock are the names of the Safari menu items, use the names macOS shows in this language.
 #: src/features/app/domain_migration/DomainMovedStepsModal.tsx
 msgid "Choose File, then Add to Dock."
@@ -9899,6 +9916,11 @@ msgstr "Potvrzení nebo dvojité kliknutí pro připojení k hlasovým kanálům
 msgid "Conflicts with {conflictLabel}"
 msgstr "V konfliktu s {conflictLabel}"
 
+#. Button in account settings that connects the account to single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Connect"
+msgstr "Propojit"
+
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 msgid "Connect a camera and try again."
 msgstr "Připojte kameru a zkuste to znovu."
@@ -10152,7 +10174,11 @@ msgstr "Kontextové nabídky lze otevřít levým kliknutím (na tlačítka) neb
 msgid "Continue"
 msgstr "Pokračovat"
 
+#. Shown on the web page after an SSO sign-in that started in the mobile app. productName is the app name.
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Continue in the {productName} app."
+msgstr "Pokračuj v aplikaci {productName}."
+
 #: src/features/auth/flow/DesktopDeepLinkPrompt.tsx
 msgid "Continue in the desktop app."
 msgstr "Pokračovat v desktopové aplikaci."
@@ -10830,6 +10856,11 @@ msgstr "Nepodařilo se zavřít soukromou konverzaci"
 #: src/features/auth/flow/auth_login_core/useDesktopHandoffFlow.ts
 msgid "Couldn't complete sign-in. Try again."
 msgstr "Přihlášení se nepodařilo dokončit. Zkuste to znovu."
+
+#. Error title shown when starting to connect single sign-on from account settings fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Couldn't connect single sign-on"
+msgstr "Jednotné přihlášení se nepodařilo propojit"
 
 #. Auth error shown when connecting to an instance fails, in the instance selector or when sign-in cannot reach the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -11770,6 +11801,11 @@ msgstr "Náhled ořezu"
 msgid "Crop profile banner"
 msgstr "Oříznout banner profilu"
 
+#. Modal title for cropping a role icon before upload.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Crop role icon"
+msgstr "Oříznout ikonu role"
+
 #. Error modal body shown when a cropped community image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #. Error modal body shown when a cropped image still exceeds the size limit. {maxSizeLabel} is a formatted file size.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/hooks/useGuildImageAssetField.tsx
@@ -11853,6 +11889,16 @@ msgstr "Aktuální výskyt"
 #: src/features/voice/components/voice_connection_status/shared.ts
 msgid "Current ping:"
 msgstr "Aktuální odezva:"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an emoji, also read out after an emoji is picked. emojiName is the emoji short name such as :shield:. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, {emojiName}"
+msgstr "Aktuální ikona role, {emojiName}"
+
+#. Accessible label of the role icon tile in the community role editor when the icon is an uploaded image, also read out after an image is added. Clicking the tile opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Current role icon, uploaded image"
+msgstr "Aktuální ikona role, nahraný obrázek"
 
 #: src/features/user/components/modals/tabs/DevicesTab.tsx
 msgid "Current session"
@@ -14172,6 +14218,11 @@ msgstr "Přetažením změňte polohu ikony skupiny. Kolečkem myši nebo gestem
 #: src/features/expressions/components/modals/AssetCropModal.tsx
 msgid "Drag to reposition your invite background and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels (16:9)."
 msgstr "Přetažením změňte polohu pozadí pozvánky. Kolečkem myši nebo gestem dvěma prsty upravte přiblížení. Doporučené minimální rozměry jsou {minimumWidth} × {minimumHeight} pixelů (16:9)."
+
+#. Description in the role icon crop modal. minimumWidth and minimumHeight are pixel dimensions for the recommended image size.
+#: src/features/expressions/components/modals/AssetCropModal.tsx
+msgid "Drag to reposition your role icon and use the scroll wheel or pinch to zoom. The recommended minimum size is {minimumWidth}×{minimumHeight} pixels."
+msgstr "Přetažením změňte polohu ikony role. Kolečkem myši nebo gestem dvěma prsty upravte přiblížení. Doporučené minimální rozměry jsou {minimumWidth} × {minimumHeight} pixelů."
 
 #. Desktop setting description under the dark taskbar badge toggle on Windows.
 #: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
@@ -21064,6 +21115,11 @@ msgstr "Umožňuje resetovat heslo, pokud ho zapomenete."
 #: src/features/permissions/system/components/MacPermissionPrompt.tsx
 msgid "Lets you share your screen or a window."
 msgstr "Umožňuje sdílet obrazovku nebo okno."
+
+#. Description of the account settings row that connects the account to the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "Lets you sign in to this account with {providerName}."
+msgstr "Umožní ti přihlásit se k tomuto účtu přes {providerName}."
 
 #: src/features/ui/components/form/UsernameValidationRules.tsx
 msgid "Letters (a-z, A-Z), numbers (0-9), and underscores (_) only"
@@ -29216,6 +29272,7 @@ msgstr "Odebrat z oblíbených GIFů uložených pouze jako URL"
 
 #: src/features/channel/components/modals/EditGroupModal.tsx
 #: src/features/guild/components/modals/add_guild_modal/GuildCreateShared.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "Remove icon"
 msgstr "Odebrat ikonu"
 
@@ -30552,6 +30609,16 @@ msgstr "Role smazána"
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx
 msgid "Role deleted successfully"
 msgstr "Role úspěšně smazána"
+
+#. Label of the role icon field in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Role icon"
+msgstr "Ikona role"
+
+#. Accessible label read by screen readers for the small icon next to a member name. roleName is the name of the community role the icon belongs to.
+#: src/features/guild/components/RoleIcon.tsx
+msgid "Role icon, {roleName}"
+msgstr "Ikona role, {roleName}"
 
 #. Label of the role name input in the community role editor.
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx
@@ -33613,6 +33680,11 @@ msgstr "Metody přihlášení"
 msgid "Sign-in page"
 msgstr "Přihlašovací stránka"
 
+#. SSO callback page error shown when the person cancelled the sign-in at their sign-in provider.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Sign-in was cancelled."
+msgstr "Přihlášení bylo zrušeno."
+
 #. Aria label on the signal-strength icon shown while the first latency sample is still pending.
 #: src/features/voice/components/SignalStrengthIcon.tsx
 msgid "Signal strength loading"
@@ -33702,8 +33774,10 @@ msgstr "Jedna vrstva"
 msgid "Single line"
 msgstr "Jeden řádek"
 
-#. Heading of the single sign-on panel when the admin has not named the sign-in provider.
+#. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
+#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Single sign-on"
 msgstr "Jednotné přihlášení"
 
@@ -37187,8 +37261,10 @@ msgstr "Tento soubor má velikost {fileSize}, což překračuje limit {maxSize}.
 msgid "This file is larger than {size}. Choose a smaller one."
 msgstr "Tento soubor je větší než {size}. Vyberte menší."
 
+#. Error under the role icon buttons when the picked file has an unsupported type. formats is a list such as PNG, JPEG, WebP.
 #. Error when a branding image has an unsupported file type in the setup wizard. formats is a list such as PNG, JPEG, WebP.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 msgid "This file type is not supported. Supported types are {formats}."
 msgstr "Tento typ souboru není podporován. Podporované typy jsou {formats}."
 
@@ -37249,6 +37325,11 @@ msgstr "Tento kód pro předání vypršel. Vygenerujte si nový, abyste mohli p
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
 msgid "This image could not be loaded after saving. Press \"Continue\" to try again, or choose a different file."
 msgstr "Tento obrázek se po uložení nepodařilo načíst. Stiskněte „Pokračovat“ pro opakování, nebo vyberte jiný soubor."
+
+#. Error under the role icon buttons when the picked image or emoji could not be used.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "This image could not be loaded. Try another one."
+msgstr "Tento obrázek se nepodařilo načíst. Zkuste jiný."
 
 #. Error modal body shown when an animated image fails to decode during cropping.
 #: src/features/messaging/components/modals/ImageCropModal.tsx
@@ -37349,6 +37430,8 @@ msgid "This is disabled"
 msgstr "Toto je zakázáno"
 
 #. Label in the messages tab.
+#. Sample message text in the role icon preview of the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/user/components/modals/tabs/appearance_tab/MessagesTab.tsx
 msgid "This is how messages appear"
 msgstr "Takto se zobrazují zprávy"
@@ -39886,6 +39969,11 @@ msgstr "Nahrajte vlastní zvuk, který se automaticky přehraje při připojení
 msgid "Upload a file"
 msgstr "Nahrát soubor"
 
+#. Helper text under the role icon label in the community role editor.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload an image or pick an emoji. Members get the icon of their highest role that has one."
+msgstr "Nahrajte obrázek nebo vyberte emoji. Vedle jména člena se zobrazí ikona jeho nejvyšší role, která ikonu má."
+
 #: src/features/theme_settings/components/AssetsSection.tsx
 msgid "Upload assets"
 msgstr "Nahrát soubory"
@@ -39947,6 +40035,7 @@ msgid "Upload icon"
 msgstr "Nahrát ikonu"
 
 #. Button label for uploading a webhook avatar image.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Upload image"
 msgstr "Nahrát obrázek"
@@ -39970,6 +40059,11 @@ msgstr "Nahrávat nová emoji a samolepky a spravovat vlastní výtvory."
 #: src/features/voice/components/modals/ScreenSharePickerModal.tsx
 msgid "Upload preview frames for screen shares."
 msgstr "Nahrávat snímky náhledů sdílených obrazovek."
+
+#. Accessible label of the empty role icon tile in the community role editor. Clicking it opens the file picker.
+#: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleIconField.tsx
+msgid "Upload role icon"
+msgstr "Nahrát ikonu role"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
@@ -43200,6 +43294,11 @@ msgstr "Přihlašujete se kódem zaslaným na váš e-mail. Heslo je volitelné.
 msgid "You sign in with this username. Pick one you will remember."
 msgstr "Přihlašujete se tímto uživatelským jménem. Vyberte si takové, které si zapamatujete."
 
+#. Error shown when the person confirmed it's them by signing in to a different account than the one they are using.
+#: src/features/auth/components/modals/SudoSsoReauth.tsx
+msgid "You signed in to a different account. Sign in with the account you're using here."
+msgstr "Přihlásil ses k jinému účtu. Přihlas se účtem, který tu používáš."
+
 #. Voice chat status tooltip for the current user. A moderator deafened them so they cannot hear voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
@@ -43567,6 +43666,11 @@ msgstr "Váš účet byl úspěšně propojen. Nyní můžete zavřít tuto kart
 #: src/features/user/components/RecoveryKitReminderGate.tsx
 msgid "Your account has no email address. If you forget your password, a recovery kit is the only way back in. It only takes a minute."
 msgstr "Váš účet nemá zadanou e-mailovou adresu. Pokud zapomenete heslo, jediná cesta zpět je záchranná sada. Zabere to jen chvilku."
+
+#. Toast shown after the account was connected to single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your account is connected to single sign-on."
+msgstr "Tvůj účet je propojený s jednotným přihlášením."
 
 #. Settings alert for an unclaimed account on an instance where people sign in with a username.
 #: src/features/user/utils/AccountGatePresentation.tsx
@@ -43976,6 +44080,16 @@ msgstr "Váš soukromý prostor pro myšlenky a připomenutí"
 msgid "Your profile privacy is limited, so some people still won't see this connection even when Everyone is enabled."
 msgstr "Viditelnost vašeho profilu je omezená, takže někteří lidé toto propojení neuvidí ani při zapnuté možnosti „Všichni“."
 
+#. SSO callback page error shown when the sign-in provider asks the person to sign in or give consent again.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider needs you to sign in again."
+msgstr "Tvůj poskytovatel chce, aby ses znovu přihlásil."
+
+#. SSO callback page error shown when the sign-in provider sent back any other error.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Your provider reported an error."
+msgstr "Tvůj poskytovatel nahlásil chybu."
+
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/components/settings_utils/search_index/GiftInventoryIndex.ts
 msgid "Your purchased gifts"
@@ -44016,6 +44130,16 @@ msgstr "Sdílení obrazovky se nepodařilo publikovat s kompatibilním video kod
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "Your setup token stopped working. Enter it again."
 msgstr "Váš nastavovací token přestal fungovat. Zadejte ho znovu."
+
+#. Explanation shown in place of the single sign-on description when the instance requires single sign-on but cannot connect to its sign-in provider right now.
+#: src/features/auth/flow/AuthSsoPanel.tsx
+msgid "Your sign-in provider is unavailable. Try again later."
+msgstr "Váš poskytovatel přihlášení není dostupný. Zkuste to prosím později."
+
+#. Description of the password row in account settings when the instance requires single sign-on and the sign-in provider manages the account's email and password.
+#: src/features/user/components/modals/tabs/account_security_tab/AccountTab.tsx
+msgid "Your sign-in provider manages your email and password."
+msgstr "Váš e-mail a heslo spravuje váš poskytovatel přihlášení."
 
 #. Subtitle under the preview-paused overlay reassuring the user that the screen share is still live for others.
 #: src/features/voice/components/voice_participant_tile/shared.ts
@@ -44109,6 +44233,11 @@ msgstr "Kód CSS vašeho motivu je příliš velký na sdílení. Zkraťte ho a 
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Your themes"
 msgstr "Vaše motivy"
+
+#. Tooltip on the disabled Change username button when the sign-in provider sets usernames. Keep the tone plain and specific.
+#: src/features/user/components/modals/tabs/my_profile_tab/MyProfileTabUsernameSection.tsx
+msgid "Your username comes from your sign-in provider."
+msgstr "Vaše uživatelské jméno pochází od vašeho poskytovatele přihlášení."
 
 #. Success toast after removing a community vanity invite URL.
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx

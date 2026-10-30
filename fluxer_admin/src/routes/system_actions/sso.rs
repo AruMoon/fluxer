@@ -52,6 +52,7 @@ pub(super) fn build_sso_update(
             enabled: Some(flag("sso_enabled")),
             enforced: Some(flag("sso_enforced")),
             auto_provision: Some(flag("sso_auto_provision")),
+            username_from_provider: Some(flag("sso_username_from_provider")),
             display_name: get("sso_display_name"),
             button_label: get("sso_button_label"),
             issuer: get("sso_issuer"),
@@ -71,6 +72,11 @@ pub(super) fn build_sso_update(
                 .first("sso_group_role_mappings")
                 .map(parse_sso_group_role_mappings)
                 .transpose()?,
+            migrate_identities: match form.clean("sso_migrate_identities").as_deref() {
+                Some("move") => Some(true),
+                Some("leave") => Some(false),
+                _ => None,
+            },
         }),
         ..Default::default()
     })

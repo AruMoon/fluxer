@@ -2,11 +2,12 @@
 
 use crate::templates::pages::instance_config::ConfigForm;
 use crate::{
-    api::types::SsoConfigResponse,
+    api::types::{AccountIdentityMode, SsoConfigResponse},
     templates::components::{
+        alert::{AlertVariant, alert},
         form::{
-            Checkbox, FORM_INPUT_CLASS, form_actions, form_field_group, submit_button, text_input,
-            textarea_input,
+            Checkbox, FORM_INPUT_CLASS, form_actions, form_field_group, select_input,
+            submit_button, text_input, textarea_input,
         },
         section_card::section_card_with_description,
     },
@@ -21,6 +22,7 @@ pub(super) fn sso_config_section(
     base: &str,
     config_form: ConfigForm<'_>,
     sso: &SsoConfigResponse,
+    identity: AccountIdentityMode,
 ) -> Markup {
     let allowed_domains = sso.allowed_domains.join("\n");
     let group_role_mappings = sso
@@ -47,6 +49,13 @@ pub(super) fn sso_config_section(
             form method="post" action={(base) "/instance-config?action=update_sso"} {
                 (config_form.fields())
                 div class="space-y-6" {
+                    @if sso.enabled && sso.issuer.as_deref().is_none_or(|issuer| issuer.trim().is_empty()) {
+                        (alert(
+                            AlertVariant::Warning,
+                            Some("SSO is off until you add an issuer."),
+                            html! { "Fill in Issuer below, or run rexctl config set sso.issuer <issuer URL> on the server." },
+                        ))
+                    }
                     div class="flex flex-col gap-2" {
                         (Checkbox {
                             name: "sso_enabled",
@@ -62,6 +71,9 @@ pub(super) fn sso_config_section(
                             checked: sso.enforced,
                             enabled: true,
                         }.render())
+                        p class="text-xs text-neutral-500" {
+                            "If your provider is down, run rexctl admins sign-in-link <admin> on the server to get in."
+                        }
                         (Checkbox {
                             name: "sso_auto_provision",
                             value: "true",
@@ -69,12 +81,47 @@ pub(super) fn sso_config_section(
                             checked: sso.auto_provision,
                             enabled: true,
                         }.render())
+                        p class="text-xs text-neutral-500" {
+                            "New people get an account even when registration is closed, and still wait for approval if accounts need it. Limit who gets in at your provider or with Allowed Email Domains."
+                        }
+                        (Checkbox {
+                            name: "sso_username_from_provider",
+                            value: "true",
+                            label: "Usernames come from your sign-in provider",
+                            checked: sso.username_from_provider,
+                            enabled: identity.is_username(),
+                        }.render())
+                        p class="text-xs text-neutral-500" {
+                            @if identity.is_username() {
+                                "Every SSO sign-in sets the person's username from the provider, and people can't change it in Fluxer."
+                            } @else {
+                                "Only for instances where people sign in with a username."
+                            }
+                        }
+                    }
+                    div class="grid grid-cols-1 gap-4 sm:grid-cols-2" {
+                        (form_field_group("Issuer", "sso_issuer", true, None,
+                            Some("The issuer URL of your sign-in provider. For Microsoft Entra, use https://login.microsoftonline.com/<tenant>/v2.0, not /common."),
+                            html! {
+                                input type="text" id="sso_issuer" name="sso_issuer"
+                                    value=(sso.issuer.as_deref().unwrap_or(""))
+                                    placeholder="https://idp.example.com"
+                                    class=(FORM_INPUT_CLASS);
+                            },
+                        ))
+                        div class="space-y-2" {
+                            (select_input("sso_migrate_identities", "SSO Links When the Issuer Changes", &[
+                                ("", "Don't save if accounts are linked"),
+                                ("move", "Move them to the new issuer"),
+                                ("leave", "Leave them on the old issuer"),
+                            ], ""))
+                            p class="text-xs text-neutral-500" {
+                                "Only used for this save. Move them when it's the same provider at a new address. Leave them when it's a different provider."
+                            }
+                        }
                     }
                     div class="grid grid-cols-1 gap-4 sm:grid-cols-2" {
                         (text_input("sso_display_name", "Display Name", sso.display_name.as_deref().unwrap_or(""), "Example Identity Provider"))
-                        (text_input("sso_issuer", "Issuer", sso.issuer.as_deref().unwrap_or(""), "https://idp.example.com"))
-                    }
-                    div class="grid grid-cols-1 gap-4 sm:grid-cols-2" {
                         (form_field_group("Button Text", "sso_button_label", false, None,
                             Some("Shown on the sign-in button. Leave empty to use \"Continue with\" and the display name, or \"Continue with SSO\" if there's no display name."),
                             html! {
@@ -143,7 +190,7 @@ pub(super) fn sso_config_section(
                         p class="text-xs text-neutral-500" {
                             "Only used in single-community mode. Write one mapping per line, as the group name the provider sends, \"=\" and the ID of a role in the single community. \
                              At every SSO sign-in, members get each listed role whose group they are in and lose each listed role whose group they left. \
-                             Roles not listed here are never changed. If the provider sends no groups claim, roles stay as they are. \
+                             Roles not listed here are never changed. If the provider sends no groups claim, members lose every listed role. Keycloak leaves the claim out when someone is in no groups. \
                              Leave the claim empty to use \"groups\"."
                         }
                     }

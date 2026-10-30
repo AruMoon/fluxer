@@ -3,9 +3,13 @@
 import {isDeepStrictEqual} from 'node:util';
 import {AdminAuditReadActions} from '@app/api/admin/AdminAuditActions';
 import {recordAdminRead, recordAdminWrite} from '@app/api/admin/AdminAuditRecorder';
+import {migrateSsoIdentities} from '@app/api/admin/controllers/SsoIdentityAdminController';
 import {startAttachmentDecayReconcile} from '@app/api/attachment/AttachmentDecayReconcileRun';
 import {maybeAutoJoinInvite} from '@app/api/auth/AuthRegistration';
-import {ssoDiscoveryCacheKey} from '@app/api/auth/services/SsoService';
+import {ssoProviderIdOf} from '@app/api/auth/services/SsoIdentityLinks';
+import {SsoIdentityRepository} from '@app/api/auth/services/SsoIdentityRepository';
+import {legacySsoDiscoveryCacheKey, ssoDiscoveryCacheKey} from '@app/api/auth/services/SsoService';
+import {tryDiscoverOidcProviderMetadata} from '@app/api/auth/services/SsoUtils';
 import {createGuildID, createInviteCode, createUserID} from '@app/api/BrandedTypes';
 import {loadSigningKey} from '@app/api/bluesky/BlueskyOAuthService';
 import {Config} from '@app/api/Config';
@@ -17,6 +21,7 @@ import {
 	type InstanceConfigRepository,
 	type InstanceIntegrationsConfigPatch,
 	type InstancePolicyConfig,
+	type InstanceSsoConfig,
 	REGISTRATION_PENDING_APPROVAL_TRAIT,
 	REGISTRATION_REJECTED_TRAIT,
 	type SsoGroupRoleMapping,
@@ -36,10 +41,13 @@ import {
 	getAssetDeletionQueue,
 	getGuildRepository,
 	getInstanceConfigRepository,
+	getKVAccountDeletionQueue,
 	getNatsConfigPublisher,
 } from '@app/api/middleware/ServiceSingletons';
+import type {User} from '@app/api/models/User';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
 import type {HonoApp, HonoEnv} from '@app/api/types/HonoEnv';
+import {scheduleSystemDeletion} from '@app/api/user/AccountCleanup';
 import {noticeEmailAddress} from '@app/api/user/services/SystemDmMessage';
 import {Validator} from '@app/api/Validator';
 import {startSingleCommunityJoin} from '@app/api/worker/tasks/JoinSingleCommunityMembers';
@@ -53,6 +61,7 @@ import {AccountIdentityModes} from '@fluxer/constants/src/AccountIdentityConstan
 import {AdminACLs} from '@fluxer/constants/src/AdminACLs';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {CaptchaProviders} from '@fluxer/constants/src/CaptchaConstants';
+import {DeletionReasons} from '@fluxer/constants/src/Core';
 import {resolveSmtpTlsMode, type SmtpTlsMode, smtpTlsModeFromSecure} from '@fluxer/constants/src/SmtpConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
@@ -148,6 +157,32 @@ async function readSavedSmtpConfig(): Promise<StoredEmailSmtpConfig> {
 	return (await getInstanceConfigRepository().getInstanceIntegrationsConfig()).email.smtp;
 }
 
+type SsoProviderKey = Pick<InstanceSsoConfig, 'issuer' | 'authorizationUrl'>;
+
+async function isSameSsoProvider(current: SsoProviderKey, next: SsoProviderKey): Promise<boolean> {
+	const withoutTrailingSlash = (id: string) => id.replace(/\/+$/, '');
+	if (withoutTrailingSlash(ssoProviderIdOf(current)) === withoutTrailingSlash(ssoProviderIdOf(next))) return true;
+	if (current.issuer || !current.authorizationUrl || !next.issuer) return false;
+	const discovered = await tryDiscoverOidcProviderMetadata(next.issuer);
+	return discovered?.authorization_endpoint === current.authorizationUrl;
+}
+
+async function shouldMoveSsoIdentities(
+	current: SsoProviderKey,
+	next: SsoProviderKey,
+	choice: boolean | undefined,
+): Promise<boolean> {
+	const fromProviderId = ssoProviderIdOf(current);
+	if (!next.issuer || fromProviderId === ssoProviderIdOf(next)) return false;
+	const linked = (await new SsoIdentityRepository().listForProvider(fromProviderId)).length;
+	if (linked === 0) return false;
+	if (choice !== undefined) return choice;
+	if (await isSameSsoProvider(current, next)) return true;
+	throw InputValidationError.fromCode('issuer', ValidationErrorCodes.SSO_ISSUER_CHANGE_HAS_IDENTITIES, {
+		count: linked,
+	});
+}
+
 async function validateSsoGroupRoleMappings(
 	mappings: Array<{group: string; role_id: string}> | undefined,
 ): Promise<Array<SsoGroupRoleMapping> | undefined> {
@@ -183,7 +218,7 @@ function nonEmptyPatch<T extends object>(value: T | null | undefined): Partial<T
 	return Object.keys(patch).length > 0 ? patch : undefined;
 }
 
-async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
+async function buildInstanceConfigResponse(warnings: Array<string> = []): Promise<InstanceConfigResponse> {
 	const instanceConfigRepository = getInstanceConfigRepository();
 	const [
 		ssoConfig,
@@ -251,6 +286,7 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 			scope: ssoConfig.scope,
 			allowed_domains: ssoConfig.allowedEmailDomains,
 			auto_provision: ssoConfig.autoProvision,
+			username_from_provider: ssoConfig.usernameFromProvider,
 			redirect_uri: deriveSsoRedirectUri(Config.endpoints.webApp),
 			groups_claim: ssoConfig.groupsClaim,
 			group_role_mappings: ssoConfig.groupRoleMappings.map(({group, roleId}) => ({group, role_id: roleId})),
@@ -301,6 +337,7 @@ async function buildInstanceConfigResponse(): Promise<InstanceConfigResponse> {
 		media,
 		billing,
 		notice,
+		warnings,
 	};
 }
 
@@ -486,6 +523,12 @@ async function assertConsistentInstanceConfig(
 			ValidationErrorCodes.IDENTIFIER_FIRST_REQUIRES_EMAIL_IDENTITY,
 		);
 	}
+	if (!usernameMode && data.sso?.username_from_provider === true) {
+		throw InputValidationError.create(
+			'sso.username_from_provider',
+			'Usernames can only come from your sign-in provider when people sign in with a username',
+		);
+	}
 	const deliveryField = emailDeliveryPatchField(integrationsPatch?.email);
 	if (usernameMode && deliveryField !== null) {
 		throw InputValidationError.fromCode(deliveryField, ValidationErrorCodes.EMAIL_DELIVERY_REQUIRES_EMAIL_IDENTITY);
@@ -575,6 +618,7 @@ interface InstanceConfigUpdateContext {
 	readonly data: InstanceConfigUpdateRequest;
 	readonly instanceConfigRepository: InstanceConfigRepository;
 	readonly integrationsPatch: InstanceIntegrationsConfigPatch | null;
+	readonly warnings: Array<string>;
 }
 
 function createInstanceConfigSectionApplier<T extends object>(
@@ -666,7 +710,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 	),
 	sso: createInstanceConfigSectionApplier(
 		({data}) => data.sso,
-		async (sso, {ctx, instanceConfigRepository}) => {
+		async (sso, {ctx, instanceConfigRepository, warnings}) => {
 			const suppliedButtonLabel = readOptionalField(sso, 'button_label');
 			const buttonLabel = suppliedButtonLabel === undefined ? undefined : normalizeSsoButtonLabel(suppliedButtonLabel);
 			const current = await instanceConfigRepository.getSsoConfig({includeSecret: true});
@@ -687,6 +731,11 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 			const validated = await normalizeAndValidateSsoConfig(next, {
 				testModeEnabled: Config.dev.testModeEnabled,
 			});
+			const moveIdentities = await shouldMoveSsoIdentities(
+				current,
+				validated,
+				readOptionalField(sso, 'migrate_identities'),
+			);
 			const supplied = <T>(field: keyof typeof sso, value: T): T | undefined =>
 				readOptionalField(sso, field) === undefined ? undefined : value;
 			await instanceConfigRepository.setSsoConfig({
@@ -704,11 +753,22 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 				scope: supplied('scope', next.scope),
 				allowedEmailDomains: supplied('allowed_domains', validated.allowedEmailDomains),
 				autoProvision: supplied('auto_provision', next.autoProvision),
+				usernameFromProvider: readOptionalField(sso, 'username_from_provider'),
 				groupsClaim: readOptionalField(sso, 'groups_claim'),
 				groupRoleMappings: await validateSsoGroupRoleMappings(readOptionalField(sso, 'group_role_mappings')),
 			});
+			if (moveIdentities) {
+				await migrateSsoIdentities(ctx, ssoProviderIdOf(current), ssoProviderIdOf(validated));
+			}
 			for (const issuer of new Set([current.issuer, validated.issuer])) {
-				if (issuer) await ctx.get('cacheService').delete(ssoDiscoveryCacheKey(issuer));
+				if (!issuer) continue;
+				await ctx.get('cacheService').delete(ssoDiscoveryCacheKey(issuer));
+				await ctx.get('cacheService').delete(legacySsoDiscoveryCacheKey(issuer));
+			}
+			if (validated.providerUnreachable) {
+				warnings.push(
+					"Couldn't connect to the sign-in provider at its issuer URL. The SSO button stays hidden until the provider answers.",
+				);
 			}
 		},
 	),
@@ -823,6 +883,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 					automatic_tax: readOptionalField(billing, 'automatic_tax'),
 					tax_id_collection: readOptionalField(billing, 'tax_id_collection'),
 					terms_consent_required: readOptionalField(billing, 'terms_consent_required'),
+					billing_emails: readOptionalField(billing, 'billing_emails'),
 				}),
 			);
 		},
@@ -907,7 +968,8 @@ export function InstanceConfigAdminController(app: HonoApp) {
 			const integrationsPatch = toIntegrationsPatch(data.integrations, await readSavedSmtpConfig());
 			await assertConsistentInstanceConfig(data, integrationsPatch);
 			await assertValidBlueskyKeys(integrationsPatch);
-			const updateContext = {ctx, data, instanceConfigRepository, integrationsPatch};
+			const warnings: Array<string> = [];
+			const updateContext = {ctx, data, instanceConfigRepository, integrationsPatch, warnings};
 			for (const applySection of Object.values(INSTANCE_CONFIG_SECTION_APPLIERS)) {
 				const pendingUpdate = applySection(updateContext);
 				if (pendingUpdate) await pendingUpdate;
@@ -920,7 +982,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 					sections: listSuppliedSections(data),
 				},
 			});
-			return ctx.json(await buildInstanceConfigResponse());
+			return ctx.json(await buildInstanceConfigResponse(warnings));
 		},
 	);
 	app.post(
@@ -1160,7 +1222,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 			operationId: 'update_admin_pending_registration',
 			summary: 'Approve or reject a pending registration',
 			description:
-				'Decides a registration waiting for manual review and returns the registrations still waiting. Approving removes its pending registration trait and joins the account to the community it was invited to and the single community, rejecting also prevents the account from logging in. Requires REGISTRATION_REVIEW permission.',
+				'Decides a registration waiting for manual review and returns the registrations still waiting. Approving removes its pending registration trait and joins the account to the community it was invited to and the single community. Rejecting stops the account from signing in and queues it for deletion right away without sending a notice, unless a deletion is already scheduled. Once the account is deleted, its email address can register again. Requires REGISTRATION_REVIEW permission.',
 			responseSchema: PendingRegistrationListResponse,
 			statusCode: 200,
 			security: 'adminApiKey',
@@ -1334,7 +1396,9 @@ async function updatePendingRegistrationUser(
 	} else {
 		traits.delete(REGISTRATION_REJECTED_TRAIT);
 	}
-	await userRepository.patchUpsert(user.id, {traits: traits.size > 0 ? traits : null}, user.toRow());
+	const updated = await userRepository.patchUpsert(user.id, {traits: traits.size > 0 ? traits : null}, user.toRow());
+	const pendingDeletionAt =
+		decision === 'reject' && !user.pendingDeletionAt ? await deleteRejectedRegistration(ctx, updated) : null;
 	if (decision === 'approve' && wasPendingApproval) {
 		await maybeAutoJoinInvite(ctx.get('inviteService'), {
 			userId: user.id,
@@ -1351,5 +1415,21 @@ async function updatePendingRegistrationUser(
 		targetType: 'user',
 		targetId: user.id,
 		action: decision === 'approve' ? 'approve_registration' : 'reject_registration',
+		metadata: {pending_deletion_at: pendingDeletionAt},
 	});
+}
+
+async function deleteRejectedRegistration(ctx: Context<HonoEnv>, user: User): Promise<string> {
+	const scheduled = await scheduleSystemDeletion(
+		{users: ctx.get('userRepository'), gateway: ctx.get('gatewayService'), deletionQueue: getKVAccountDeletionQueue()},
+		user,
+		{reasonCode: DeletionReasons.OTHER, delayMs: 0, cancelledBySignIn: false, endSessions: true},
+	);
+	const pendingDeletionAt = scheduled.pendingDeletionAt!.toISOString();
+	await ctx.get('workerService').addJob('userProcessPendingDeletion', {
+		userId: user.id.toString(),
+		deletionReasonCode: DeletionReasons.OTHER,
+		pendingDeletionAt,
+	});
+	return pendingDeletionAt;
 }

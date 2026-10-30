@@ -56,6 +56,8 @@ pub struct InstanceConfigResponse {
     pub guild_visits: GuildVisitsConfigResponse,
     #[serde(default)]
     pub notice: Option<InstanceNoticeResponse>,
+    #[serde(default)]
+    pub warnings: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -138,6 +140,7 @@ pub struct AccountIdentitySettings {
     pub mode: AccountIdentityMode,
     pub tag_style: TagStyle,
     pub emails_enabled: bool,
+    pub username_from_provider: bool,
 }
 
 impl Default for AccountIdentitySettings {
@@ -146,11 +149,16 @@ impl Default for AccountIdentitySettings {
             mode: AccountIdentityMode::default(),
             tag_style: TagStyle::default(),
             emails_enabled: true,
+            username_from_provider: false,
         }
     }
 }
 
 impl AccountIdentitySettings {
+    pub fn sso_manages_usernames(self) -> bool {
+        self.username_from_provider && self.mode.is_username()
+    }
+
     pub fn admin_reset_links_available(self) -> bool {
         self.mode.is_username() || !self.emails_enabled
     }
@@ -160,6 +168,14 @@ impl AccountIdentitySettings {
 pub struct InstanceAccountIdentityDiscovery {
     #[serde(default)]
     pub features: InstanceAccountIdentityDiscoveryFeatures,
+    #[serde(default)]
+    pub sso: InstanceSsoDiscovery,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+pub struct InstanceSsoDiscovery {
+    #[serde(default)]
+    pub username_from_provider: bool,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -521,6 +537,8 @@ pub struct SsoConfigResponse {
     pub allowed_domains: Vec<String>,
     #[serde(default)]
     pub auto_provision: bool,
+    #[serde(default)]
+    pub username_from_provider: bool,
     pub redirect_uri: Option<String>,
     #[serde(default)]
     pub groups_claim: Option<String>,
@@ -1215,11 +1233,15 @@ pub struct SsoConfigUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auto_provision: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub username_from_provider: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub redirect_uri: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub groups_claim: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group_role_mappings: Option<Vec<SsoGroupRoleMapping>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub migrate_identities: Option<bool>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]

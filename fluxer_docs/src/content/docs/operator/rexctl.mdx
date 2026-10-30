@@ -46,7 +46,7 @@ rexctl admins remove <user>
 
 ### rexctl admins sign-in-link
 
-Print a link that signs an admin in once.
+Print a link that signs an admin in once. Use it to get in when Require SSO is on and your sign-in provider is down or set up wrong. See https://docs.fluxer.app/operator/sign-in/#single-sign-on.
 
 ```sh
 rexctl admins sign-in-link <user>
@@ -174,6 +174,14 @@ rexctl branding set [flags]
 
 Read and change Fluxer's settings.
 
+### rexctl config edit
+
+Opens custom.compose.yml in $VISUAL or $EDITOR. rexctl checks the file, says which services restart and applies it once you agree. Your file stays as it was until it passes the check.
+
+```sh
+rexctl config edit
+```
+
 ### rexctl config get
 
 Show one setting.
@@ -198,10 +206,6 @@ List every setting with its value and help.
 rexctl config list [flags]
 ```
 
-- `--all`
-
-  Also list every raw setting and the secrets rexctl generated.
-
 - `--json`
 
   Print JSON.
@@ -211,8 +215,16 @@ rexctl config list [flags]
 Change one or more settings.
 
 ```sh
-rexctl config set <key> <value> | <key>=<value>...
+rexctl config set <key> <value> | <key>=<value>... [flags]
 ```
+
+- `--migrate-identities`
+
+  When sso.issuer changes, move SSO links to the new issuer.
+
+- `--no-migrate-identities`
+
+  When sso.issuer changes, leave SSO links on the old issuer.
 
 ### rexctl config unset
 
@@ -365,6 +377,10 @@ rexctl install [flags]
 - `--open-firewall`
 
   Open the ports Fluxer needs in ufw or firewalld. The default is `true`.
+
+- `--project string`
+
+  Name for this instance's containers and volumes, for running more than one instance on a host. The default is `fluxer`.
 
 - `--registration string`
 
@@ -796,6 +812,14 @@ rexctl upgrade [flags]
 - `--to string`
 
   Upgrade to this version, not the latest.
+
+## rexctl use
+
+Show which instance rexctl uses when you don't pass --dir and aren't in an instance folder, or pass a folder to use that instance from now on. rexctl remembers each instance it installs, so you only need this with more than one instance or one installed by an older rexctl. Each account has its own choice. Root's choice also applies to accounts that have no instance of their own. The services rexctl sets up for starting and upgrading Fluxer always name their folder, so this doesn't change them.
+
+```sh
+rexctl use [folder]
+```
 
 ## rexctl users
 
