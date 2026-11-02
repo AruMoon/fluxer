@@ -3331,6 +3331,10 @@ msgstr "新增說明（選填）"
 msgid "Add a friend to get started."
 msgstr "新增好友以開始使用。"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting single sign-on."
+msgstr "在中斷單點登入之前，請新增本地登入方式。"
+
 #. Text button in the Operator Pass checkout dialog that shows the optional monthly donation choice. The donation is separate from the pass.
 #: src/features/premium/components/modals/OperatorPassCheckoutModal.tsx
 msgid "Add a monthly donation"
@@ -9970,6 +9974,10 @@ msgstr "已連線到通話"
 msgid "Connected to voice"
 msgstr "已連線到語音"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Connected. You can disconnect this sign-in method."
+msgstr "已連接。您可以中斷此登入方式。"
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -10968,6 +10976,11 @@ msgstr "無法刪除此 Webhook"
 #: src/features/guild/hooks/useDeleteMyMessagesInGuild.tsx
 msgid "Couldn't delete your messages"
 msgstr "無法刪除您的訊息"
+
+#. Error title shown when disconnecting single sign-on fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Couldn't disconnect single sign-on"
+msgstr "無法中斷單點登入"
 
 #. Modal title shown when a desktop update download fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx
@@ -13632,7 +13645,9 @@ msgstr "捨棄貼文"
 msgid "Discard voice message"
 msgstr "捨棄語音訊息"
 
+#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "中斷連線"
@@ -13658,6 +13673,11 @@ msgstr "從 {channel} 中斷連線"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "中斷語音連線"
+
+#. Confirmation title when disconnecting the current account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "中斷單點登入？"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -33774,10 +33794,12 @@ msgstr "單層"
 msgid "Single line"
 msgstr "單行"
 
+#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
 #. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "單一登入"
 
@@ -37379,6 +37401,10 @@ msgstr "此實例未使用電子郵件，因此無法透過此表單接收檢舉
 #: src/features/auth/flow/AuthSsoPanel.tsx
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
 msgstr "此伺服器尚未完成單一登入設定。請詢問管理員啟用它。"
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires single sign-on."
+msgstr "此執行個體需要單點登入。"
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43303,6 +43329,11 @@ msgstr "你登入的是另一個帳號。請使用你在這裡使用的帳號登
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
 msgstr "您已遭管理員設為耳機靜音"
+
+#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
+msgstr "您將在所有裝置上登出。中斷後，請使用您的本地帳戶憑據登入。"
 
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx

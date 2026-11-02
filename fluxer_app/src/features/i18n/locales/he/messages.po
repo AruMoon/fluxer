@@ -3331,6 +3331,10 @@ msgstr "הוסף תיאור (אופציונלי)"
 msgid "Add a friend to get started."
 msgstr "הוסף חבר כדי להתחיל."
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting single sign-on."
+msgstr "הוסף שיטת התחברות מקומית לפני ניתוק ה-single sign-on."
+
 #. Text button in the Operator Pass checkout dialog that shows the optional monthly donation choice. The donation is separate from the pass.
 #: src/features/premium/components/modals/OperatorPassCheckoutModal.tsx
 msgid "Add a monthly donation"
@@ -9970,6 +9974,10 @@ msgstr "מחובר לשיחה"
 msgid "Connected to voice"
 msgstr "מחובר לערוץ הקולי"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Connected. You can disconnect this sign-in method."
+msgstr "מחובר. ניתן לנתק שיטת התחברות זו."
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -10968,6 +10976,11 @@ msgstr "לא ניתן היה למחוק את ה-webhook הזה"
 #: src/features/guild/hooks/useDeleteMyMessagesInGuild.tsx
 msgid "Couldn't delete your messages"
 msgstr "לא ניתן היה למחוק את ההודעות שלך"
+
+#. Error title shown when disconnecting single sign-on fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Couldn't disconnect single sign-on"
+msgstr "לא ניתן היה לנתק את ה-single sign-on"
 
 #. Modal title shown when a desktop update download fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx
@@ -13632,7 +13645,9 @@ msgstr "בטל פרסום"
 msgid "Discard voice message"
 msgstr "מחיקת ההודעה הקולית"
 
+#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "התנתק"
@@ -13658,6 +13673,11 @@ msgstr "התנתק מ-{channel}"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "התנתק משיחה קולית"
+
+#. Confirmation title when disconnecting the current account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "לנתק את ה-single sign-on?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -33774,10 +33794,12 @@ msgstr "שכבה אחת"
 msgid "Single line"
 msgstr "שורה בודדת"
 
+#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
 #. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "כניסה יחידה"
 
@@ -37379,6 +37401,10 @@ msgstr "המופע הזה לא משתמש באימייל, ולכן אינו יכ
 #: src/features/auth/flow/AuthSsoPanel.tsx
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
 msgstr "ההגדרה של כניסה יחידה (SSO) במערכת זו עדיין לא הושלמה. אנא פנה למנהל המערכת כדי לאפשר זאת."
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires single sign-on."
+msgstr "מופע זה דורש single sign-on."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43303,6 +43329,11 @@ msgstr "התחברת לחשבון אחר. יש להתחבר עם החשבון ש
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
 msgstr "השמע שלך הושתק על ידי מנהלים"
+
+#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
+msgstr "תתנתק מכל המכשירים. לאחר הניתוק, התחבר באמצעות פרטי החשבון המקומיים שלך."
 
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx

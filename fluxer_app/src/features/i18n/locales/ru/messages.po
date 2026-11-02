@@ -3331,6 +3331,10 @@ msgstr "Добавьте описание (необязательно)"
 msgid "Add a friend to get started."
 msgstr "Добавьте друга, чтобы начать."
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting single sign-on."
+msgstr "Добавьте локальный способ входа перед отключением единого входа."
+
 #. Text button in the Operator Pass checkout dialog that shows the optional monthly donation choice. The donation is separate from the pass.
 #: src/features/premium/components/modals/OperatorPassCheckoutModal.tsx
 msgid "Add a monthly donation"
@@ -9970,6 +9974,10 @@ msgstr "Подключено к звонку"
 msgid "Connected to voice"
 msgstr "Подключено к голосовому каналу"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Connected. You can disconnect this sign-in method."
+msgstr "Подключено. Вы можете отключить этот способ входа."
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -10968,6 +10976,11 @@ msgstr "Не удалось удалить этот вебхук"
 #: src/features/guild/hooks/useDeleteMyMessagesInGuild.tsx
 msgid "Couldn't delete your messages"
 msgstr "Не удалось удалить ваши сообщения"
+
+#. Error title shown when disconnecting single sign-on fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Couldn't disconnect single sign-on"
+msgstr "Не удалось отключить единый вход"
 
 #. Modal title shown when a desktop update download fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx
@@ -13632,7 +13645,9 @@ msgstr "Отменить публикацию"
 msgid "Discard voice message"
 msgstr "Отменить голосовое сообщение"
 
+#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "Отключиться"
@@ -13658,6 +13673,11 @@ msgstr "Отключиться от {channel}"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "Отключиться от голосового чата"
+
+#. Confirmation title when disconnecting the current account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "Отключить единый вход?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -33774,10 +33794,12 @@ msgstr "Один слой"
 msgid "Single line"
 msgstr "Одна строка"
 
+#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
 #. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "Единый вход"
 
@@ -37379,6 +37401,10 @@ msgstr "Этот экземпляр не использует электронн
 #: src/features/auth/flow/AuthSsoPanel.tsx
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
 msgstr "В этой организации еще не настроен единый вход. Попросите администратора включить его."
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires single sign-on."
+msgstr "Эта инстанция требует использования единого входа."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43303,6 +43329,11 @@ msgstr "Ты вошёл в другой аккаунт. Войди в аккау
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
 msgstr "Модераторы отключили вам звук"
+
+#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
+msgstr "Вы будете выведены из системы на всех устройствах. После отключения войдите, используя учетные данные вашей локальной учетной записи."
 
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx
