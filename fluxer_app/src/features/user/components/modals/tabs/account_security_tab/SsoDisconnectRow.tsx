@@ -16,12 +16,16 @@ import {Trans, useLingui} from '@lingui/react/macro';
 import {observer} from 'mobx-react-lite';
 import {useCallback} from 'react';
 
+const SINGLE_SIGN_ON_DESCRIPTOR = msg({
+	message: 'Single sign-on',
+	comment: 'Fallback label for the SSO provider in account security when no display name is configured.',
+});
 const DISCONNECT_SSO_TITLE_DESCRIPTOR = msg({
 	message: 'Disconnect single sign-on?',
 	comment: 'Confirmation title when disconnecting the current account from single sign-on.',
 });
 const DISCONNECT_SSO_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'You will be signed out on all devices. The next time you sign in, use your local password or email sign-in instead.',
+	message: 'You will be signed out on all devices. After disconnecting, sign in using your local account credentials.',
 	comment: 'Warning shown before disconnecting single sign-on. All current sessions will be revoked.',
 });
 const DISCONNECT_SSO_BUTTON_DESCRIPTOR = msg({
@@ -51,7 +55,7 @@ export function canDisconnectSso(user: User): boolean {
 
 export const SsoDisconnectRow = observer(({user}: {user: User}) => {
 	const {i18n} = useLingui();
-	const providerName = RuntimeConfig.getSnapshot().sso?.display_name ?? 'Single sign-on';
+	const providerName = RuntimeConfig.getSnapshot().sso?.display_name ?? i18n._(SINGLE_SIGN_ON_DESCRIPTOR);
 	const canDisconnect = canDisconnectSso(user);
 	const isEnforced = RuntimeConfig.getSnapshot().sso?.enforced === true;
 	const handleDisconnect = useCallback(() => {
