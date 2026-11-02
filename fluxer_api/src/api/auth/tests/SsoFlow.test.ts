@@ -1023,7 +1023,8 @@ describe('Auth SSO flow', () => {
 		});
 
 		it('lets a regular user disconnect SSO and revokes every session', async () => {
-			const account = await accountThenSso();
+			const account = await createTestAccount(harness);
+			await enableSso(harness, admin.token, {enforced: false});
 			const sub = `itest-sso-unlink-${Date.now()}`;
 			await complete(
 				await startLink(account),
