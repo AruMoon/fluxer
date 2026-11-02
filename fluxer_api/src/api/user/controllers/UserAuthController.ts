@@ -224,7 +224,7 @@ export function UserAuthController(app: HonoApp) {
 	);
 	app.delete(
 		'/users/@me/sso',
-		RateLimitMiddleware(RateLimitConfigs.AUTH_SSO_START),
+		RateLimitMiddleware(RateLimitConfigs.USER_SSO_UNLINK),
 		LoginRequired,
 		DefaultUserOnly,
 		SudoModeMiddleware,
