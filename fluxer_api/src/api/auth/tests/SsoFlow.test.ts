@@ -1026,10 +1026,7 @@ describe('Auth SSO flow', () => {
 			const account = await createTestAccount(harness);
 			await enableSso(harness, admin.token, {enforced: false});
 			const sub = `itest-sso-unlink-${Date.now()}`;
-			await complete(
-				await startLink(account),
-				providerCode(createUniqueEmail('sso-unlink'), sub),
-			);
+			await complete(await startLink(account), providerCode(createUniqueEmail('sso-unlink'), sub));
 			expect(await new SsoIdentityRepository().listForUser(createUserID(BigInt(account.userId)))).toHaveLength(1);
 
 			await createBuilder(harness, account.token)
@@ -1045,10 +1042,7 @@ describe('Auth SSO flow', () => {
 		it('does not allow users to disconnect SSO while the instance enforces it', async () => {
 			const account = await accountThenSso();
 			const sub = `itest-sso-unlink-enforced-${Date.now()}`;
-			await complete(
-				await startLink(account),
-				providerCode(createUniqueEmail('sso-unlink-enforced'), sub),
-			);
+			await complete(await startLink(account), providerCode(createUniqueEmail('sso-unlink-enforced'), sub));
 			await createBuilder(harness, account.token)
 				.delete('/users/@me/sso')
 				.body({password: account.password})
