@@ -255,6 +255,7 @@ export function UserAuthController(app: HonoApp) {
 				(await instanceConfig.getAccountIdentityMode()) === AccountIdentityModes.EMAIL &&
 				user.email !== null &&
 				user.emailVerified &&
+				!user.emailBounced &&
 				(await instanceConfig.isEmailEnabled());
 			if (!hasLocalPassword && !hasEmailCodeSignIn) {
 				throw InputValidationError.fromCode('password', ValidationErrorCodes.PASSWORD_NOT_SET);
