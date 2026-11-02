@@ -1042,6 +1042,20 @@ describe('Auth SSO flow', () => {
 			await createBuilder(harness, account.token).get('/users/@me').expect(401).execute();
 		});
 
+		it('does not allow users to disconnect SSO while the instance enforces it', async () => {
+			const account = await accountThenSso();
+			const sub = `itest-sso-unlink-enforced-${Date.now()}`;
+			await complete(
+				await startLink(account),
+				providerCode(createUniqueEmail('sso-unlink-enforced'), sub),
+			);
+			await createBuilder(harness, account.token)
+				.delete('/users/@me/sso')
+				.body({password: account.password})
+				.expect(403, 'SSO_REQUIRED')
+				.execute();
+		});
+
 		it('refuses to connect an identity another account already uses', async () => {
 			const account = await accountThenSso();
 			const sub = `itest-sso-link-taken-${Date.now()}`;
