@@ -44,7 +44,8 @@ export function canDisconnectSso(user: User): boolean {
 		!RuntimeConfig.usesUsernameSignIn &&
 		RuntimeConfig.emailsEnabled &&
 		user.email != null &&
-		user.verified === true
+		user.verified === true &&
+		user.emailBounced !== true
 	);
 }
 
