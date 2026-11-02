@@ -78,7 +78,17 @@ describe('sudo mode for SSO accounts without credentials', () => {
 			.body({date_of_birth: '2000-01-01'})
 			.expect(200)
 			.execute();
-		await createBuilder(harness, token).delete('/users/@me/sso').body({}).expect(400, 'PASSWORD_NOT_SET').execute();
+		const {json} = await createBuilder<{code: string; errors: Array<{path: string; code: string}>}>(harness, token)
+			.delete('/users/@me/sso')
+			.body({})
+			.expect(400, 'INVALID_FORM_BODY')
+			.executeWithResponse();
+		expect(json.errors).toContainEqual(
+			expect.objectContaining({
+				path: 'password',
+				code: 'PASSWORD_NOT_SET',
+			}),
+		);
 	});
 
 	it('asks an older SSO session to sign in again', async () => {
