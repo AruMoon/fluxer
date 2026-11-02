@@ -73,11 +73,7 @@ describe('sudo mode for SSO accounts without credentials', () => {
 
 	it('refuses to disconnect SSO when the account has no local sign-in method', async () => {
 		const token = await signInWithSso();
-		await createBuilder(harness, token)
-			.delete('/users/@me/sso')
-			.body({})
-			.expect(400, 'PASSWORD_NOT_SET')
-			.execute();
+		await createBuilder(harness, token).delete('/users/@me/sso').body({}).expect(400, 'PASSWORD_NOT_SET').execute();
 	});
 
 	it('asks an older SSO session to sign in again', async () => {
