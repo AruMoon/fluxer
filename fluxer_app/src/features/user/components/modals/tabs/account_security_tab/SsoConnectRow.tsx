@@ -4,6 +4,7 @@ import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
 import {Button} from '@app/features/ui/button/Button';
 import {isDesktop} from '@app/features/ui/utils/NativeUtils';
 import {connectSso} from '@app/features/user/commands/SsoLinkCommands';
+import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {AccountSecurityRow} from '@app/features/user/components/modals/tabs/account_security_tab/AccountSecurityCard';
 import type {User} from '@app/features/user/models/User';
 import * as FormUtils from '@app/lib/forms';
@@ -26,6 +27,7 @@ export function canConnectSso(user: User): boolean {
 	return (
 		RuntimeConfig.getSnapshot().sso?.enabled === true &&
 		!isDesktop() &&
+		!user.traits.includes(UserTraits.SSO) &&
 		!user.traits.some((trait) => trait.startsWith('sso_identity:'))
 	);
 }
