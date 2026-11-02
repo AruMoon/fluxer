@@ -3331,6 +3331,10 @@ msgstr "विवरण जोड़ें (वैकल्पिक)"
 msgid "Add a friend to get started."
 msgstr "शुरू करने के लिए किसी दोस्त को जोड़ें।"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting single sign-on."
+msgstr "सिंगल साइन-ऑन को डिस्कनेक्ट करने से पहले एक स्थानीय साइन-इन विधि जोड़ें।"
+
 #. Text button in the Operator Pass checkout dialog that shows the optional monthly donation choice. The donation is separate from the pass.
 #: src/features/premium/components/modals/OperatorPassCheckoutModal.tsx
 msgid "Add a monthly donation"
@@ -9970,6 +9974,10 @@ msgstr "कॉल से कनेक्ट किया गया"
 msgid "Connected to voice"
 msgstr "वॉइस से कनेक्ट किया गया"
 
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Connected. You can disconnect this sign-in method."
+msgstr "कनेक्टेड। आप इस साइन-इन विधि को डिस्कनेक्ट कर सकते हैं।"
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -10968,6 +10976,11 @@ msgstr "इस वेबहुक को हटाया नहीं जा स
 #: src/features/guild/hooks/useDeleteMyMessagesInGuild.tsx
 msgid "Couldn't delete your messages"
 msgstr "आपके मैसेज मिटाए नहीं जा सके"
+
+#. Error title shown when disconnecting single sign-on fails.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Couldn't disconnect single sign-on"
+msgstr "सिंगल साइन-ऑन को डिस्कनेक्ट नहीं कर सके"
 
 #. Modal title shown when a desktop update download fails.
 #: src/features/updater/commands/UpdaterModalCommands.tsx
@@ -13632,7 +13645,9 @@ msgstr "पोस्ट छोड़ें"
 msgid "Discard voice message"
 msgstr "वॉइस मैसेज हटाएँ"
 
+#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "डिस्कनेक्ट करें"
@@ -13658,6 +13673,11 @@ msgstr "{channel} से डिस्कनेक्ट करें"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "वॉइस से डिस्कनेक्ट करें"
+
+#. Confirmation title when disconnecting the current account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "सिंगल साइन-ऑन को डिस्कनेक्ट करें?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -33774,10 +33794,12 @@ msgstr "सिंगल लेयर"
 msgid "Single line"
 msgstr "एकल पंक्ति"
 
+#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
 #. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "सिंगल साइन-ऑन"
 
@@ -37379,6 +37401,10 @@ msgstr "यह इंस्टेंस ईमेल का उपयोग न�
 #: src/features/auth/flow/AuthSsoPanel.tsx
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
 msgstr "इस इंस्टेंस ने सिंगल साइन-ऑन सेटअप पूरा नहीं किया है। इसे सक्षम करने के लिए किसी एडमिनिस्ट्रेटर से कहें।"
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires single sign-on."
+msgstr "इस इंस्टेंस के लिए सिंगल साइन-ऑन की आवश्यकता है।"
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43303,6 +43329,11 @@ msgstr "आपने किसी दूसरे खाते में सा�
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "You were deafened by moderators"
 msgstr "आपको मॉडरेटर ने डीफ़ेन किया है"
+
+#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
+msgstr "आपको सभी उपकरणों से लॉग आउट कर दिया जाएगा। डिस्कनेक्ट करने के बाद, अपने स्थानीय खाता क्रेडेंशियल का उपयोग करके साइन इन करें।"
 
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx

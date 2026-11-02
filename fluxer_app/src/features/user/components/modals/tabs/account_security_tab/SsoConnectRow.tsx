@@ -7,6 +7,7 @@ import {connectSso} from '@app/features/user/commands/SsoLinkCommands';
 import {AccountSecurityRow} from '@app/features/user/components/modals/tabs/account_security_tab/AccountSecurityCard';
 import type {User} from '@app/features/user/models/User';
 import * as FormUtils from '@app/lib/forms';
+import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {msg} from '@lingui/core/macro';
 import {Trans, useLingui} from '@lingui/react/macro';
 import {observer} from 'mobx-react-lite';
@@ -26,6 +27,7 @@ export function canConnectSso(user: User): boolean {
 	return (
 		RuntimeConfig.getSnapshot().sso?.enabled === true &&
 		!isDesktop() &&
+		!user.traits.includes(UserTraits.SSO) &&
 		!user.traits.some((trait) => trait.startsWith('sso_identity:'))
 	);
 }
