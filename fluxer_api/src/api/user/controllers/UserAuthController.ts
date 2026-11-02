@@ -2,12 +2,12 @@
 
 import {createRecoveryKit, getRecoveryKitStatus} from '@app/api/auth/AuthRecoveryKit';
 import {revokeAllAuthSessions} from '@app/api/auth/AuthSessionRevocation';
-import {SsoIdentityLinkService, ssoProviderIdOf} from '@app/api/auth/services/SsoIdentityLinks';
 import {
 	completePasskeyMigration,
 	getPasskeyMigration,
 	getPasskeyMigrationRegistrationOptions,
 } from '@app/api/auth/services/PasskeyMigrationService';
+import {SsoIdentityLinkService, ssoProviderIdOf} from '@app/api/auth/services/SsoIdentityLinks';
 import {requireSudoMode} from '@app/api/auth/services/SudoVerificationService';
 import {
 	RequireEmailAccountIdentity,
@@ -15,10 +15,10 @@ import {
 	RequireUsernameAccountIdentity,
 } from '@app/api/middleware/AccountIdentityMiddleware';
 import {DefaultUserOnly, LoginRequired} from '@app/api/middleware/AuthMiddleware';
-import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import {LocalAuthMiddleware} from '@app/api/middleware/LocalAuthMiddleware';
 import {RateLimitMiddleware} from '@app/api/middleware/RateLimitMiddleware';
 import {OpenAPI} from '@app/api/middleware/ResponseTypeMiddleware';
+import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import {SudoModeMiddleware} from '@app/api/middleware/SudoModeMiddleware';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
 import type {HonoApp} from '@app/api/types/HonoEnv';
@@ -28,9 +28,9 @@ import {Validator} from '@app/api/Validator';
 import {AccountIdentityModes} from '@fluxer/constants/src/AccountIdentityConstants';
 import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
+import {SsoRequiredError, SsoRequiredReasons} from '@fluxer/errors/src/domains/auth/SsoRequiredError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {UnauthorizedError} from '@fluxer/errors/src/domains/core/UnauthorizedError';
-import {SsoRequiredError, SsoRequiredReasons} from '@fluxer/errors/src/domains/auth/SsoRequiredError';
 import {
 	DisableTotpRequest,
 	EnableMfaTotpRequest,
