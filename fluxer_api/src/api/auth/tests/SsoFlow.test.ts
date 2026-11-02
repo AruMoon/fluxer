@@ -1022,6 +1022,25 @@ describe('Auth SSO flow', () => {
 			expect(signedIn.user_id).toBe(account.userId);
 		});
 
+		it('lets a regular user disconnect SSO and revokes every session', async () => {
+			const account = await accountThenSso();
+			const sub = `itest-sso-unlink-${Date.now()}`;
+			await complete(
+				await startLink(account),
+				providerCode(createUniqueEmail('sso-unlink'), sub),
+			);
+			expect(await new SsoIdentityRepository().listForUser(createUserID(BigInt(account.userId)))).toHaveLength(1);
+
+			await createBuilder(harness, account.token)
+				.delete('/users/@me/sso')
+				.body({password: account.password})
+				.expect(204)
+				.execute();
+
+			expect(await new SsoIdentityRepository().listForUser(createUserID(BigInt(account.userId)))).toHaveLength(0);
+			await createBuilder(harness, account.token).get('/users/@me').expect(401).execute();
+		});
+
 		it('refuses to connect an identity another account already uses', async () => {
 			const account = await accountThenSso();
 			const sub = `itest-sso-link-taken-${Date.now()}`;
