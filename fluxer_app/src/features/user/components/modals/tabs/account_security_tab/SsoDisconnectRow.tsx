@@ -53,6 +53,12 @@ export function canDisconnectSso(user: User): boolean {
 	);
 }
 
+function getDisconnectDescription(canDisconnect: boolean, isEnforced: boolean) {
+	if (canDisconnect) return <Trans>Connected. You can disconnect this sign-in method.</Trans>;
+	if (isEnforced) return <Trans>This instance requires single sign-on.</Trans>;
+	return <Trans>Add a local sign-in method before disconnecting single sign-on.</Trans>;
+}
+
 export const SsoDisconnectRow = observer(({user}: {user: User}) => {
 	const {i18n} = useLingui();
 	const providerName = RuntimeConfig.getSnapshot().sso?.display_name ?? i18n._(SINGLE_SIGN_ON_DESCRIPTOR);
@@ -83,15 +89,7 @@ export const SsoDisconnectRow = observer(({user}: {user: User}) => {
 	return (
 		<AccountSecurityRow
 			label={<bdi data-flx="user.account-security-tab.sso-disconnect-row.provider-name">{providerName}</bdi>}
-			description={
-				canDisconnect ? (
-					<Trans>Connected. You can disconnect this sign-in method.</Trans>
-				) : isEnforced ? (
-					<Trans>This instance requires single sign-on.</Trans>
-				) : (
-					<Trans>Add a local sign-in method before disconnecting single sign-on.</Trans>
-				)
-			}
+			description={getDisconnectDescription(canDisconnect, isEnforced)}
 			data-flx="user.account-security-tab.sso-disconnect-row"
 		>
 			{canDisconnect && (
