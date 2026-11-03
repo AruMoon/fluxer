@@ -123,6 +123,7 @@ export interface MasterConfig {
 			unfurl_ignored_hosts: Array<string>;
 			app_origin_aliases: Array<string>;
 			discovery_public_endpoint: string;
+			discovery_transport_endpoint: string;
 			worker?: {
 				mode?: 'all_lanes' | 'single_lane' | 'single_task';
 				lane?: 'realtime' | 'unfurl' | 'lifecycle' | 'batch' | 'crosspost';
@@ -332,7 +333,6 @@ export interface MasterConfig {
 		closure_effective_at?: string;
 	};
 	operator_pass: {
-		sale_opens_at?: string;
 		price_rises_at?: string;
 		grace_minutes: number;
 		now_override?: string;
@@ -343,13 +343,10 @@ export interface MasterConfig {
 		labs_operators_channel_id?: string;
 		standard_prices_minor?: Partial<Record<string, number>>;
 		release_lists?: string;
-		transfer_lock_hours?: number;
-		wall_auto_approve?: boolean;
 		withdrawal_countries?: string;
 		localized_prices_enabled?: Partial<Record<string, boolean>>;
 		wall_tiers?: string;
 		max_quantity?: number;
-		preview_ips?: Array<string>;
 	};
 	dev: {
 		relax_registration_rate_limits: boolean;

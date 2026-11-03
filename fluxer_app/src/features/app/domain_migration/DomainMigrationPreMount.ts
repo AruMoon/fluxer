@@ -2,6 +2,7 @@
 
 import {
 	hasStoredAccount,
+	hasUsableStoredAccount,
 	loadDomainMigrationDiscovery,
 	readActiveSessionToken,
 	readDomainMigrationDiscovery,
@@ -37,6 +38,7 @@ import {
 	isCompletedDomainMigrationMarker,
 	isDomainMigrationOneShotRoute,
 	isExportableLocalStorageKey,
+	isForwardableOneShotRoute,
 	keepValidTargetSession,
 	markDomainMigrationCompleted,
 	markDomainMigrationFailed,
@@ -485,10 +487,11 @@ async function startEnrolledSource(side: DomainMigrationSide): Promise<boolean> 
 
 async function forwardFromSource(side: DomainMigrationSide): Promise<boolean> {
 	const {pathname, search, hash} = readCurrentPath();
-	if (isDomainMigrationOneShotRoute(pathname)) {
+	const oneShotRoute = isDomainMigrationOneShotRoute(pathname);
+	if (oneShotRoute && !isForwardableOneShotRoute(pathname)) {
 		return false;
 	}
-	if (await startEnrolledSource(side)) {
+	if (!oneShotRoute && (await startEnrolledSource(side))) {
 		return true;
 	}
 	const environment = readDomainMigrationEnvironment();
@@ -498,6 +501,9 @@ async function forwardFromSource(side: DomainMigrationSide): Promise<boolean> {
 	}
 	if (shouldForwardCompletedSource(discovery, readDomainMigrationMarker(getProtectedLocalStorage()), environment)) {
 		return forwardCompletedSource(side);
+	}
+	if (oneShotRoute) {
+		return (await hasUsableStoredAccount()) ? false : navigate(buildTargetUrl(side.target, pathname, search, hash));
 	}
 	if (
 		discovery !== null &&
