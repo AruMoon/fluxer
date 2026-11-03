@@ -52,7 +52,6 @@ export function canDisconnectSso(user: User): boolean {
 		user.emailBounced !== true
 	);
 }
-}
 
 function getDisconnectDescription(canDisconnect: boolean, isEnforced: boolean) {
 	if (canDisconnect) return <Trans>Connected. You can disconnect this sign-in method.</Trans>;
