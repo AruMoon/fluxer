@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {createRecoveryKit, getRecoveryKitStatus} from '@app/api/auth/AuthRecoveryKit';
-import {revokeAllAuthSessions} from '@app/api/auth/AuthSessionRevocation';
 import {
 	completePasskeyMigration,
 	getPasskeyMigration,
@@ -263,7 +262,6 @@ export function UserAuthController(app: HonoApp) {
 
 			if (user.traits.has(UserTraits.SSO)) {
 				await new SsoIdentityLinkService(ctx.get('userRepository')).unlink(user, ssoProviderIdOf(ssoConfig));
-				await revokeAllAuthSessions(ctx.get('apiContext').services, user.id);
 			}
 			return ctx.body(null, 204);
 		},

@@ -2,7 +2,6 @@
 
 import {ConfirmModal} from '@app/features/app/components/dialogs/ConfirmModal';
 import RuntimeConfig from '@app/features/app/state/RuntimeConfig';
-import {logout} from '@app/features/auth/commands/AuthenticationCommands';
 import {Button} from '@app/features/ui/button/Button';
 import * as ModalCommands from '@app/features/ui/commands/ModalCommands';
 import {modal} from '@app/features/ui/commands/ModalCommands';
@@ -19,14 +18,6 @@ import {useCallback} from 'react';
 const SINGLE_SIGN_ON_DESCRIPTOR = msg({
 	message: 'Single sign-on',
 	comment: 'Fallback label for the SSO provider in account security when no display name is configured.',
-});
-const DISCONNECT_SSO_TITLE_DESCRIPTOR = msg({
-	message: 'Disconnect single sign-on?',
-	comment: 'Confirmation title when disconnecting the current account from single sign-on.',
-});
-const DISCONNECT_SSO_DESCRIPTION_DESCRIPTOR = msg({
-	message: 'You will be signed out on all devices. After disconnecting, sign in using your local account credentials.',
-	comment: 'Warning shown before disconnecting single sign-on. All current sessions will be revoked.',
 });
 const DISCONNECT_SSO_BUTTON_DESCRIPTOR = msg({
 	message: 'Disconnect',
@@ -53,10 +44,10 @@ export function canDisconnectSso(user: User): boolean {
 	);
 }
 
-function getDisconnectDescription(canDisconnect: boolean, isEnforced: boolean) {
+function getDisconnectDescription(canDisconnect: boolean, isEnforced: boolean, providerName: string) {
 	if (canDisconnect) return <Trans>Connected. You can disconnect this sign-in method.</Trans>;
-	if (isEnforced) return <Trans>This instance requires single sign-on.</Trans>;
-	return <Trans>Add a local sign-in method before disconnecting single sign-on.</Trans>;
+	if (isEnforced) return <Trans>This instance requires {providerName}.</Trans>;
+	return <Trans>Add a local sign-in method before disconnecting {providerName}.</Trans>;
 }
 
 export const SsoDisconnectRow = observer(({user}: {user: User}) => {
@@ -68,14 +59,22 @@ export const SsoDisconnectRow = observer(({user}: {user: User}) => {
 		ModalCommands.push(
 			modal(() => (
 				<ConfirmModal
-					title={i18n._(DISCONNECT_SSO_TITLE_DESCRIPTOR)}
-					description={i18n._(DISCONNECT_SSO_DESCRIPTION_DESCRIPTOR)}
+					title={
+						<Trans comment="Confirmation title when disconnecting the current account from the instance's single sign-on provider.">
+							Disconnect {providerName}?
+						</Trans>
+					}
+					description={
+						<Trans comment="Warning shown before disconnecting single sign-on.">
+							You will disconnect {providerName} from your account. You will be able to sign in to your account using a
+							different method.
+						</Trans>
+					}
 					primaryText={i18n._(DISCONNECT_SSO_BUTTON_DESCRIPTOR)}
 					primaryVariant="danger"
 					onPrimary={async () => {
 						try {
 							await disconnectSso();
-							await logout({notifyServer: false});
 						} catch (error) {
 							FormUtils.pushApiErrorModal(i18n, error, i18n._(DISCONNECT_SSO_FAILED_DESCRIPTOR));
 						}
@@ -89,7 +88,7 @@ export const SsoDisconnectRow = observer(({user}: {user: User}) => {
 	return (
 		<AccountSecurityRow
 			label={<bdi data-flx="user.account-security-tab.sso-disconnect-row.provider-name">{providerName}</bdi>}
-			description={getDisconnectDescription(canDisconnect, isEnforced)}
+			description={getDisconnectDescription(canDisconnect, isEnforced, providerName)}
 			data-flx="user.account-security-tab.sso-disconnect-row"
 		>
 			{canDisconnect && (

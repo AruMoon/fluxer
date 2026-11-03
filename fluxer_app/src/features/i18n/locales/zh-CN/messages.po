@@ -3359,14 +3359,14 @@ msgstr "添加描述（可选）"
 msgid "Add a friend to get started."
 msgstr "添加好友以开始聊天。"
 
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Add a local sign-in method before disconnecting single sign-on."
-msgstr "在断开单点登录之前，请添加本地登录方式。"
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts
 msgid "Add a keybind"
 msgstr "添加快捷键"
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting {providerName}."
+msgstr "在断开 {providerName} 之前，请添加本地登录方式。"
 
 #. Body of the optional, dismissible offer to add a passkey.
 #: src/features/auth/components/modals/AuthenticatorOfferModal.tsx
@@ -13678,6 +13678,11 @@ msgstr "放弃语音消息"
 msgid "Disconnect"
 msgstr "断开连接"
 
+#. Confirmation title when disconnecting the current account from the instance's single sign-on provider.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect {providerName}?"
+msgstr "断开 {providerName}？"
+
 #. Voice menu action that disconnects every active device or session from voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect all devices"
@@ -13699,11 +13704,6 @@ msgstr "从 {channel} 断开连接"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "断开语音连接"
-
-#. Confirmation title when disconnecting the current account from single sign-on.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Disconnect single sign-on?"
-msgstr "断开单点登录？"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -37668,8 +37668,8 @@ msgid "This instance has not finished setting up single sign-on. Ask an administ
 msgstr "此实例尚未完成单点登录设置。请管理员启用它。"
 
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "This instance requires single sign-on."
-msgstr "此实例需要单点登录。"
+msgid "This instance requires {providerName}."
+msgstr "此实例需要 {providerName}。"
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43824,15 +43824,15 @@ msgstr "你登录的是另一个账号。请使用你在这里使用的账号登
 msgid "You were deafened by moderators"
 msgstr "你已被管理员设为拒听"
 
-#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
-msgstr "您将在所有设备上退出登录。断开后，请使用您的本地账户凭据登录。"
-
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx
 msgid "You will be taken to {redirectHostname} after authorizing."
 msgstr "授权后，你将跳转到 {redirectHostname}。"
+
+#. Warning shown before disconnecting single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will disconnect {providerName} from your account. You will be able to sign in to your account using a different method."
+msgstr "您将从账户中断开 {providerName}。您将能够使用其他方式登录您的账户。"
 
 #. Security settings: confirmation modal body for turning off passkey-based two-factor authentication when the account also has an authenticator app.
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx

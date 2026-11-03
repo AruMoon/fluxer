@@ -3359,14 +3359,14 @@ msgstr "Thêm mô tả (tùy chọn)"
 msgid "Add a friend to get started."
 msgstr "Thêm bạn bè để bắt đầu."
 
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Add a local sign-in method before disconnecting single sign-on."
-msgstr "Thêm phương thức đăng nhập cục bộ trước khi ngắt kết nối single sign-on."
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts
 msgid "Add a keybind"
 msgstr "Thêm phím tắt"
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting {providerName}."
+msgstr "Thêm phương thức đăng nhập cục bộ trước khi ngắt kết nối {providerName}."
 
 #. Body of the optional, dismissible offer to add a passkey.
 #: src/features/auth/components/modals/AuthenticatorOfferModal.tsx
@@ -13678,6 +13678,11 @@ msgstr "Hủy tin nhắn thoại"
 msgid "Disconnect"
 msgstr "Ngắt kết nối"
 
+#. Confirmation title when disconnecting the current account from the instance's single sign-on provider.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect {providerName}?"
+msgstr "Ngắt kết nối {providerName}?"
+
 #. Voice menu action that disconnects every active device or session from voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect all devices"
@@ -13699,11 +13704,6 @@ msgstr "Ngắt kết nối khỏi {channel}"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "Ngắt kết nối thoại"
-
-#. Confirmation title when disconnecting the current account from single sign-on.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Disconnect single sign-on?"
-msgstr "Ngắt kết nối single sign-on?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -37668,8 +37668,8 @@ msgid "This instance has not finished setting up single sign-on. Ask an administ
 msgstr "Phiên này chưa thiết lập xong đăng nhập một lần. Hãy yêu cầu quản trị viên bật tính năng này."
 
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "This instance requires single sign-on."
-msgstr "Thực thể này yêu cầu single sign-on."
+msgid "This instance requires {providerName}."
+msgstr "Thực thể này yêu cầu {providerName}."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43824,15 +43824,15 @@ msgstr "Bạn đã đăng nhập vào một tài khoản khác. Hãy đăng nh�
 msgid "You were deafened by moderators"
 msgstr "Bạn đã bị người điều hành tắt tiếng nghe"
 
-#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
-msgstr "Bạn sẽ bị đăng xuất khỏi tất cả các thiết bị. Sau khi ngắt kết nối, hãy đăng nhập bằng thông tin đăng nhập tài khoản cục bộ của bạn."
-
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx
 msgid "You will be taken to {redirectHostname} after authorizing."
 msgstr "Bạn sẽ được đưa đến {redirectHostname} sau khi ủy quyền."
+
+#. Warning shown before disconnecting single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will disconnect {providerName} from your account. You will be able to sign in to your account using a different method."
+msgstr "Bạn sẽ ngắt kết nối {providerName} khỏi tài khoản của mình. Bạn sẽ có thể đăng nhập vào tài khoản của mình bằng một phương thức khác."
 
 #. Security settings: confirmation modal body for turning off passkey-based two-factor authentication when the account also has an authenticator app.
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx

@@ -3359,14 +3359,14 @@ msgstr "Pridėkite aprašymą (nebūtina)"
 msgid "Add a friend to get started."
 msgstr "Pridėkite draugą, kad pradėtumėte."
 
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Add a local sign-in method before disconnecting single sign-on."
-msgstr "Pridėkite vietinį prisijungimo metodą prieš atjungiant single sign-on."
-
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/KeybindsIndex.ts
 msgid "Add a keybind"
 msgstr "Pridėti spartųjį klavišą"
+
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a local sign-in method before disconnecting {providerName}."
+msgstr "Pridėkite vietinį prisijungimo metodą prieš atjungiant {providerName}."
 
 #. Body of the optional, dismissible offer to add a passkey.
 #: src/features/auth/components/modals/AuthenticatorOfferModal.tsx
@@ -13678,6 +13678,11 @@ msgstr "Atmesti balso žinutę"
 msgid "Disconnect"
 msgstr "Atjungti"
 
+#. Confirmation title when disconnecting the current account from the instance's single sign-on provider.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect {providerName}?"
+msgstr "Atjungti {providerName}?"
+
 #. Voice menu action that disconnects every active device or session from voice chat.
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect all devices"
@@ -13699,11 +13704,6 @@ msgstr "Atsijungti nuo „{channel}“"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "Atsijungti nuo balso pokalbio"
-
-#. Confirmation title when disconnecting the current account from single sign-on.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Disconnect single sign-on?"
-msgstr "Atjungti single sign-on?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -37669,8 +37669,8 @@ msgid "This instance has not finished setting up single sign-on. Ask an administ
 msgstr "Ši paskyra nebaigė nustatyti vieno prisijungimo. Paprašykite administratoriaus jį įjungti."
 
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "This instance requires single sign-on."
-msgstr "Ši instancija reikalauja single sign-on."
+msgid "This instance requires {providerName}."
+msgstr "Ši instancija reikalauja {providerName}."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -43825,15 +43825,15 @@ msgstr "Prisijungei prie kitos paskyros. Prisijunk paskyra, kurią naudoji čia.
 msgid "You were deafened by moderators"
 msgstr "Moderatoriai išjungė jūsų garsą"
 
-#. Warning shown before disconnecting single sign-on. All current sessions will be revoked.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "You will be signed out on all devices. After disconnecting, sign in using your local account credentials."
-msgstr "Būsite atjungti nuo visų įrenginių. Atjungus, prisijunkite naudodami savo vietinius paskyros duomenis."
-
 #. OAuth authorization footer shown before submission. {redirectHostname} is the external redirect host.
 #: src/features/auth/components/pages/oauth_authorize_page/OAuthAuthorizeActions.tsx
 msgid "You will be taken to {redirectHostname} after authorizing."
 msgstr "Po autorizacijos būsite nukreipti į {redirectHostname}."
+
+#. Warning shown before disconnecting single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You will disconnect {providerName} from your account. You will be able to sign in to your account using a different method."
+msgstr "Atjungsite {providerName} nuo savo paskyros. Galėsite prisijungti prie savo paskyros naudodami kitą metodą."
 
 #. Security settings: confirmation modal body for turning off passkey-based two-factor authentication when the account also has an authenticator app.
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx
