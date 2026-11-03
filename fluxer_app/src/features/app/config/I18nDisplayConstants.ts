@@ -8,6 +8,8 @@ import {THE_OTHER_PLATFORM} from '@fluxer/constants/src/ExternalPlatformConstant
 export {PRODUCT_NAME};
 export const PRODUCT_LABS_COMMUNITY_NAME = `${PRODUCT_NAME} Labs`;
 export const OPERATOR_PASS_NAME = 'Operator Pass';
+export const OPERATOR_PASS_SELLER_ADDRESS = 'c/o Embassy House, Östgötagatan 12, 116 25 Stockholm';
+export const OPERATOR_PASS_SELLER_PHONE = '+46 79 101 18 18';
 export const DESKTOP_ENTRY_NAME = 'Fluxer';
 export const CANARY_DESKTOP_ENTRY_NAME = 'Fluxer Canary';
 export const PAYMENT_PROVIDER_NAME = 'Stripe';
@@ -39,12 +41,12 @@ export const EXAMPLE_USERNAME_MENTION = '@username';
 export const EXAMPLE_FLUXER_TAG_FULL = 'Username#0000';
 export const EXAMPLE_USERNAME = 'Username';
 export const VISIONARY_LIFETIME_BADGE_LABEL = 'Visionary #42';
-export const LINK_PREVIEW_EXAMPLE_URL = 'https://fluxer.app';
+export const LINK_PREVIEW_EXAMPLE_URL = 'https://fluxer.com';
 export const EXAMPLE_GIF_URLS = `${EXAMPLE_URL}/gif1.gif\n${EXAMPLE_URL}/gif2.gif`;
 export const THE_OTHER_PLATFORM_TEMPLATE_EXAMPLE_URL = `https://${THE_OTHER_PLATFORM.toLowerCase()}.new/abcd1234`;
 const DESKTOP_DOWNLOAD_URLS: Record<string, string> = {
-	stable: 'https://fluxer.app/download',
-	canary: 'https://canary.fluxer.app/download',
+	stable: 'https://fluxer.com/download',
+	canary: 'https://canary.fluxer.com/download',
 	development: 'http://localhost:8088/download',
 };
 

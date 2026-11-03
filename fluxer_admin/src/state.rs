@@ -3,7 +3,10 @@
 use crate::{
     api::{
         client::{AdminApiClient, ApiResultExt},
-        types::{AccountIdentityMode, AccountIdentitySettings, PremiumBranding, ReportReasonEntry},
+        types::{
+            AccountIdentityMode, AccountIdentitySettings, InstanceConfigResponse, PremiumBranding,
+            ReportReasonEntry,
+        },
     },
     config::AdminConfig,
 };
@@ -72,6 +75,25 @@ impl AppState {
             .premium_branding
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some((Instant::now(), branding));
+    }
+
+    pub fn remember_instance_config_branding(&self, instance_config: &InstanceConfigResponse) {
+        self.merge_instance_config_branding(PremiumBranding::from_instance_config(instance_config));
+    }
+
+    fn merge_instance_config_branding(&self, branding: PremiumBranding) {
+        let mut cache = self
+            .inner
+            .premium_branding
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if let Some((fetched_at, previous)) = cache.as_ref() {
+            let branding = PremiumBranding {
+                discovery_enabled: previous.discovery_enabled,
+                ..branding
+            };
+            *cache = Some((*fetched_at, branding));
+        }
     }
 
     pub async fn premium_branding(&self, client: &AdminApiClient) -> Option<PremiumBranding> {

@@ -21,6 +21,7 @@ import {
 	profileOperatorPassSince,
 	resolveOperatorPassHolder,
 } from '@app/api/operator_pass/OperatorPassEntitlementService';
+import type {OperatorPassLabsRoleService} from '@app/api/operator_pass/OperatorPassLabsRole';
 import type {AuthTokenType, HonoEnv} from '@app/api/types/HonoEnv';
 import {assertAccountNotLimited} from '@app/api/user/AccountLimit';
 import {
@@ -132,6 +133,7 @@ export class UserAccountRequestService {
 		private readonly userCacheService: UserCacheService,
 		private readonly gatewayService: IGatewayService,
 		private readonly operatorPassEntitlementService: OperatorPassEntitlementService | null = null,
+		private readonly labsRoleService: OperatorPassLabsRoleService | null = null,
 	) {}
 
 	async getCurrentUserResponse(params: {
@@ -287,6 +289,14 @@ export class UserAccountRequestService {
 			}
 		}
 		if (
+			this.labsRoleService &&
+			(user.hiddenProfileBadges.has('visionary') !== updatedUser.hiddenProfileBadges.has('visionary') ||
+				user.hiddenProfileBadges.has('operator_pass') !== updatedUser.hiddenProfileBadges.has('operator_pass') ||
+				userUpdateData.premium_badge_masked !== undefined)
+		) {
+			await this.labsRoleService.resyncLabsRoles(updatedUser);
+		}
+		if (
 			(user.hiddenProfileBadges.has('operator_pass') !== updatedUser.hiddenProfileBadges.has('operator_pass') ||
 				userUpdateData.operator_pass_badge_timestamp_hidden !== undefined ||
 				userUpdateData.operator_pass_badge_count_hidden !== undefined) &&
@@ -342,17 +352,18 @@ export class UserAccountRequestService {
 
 	async getUserProfile(params: UserProfileParams): Promise<UserProfileFullResponse> {
 		const guildId = params.guildId ? createGuildID(params.guildId) : undefined;
+		const profileLookup = this.userAccountService.lookupService.getUserProfile({
+			userId: params.currentUserId,
+			targetId: params.targetUserId,
+			guildId,
+			withMutualFriends: params.withMutualFriends,
+			withMutualGuilds: params.withMutualGuilds,
+			requestCache: params.requestCache,
+		});
 		const [profile, operatorPassState, badgeEnvironment] = await Promise.all([
-			this.userAccountService.lookupService.getUserProfile({
-				userId: params.currentUserId,
-				targetId: params.targetUserId,
-				guildId,
-				withMutualFriends: params.withMutualFriends,
-				withMutualGuilds: params.withMutualGuilds,
-				requestCache: params.requestCache,
-			}),
+			profileLookup,
 			this.operatorPassEntitlementService?.loadState(params.targetUserId) ?? null,
-			loadProfileBadgeEnvironment(),
+			profileLookup.then((found) => loadProfileBadgeEnvironment(found.user.badgeIds)),
 		]);
 		let profileUser = profile.user;
 		let premiumType = profile.premiumType;
@@ -415,7 +426,6 @@ export class UserAccountRequestService {
 			environment: badgeEnvironment,
 			restricted: restrictProfile,
 			profileHidden: hidden,
-			viewerIsSelf,
 		};
 		const profileBadges = buildProfileBadges(badgeInput);
 		const hiddenProfileBadgeCount = viewerIsSelf
@@ -450,7 +460,7 @@ export class UserAccountRequestService {
 		const {user, settings} = params;
 		const [operatorPassState, environment] = await Promise.all([
 			user.isBot ? null : (this.operatorPassEntitlementService?.loadState(user.id) ?? null),
-			loadProfileBadgeEnvironment(),
+			loadProfileBadgeEnvironment(user.badgeIds),
 		]);
 		const expired = shouldStripExpiredPremium(user);
 		const input = {

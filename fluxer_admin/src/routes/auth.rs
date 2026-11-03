@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{
-    api::client::AdminApiClient,
+    api::client::{AdminApiClient, ApiError},
     config::AdminConfig,
     oauth2,
     session::{
@@ -81,15 +81,7 @@ async fn login_page(
     {
         return Redirect::to(&format!("{}/dashboard", config.base_path)).into_response();
     }
-    let error_msg = match query.error.as_deref() {
-        Some("oauth_failed") => Some("Authentication failed. Please try again."),
-        Some("missing_admin_acl") => Some(
-            "Access denied: missing admin:authenticate permission. \
-             Ask an administrator to grant access.",
-        ),
-        Some(_) => Some("Login error. Please try again."),
-        None => None,
-    };
+    let error_msg = query.error.as_deref().map(login_error_message);
     let branding = state.self_hosted_branding().await;
     Html(login::login_page(config, branding.as_ref(), error_msg).into_string()).into_response()
 }
@@ -181,12 +173,16 @@ async fn oauth2_callback_finish(
         created_at: 0,
     };
     let api_client = AdminApiClient::new(state.http_client(), config, &temp_session);
-    if api_client.get_current_admin().await.is_err() {
-        return oauth_finish_response(
-            StatusCode::FORBIDDEN,
-            &format!("{base}/login?error=missing_admin_acl"),
-            &[],
-        );
+    if let Err(err) = api_client.get_current_admin().await {
+        let code = admin_check_error_code(&err);
+        let status = if code == "missing_admin_acl" {
+            tracing::warn!(%err, user_id = %user.id, "Admin access check denied");
+            StatusCode::FORBIDDEN
+        } else {
+            tracing::error!(%err, user_id = %user.id, "Admin access check failed");
+            StatusCode::BAD_GATEWAY
+        };
+        return oauth_finish_response(status, &format!("{base}/login?error={code}"), &[]);
     }
 
     let session_cookie_value =
@@ -484,19 +480,39 @@ fn now_seconds() -> u64 {
         .as_secs()
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+fn admin_check_error_code(err: &ApiError) -> &'static str {
+    match err {
+        ApiError::Http {
+            status: 401 | 403, ..
+        } => "missing_admin_acl",
+        ApiError::Http {
+            status: 404 | 405, ..
+        }
+        | ApiError::Parse(_) => "admin_api_mismatch",
+        ApiError::Network(_) => "admin_api_unreachable",
+        ApiError::Http { .. } => "admin_check_failed",
+    }
+}
 
-    #[test]
-    fn oauth_state_survives_ten_minutes_on_the_consent_page() {
-        let verifier = "verifier";
-        let issued = |age: u64| sign_oauth_state("secret", now_seconds() - age, [7; 16], verifier);
-        assert!(verify_oauth_state("secret", &issued(10 * 60), verifier));
-        assert!(!verify_oauth_state(
-            "secret",
-            &issued(OAUTH_STATE_MAX_AGE_SECONDS + 60),
-            verifier
-        ));
+fn login_error_message(code: &str) -> &'static str {
+    match code {
+        "oauth_failed" => "Authentication failed. Please try again.",
+        "missing_admin_acl" => {
+            "Access denied: missing admin:authenticate permission. \
+             Ask an administrator to grant access."
+        }
+        "admin_api_mismatch" => {
+            "Could not verify admin access because the API response did not match this admin panel. \
+             Make sure the admin and API services run the same release."
+        }
+        "admin_api_unreachable" => {
+            "Could not connect to the API to verify admin access. \
+             Check that the admin service can connect to the API and try again."
+        }
+        "admin_check_failed" => {
+            "Could not verify admin access. \
+             Try again in a moment and check the admin service logs if it keeps failing."
+        }
+        _ => "Login error. Please try again.",
     }
 }

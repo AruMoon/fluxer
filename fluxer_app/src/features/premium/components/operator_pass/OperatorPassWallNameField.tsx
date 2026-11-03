@@ -21,11 +21,6 @@ const WALL_NAME_SETTINGS_LABEL_DESCRIPTOR = msg({
 	comment:
 		"Label of the text field for the name shown on the Operators' wall, in the settings. The wall is the list of Operators on the homepage.",
 });
-const WALL_NAME_HINT_DESCRIPTOR = msg({
-	message: 'We check new names before they go live.',
-	comment:
-		"Hint under the Operators' wall name field. Go live means showing on the Operators' wall, the list of Operators on the homepage.",
-});
 export const DONT_LIST_ME_DESCRIPTOR = msg({
 	message: "Don't list me",
 	comment:
@@ -35,6 +30,11 @@ const WALL_NAME_REQUIRED_DESCRIPTOR = msg({
 	message: "Enter a name, or check Don't list me.",
 	comment:
 		"Error under the Operators' wall name field when it is empty and the person did not choose to stay off the wall. Don't list me is the label of the checkbox under the field, use the same words as that label.",
+});
+const WALL_NAME_REJECTED_DESCRIPTOR = msg({
+	message: "We can't show this name on the Operators' wall. Please choose another one.",
+	comment:
+		"Error under the Operators' wall name field when the server turned the name down, for example because it looks like it comes from Fluxer or another brand. Never say which rule matched.",
 });
 const WALL_NAME_TOO_LONG_DESCRIPTOR = msg({
 	message: 'Use 32 characters or fewer.',
@@ -67,6 +67,8 @@ export const OperatorPassWallNameField = observer(function OperatorPassWallNameF
 			error = i18n._(WALL_NAME_REQUIRED_DESCRIPTOR);
 		} else if (problem === 'too_long') {
 			error = i18n._(WALL_NAME_TOO_LONG_DESCRIPTOR);
+		} else if (problem === 'rejected') {
+			error = i18n._(WALL_NAME_REJECTED_DESCRIPTOR);
 		}
 	}
 	return (
@@ -78,13 +80,6 @@ export const OperatorPassWallNameField = observer(function OperatorPassWallNameF
 				dir="auto"
 				onChange={(event) => onNameChange(event.target.value)}
 				error={error}
-				footer={
-					error ? undefined : (
-						<span className={styles.hint} data-flx="premium.operator-pass-wall-name-field.hint">
-							{i18n._(WALL_NAME_HINT_DESCRIPTOR)}
-						</span>
-					)
-				}
 				maxLength={OPERATOR_PASS_WALL_NAME_MAX_LENGTH + WALL_NAME_INPUT_OVERFLOW_ALLOWANCE}
 				autoComplete="off"
 				disabled={disabled || optOut}

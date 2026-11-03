@@ -178,12 +178,17 @@ export class VoiceService {
 			let serverSelection = null;
 
 			if (countryRegionId !== null) {
-				serverSelection = this.selectServerForRegion({
-					regionId: countryRegionId,
-					context,
-					accessibleRegions,
-					allowRegionFallback: false,
-				});
+				const countryServer = this.voiceAvailabilityService.selectServer(
+        			countryRegionId,
+        			context,
+    			);
+
+    			if (countryServer) {
+        			serverSelection = {
+            			regionId: countryRegionId,
+            			server: countryServer,
+        			};
+    			}
 			}
 
 			if (serverSelection) {
@@ -221,11 +226,11 @@ export class VoiceService {
 				if (!regionId) {
 					throw new FeatureTemporarilyDisabledError();
 				}
-				serverSelection = this.selectServerForRegion({
+				serverSelection = this.voiceAvailabilityService.selectServerOrFallback(
 					regionId,
 					context,
 					accessibleRegions,
-				});
+				);
 				if (!serverSelection) {
 					throw new FeatureTemporarilyDisabledError();
 				}
@@ -352,7 +357,11 @@ export class VoiceService {
 			return null;
 		}
 		const serverRecord = this.liveKitService.getServer(pinnedServer.regionId, pinnedServer.serverId);
-		if (serverRecord && this.voiceAvailabilityService.isServerAccessible(serverRecord, context)) {
+		if (
+			serverRecord &&
+			this.voiceAvailabilityService.isServerAccessible(serverRecord, context) &&
+			!this.voiceAvailabilityService.isServerDown(serverRecord)
+		) {
 			return {
 				regionId: pinnedServer.regionId,
 				serverId: pinnedServer.serverId,
@@ -360,40 +369,6 @@ export class VoiceService {
 			};
 		}
 		await this.voiceRoomStore.deleteRoomServer(guildId, channelId);
-		return null;
-	}
-
-	private selectServerForRegion({
-		regionId,
-		context,
-		accessibleRegions,
-		allowRegionFallback = true,
-	}: {
-		regionId: string;
-		context: VoiceAccessContext;
-		accessibleRegions: Array<VoiceRegionAvailability>;
-		allowRegionFallback?: boolean;
-	}): {
-		regionId: string;
-		server: VoiceServerRecord;
-	} | null {
-		const initialServer = this.voiceAvailabilityService.selectServer(regionId, context);
-		if (initialServer) {
-			return {regionId, server: initialServer};
-		}
-		if (!allowRegionFallback) {
-			return null;
-		}
-		const fallbackRegion = accessibleRegions.find((region) => region.id !== regionId);
-		if (fallbackRegion) {
-			const fallbackServer = this.voiceAvailabilityService.selectServer(fallbackRegion.id, context);
-			if (fallbackServer) {
-				return {
-					regionId: fallbackRegion.id,
-					server: fallbackServer,
-				};
-			}
-		}
 		return null;
 	}
 
@@ -405,7 +380,7 @@ export class VoiceService {
 		for (const region of accessibleRegions) {
 			servers.push(...this.voiceAvailabilityService.getAccessibleServersForRegion(region.id, context));
 		}
-		return servers;
+		return this.voiceAvailabilityService.preferPlaceableServers(servers);
 	}
 
 	async updateParticipant(params: {

@@ -14,7 +14,9 @@ import {
 	AccountIdentityModes,
 	TagStyles,
 } from '@fluxer/constants/src/AccountIdentityConstants';
+import {BUILT_IN_GUILD_BADGE_KINDS} from '@fluxer/constants/src/BadgeConstants';
 import {LIMIT_KEYS, type LimitKey} from '@fluxer/constants/src/LimitConfigMetadata';
+import {NO_BUILT_IN_GUILD_BADGE_IMAGES} from '@fluxer/instance_bootstrap/src/ClientRuntimeDiscovery';
 import {
 	ACCOUNT_DELETION_GRACE_PERIOD_HOURS_MAX,
 	ACCOUNT_DELETION_GRACE_PERIOD_HOURS_MIN,
@@ -30,10 +32,12 @@ import {
 	type InstanceAgePolicy,
 	type InstanceAgePolicyGeo,
 	type InstanceAppPublic,
+	type InstanceBuiltInGuildBadgeImages,
 	type InstanceCommunity,
 	type InstanceDomainMigration,
 	type InstanceFeatures,
 	type InstanceGuildBadge,
+	type InstanceHiddenBuiltInGuildBadges,
 	type InstanceNotice,
 	type InstanceRegistration,
 	type InstanceServices,
@@ -76,6 +80,10 @@ export interface RuntimeConfigSnapshot extends RuntimeConfigIdentity {
 	readonly domainMigration: InstanceDomainMigration | null;
 	readonly notice: InstanceNotice | null;
 	readonly guildBadges: ReadonlyArray<InstanceGuildBadge>;
+	readonly guildBadgesPartial: boolean;
+	readonly customBadgesVersion: string | null;
+	readonly builtInGuildBadgeImages: InstanceBuiltInGuildBadgeImages;
+	readonly hiddenBuiltInGuildBadges: InstanceHiddenBuiltInGuildBadges;
 }
 
 export class InvalidRuntimeConfigSnapshotError extends Error {
@@ -480,6 +488,8 @@ function readAppPublic(value: unknown): InstanceAppPublic {
 				: null,
 			theme_color: normalizeThemeColor(branding.theme_color),
 			status_page_url: readOptionalText(branding, 'status_page_url'),
+			status_page_instatus:
+				readOptionalBoolean(branding, 'status_page_instatus', 'appPublic.branding.status_page_instatus') ?? false,
 			status_page_incident_history_url: readOptionalText(branding, 'status_page_incident_history_url'),
 			premium_product_name: readOptionalText(branding, 'premium_product_name') ?? DEFAULT_PREMIUM_PRODUCT_NAME,
 			premium_info_url: Object.hasOwn(branding, 'premium_info_url')
@@ -575,14 +585,37 @@ function readGuildBadges(value: unknown): Array<InstanceGuildBadge> {
 	return value.map((entry, index) => {
 		const path = `guildBadges[${index}]`;
 		const source = readRecord(entry, path);
+		const position =
+			source.position === undefined ? undefined : readNonEmptyString(source, 'position', `${path}.position`);
 		return {
 			id: readNonEmptyString(source, 'id', `${path}.id`),
 			name: readNonEmptyString(source, 'name', `${path}.name`),
 			description: readNullableNonEmptyString(source, 'description', `${path}.description`),
 			asset_url: readNonEmptyString(source, 'asset_url', `${path}.asset_url`),
 			href: readNullableAbsoluteHttpUrl(source, 'href', `${path}.href`),
+			...(position === undefined ? {} : {position}),
 		};
 	});
+}
+
+function readBuiltInGuildBadgeImages(value: unknown): InstanceBuiltInGuildBadgeImages {
+	if (value === undefined) {
+		return NO_BUILT_IN_GUILD_BADGE_IMAGES;
+	}
+	const source = readRecord(value, 'builtInGuildBadgeImages');
+	const read = (key: keyof InstanceBuiltInGuildBadgeImages) =>
+		source[key] === undefined ? null : readNullableNonEmptyString(source, key, `builtInGuildBadgeImages.${key}`);
+	return {verified: read('verified'), partnered: read('partnered'), discoverable: read('discoverable')};
+}
+
+function readHiddenBuiltInGuildBadges(value: unknown): InstanceHiddenBuiltInGuildBadges {
+	if (value === undefined) {
+		return [];
+	}
+	if (!Array.isArray(value)) {
+		invalid('hiddenBuiltInGuildBadges', 'must be an array');
+	}
+	return BUILT_IN_GUILD_BADGE_KINDS.filter((kind) => value.includes(kind));
 }
 
 export function requireRuntimeConfigSnapshot(value: unknown): RuntimeConfigSnapshot {
@@ -615,5 +648,12 @@ export function requireRuntimeConfigSnapshot(value: unknown): RuntimeConfigSnaps
 		domainMigration: parseInstanceDomainMigration(source.domainMigration),
 		notice: readNotice(source.notice),
 		guildBadges: readGuildBadges(source.guildBadges),
+		guildBadgesPartial: source.guildBadgesPartial === true,
+		customBadgesVersion:
+			source.customBadgesVersion === undefined || source.customBadgesVersion === null
+				? null
+				: readNonEmptyString(source, 'customBadgesVersion', 'customBadgesVersion'),
+		builtInGuildBadgeImages: readBuiltInGuildBadgeImages(source.builtInGuildBadgeImages),
+		hiddenBuiltInGuildBadges: readHiddenBuiltInGuildBadges(source.hiddenBuiltInGuildBadges),
 	};
 }

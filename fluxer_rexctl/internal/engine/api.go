@@ -20,6 +20,8 @@ const (
 const (
 	MinPodman = "5.4.0"
 	MinDocker = "24.0.0"
+
+	MinDockerIPv6 = "27.0.0"
 )
 
 const DefaultReadyTimeout = 10 * time.Minute
@@ -103,6 +105,7 @@ type HelperOptions struct {
 	Image      string
 	Entrypoint []string
 	Command    []string
+	Env        []string
 	Mounts     []Mount
 	Stdin      io.Reader
 	Stdout     io.Writer
@@ -149,6 +152,7 @@ type Volume struct {
 	Labels     map[string]string
 	Mountpoint string
 	Device     string
+	CreatedAt  string
 }
 
 type ProjectInfo struct {

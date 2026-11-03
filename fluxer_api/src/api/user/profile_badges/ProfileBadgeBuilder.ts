@@ -15,7 +15,12 @@ import {
 	type ProfileBadgeView,
 	type VisibleOperatorPass,
 } from '@app/api/user/profile_badges/ProfileBadgeRegistry';
-import {customProfileBadgeKey, type ProfileBadgeKey, type ProfileBadgeKind} from '@fluxer/constants/src/BadgeConstants';
+import {
+	customProfileBadgeKey,
+	isReplaceableProfileBadgeKind,
+	type ProfileBadgeKey,
+	type ProfileBadgeKind,
+} from '@fluxer/constants/src/BadgeConstants';
 import {PremiumFlags, stripHiddenProfileBadgeFlags} from '@fluxer/constants/src/UserConstants';
 import type {
 	AdminProfileBadgeResponse,
@@ -41,22 +46,22 @@ export interface ProfileBadgeInput {
 	environment: ProfileBadgeEnvironment;
 	restricted?: boolean;
 	profileHidden?: boolean;
-	viewerIsSelf?: boolean;
 }
 
 type ViewSource = Omit<ProfileBadgeView, 'shown'> & {customBadgeIds: ReadonlySet<bigint>};
 
 const NO_HIDDEN_BADGES: ReadonlySet<ProfileBadgeKey> = new Set();
 
-function publicOperatorPass(
-	holder: OperatorPassHolder | null,
-	user: ProfileBadgeSubject,
-	viewerIsSelf: boolean,
-): VisibleOperatorPass | null {
+function visibleOperatorPass(holder: OperatorPassHolder, user: ProfileBadgeSubject): VisibleOperatorPass {
+	return {
+		since: isOperatorPassTimestampHidden(user.premiumFlags) ? null : holder.since,
+		count: isOperatorPassCountHidden(user.premiumFlags) ? null : holder.count,
+	};
+}
+
+function publicOperatorPass(holder: OperatorPassHolder | null, user: ProfileBadgeSubject): VisibleOperatorPass | null {
 	if (!holder || user.hiddenProfileBadges.has('operator_pass')) return null;
-	const since = !viewerIsSelf && isOperatorPassTimestampHidden(user.premiumFlags) ? null : holder.since;
-	const count = !viewerIsSelf && isOperatorPassCountHidden(user.premiumFlags) ? null : holder.count;
-	return {since, count};
+	return visibleOperatorPass(holder, user);
 }
 
 function publicViewSource(input: ProfileBadgeInput): ViewSource | null {
@@ -72,7 +77,7 @@ function publicViewSource(input: ProfileBadgeInput): ViewSource | null {
 			selfHosted: environment.selfHosted,
 			restricted,
 		}),
-		operatorPass: restricted ? null : publicOperatorPass(input.operatorPass, user, input.viewerIsSelf === true),
+		operatorPass: restricted ? null : publicOperatorPass(input.operatorPass, user),
 		environment,
 		locale: resolveContentLocale(input.locale),
 		customBadgeIds: new Set([...user.badgeIds].filter((id) => !hidden.has(customProfileBadgeKey(id.toString())))),
@@ -89,7 +94,7 @@ function heldViewSource(input: ProfileBadgeInput, premiumFlags: number): ViewSou
 			selfHosted: environment.selfHosted,
 			restricted: false,
 		}),
-		operatorPass: input.operatorPass ? {since: input.operatorPass.since, count: input.operatorPass.count} : null,
+		operatorPass: input.operatorPass ? visibleOperatorPass(input.operatorPass, input.user) : null,
 		environment,
 		locale: resolveContentLocale(input.locale),
 		customBadgeIds: user.badgeIds,
@@ -108,14 +113,21 @@ function render(source: ViewSource | null): Array<KeyedProfileBadge> {
 		const content = definition.qualify({...source, shown});
 		if (!content) continue;
 		shown.add(definition.kind);
+		const replacement = isReplaceableProfileBadgeKind(definition.kind)
+			? source.environment.builtInImages[definition.kind]
+			: undefined;
 		badges.push({
 			key: definition.kind,
 			kind: definition.kind,
 			label: content.label,
-			asset: content.asset ?? definition.asset,
-			asset_url: null,
-			...(content.smallAsset ? {small_asset: content.smallAsset} : {}),
-			aspect_ratio: content.aspectRatio ?? null,
+			...(replacement
+				? {asset: null, asset_url: customBadgeImageUrl(replacement, source.environment.mediaUrl), aspect_ratio: null}
+				: {
+						asset: content.asset ?? definition.asset,
+						asset_url: null,
+						...(content.smallAsset ? {small_asset: content.smallAsset} : {}),
+						aspect_ratio: content.aspectRatio ?? null,
+					}),
 			caption: content.caption ?? null,
 			href: definition.href(source.environment),
 			...(content.count !== undefined ? {count: content.count} : {}),

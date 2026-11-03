@@ -48,6 +48,12 @@ function createServer(overrides: Partial<VoiceServerRecord> = {}): VoiceServerRe
 		isActive: true,
 		softConnectionLimit: null,
 		notes: null,
+		internalEndpoint: null,
+		pinnedHostname: null,
+		pinnedSoftLimit: false,
+		publicIpv4: null,
+		publicIpv6: null,
+		draining: false,
 		restrictions: {
 			vipOnly: false,
 			requiredGuildFeatures: new Set(),

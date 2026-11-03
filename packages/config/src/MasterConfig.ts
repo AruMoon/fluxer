@@ -15,6 +15,16 @@ export const TAG_STYLE_NAMES = ['none', 'random'] as const;
 type TagStyleName = (typeof TAG_STYLE_NAMES)[number];
 type SmtpTlsModeName = 'implicit' | 'starttls' | 'opportunistic' | 'none';
 
+export interface VoiceTurnServerConfig {
+	host: string;
+	port: number;
+	protocol: 'udp' | 'tcp' | 'tls';
+	username?: string;
+	credential?: string;
+	secret?: string;
+	ttl?: number;
+}
+
 interface SmtpConfig {
 	host: string;
 	port: number;
@@ -112,6 +122,7 @@ export interface MasterConfig {
 			presigned_harvest_downloads_enabled: boolean;
 			unfurl_ignored_hosts: Array<string>;
 			app_origin_aliases: Array<string>;
+			discovery_public_endpoint: string;
 			worker?: {
 				mode?: 'all_lanes' | 'single_lane' | 'single_task';
 				lane?: 'realtime' | 'unfurl' | 'lifecycle' | 'batch' | 'crosspost';
@@ -196,6 +207,7 @@ export interface MasterConfig {
 			from_email: string;
 			from_name: string;
 			reply_to_email: string;
+			support_alert_email?: string;
 			app_base_url: string;
 			webhook_secret?: string;
 			smtp?: SmtpConfig;
@@ -210,6 +222,7 @@ export interface MasterConfig {
 			api_secret: string;
 			url: string;
 			internal_url: string;
+			bundled?: boolean;
 			default_region?: {
 				id: string;
 				name: string;
@@ -218,6 +231,9 @@ export interface MasterConfig {
 				longitude: number;
 			};
 			p2p_stun_urls?: Array<string>;
+			turn_servers?: Array<VoiceTurnServerConfig>;
+			join_allow_private_endpoints?: boolean;
+			health_interval_ms?: number;
 		};
 		search: {
 			engine: 'elasticsearch' | 'meilisearch' | 'none';
@@ -307,6 +323,10 @@ export interface MasterConfig {
 		};
 		account_identity: AccountIdentityModeName | null;
 		tag_style: TagStyleName | null;
+		age_policy: {
+			enabled?: boolean;
+			restricted_regions?: Array<string>;
+		};
 	};
 	payment_disputes: {
 		closure_effective_at?: string;
@@ -318,14 +338,18 @@ export interface MasterConfig {
 		now_override?: string;
 		labs_guild_id?: string;
 		labs_operator_role_id?: string;
+		labs_visionary_role_id?: string;
+		labs_access_role_id?: string;
+		labs_operators_channel_id?: string;
 		standard_prices_minor?: Partial<Record<string, number>>;
 		release_lists?: string;
 		transfer_lock_hours?: number;
+		wall_auto_approve?: boolean;
 		withdrawal_countries?: string;
-		stopped_countries?: string;
 		localized_prices_enabled?: Partial<Record<string, boolean>>;
 		wall_tiers?: string;
 		max_quantity?: number;
+		preview_ips?: Array<string>;
 	};
 	dev: {
 		relax_registration_rate_limits: boolean;

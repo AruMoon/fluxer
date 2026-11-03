@@ -8,11 +8,13 @@ import {
 import type {
 	InstanceAgePolicy,
 	InstanceAppPublic,
+	InstanceBuiltInGuildBadgeImages,
 	InstanceCommunity,
 	InstanceDomainMigration,
 	InstanceFeatures,
 	InstanceGif,
 	InstanceGuildBadge,
+	InstanceHiddenBuiltInGuildBadges,
 	InstanceNotice,
 	InstancePush,
 	InstanceRegistration,
@@ -22,6 +24,12 @@ import type {
 import type {LimitConfigSnapshot, LimitConfigWireFormat} from '@fluxer/limits/src/LimitTypes';
 
 const DEFAULT_PREMIUM_PRODUCT_NAME = 'Plutonium';
+
+export const NO_BUILT_IN_GUILD_BADGE_IMAGES: InstanceBuiltInGuildBadgeImages = {
+	verified: null,
+	partnered: null,
+	discoverable: null,
+};
 
 export interface ClientRuntimeDiscoveryEndpoints {
 	readonly discoveryApiEndpoint: string;
@@ -56,6 +64,10 @@ export interface ClientRuntimeDiscovery {
 	readonly domainMigration: InstanceDomainMigration | null;
 	readonly notice?: InstanceNotice | null;
 	readonly guildBadges: ReadonlyArray<InstanceGuildBadge>;
+	readonly guildBadgesPartial: boolean;
+	readonly customBadgesVersion: string | null;
+	readonly builtInGuildBadgeImages: InstanceBuiltInGuildBadgeImages;
+	readonly hiddenBuiltInGuildBadges: InstanceHiddenBuiltInGuildBadges;
 }
 
 export function projectClientRuntimeDiscovery(document: InstanceDiscoveryDocument): ClientRuntimeDiscovery {
@@ -76,6 +88,10 @@ export function projectClientRuntimeDiscovery(document: InstanceDiscoveryDocumen
 		domainMigration: document.domainMigration,
 		notice: document.notice ?? null,
 		guildBadges: document.guildBadges ?? [],
+		guildBadgesPartial: document.guildBadgesPartial ?? false,
+		customBadgesVersion: document.customBadgesVersion ?? null,
+		builtInGuildBadgeImages: document.builtInGuildBadgeImages ?? NO_BUILT_IN_GUILD_BADGE_IMAGES,
+		hiddenBuiltInGuildBadges: document.hiddenBuiltInGuildBadges ?? [],
 	};
 }
 
@@ -135,6 +151,7 @@ function projectAppPublic(appPublic: InstanceDiscoveryDocument['appPublic']): In
 			favicon_dark_url: value.branding.favicon_dark_url ?? null,
 			theme_color: requireDefined(value.branding.theme_color, 'app_public.branding.theme_color'),
 			status_page_url: value.branding.status_page_url ?? null,
+			status_page_instatus: value.branding.status_page_instatus ?? false,
 			status_page_incident_history_url: value.branding.status_page_incident_history_url ?? null,
 			premium_product_name: value.branding.premium_product_name ?? DEFAULT_PREMIUM_PRODUCT_NAME,
 			premium_info_url: value.branding.premium_info_url ?? null,

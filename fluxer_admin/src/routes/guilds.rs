@@ -43,6 +43,8 @@ struct GuildDetailQuery {
     page: Option<u32>,
     reports_page: Option<u32>,
     before: Option<String>,
+    badge_q: Option<String>,
+    badge_pick: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -533,6 +535,15 @@ async fn guild_tab(
     request: Request,
 ) -> Response {
     let config = state.config();
+    if let Some(redirect) = htmx::tab_page_redirect(
+        request.headers(),
+        request.uri().query(),
+        &format!("{}/guilds", config.base_path),
+        &guild_id,
+        &tab,
+    ) {
+        return redirect;
+    }
     let csrf_token = csrf::get_csrf_token(&request);
     let client = AdminApiClient::new(state.http_client(), config, &auth.0.session);
     let admin_acls = auth.0.acls();
@@ -580,6 +591,8 @@ fn to_tab_query(q: &GuildDetailQuery) -> guild_tabs::GuildTabQuery {
         members_page: q.page,
         reports_page: q.reports_page,
         audit_before: q.before.clone(),
+        badge_query: q.badge_q.clone(),
+        badge_picks: crate::api::badges::parse_badge_picks(q.badge_pick.as_deref()),
     }
 }
 
