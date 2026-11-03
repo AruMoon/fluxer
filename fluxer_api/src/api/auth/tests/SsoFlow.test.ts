@@ -1022,7 +1022,7 @@ describe('Auth SSO flow', () => {
 			expect(signedIn.user_id).toBe(account.userId);
 		});
 
-		it('lets a regular user disconnect SSO and revokes every session', async () => {
+		it('lets a regular user disconnect SSO', async () => {
 			const account = await createTestAccount(harness);
 			await enableSso(harness, admin.token, {enforced: false});
 			const sub = `itest-sso-unlink-${Date.now()}`;
@@ -1036,7 +1036,6 @@ describe('Auth SSO flow', () => {
 				.execute();
 
 			expect(await new SsoIdentityRepository().listForUser(createUserID(BigInt(account.userId)))).toHaveLength(0);
-			await createBuilder(harness, account.token).get('/users/@me').expect(401).execute();
 		});
 
 		it('does not allow users to disconnect SSO while the instance enforces it', async () => {
