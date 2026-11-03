@@ -178,17 +178,14 @@ export class VoiceService {
 			let serverSelection = null;
 
 			if (countryRegionId !== null) {
-				const countryServer = this.voiceAvailabilityService.selectServer(
-        			countryRegionId,
-        			context,
-    			);
+				const countryServer = this.voiceAvailabilityService.selectServer(countryRegionId, context);
 
-    			if (countryServer) {
-        			serverSelection = {
-            			regionId: countryRegionId,
-            			server: countryServer,
-        			};
-    			}
+				if (countryServer) {
+					serverSelection = {
+						regionId: countryRegionId,
+						server: countryServer,
+					};
+				}
 			}
 
 			if (serverSelection) {
@@ -226,11 +223,7 @@ export class VoiceService {
 				if (!regionId) {
 					throw new FeatureTemporarilyDisabledError();
 				}
-				serverSelection = this.voiceAvailabilityService.selectServerOrFallback(
-					regionId,
-					context,
-					accessibleRegions,
-				);
+				serverSelection = this.voiceAvailabilityService.selectServerOrFallback(regionId, context, accessibleRegions);
 				if (!serverSelection) {
 					throw new FeatureTemporarilyDisabledError();
 				}
