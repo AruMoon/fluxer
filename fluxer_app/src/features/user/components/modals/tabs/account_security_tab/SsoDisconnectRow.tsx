@@ -42,7 +42,16 @@ export function isSsoLinked(user: User): boolean {
 }
 
 export function canDisconnectSso(user: User): boolean {
-	return isSsoLinked(user) && RuntimeConfig.getSnapshot().sso?.enforced !== true && user.hasPassword;
+	if (!isSsoLinked(user) || RuntimeConfig.getSnapshot().sso?.enforced === true) return false;
+	if (user.hasPassword) return true;
+	return (
+		!RuntimeConfig.usesUsernameSignIn &&
+		RuntimeConfig.emailsEnabled &&
+		user.email != null &&
+		user.verified === true &&
+		user.emailBounced !== true
+	);
+}
 }
 
 function getDisconnectDescription(canDisconnect: boolean, isEnforced: boolean) {

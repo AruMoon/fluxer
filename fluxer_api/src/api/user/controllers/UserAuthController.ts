@@ -25,6 +25,7 @@ import type {HonoApp} from '@app/api/types/HonoEnv';
 import {assertValidTotpSetupCode} from '@app/api/user/services/UserAuth';
 import {isSsoUserWithoutPassword} from '@app/api/user/UserHelpers';
 import {Validator} from '@app/api/Validator';
+import {AccountIdentityModes} from '@fluxer/constants/src/AccountIdentityConstants';
 import {UserTraits} from '@fluxer/constants/src/UserTraitConstants';
 import {ValidationErrorCodes} from '@fluxer/constants/src/ValidationErrorCodes';
 import {SsoRequiredError, SsoRequiredReasons} from '@fluxer/errors/src/domains/auth/SsoRequiredError';
@@ -250,7 +251,13 @@ export function UserAuthController(app: HonoApp) {
 			}
 
 			const hasLocalPassword = user.passwordHash !== null;
-			if (!hasLocalPassword) {
+			const hasEmailCodeSignIn =
+				(await instanceConfig.getAccountIdentityMode()) === AccountIdentityModes.EMAIL &&
+				user.email !== null &&
+				user.emailVerified &&
+				!user.emailBounced &&
+				(await instanceConfig.isEmailEnabled());
+			if (!hasLocalPassword && !hasEmailCodeSignIn) {
 				throw InputValidationError.fromCode('password', ValidationErrorCodes.PASSWORD_NOT_SET);
 			}
 
