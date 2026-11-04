@@ -54,6 +54,7 @@ import {
 	PasskeyMigrationCompleteRequest,
 	PasskeyMigrationResponse,
 } from '@fluxer/schema/src/domains/auth/PasskeyMigrationSchemas';
+import {WebAuthnRpIdQuery} from '@fluxer/schema/src/domains/auth/WebAuthnSchemas';
 import {CredentialIdParam} from '@fluxer/schema/src/domains/common/CommonParamSchemas';
 import {EmptyBodyRequest} from '@fluxer/schema/src/domains/user/UserRequestSchemas';
 import {
@@ -415,6 +416,7 @@ export function UserAuthController(app: HonoApp) {
 		DefaultUserOnly,
 		SudoModeMiddleware,
 		Validator('json', SudoVerificationSchema),
+		Validator('query', WebAuthnRpIdQuery),
 		OpenAPI({
 			operationId: 'get_webauthn_registration_options',
 			summary: 'Get WebAuthn registration options',
@@ -432,7 +434,9 @@ export function UserAuthController(app: HonoApp) {
 				issueSudoToken: false,
 			});
 			return ctx.json(
-				await ctx.get('userAuthRequestService').generateWebAuthnRegistrationOptions(user, ctx.req.header('origin')),
+				await ctx
+					.get('userAuthRequestService')
+					.generateWebAuthnRegistrationOptions(user, ctx.req.header('origin'), ctx.req.valid('query').rp_id),
 			);
 		},
 	);
@@ -639,6 +643,7 @@ export function UserAuthController(app: HonoApp) {
 		RateLimitMiddleware(RateLimitConfigs.SUDO_WEBAUTHN_OPTIONS),
 		LoginRequired,
 		DefaultUserOnly,
+		Validator('query', WebAuthnRpIdQuery),
 		OpenAPI({
 			operationId: 'get_sudo_webauthn_authentication_options',
 			summary: 'Get sudo WebAuthn authentication options',
@@ -651,7 +656,9 @@ export function UserAuthController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			return ctx.json(
-				await ctx.get('userAuthRequestService').getSudoWebAuthnOptions(ctx.get('user'), ctx.req.header('origin')),
+				await ctx
+					.get('userAuthRequestService')
+					.getSudoWebAuthnOptions(ctx.get('user'), ctx.req.header('origin'), ctx.req.valid('query').rp_id),
 			);
 		},
 	);

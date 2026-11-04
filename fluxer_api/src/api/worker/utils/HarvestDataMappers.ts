@@ -37,6 +37,7 @@ import type {WebAuthnCredential} from '@app/api/models/WebAuthnCredential';
 import {mapStorePurchaseToResponse} from '@app/api/store_billing/StoreBillingMappers';
 import {resolveSessionClientInfo} from '@app/api/utils/SessionClientIdentity';
 import {getAnimatedAssetExtension} from '@app/api/worker/utils/AssetArchiveHelpers';
+import {PremiumFlags} from '@fluxer/constants/src/UserConstants';
 import {
 	decodeSyncedPreferencesLenient,
 	syncedPreferencesToJson,
@@ -296,6 +297,7 @@ export function buildUserDataJson(params: UserDataJsonParams) {
 			premium_since: user.premiumSince?.toISOString() ?? null,
 			premium_until: user.premiumUntil?.toISOString() ?? null,
 			premium_lifetime_sequence: user.premiumLifetimeSequence,
+			operator_pass_show_operators: (user.premiumFlags & PremiumFlags.OPERATORS_CHANNEL_HIDDEN) === 0,
 			stripe_customer_id: user.stripeCustomerId,
 			stripe_subscription_id: user.stripeSubscriptionId,
 			terms_agreed_at: user.termsAgreedAt?.toISOString() ?? null,
@@ -517,6 +519,7 @@ export function buildUserDataJson(params: UserDataJsonParams) {
 		operator_pass_wall: operatorPassWall
 			? {
 					name: operatorPassWall.name ?? null,
+					quote: operatorPassWall.quote ?? null,
 					opted_out: operatorPassWall.opted_out,
 					keep_as_is: operatorPassWall.keep_as_is,
 					release_list_opt_in: operatorPassWall.release_list_opt_in ?? false,

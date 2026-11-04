@@ -20758,6 +20758,11 @@ msgstr "Kontynuuj działanie"
 msgid "Keep subscription"
 msgstr "Zachowaj subskrypcję"
 
+#. Error under the "Quote on the wall" field when the quote has a line break.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Keep the quote on one line."
+msgstr "Zapisz cytat w jednym wierszu."
+
 #. Description text in the secrets section.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/SecretsSection.tsx
 msgid "Keep these safe. Regenerating will break existing integrations."
@@ -26411,6 +26416,11 @@ msgstr "Opcja druga"
 msgid "Optional arguments"
 msgstr "Opcjonalne argumenty"
 
+#. Text under the "Quote on the wall" field in the Operators' wall settings. The wall listing is the person's entry on the Operators' wall. Operator is the badge name.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Optional. It shows in quotes on your wall listing and with your Operator badge."
+msgstr "Opcjonalnie. Pojawia się w cudzysłowie przy Twoim wpisie na ścianie i przy Twojej odznace Operator."
+
 #. Short label in the channel and chat textual attachment preview bottom sheet. Keep it concise.
 #: src/features/channel/components/embeds/attachments/TextualAttachmentPreviewBottomSheet.tsx
 msgid "Options"
@@ -28690,6 +28700,11 @@ msgstr "Zamknij {appName}"
 msgid "Quit {appName}, make sure no other copy is running, and open it again."
 msgstr "Zamknij {appName}, upewnij się, że żadna inna kopia nie działa, i otwórz ją ponownie."
 
+#. Label of the optional text field for a short quote that shows with the person's listing on the Operators' wall and with their Operator badge. The wall is the list of Operators on the Operator Pass page.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Quote on the wall"
+msgstr "Cytat na ścianie"
+
 #: src/features/channel/components/embeds/channel_embed/BlueskyEmbed.tsx
 msgid "Quotes: <0>{countLabel}</0>"
 msgstr "Cytowania: <0>{countLabel}</0>"
@@ -29506,6 +29521,11 @@ msgstr "Usuń naklejkę"
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
 msgid "Remove tag {tag}"
 msgstr "Usuń tag {tag}"
+
+#. Error under the "Quote on the wall" field when the quote has invisible characters, text direction controls or stacked accent marks.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Remove the hidden or special characters from the quote."
+msgstr "Usuń z cytatu ukryte lub specjalne znaki."
 
 #. Error message in the linked accounts tab. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
@@ -33091,6 +33111,11 @@ msgstr "Pokaż {badgeLabel} w twoim profilu"
 #: src/features/premium/components/operator_pass/checkout/OperatorPassShowcase.tsx
 msgid "Show {title}"
 msgstr "Pokaż: {title}"
+
+#. Switch label in the Fluxer Labs section of the Operator Pass settings. On by default. #operators is a channel in the Fluxer Labs community, keep it as is.
+#: src/features/user/components/modals/tabs/operator_pass_tab/OperatorPassLabsGreetingSetting.tsx
+msgid "Show #operators"
+msgstr "Pokaż #operators"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts
@@ -36711,6 +36736,11 @@ msgstr "Podany adres redirect_uri nie jest zarejestrowany dla tej aplikacji."
 msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "Podany adres redirect_uri musi używać protokołu HTTP lub HTTPS."
 
+#. Error under the "Quote on the wall" field when the quote looks like a link, a web address such as example.com, an email address, an @mention or a community invite.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "The quote can't have links, web addresses, email addresses, @mentions or invites."
+msgstr "Cytat nie może zawierać linków, adresów stron, adresów e-mail, @wzmianek ani zaproszeń."
+
 #. Report flow: toast shown when the report questions changed while the reporter was answering them.
 #: src/features/moderation/components/report_flow/ReportFlowCopy.ts
 msgid "The report form changed. Please start again."
@@ -39158,6 +39188,11 @@ msgstr "Wyłączenie zakresów autoryzacji może uniemożliwić poprawne działa
 msgid "Turning this off only hides your camera from your own view. Others in the call can still see your camera feed."
 msgstr "Wyłączenie tej opcji ukrywa Twoją kamerę tylko w Twoim widoku. Inni uczestnicy połączenia nadal będą widzieć Twój obraz z kamery."
 
+#. Description under the switch "Show #operators" in the Operator Pass settings. #operators is a channel name, keep it as is. {labsName} is the name of the community, such as Fluxer Labs. Turning it off does not remove the account from the community, the pass or the badge.
+#: src/features/user/components/modals/tabs/operator_pass_tab/OperatorPassLabsGreetingSetting.tsx
+msgid "Turning this off removes the roles that open #operators in {labsName}, and we won't add them back until you turn it on again."
+msgstr "Wyłączenie tej opcji usuwa role, które otwierają dostęp do #operators w {labsName}, i nie przywrócimy ich, dopóki jej ponownie nie włączysz."
+
 #. Help under the Klipy API key field in the setup wizard.
 #: src/features/app/components/setup/SetupServicesStep.tsx
 msgid "Turns on GIF search."
@@ -40497,6 +40532,11 @@ msgstr "Użyj maksymalnie 32 znaków."
 #: src/features/premium/components/operator_pass/OperatorPassCertificateNamesField.tsx
 msgid "Use 48 characters or fewer."
 msgstr "Użyj najwyżej 48 znaków."
+
+#. Error under the "Quote on the wall" field when the quote is longer than 80 characters. An emoji counts as one character.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Use 80 characters or fewer."
+msgstr "Użyj maksymalnie 80 znaków."
 
 #. Text button on the browser approval page that goes back to choosing which account signs in to the app.
 #: src/features/auth/flow/HandoffApprovalFlow.tsx

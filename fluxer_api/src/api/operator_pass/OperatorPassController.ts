@@ -28,6 +28,7 @@ import {
 import {
 	mapOperatorPassListing,
 	normalizeOperatorPassWallChoice,
+	parseOperatorPassWallQuote,
 } from '@app/api/operator_pass/OperatorPassWallPresentation';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
 import {OperatorPassRateLimitConfigs} from '@app/api/rate_limit_configs/OperatorPassRateLimitConfig';
@@ -48,6 +49,7 @@ import {
 	OperatorPassCheckoutResponse,
 	OperatorPassLabsGreetingRequest,
 	OperatorPassLabsJoinResponse,
+	OperatorPassLabsOperatorsRequest,
 	OperatorPassLatestReleaseResponse,
 	OperatorPassListingResponse,
 	OperatorPassListingUpdateRequest,
@@ -401,7 +403,7 @@ export function OperatorPassController(app: HonoApp) {
 			operationId: 'update_operator_pass_listing',
 			summary: "Update Operators' wall listing",
 			description:
-				"Submits a new name for the Operators' wall, takes the listing off the wall, or sets keep_as_is or release_list_opt_in. A new name goes on the wall at once, together with the current profile avatar. An already listed holder can send only keep_as_is or release_list_opt_in.",
+				"Submits a new name for the Operators' wall, takes the listing off the wall, or sets keep_as_is, release_list_opt_in or wall_quote. A new name or quote goes on the wall at once, the name together with the current profile avatar. An already listed holder can leave out wall_name and send only keep_as_is, release_list_opt_in or wall_quote.",
 			responseSchema: OperatorPassListingResponse,
 			statusCode: 200,
 			security: ['bearerToken', 'sessionToken'],
@@ -421,9 +423,12 @@ export function OperatorPassController(app: HonoApp) {
 				!body.wall_opt_out && !body.wall_name && current && !current.opted_out
 					? {name: null, optedOut: false}
 					: normalizeOperatorPassWallChoice({name: body.wall_name, optOut: body.wall_opt_out});
+			const quote =
+				body.wall_quote === undefined || choice.optedOut ? undefined : parseOperatorPassWallQuote(body.wall_quote);
 			await wallService.setChoice(user.id, choice, user.id, {
 				keepAsIs: body.keep_as_is,
 				releaseListOptIn: body.release_list_opt_in,
+				quote,
 			});
 			return ctx.json(mapOperatorPassListing(await wallService.getEntry(user.id), holder.count));
 		},
@@ -472,6 +477,29 @@ export function OperatorPassController(app: HonoApp) {
 			return ctx.json(await holding.queries.describePasses(user));
 		},
 	);
+	app.put(
+		'/operator-pass/labs-operators',
+		HostedOnlyRoute,
+		RateLimitMiddleware(OperatorPassRateLimitConfigs.OPERATOR_PASS_LISTING),
+		LoginRequired,
+		DefaultUserOnly,
+		OpenAPI({
+			operationId: 'update_operator_pass_labs_operators',
+			summary: 'Show or hide #operators',
+			description:
+				'Turns the Fluxer Labs roles that open #operators on or off for the current account. These are the Operator role, the Visionary role and the access role. Turning it off removes them at once, and no later role update adds them back. Turning it on gives back the roles the account is entitled to at once. It does not change passes, badges, the Operators wall, Fluxer Labs membership or other roles.',
+			responseSchema: OperatorPassPassesResponse,
+			statusCode: 200,
+			security: ['bearerToken', 'sessionToken'],
+			tags: TAG,
+		}),
+		Validator('json', OperatorPassLabsOperatorsRequest),
+		async (ctx) => {
+			const holding = requireFulfilmentService(ctx).holdingService;
+			const user = await holding.updateLabsOperatorsChannel(ctx.get('user'), ctx.req.valid('json').show_operators);
+			return ctx.json(await holding.queries.describePasses(user));
+		},
+	);
 	app.post(
 		'/operator-pass/labs/join',
 		HostedOnlyRoute,
@@ -482,7 +510,7 @@ export function OperatorPassController(app: HonoApp) {
 			operationId: 'join_operator_pass_labs',
 			summary: 'Join Fluxer Labs with the Operator Pass',
 			description:
-				'Adds the current account to Fluxer Labs with the Operator role, the same way a delivered pass does, and returns the IDs of the community and #operators. Needs at least one pass. An account that is already in Fluxer Labs gets the Operator role if it is missing. An account that left Fluxer Labs or was removed from it is never added again and gets status left, so it can join with the invite. A banned account gets status banned.',
+				'Adds the current account to Fluxer Labs with the Operator role, the same way a delivered pass does, and returns the IDs of the community and #operators. Needs at least one pass. An account that is already in Fluxer Labs gets the Operator role if it is missing, unless it turned off #operators. An account that left Fluxer Labs or was removed from it is never added again and gets status left, so it can join with the invite. A banned account gets status banned.',
 			responseSchema: OperatorPassLabsJoinResponse,
 			statusCode: 200,
 			security: ['bearerToken', 'sessionToken'],

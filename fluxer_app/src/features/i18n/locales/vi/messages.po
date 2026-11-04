@@ -20758,6 +20758,11 @@ msgstr "Tiếp tục chạy"
 msgid "Keep subscription"
 msgstr "Giữ gói đăng ký"
 
+#. Error under the "Quote on the wall" field when the quote has a line break.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Keep the quote on one line."
+msgstr "Hãy viết câu trích dẫn trên một dòng."
+
 #. Description text in the secrets section.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/SecretsSection.tsx
 msgid "Keep these safe. Regenerating will break existing integrations."
@@ -26411,6 +26416,11 @@ msgstr "Tùy chọn hai"
 msgid "Optional arguments"
 msgstr "Các đối số tùy chọn"
 
+#. Text under the "Quote on the wall" field in the Operators' wall settings. The wall listing is the person's entry on the Operators' wall. Operator is the badge name.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Optional. It shows in quotes on your wall listing and with your Operator badge."
+msgstr "Không bắt buộc. Câu này hiển thị trong dấu ngoặc kép ở mục của bạn trên bức tường và cùng huy hiệu Operator của bạn."
+
 #. Short label in the channel and chat textual attachment preview bottom sheet. Keep it concise.
 #: src/features/channel/components/embeds/attachments/TextualAttachmentPreviewBottomSheet.tsx
 msgid "Options"
@@ -28690,6 +28700,11 @@ msgstr "Thoát {appName}"
 msgid "Quit {appName}, make sure no other copy is running, and open it again."
 msgstr "Thoát {appName}, đảm bảo không có bản sao nào khác đang chạy, rồi mở lại."
 
+#. Label of the optional text field for a short quote that shows with the person's listing on the Operators' wall and with their Operator badge. The wall is the list of Operators on the Operator Pass page.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Quote on the wall"
+msgstr "Câu trích dẫn trên bức tường"
+
 #: src/features/channel/components/embeds/channel_embed/BlueskyEmbed.tsx
 msgid "Quotes: <0>{countLabel}</0>"
 msgstr "Lượt trích dẫn: <0>{countLabel}</0>"
@@ -29506,6 +29521,11 @@ msgstr "Xóa nhãn dán"
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
 msgid "Remove tag {tag}"
 msgstr "Xóa thẻ {tag}"
+
+#. Error under the "Quote on the wall" field when the quote has invisible characters, text direction controls or stacked accent marks.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Remove the hidden or special characters from the quote."
+msgstr "Hãy xóa các ký tự ẩn hoặc ký tự đặc biệt khỏi câu trích dẫn."
 
 #. Error message in the linked accounts tab. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
@@ -33091,6 +33111,11 @@ msgstr "Hiển thị {badgeLabel} trên hồ sơ của bạn"
 #: src/features/premium/components/operator_pass/checkout/OperatorPassShowcase.tsx
 msgid "Show {title}"
 msgstr "Hiển thị {title}"
+
+#. Switch label in the Fluxer Labs section of the Operator Pass settings. On by default. #operators is a channel in the Fluxer Labs community, keep it as is.
+#: src/features/user/components/modals/tabs/operator_pass_tab/OperatorPassLabsGreetingSetting.tsx
+msgid "Show #operators"
+msgstr "Hiển thị #operators"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts
@@ -36711,6 +36736,11 @@ msgstr "redirect_uri được cung cấp chưa đăng ký với ứng dụng nà
 msgid "The provided redirect_uri must use HTTP or HTTPS."
 msgstr "redirect_uri được cung cấp phải dùng HTTP hoặc HTTPS."
 
+#. Error under the "Quote on the wall" field when the quote looks like a link, a web address such as example.com, an email address, an @mention or a community invite.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "The quote can't have links, web addresses, email addresses, @mentions or invites."
+msgstr "Câu trích dẫn không được chứa liên kết, địa chỉ web, địa chỉ email, @lượt nhắc hoặc lời mời."
+
 #. Report flow: toast shown when the report questions changed while the reporter was answering them.
 #: src/features/moderation/components/report_flow/ReportFlowCopy.ts
 msgid "The report form changed. Please start again."
@@ -39158,6 +39188,11 @@ msgstr "Việc tắt các phạm vi có thể khiến ứng dụng không hoạt
 msgid "Turning this off only hides your camera from your own view. Others in the call can still see your camera feed."
 msgstr "Tắt tính năng này chỉ ẩn camera của bạn khỏi chế độ xem của chính bạn. Những người khác trong cuộc gọi vẫn có thể thấy camera của bạn."
 
+#. Description under the switch "Show #operators" in the Operator Pass settings. #operators is a channel name, keep it as is. {labsName} is the name of the community, such as Fluxer Labs. Turning it off does not remove the account from the community, the pass or the badge.
+#: src/features/user/components/modals/tabs/operator_pass_tab/OperatorPassLabsGreetingSetting.tsx
+msgid "Turning this off removes the roles that open #operators in {labsName}, and we won't add them back until you turn it on again."
+msgstr "Khi tắt tùy chọn này, các vai trò mở #operators trong {labsName} sẽ bị gỡ, và chúng tôi sẽ không thêm lại cho đến khi bạn bật lại."
+
 #. Help under the Klipy API key field in the setup wizard.
 #: src/features/app/components/setup/SetupServicesStep.tsx
 msgid "Turns on GIF search."
@@ -40497,6 +40532,11 @@ msgstr "Dùng tối đa 32 ký tự."
 #: src/features/premium/components/operator_pass/OperatorPassCertificateNamesField.tsx
 msgid "Use 48 characters or fewer."
 msgstr "Dùng tối đa 48 ký tự."
+
+#. Error under the "Quote on the wall" field when the quote is longer than 80 characters. An emoji counts as one character.
+#: src/features/premium/components/operator_pass/OperatorPassWallQuoteField.tsx
+msgid "Use 80 characters or fewer."
+msgstr "Dùng tối đa 80 ký tự."
 
 #. Text button on the browser approval page that goes back to choosing which account signs in to the app.
 #: src/features/auth/flow/HandoffApprovalFlow.tsx

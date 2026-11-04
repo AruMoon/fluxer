@@ -23,14 +23,18 @@ let cachedConfig: MasterConfig | null = null;
 
 const MAX_REPORT_RETENTION_DAYS = 36_500;
 
+const OFFICIAL_ANDROID_PASSKEY_ORIGINS = [
+	'android:apk-key-hash:keSY4bimyLqZQV7bKXgpa2xYuqXi0qZJzsYtp6gpx7w',
+	'android:apk-key-hash:Ld4qnT0TfBeHMT3Yu2H0WTwqlxgFs-32uDmwqtLndsk',
+];
+
 const DEFAULT_PASSKEY_ORIGINS = [
 	'https://fluxer.app',
 	'https://web.fluxer.app',
 	'https://web.canary.fluxer.app',
 	'https://fluxer.com',
 	'https://canary.fluxer.com',
-	'android:apk-key-hash:keSY4bimyLqZQV7bKXgpa2xYuqXi0qZJzsYtp6gpx7w',
-	'android:apk-key-hash:Ld4qnT0TfBeHMT3Yu2H0WTwqlxgFs-32uDmwqtLndsk',
+	...OFFICIAL_ANDROID_PASSKEY_ORIGINS,
 ];
 
 function defaultConfig(): MasterConfig {
@@ -105,6 +109,7 @@ function defaultConfig(): MasterConfig {
 				headers_timeout_ms: 30_000,
 				request_timeout_ms: 120_000,
 				max_inflight_requests: 512,
+				max_concurrent_form_uploads: 16,
 				automated_message_deletion_delay_days: 7,
 				ip_ban_exempt_ips: [],
 				donation_proxy_key: '',
@@ -743,6 +748,12 @@ function normalizeConfig(config: MasterConfig): MasterConfig {
 	normalizeAgePolicyConfig(config);
 	assertIntegerInRange(config.services.api.max_inflight_requests, 'FLUXER_API_MAX_INFLIGHT_REQUESTS', 1, 100_000);
 	assertIntegerInRange(
+		config.services.api.max_concurrent_form_uploads,
+		'FLUXER_API_MAX_CONCURRENT_FORM_UPLOADS',
+		1,
+		10_000,
+	);
+	assertIntegerInRange(
 		config.services.api.automated_message_deletion_delay_days,
 		'FLUXER_API_AUTOMATED_MESSAGE_DELETION_DELAY_DAYS',
 		1,
@@ -894,6 +905,9 @@ function normalizePasskeys(config: MasterConfig, useDefaultOrigins: boolean): vo
 			...new Set([...passkeys.additional_allowed_origins, new URL(config.endpoints.app).origin]),
 		];
 	}
+	passkeys.additional_allowed_origins = [
+		...new Set([...passkeys.additional_allowed_origins, ...OFFICIAL_ANDROID_PASSKEY_ORIGINS]),
+	];
 }
 
 export async function loadConfig(): Promise<MasterConfig> {
