@@ -37619,7 +37619,7 @@ msgstr "Instance ini belum selesai menyiapkan single sign-on. Mintalah administr
 
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "This instance requires {providerName}."
-msgstr "Instansi ini memerlukan {providerName}."
+msgstr "Instance ini memerlukan {providerName}."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx

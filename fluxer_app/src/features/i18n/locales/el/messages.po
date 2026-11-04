@@ -37619,7 +37619,7 @@ msgstr "Αυτή η παρουσία δεν έχει ολοκληρώσει τη
 
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "This instance requires {providerName}."
-msgstr "Αυτή η υπηρεσία απαιτεί το {providerName}."
+msgstr "Αυτή η παρουσία απαιτεί το {providerName}."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
