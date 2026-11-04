@@ -16618,6 +16618,7 @@
 									"global_name": {"nullable": true, "type": "string"},
 									"bio": {"nullable": true, "type": "string"},
 									"pronouns": {"nullable": true, "type": "string"},
+									"custom_status": {"nullable": true, "type": "string"},
 									"avatar": {
 										"nullable": true,
 										"type": "object",
@@ -16651,7 +16652,17 @@
 										"additionalProperties": false
 									}
 								},
-								"required": ["id", "username", "discriminator", "global_name", "bio", "pronouns", "avatar", "banner"],
+								"required": [
+									"id",
+									"username",
+									"discriminator",
+									"global_name",
+									"bio",
+									"pronouns",
+									"custom_status",
+									"avatar",
+									"banner"
+								],
 								"additionalProperties": false
 							},
 							"member": {
@@ -24841,15 +24852,30 @@
 			},
 			"InstantAccountAvailabilitySchema": {
 				"description": "Whether accounts can be created from just a display name, and why not",
-				"x-enumNames": ["AVAILABLE", "DISABLED", "CAPTCHA_OFF", "REGISTRATION_CLOSED", "APPROVAL_REQUIRED"],
+				"x-enumNames": [
+					"AVAILABLE",
+					"DISABLED",
+					"CAPTCHA_OFF",
+					"REGISTRATION_CLOSED",
+					"APPROVAL_REQUIRED",
+					"EMAIL_DOMAINS_RESTRICTED"
+				],
 				"x-enumDescriptions": [
 					"Accounts can be created from a display name",
 					"Instant accounts are turned off",
 					"Instant accounts need the captcha, which is off",
 					"Public registration is closed",
-					"New accounts need approval, so they need credentials to sign in once approved"
+					"New accounts need approval, so they need credentials to sign in once approved",
+					"Public sign-ups must use an email address on an allowed domain"
 				],
-				"enum": ["available", "disabled", "captcha_off", "registration_closed", "approval_required"],
+				"enum": [
+					"available",
+					"disabled",
+					"captcha_off",
+					"registration_closed",
+					"approval_required",
+					"email_domains_restricted"
+				],
 				"type": "string"
 			},
 			"CaptchaConfigResponse": {
