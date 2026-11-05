@@ -46,6 +46,7 @@ import {
 } from '@app/api/middleware/ServiceSingletons';
 import type {User} from '@app/api/models/User';
 import {RateLimitConfigs} from '@app/api/RateLimitConfig';
+import {mergeDistributionRules} from '@app/api/stripe/DistributionPricing';
 import type {HonoApp, HonoEnv} from '@app/api/types/HonoEnv';
 import {scheduleSystemDeletion} from '@app/api/user/AccountCleanup';
 import {noticeEmailAddress} from '@app/api/user/services/SystemDmMessage';
@@ -258,6 +259,7 @@ async function buildInstanceConfigResponse(warnings: Array<string> = []): Promis
 		accountIdentityLockReason,
 		instantAccountAvailability,
 		notice,
+		distributionPricing,
 	] = await Promise.all([
 		instanceConfigRepository.getAppPublicConfig(),
 		instanceConfigRepository.getInstancePolicyConfig(),
@@ -269,6 +271,7 @@ async function buildInstanceConfigResponse(warnings: Array<string> = []): Promis
 		instanceConfigRepository.getAccountIdentityLockReason(),
 		instanceConfigRepository.getInstantAccountAvailability(),
 		instanceConfigRepository.getInstanceNotice(),
+		instanceConfigRepository.getDistributionPricingConfig(),
 	]);
 	return {
 		sso: {
@@ -336,6 +339,7 @@ async function buildInstanceConfigResponse(warnings: Array<string> = []): Promis
 		integrations,
 		media,
 		billing,
+		distribution_pricing: distributionPricing,
 		notice,
 		warnings,
 	};
@@ -375,6 +379,7 @@ function assertSelfHostedBillingSections(data: InstanceConfigUpdateRequest): voi
 		'premium_product_name',
 		'premium_info_url',
 		'sign_in_backdrop_url',
+		'premium_page_color',
 		'favicon_dark_url',
 		'custom_css',
 		'upload_limit_message',
@@ -666,6 +671,14 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 			);
 		},
 	),
+	distribution_pricing: createInstanceConfigSectionApplier(
+		({data}) => data.distribution_pricing,
+		async (update, {instanceConfigRepository}) => {
+			await instanceConfigRepository.updateDistributionPricingConfig((current) =>
+				mergeDistributionRules(current, update.rules),
+			);
+		},
+	),
 	voice_p2p: createInstanceConfigSectionApplier(
 		({data}) => nonEmptyPatch(data.voice_p2p),
 		async (patch, {instanceConfigRepository}) => {
@@ -804,6 +817,7 @@ const INSTANCE_CONFIG_SECTION_APPLIERS = {
 							premium_product_name: readOptionalField(appPublic.branding, 'premium_product_name'),
 							premium_info_url: readOptionalField(appPublic.branding, 'premium_info_url'),
 							sign_in_backdrop_url: readOptionalField(appPublic.branding, 'sign_in_backdrop_url'),
+							premium_page_color: readOptionalField(appPublic.branding, 'premium_page_color'),
 							custom_css: readOptionalField(appPublic.branding, 'custom_css'),
 							upload_limit_message: readOptionalField(appPublic.branding, 'upload_limit_message'),
 							trusted_domains: readTrustedDomains(appPublic.branding),
@@ -994,7 +1008,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 			operationId: 'create_admin_instance_branding_asset',
 			summary: 'Upload an instance branding asset',
 			description:
-				'Uploads a branding image served by the media proxy and stores its URL, or clears it when no image is provided. Requires INSTANCE_CONFIG_UPDATE permission.',
+				'Uploads a branding image served by the media proxy and stores its URL, or clears it when no image is provided. The favicon_dark, sign_in_backdrop and premium_showcase_* kinds are only available on self-hosted instances. Requires INSTANCE_CONFIG_UPDATE permission.',
 			responseSchema: InstanceConfigResponse,
 			statusCode: 200,
 			security: 'adminApiKey',
@@ -1002,7 +1016,8 @@ export function InstanceConfigAdminController(app: HonoApp) {
 		}),
 		async (ctx) => {
 			const {kind, image} = ctx.req.valid('json');
-			const isBackdrop = kind === 'sign_in_backdrop';
+			const isPremiumShowcase = kind.startsWith('premium_showcase_');
+			const isBackdrop = kind === 'sign_in_backdrop' || isPremiumShowcase;
 			if ((isBackdrop || kind === 'favicon_dark') && !Config.instance.selfHosted) {
 				throw InputValidationError.create('kind', 'This setting is only available on self-hosted instances');
 			}
@@ -1013,6 +1028,7 @@ export function InstanceConfigAdminController(app: HonoApp) {
 				previousHash: null,
 				base64Image: image ?? null,
 				errorPath: 'image',
+				enforceDimensions: isPremiumShowcase,
 			});
 			const brandingPatch: Partial<InstanceBranding> = {[`${kind}_url`]: prepared.newCdnUrl};
 			const {releasedBrandingAssets} = await instanceConfigRepository.writeAppPublicConfig({branding: brandingPatch});
