@@ -4,7 +4,7 @@ import type {UserID} from '@app/api/BrandedTypes';
 import {LocalDate} from '@app/api/database/LocalDate';
 import type {UserRow} from '@app/api/database/types/UserTypes';
 import {checkIsPremium, getEffectivePremiumUntil} from '@app/api/user/UserHelpers';
-import {type AttestedAgeFloor, isAttestedAgeFloor} from '@fluxer/constants/src/AgeAssuranceConstants';
+import {type AttestedAgeFloor, isAttestedAgeFloor} from '@fluxer/constants/src/AgeRangeConstants';
 import {isProfileBadgeKey, type ProfileBadgeKey} from '@fluxer/constants/src/BadgeConstants';
 import {
 	extractPremiumFlagsFromLegacyUserFlags,
@@ -168,6 +168,10 @@ export class User {
 
 	get effectivePremiumUntil(): Date | null {
 		return getEffectivePremiumUntil(this);
+	}
+
+	get moderationIp(): string | null {
+		return this.isBot ? null : this.lastActiveIp;
 	}
 
 	toRow(): UserRow {

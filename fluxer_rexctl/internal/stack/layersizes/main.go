@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"maps"
 	"net/http"
 	"net/url"
@@ -35,13 +36,15 @@ const (
 	mediaManifest  = "application/vnd.oci.image.manifest.v1+json"
 	mediaDockerV2  = "application/vnd.docker.distribution.manifest.v2+json"
 	parallelLayers = 4
+	maxManifest    = 4 << 20
 )
 
 func main() {
 	setPath := flag.String("set", "internal/stack/imageset.json", "the image set file to add sizes to")
 	cachePath := flag.String("cache", "", "a file that keeps layer sizes between runs")
+	pin := flag.Bool("pin", false, "pin 3rd party images in the compose file to the digest of the tag")
 	flag.Parse()
-	if err := run(context.Background(), *setPath, *cachePath); err != nil {
+	if err := run(context.Background(), *setPath, *cachePath, *pin); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -75,7 +78,7 @@ type blob struct {
 	diffID    string
 }
 
-func run(ctx context.Context, setPath, cachePath string) error {
+func run(ctx context.Context, setPath, cachePath string, pin bool) error {
 	data, err := os.ReadFile(setPath)
 	if err != nil {
 		return err
@@ -84,9 +87,19 @@ func run(ctx context.Context, setPath, cachePath string) error {
 	if err := json.Unmarshal(data, &set); err != nil {
 		return err
 	}
-	refs, err := thirdParty()
+	third, err := thirdParty(stack.Embedded())
 	if err != nil {
 		return err
+	}
+	c := &client{http: &http.Client{Timeout: 30 * time.Minute}, tokens: map[string]string{}}
+	if pin {
+		if err := pinThirdParty(ctx, c, &set, third); err != nil {
+			return err
+		}
+	}
+	var refs []string
+	if !pin {
+		refs = slices.Collect(maps.Values(third))
 	}
 	for _, ref := range set.Images {
 		refs = append(refs, ref)
@@ -103,8 +116,6 @@ func run(ctx context.Context, setPath, cachePath string) error {
 		}
 	}
 
-	c := &client{http: &http.Client{Timeout: 30 * time.Minute}, tokens: map[string]string{}}
-	set.Tags = map[string]string{}
 	set.Layers = map[string]stack.Layer{}
 	set.Platforms = map[string]map[string][]string{}
 	var todo []blob
@@ -114,12 +125,9 @@ func run(ctx context.Context, setPath, cachePath string) error {
 		if err != nil {
 			return err
 		}
-		top, topDigest, err := c.manifest(ctx, r, r.ref)
+		top, _, err := c.manifest(ctx, r, r.ref)
 		if err != nil {
 			return fmt.Errorf("%s: %w", ref, err)
-		}
-		if !strings.Contains(ref, "@") {
-			set.Tags[ref] = topDigest
 		}
 		for _, p := range platforms {
 			m, err := c.platformManifest(ctx, r, top, p)
@@ -189,22 +197,72 @@ func run(ctx context.Context, setPath, cachePath string) error {
 	return writeJSON(setPath, set)
 }
 
-func thirdParty() ([]string, error) {
-	compose, err := stack.ReadFile(stack.Embedded(), stack.ComposeFile)
+func thirdParty(set *stack.Set) (map[string]string, error) {
+	files := []string{stack.ComposeFile}
+	voice, err := fs.Glob(set.Files, "voice/*.compose.yml")
 	if err != nil {
 		return nil, err
 	}
-	var out []string
-	for _, value := range stack.ComposeImages(compose) {
-		if strings.HasPrefix(value, "${FLUXER_REGISTRY") {
-			continue
+	files = append(files, voice...)
+	out := map[string]string{}
+	for _, name := range files {
+		compose, err := stack.ReadFile(set, name)
+		if err != nil {
+			return nil, err
 		}
-		if def, ok := stack.ImageDefault(value); ok {
-			value = def
+		for svc, value := range stack.ComposeImages(compose) {
+			if strings.HasPrefix(value, "${FLUXER_REGISTRY") {
+				continue
+			}
+			if def, ok := stack.ImageDefault(value); ok {
+				value = def
+			}
+			if seen, ok := out[svc]; ok && seen != value {
+				return nil, fmt.Errorf("%s runs %s in one compose file and %s in another, so it can't have one pinned image", svc, seen, value)
+			}
+			out[svc] = value
 		}
-		out = append(out, value)
 	}
 	return out, nil
+}
+
+type resolver interface {
+	digest(ctx context.Context, ref string) (string, error)
+}
+
+func (c *client) digest(ctx context.Context, ref string) (string, error) {
+	r, err := parse(ref)
+	if err != nil {
+		return "", err
+	}
+	_, d, err := c.manifest(ctx, r, r.ref)
+	return d, err
+}
+
+func pinThirdParty(ctx context.Context, c resolver, set *stack.ImageSet, third map[string]string) error {
+	if set.Images == nil {
+		set.Images = map[string]string{}
+	}
+	resolved := map[string]string{}
+	for _, svc := range slices.Sorted(maps.Keys(third)) {
+		ref := third[svc]
+		if _, ok := set.Images[svc]; ok {
+			return fmt.Errorf("%s already has an image in the image set", svc)
+		}
+		if strings.Contains(ref, "@") {
+			set.Images[svc] = ref
+			continue
+		}
+		if _, ok := resolved[ref]; !ok {
+			d, err := c.digest(ctx, ref)
+			if err != nil {
+				return fmt.Errorf("%s: %w", ref, err)
+			}
+			resolved[ref] = d
+		}
+		set.Images[svc] = ref + "@" + resolved[ref]
+	}
+	return nil
 }
 
 func writeJSON(path string, v any) error {
@@ -316,7 +374,7 @@ func (c *client) login(ctx context.Context, r repo, challenge string) error {
 		Token       string `json:"token"`
 		AccessToken string `json:"access_token"`
 	}
-	if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
+	if err := json.NewDecoder(io.LimitReader(res.Body, maxManifest)).Decode(&body); err != nil {
 		return err
 	}
 	tok := body.Token
@@ -335,9 +393,12 @@ func (c *client) manifest(ctx context.Context, r repo, ref string) (manifest, st
 		return manifest{}, "", err
 	}
 	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
+	data, err := io.ReadAll(io.LimitReader(res.Body, maxManifest+1))
 	if err != nil {
 		return manifest{}, "", err
+	}
+	if len(data) > maxManifest {
+		return manifest{}, "", fmt.Errorf("manifest %s is larger than %d bytes", ref, maxManifest)
 	}
 	var m manifest
 	if err := json.Unmarshal(data, &m); err != nil {
@@ -375,7 +436,7 @@ func (c *client) diffIDs(ctx context.Context, r repo, digest string) ([]string, 
 			DiffIDs []string `json:"diff_ids"`
 		} `json:"rootfs"`
 	}
-	if err := json.NewDecoder(res.Body).Decode(&cfg); err != nil {
+	if err := json.NewDecoder(io.LimitReader(res.Body, maxManifest)).Decode(&cfg); err != nil {
 		return nil, err
 	}
 	return cfg.RootFS.DiffIDs, nil

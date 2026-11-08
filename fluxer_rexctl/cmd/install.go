@@ -3,11 +3,9 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"maps"
 	"net"
 	"net/netip"
@@ -200,7 +198,10 @@ func runInstall(ctx context.Context, app *App, c *cobra.Command, f *installFlags
 		return err
 	}
 	if in.engine != nil {
-		if in.runChecks(ctx, checks.Preinstall, "engine", "podman-subids", "windows-linux-containers") {
+		if in.engine != in.found {
+			delete(in.ran, "disk")
+		}
+		if in.runChecks(ctx, checks.Preinstall, "engine", "podman-subids", "windows-linux-containers", "disk") {
 			return notReady()
 		}
 	} else {
@@ -390,7 +391,7 @@ func validateDomain(v string) error {
 }
 
 func (in *installer) runChecks(ctx context.Context, phase checks.Phase, ids ...string) bool {
-	env := &checks.Env{Dir: in.dir, Domain: normaliseDomain(in.f.Domain), Engine: in.engine, Host: in.host, Behind: in.f.BehindProxy, Bind: in.f.Bind, Settings: in.settings()}
+	env := &checks.Env{Dir: in.dir, Domain: normaliseDomain(in.f.Domain), Engine: in.engine, Host: in.host, Behind: in.f.BehindProxy, Bind: in.f.Bind, Settings: in.settings(), Prefer: engine.Kind(in.f.Engine)}
 	if in.engine == nil {
 		env.SetEngine(in.found, in.findErr)
 	}
@@ -491,7 +492,7 @@ func (in *installer) ensureEngine(ctx context.Context) error {
 
 func dockerInstalled() bool {
 	if path, err := exec.LookPath("docker"); err == nil {
-		return !podmanDockerWrapper(path)
+		return !engine.PodmanDockerWrapper(path)
 	}
 	switch runtime.GOOS {
 	case "windows":
@@ -502,23 +503,6 @@ func dockerInstalled() bool {
 		return fileExists("/Applications/Docker.app") || (home != "" && fileExists(filepath.Join(home, "Applications", "Docker.app")))
 	}
 	return false
-}
-
-func podmanDockerWrapper(path string) bool {
-	if runtime.GOOS != "linux" {
-		return false
-	}
-	if target, err := filepath.EvalSymlinks(path); err == nil && filepath.Base(target) == "podman" {
-		return true
-	}
-	f, err := os.Open(path)
-	if err != nil {
-		return false
-	}
-	defer f.Close()
-	head := make([]byte, 512)
-	n, _ := io.ReadFull(f, head)
-	return bytes.HasPrefix(head[:n], []byte("#!")) && bytes.Contains(head[:n], []byte("podman"))
 }
 
 func (in *installer) startPodman(ctx context.Context) error {
@@ -1166,7 +1150,7 @@ func (in *installer) write(ctx context.Context, inst *instance.Instance, deleteO
 	if in.storage != nil {
 		maps.Copy(st.Settings, in.storage.values())
 	}
-	store := engine.ImageStore(inst.Dir, in.engine)
+	store := engine.Stores(inst.Dir, in.engine, "").Data
 	if total, err := host.DiskSize(store); err == nil {
 		if profile := stack.DiskProfileFor(total); profile != "" {
 			st.Settings[settings.DiskProfile] = profile
@@ -1349,12 +1333,22 @@ func installBootUnit(ctx context.Context, inst *instance.Instance, e *engine.Eng
 	return host.RunSteps(ctx, steps)
 }
 
-func refreshBootUnit(ctx context.Context, inst *instance.Instance, e *engine.Engine, p *engine.Project) error {
+func refreshBootUnit(ctx context.Context, app *App, inst *instance.Instance, e *engine.Engine, p *engine.Project) error {
 	u, err := checks.BootUnitFor(inst, e, p)
 	if err != nil {
 		return err
 	}
-	return host.RefreshBootUnit(ctx, u)
+	steps, err := u.RefreshSteps(ctx)
+	if err != nil || len(steps) == 0 {
+		return err
+	}
+	if !u.Rootless && euid() != 0 {
+		app.UI.Info("Updating the service that starts Fluxer with this machine needs root, so sudo may ask for your password.")
+		for _, s := range steps {
+			app.UI.Info("  %s", s.Do)
+		}
+	}
+	return host.RunSteps(ctx, steps)
 }
 
 func (in *installer) waitCertificate(ctx context.Context, inst *instance.Instance, p *engine.Project) {

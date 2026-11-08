@@ -191,7 +191,7 @@ export const RpcRequest = z.discriminatedUnion('type', [
 	z.object({
 		type: z
 			.literal('voice_update_participant_permissions')
-			.describe('Request type for updating voice participant permissions'),
+			.describe('Request type for updating the voice permissions of one connection'),
 		guild_id: SnowflakeType.optional().describe('ID of the guild'),
 		channel_id: SnowflakeType.describe('ID of the voice channel'),
 		user_id: SnowflakeType.describe('ID of the user to update'),
@@ -199,7 +199,7 @@ export const RpcRequest = z.discriminatedUnion('type', [
 		can_speak: z.boolean().describe('Whether the user can speak'),
 		can_stream: z.boolean().describe('Whether the user can stream'),
 		can_video: z.boolean().describe('Whether the user can use video'),
-		deaf: z.boolean().optional().describe('Whether the user is deafened'),
+		deaf: z.boolean().describe('Whether the user is deafened'),
 	}),
 	z.object({
 		type: z.literal('call_ended').describe('Request type for notifying that a call has ended'),

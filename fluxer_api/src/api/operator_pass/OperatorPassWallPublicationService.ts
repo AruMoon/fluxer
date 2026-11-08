@@ -53,6 +53,7 @@ interface OperatorPassWallSnapshot {
 
 interface RankedWallEntry {
 	entry: OperatorPassWallBlobEntry;
+	count: number;
 	since: number;
 }
 
@@ -95,6 +96,7 @@ export class OperatorPassWallPublicationService {
 				...(entry.live_business ? {business: true as const} : {}),
 				...(entry.quote ? {quote: entry.quote} : {}),
 			},
+			count: holder.count,
 			since: holder.since.getTime(),
 		};
 	}
@@ -262,6 +264,7 @@ export class OperatorPassWallPublicationService {
 				(left, right) =>
 					Number(left.entry.business === true) - Number(right.entry.business === true) ||
 					(left.entry.business ? 0 : right.entry.tier - left.entry.tier) ||
+					right.count - left.count ||
 					left.since - right.since ||
 					left.entry.id.localeCompare(right.entry.id),
 			)
@@ -335,11 +338,15 @@ export class OperatorPassWallPublicationService {
 	private async dropFromFrozenSnapshot(userIds: ReadonlyArray<UserID>): Promise<void> {
 		const gone = new Set<string>();
 		const quotes = new Map<string, string | undefined>();
+		const hiddenCounts = new Set<string>();
 		for (const userId of new Set(userIds)) {
 			const entry = await this.repository.findWallEntry(userId);
 			const item = entry ? await this.buildPublicEntry(entry) : null;
 			if (item) {
 				quotes.set(item.id, item.quote);
+				if (item.count === undefined) {
+					hiddenCounts.add(item.id);
+				}
 			} else {
 				gone.add(operatorPassWallPublicId(userId));
 			}
@@ -359,12 +366,19 @@ export class OperatorPassWallPublicationService {
 					changed = true;
 					return [];
 				}
-				if (item.quote !== undefined && quotes.has(item.id) && quotes.get(item.id) !== item.quote) {
-					changed = true;
-					const {quote: _quote, ...rest} = item;
-					return [rest];
+				let next = item;
+				if (next.quote !== undefined && quotes.has(next.id) && quotes.get(next.id) !== next.quote) {
+					const {quote: _quote, ...rest} = next;
+					next = rest;
 				}
-				return [item];
+				if (next.count !== undefined && hiddenCounts.has(next.id)) {
+					const {count: _count, ...rest} = next;
+					next = rest;
+				}
+				if (next !== item) {
+					changed = true;
+				}
+				return [next];
 			});
 			if (!changed) {
 				return;

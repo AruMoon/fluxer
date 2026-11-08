@@ -70,6 +70,7 @@ COPY packages/markdown_parser/rust/benches/parser.rs ./packages/markdown_parser/
 COPY packages/markdown_parser/rust/src/ ./packages/markdown_parser/rust/src/
 COPY tools/ci/ ./tools/ci/
 COPY fluxer_app/index.html fluxer_app/lingui.config.js fluxer_app/package.json fluxer_app/postcss.config.js fluxer_app/rspack.config.mjs fluxer_app/tsconfig.base.json fluxer_app/tsconfig.json ./fluxer_app/
+COPY fluxer_app/inline_scripts/ ./fluxer_app/inline_scripts/
 COPY fluxer_app/pkgs/livekit-client/ ./fluxer_app/pkgs/livekit-client/
 COPY fluxer_app/rust/ ./fluxer_app/rust/
 COPY fluxer_app/scripts/ ./fluxer_app/scripts/
@@ -105,6 +106,7 @@ RUN --mount=type=bind,from=app-dist,source=/dist,target=/dist \
 		esac; \
 		find /assets/assets -type f ! -name 'fonts-*.txt' -delete; \
 	fi \
+	&& find /assets/assets -type f -name '*.map' -delete \
 	&& /usr/local/bin/precompress_assets.sh /assets
 
 FROM --platform=${APP_ASSETS_PLATFORM} ${APP_ASSETS_REF} AS app-static

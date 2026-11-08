@@ -100,11 +100,30 @@ func restoreDataNeed(m *Manifest) uint64 {
 	return n
 }
 
-func checkRestoreSpace(store, dir string, need uint64) error {
-	if err := needFree(store, need+DiskReserve); err != nil || sameDisk(store, dir) {
-		return err
+type restoreNeed struct {
+	path string
+	need uint64
+}
+
+func checkRestoreSpace(stores engine.Roots, dir string, pull, data uint64) error {
+	var disks []restoreNeed
+	for _, want := range []restoreNeed{{stores.Data, data}, {stores.Images, pull}, {dir, 0}} {
+		if want.path == "" {
+			continue
+		}
+		i := slices.IndexFunc(disks, func(d restoreNeed) bool { return sameDisk(d.path, want.path) })
+		if i >= 0 {
+			disks[i].need += want.need
+			continue
+		}
+		disks = append(disks, want)
 	}
-	return needFree(dir, DiskReserve)
+	for _, d := range disks {
+		if err := needFree(d.path, d.need+DiskReserve); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func needFree(path string, need uint64) error {
@@ -154,7 +173,7 @@ func Restore(ctx context.Context, path, dir string, e *engine.Engine, opts Resto
 	}
 
 	progress(StagePulling)
-	if err := pullFromBackup(ctx, path, dir, e, data, opts.OnEvent); err != nil {
+	if err := pullFromBackup(ctx, path, dir, e, m, data, opts.OnEvent); err != nil {
 		return nil, err
 	}
 
@@ -467,7 +486,7 @@ func removeStaleImages(ctx context.Context, p *engine.Project, stale []string) {
 	}
 }
 
-func pullFromBackup(ctx context.Context, path, dir string, e *engine.Engine, data uint64, onEvent func(engine.Event)) error {
+func pullFromBackup(ctx context.Context, path, dir string, e *engine.Engine, m *Manifest, data uint64, onEvent func(engine.Event)) error {
 	staging, err := os.MkdirTemp("", "rexctl-restore-")
 	if err != nil {
 		return err
@@ -480,12 +499,15 @@ func pullFromBackup(ctx context.Context, path, dir string, e *engine.Engine, dat
 	if err != nil {
 		return err
 	}
+	if inst.Project() != m.Project {
+		return fmt.Errorf("%w: the backup's state names project %s and its manifest names %s", ErrDamaged, inst.Project(), m.Project)
+	}
 	p, err := deploy.Load(ctx, inst, e)
 	if err != nil {
 		return &PullError{Err: err}
 	}
 	images, _ := stack.EmbeddedImages()
-	if err := checkRestoreSpace(engine.ImageStore(dir, e), dir, data+e.PullNeed(ctx, images, p.Images(), nil)); err != nil {
+	if err := checkRestoreSpace(engine.Stores(dir, e, ""), dir, e.PullNeed(ctx, images, p.Images(), nil), data); err != nil {
 		return err
 	}
 	if err := p.Pull(ctx, onEvent); err != nil {

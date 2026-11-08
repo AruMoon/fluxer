@@ -25,6 +25,7 @@
 		"generate:colors": "pnpm tsx scripts/GenerateColorSystem.ts",
 		"generate:css-types": "pnpm tsx scripts/GenerateCssTypes.ts",
 		"generate:css-types:watch": "pnpm tsx scripts/GenerateCssTypes.ts --watch",
+		"generate:emoji-data": "pnpm tsx scripts/GenerateEmojiData.ts",
 		"generate:emoji-sprites": "pnpm tsx scripts/GenerateEmojiSprites.ts",
 		"generate:message-layout": "pnpm tsx scripts/GenerateMessageLayoutCss.ts",
 		"generate:theme-variables": "pnpm tsx scripts/GenerateThemeVariables.ts",
@@ -40,15 +41,11 @@
 		"wasm:codegen": "../tools/ci/run.sh build-app-wasm"
 	},
 	"browserslist": [
-		"chrome >= 47",
-		"edge >= 12",
-		"firefox >= 44",
-		"safari >= 9",
-		"ios >= 9",
-		"last 2 versions",
-		"not dead",
-		"> 0.2%",
-		"not op_mini all"
+		"chrome >= 111",
+		"edge >= 111",
+		"firefox >= 114",
+		"safari >= 16.4",
+		"ios >= 16.4"
 	],
 	"dependencies": {
 		"@arborium/ada": "2.18.2",

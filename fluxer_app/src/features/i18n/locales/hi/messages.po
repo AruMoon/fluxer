@@ -2185,6 +2185,10 @@ msgstr "{productName} शुरू होने पर अपडेट नही
 msgid "{productName} wordmark"
 msgstr "{productName} वर्डमार्क"
 
+#: src/features/connection/components/modals/AddConnectionModal.tsx
+msgid "{providerName} opens in your browser. Sign in there to connect your account."
+msgstr "{providerName} आपके ब्राउज़र में खुलता है। अपना अकाउंट कनेक्ट करने के लिए वहाँ साइन इन करें।"
+
 #. Reaction tooltip. Preserve {emojiName}, {reactors}; they are inserted by code. {reactorCount} is how many people reacted, for verb agreement. Order the parts so the emoji never reads as the one doing the reacting.
 #: src/features/messaging/utils/ReactionUtils.ts
 msgid "{reactorCount, plural, one {{emojiName} reacted by {reactors}} other {{emojiName} reacted by {reactors}}}"
@@ -2234,6 +2238,11 @@ msgstr "{requestedLabel} शुरू नहीं हो सका। इसक
 #: src/features/voice/components/StreamInfoPill.tsx
 msgid "{resolution} {fps} FPS"
 msgstr "{resolution} {fps} FPS"
+
+#. Footer summary under the preset name in the web stream setup modal. {resolution} is a technical token like 1080p. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "{resolution} at {fps} FPS"
+msgstr "{fps} FPS पर {resolution}"
 
 #. Short label in the channel display name state. Keep it concise. Preserve {resolvedName}; it is inserted by code.
 #: src/features/channel/state/ChannelDisplayName.ts
@@ -3334,10 +3343,10 @@ msgstr "इस लाइन के अंत में \";\" जोड़ें�
 msgid "Add \":\" between the property and its value."
 msgstr "प्रॉपर्टी और उसके वैल्यू के बीच में \":\" जोड़ें।"
 
-#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {blueskyProviderName}; it is inserted by code.
+#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {providerName}; it is the provider name, inserted by code.
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Add {blueskyProviderName} connection"
-msgstr "{blueskyProviderName} कनेक्शन जोड़ें"
+msgid "Add {providerName} connection"
+msgstr "{providerName} कनेक्शन जोड़ें"
 
 #. OAuth scope description shown on the consent screen for the bot scope.
 #: src/features/app/constants/AppConstants.ts
@@ -4126,6 +4135,11 @@ msgstr "साइन इन करने के बाद कार्रवा�
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "आपका अकाउंट डिलीट होने के बाद आप अपने भेजे गए मैसेज डिलीट नहीं कर पाएँगे"
 
+#. Label in the sensitive content settings, shown when the Fluxer app for iPhone, iPad or Android has sent the age range that the Apple or Google account shares with apps.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Age range from your Apple or Google account"
+msgstr "आपके Apple या Google खाते से आयु सीमा"
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -4741,6 +4755,11 @@ msgstr "एक अपलोड की गई वीडियो फ़ाइल"
 #: src/features/guild/components/modals/GuildOwnershipWarningModal.tsx
 msgid "and {remainingCount} more"
 msgstr "और {remainingCount} अन्य"
+
+#. Developer / debug surface — keep terse and technical. Label in the developer Nagbar controls panel for the Android app on Google Play banner.
+#: src/features/devtools/components/NagbarControls.ts
+msgid "Android app nagbar"
+msgstr "Android ऐप नागबार"
 
 #. Short label in the animation tab. Keep it concise.
 #: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
@@ -9517,6 +9536,11 @@ msgstr "कम्युनिटी अपडेट की गई"
 msgid "Community voice"
 msgstr "कम्युनिटी वॉइस"
 
+#. Report flow: section heading above the card of the community being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Community you're reporting"
+msgstr "जिस कम्युनिटी की आप रिपोर्ट कर रहे हैं"
+
 #. Permission category for permissions that affect the whole community.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts
 msgid "Community-wide"
@@ -11319,10 +11343,10 @@ msgstr "पुष्टि करने वाला ईमेल भेजा �
 msgid "Couldn't sign you in"
 msgstr "आपको साइन इन नहीं किया जा सका"
 
-#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {blueskyProviderName}; it is inserted by code and must appear verbatim in the translation.
+#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {providerName}; it is the provider name, inserted by code, and must appear verbatim in the translation.
 #: src/features/connection/commands/ConnectionCommands.ts
-msgid "Couldn't start {blueskyProviderName} authorization"
-msgstr "{blueskyProviderName} ऑथराइज़ेशन शुरू नहीं किया जा सका"
+msgid "Couldn't start {providerName} authorization"
+msgstr "{providerName} ऑथराइज़ेशन शुरू नहीं किया जा सका"
 
 #. Title of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -17322,9 +17346,11 @@ msgid "Frame"
 msgstr "फ़्रेम"
 
 #. Section header in the stream settings menu for frame rate options.
+#. Section label in the web stream setup modal for the stream frame rate options, in frames per second.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Frame rate"
 msgstr "फ़्रेम रेट"
@@ -17799,6 +17825,11 @@ msgstr "एक एनिमेटेड अवतार और बैनर, ए
 #: src/features/premium/components/operator_pass/OperatorPassHoldingsSection.tsx
 msgid "Get another pass"
 msgstr "एक और Operator Pass प्राप्त करें"
+
+#. Button in the Android app nagbar that opens the Fluxer listing on Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Use the wording Google Play uses for its own "Get it on Google Play" badge in this language when one exists. Keep it short.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "Get it on {googlePlay}"
+msgstr "{googlePlay} पर पाएँ"
 
 #. Secondary Plutonium page button that starts a monthly subscription checkout.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -20032,11 +20063,6 @@ msgstr "अमान्य ऑथराइज़ेशन अनुरोध"
 msgid "Invalid bot permissions."
 msgstr "अमान्य बॉट अनुमतियाँ।"
 
-#. Title of the error modal shown when a custom emoji name fails validation.
-#: src/features/emoji/components/emojis/EmojiListItem.tsx
-msgid "Invalid emoji name"
-msgstr "अमान्य इमोजी नाम"
-
 #. Gift redemption error modal title for an invalid or already used code.
 #: src/features/gift/commands/GiftCommands.tsx
 msgid "Invalid gift code"
@@ -21463,8 +21489,8 @@ msgid "Link warnings"
 msgstr "लिंक चेतावनियाँ"
 
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Link your {BLUESKY_PROVIDER_NAME} account or verify domain ownership to display them on your profile."
-msgstr "अपनी प्रोफ़ाइल पर दिखाने के लिए अपने {BLUESKY_PROVIDER_NAME} अकाउंट को लिंक करें या डोमेन के मालिकाना हक को वेरिफ़ाई करें।"
+msgid "Link your accounts or verify domain ownership to display them on your profile."
+msgstr "अपनी प्रोफ़ाइल पर दिखाने के लिए अपने अकाउंट लिंक करें या डोमेन के मालिकाना हक को वेरिफ़ाई करें।"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/LinkedAccountsIndex.ts
@@ -24652,6 +24678,11 @@ msgstr "किसी स्थानीय फ़ाइल का संदर�
 msgid "No logs yet"
 msgstr "अभी तक कोई लॉग नहीं"
 
+#. Label for a linked account whose provider this instance removed or turned off. The account is hidden from the profile.
+#: src/features/connection/components/ConnectionIcon.tsx
+msgid "No longer available"
+msgstr "अब उपलब्ध नहीं है"
+
 #: src/features/app/components/dialogs/shared/AddOverridePopout.tsx
 msgid "No matches"
 msgstr "कोई मिलान नहीं"
@@ -25717,6 +25748,11 @@ msgstr "केवल CSS टेक्स्ट डिवाइसों मे�
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Only the CSS text is synced. Uploaded assets and local file references stay on this device."
 msgstr "केवल CSS टेक्स्ट सिंक होता है। अपलोड की गई एसेट और लोकल फ़ाइल रेफ़रेंस इसी डिवाइस पर रहते हैं।"
+
+#. Notice under the search results pagination when a search has more pages than can be shown. maxPages is a number.
+#: src/features/channel/components/channel_search_results/ChannelSearchResultsShared.tsx
+msgid "Only the first {maxPages} pages of results can be shown. Try a more specific search."
+msgstr "परिणामों के केवल पहले {maxPages} पेज ही दिखाए जा सकते हैं। ज़्यादा सटीक खोज आज़माएँ।"
 
 #. Shown for a watched theme folder in Settings > Themes when it has more than 200 CSS files.
 #: src/features/theme_settings/components/YourThemesSection.tsx
@@ -27130,6 +27166,11 @@ msgstr "लोग अपनी कम्युनिटी बना सकत�
 msgid "People can only talk in communities."
 msgstr "लोग सिर्फ़ कम्युनिटी में बात कर सकते हैं।"
 
+#. Description under the "Share a preview image" switch in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "People can see a still image of what you share before they start watching."
+msgstr "देखना शुरू करने से पहले लोग आपकी शेयर की जा रही चीज़ की एक स्थिर तस्वीर देख सकते हैं।"
+
 #. Description of allowing direct messages in the setup wizard.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
 msgid "People can send friend requests and direct messages."
@@ -27323,6 +27364,11 @@ msgstr "अनुमतियाँ"
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx
 msgid "Permissions for {0}"
 msgstr "{0} के लिए अनुमतियाँ"
+
+#. Report flow: section heading above the card of the person being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Person you're reporting"
+msgstr "आप जिस व्यक्ति की रिपोर्ट कर रहे हैं"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/utils/UserMessageDescriptors.ts
@@ -27927,6 +27973,11 @@ msgstr "तैयार हो रहा है"
 msgid "Presence"
 msgstr "उपस्थिति"
 
+#. Section label in the web stream setup modal. Picks the Gaming preset (motion), the Screen share preset (sharp text) or custom numbers.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Preset"
+msgstr "प्रीसेट"
+
 #. Shown in the "Quick CSS" section in Settings > Themes. {shortcut} is a keyboard shortcut such as Ctrl+Alt+Shift+T.
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Press {shortcut} anywhere in the app to open the editor."
@@ -28327,11 +28378,6 @@ msgstr "प्रोफ़ाइल प्रकार"
 #: src/features/user/components/modals/tabs/MyProfileTab.tsx
 msgid "Profile updated"
 msgstr "प्रोफ़ाइल अपडेट की गई"
-
-#. Report flow: section heading above the card of the user whose profile is being reported.
-#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
-msgid "Profile you're reporting"
-msgstr "आप जिस प्रोफ़ाइल की रिपोर्ट कर रहे हैं"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
@@ -29315,6 +29361,7 @@ msgstr "विंडो का साइज़ और पोज़िशन य�
 #. Button or menu action label in the channel and chat message reactions sheet. Keep it concise. Keep the tone plain and specific.
 #. Button that clears the default reaction or deletes a tag in forum settings.
 #. Button that removes a branding image in the setup wizard.
+#. Confirm button in the dialog that deletes the stored age range.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the shared app saved message missing card. Keep the tone plain and specific.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
@@ -29329,6 +29376,7 @@ msgstr "विंडो का साइज़ और पोज़िशन य�
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx
 #: src/features/ui/action_menu/GroupDMContextMenu.tsx
 #: src/features/ui/action_menu/UserContextMenu.tsx
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Remove"
@@ -29365,6 +29413,11 @@ msgstr "क्या आप {userName} को ग्रुप से हटा�
 #: src/features/relationship/utils/RelationshipActionUtils.tsx
 msgid "Remove {userName} from your friends?"
 msgstr "क्या आप {userName} को अपने दोस्तों से हटाना चाहते हैं?"
+
+#. Button in the sensitive content settings that opens a confirmation to delete the stored age range.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove age range"
+msgstr "आयु सीमा हटाएं"
 
 #. Confirm button label on the remove-all-reactions alert. Destructive.
 #: src/features/channel/components/MessageActionUtils.tsx
@@ -29572,6 +29625,11 @@ msgstr "अनुवादक हटाएँ"
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
 msgid "Remove when you first bought {premiumProductName} from your badge"
 msgstr "अपने बैज से हटाएँ कि आपने {premiumProductName} पहली बार कब खरीदा था"
+
+#. Title of the confirmation shown before deleting the age range from an Apple or Google account.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove your age range?"
+msgstr "अपनी आयु सीमा हटाएं?"
 
 #. Status badge for the application to Explore, shown in the "Explore" tab in community settings. The community was removed from Explore.
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
@@ -29942,6 +30000,11 @@ msgstr "{replyAuthorName} को जवाब देते हुए, {authorNam
 msgid "Replying to <0>{authorNickname}</0>"
 msgstr "<0>{authorNickname}</0> को जवाब दे रहे हैं"
 
+#. Voice and call participant menu action that reports this person to the safety team, for example for something they said or showed in the call.
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx
+msgid "Report"
+msgstr "रिपोर्ट करें"
+
 #. Report flow target option. Selects reporting an entire community (server). Use the localized term for community, not server.
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a community"
@@ -29956,6 +30019,11 @@ msgstr "मैसेज की रिपोर्ट करें"
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a user profile"
 msgstr "किसी यूज़र प्रोफ़ाइल की रिपोर्ट करें"
+
+#. Action label in community menus, on invites and in Explore, and the title of the report window it opens. Reports a whole community to the safety team.
+#: src/features/moderation/utils/ModerationMessageDescriptors.ts
+msgid "Report community"
+msgstr "कम्युनिटी की रिपोर्ट करें"
 
 #: src/features/moderation/components/report/ReportStepDetails.tsx
 msgid "Report details"
@@ -29977,7 +30045,12 @@ msgstr "समस्या की रिपोर्ट करें"
 msgid "Report message"
 msgstr "मैसेज की रिपोर्ट करें"
 
-#. Action label in the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
+#. Action in a forum post's menu. Reports the post's opening message to the safety team. A post is a topic thread in a forum channel.
+#: src/features/forum/utils/ForumMessageDescriptors.ts
+msgid "Report post"
+msgstr "पोस्ट की रिपोर्ट करें"
+
+#. Action label in user right-click menus and the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
 #: src/features/moderation/utils/ModerationMessageDescriptors.ts
 msgid "Report profile"
 msgstr "प्रोफ़ाइल की रिपोर्ट करें"
@@ -30491,8 +30564,10 @@ msgid "Resizing, maximizing, and window snapping depend on the compositor. Wayla
 msgstr "आकार बदलना, विंडो बड़ी करना और विंडो स्नैपिंग कंपोजिटर पर निर्भर करते हैं। क्लाइंट-साइड डेकोरेशन के बिना Wayland हैंडल नहीं देता। अगर विंडो अटकी हुई लगे, तो --ozone-platform=x11 के साथ लॉन्च करें।"
 
 #. Section header in the stream settings menu for resolution options.
+#. Section label in the web stream setup modal for the stream resolution options.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Resolution"
 msgstr "रिज़ॉल्यूशन"
@@ -32928,6 +33003,11 @@ msgstr "कई लोग टाइप कर रहे हैं..."
 msgid "Share"
 msgstr "शेयर करें"
 
+#. Switch label in the web stream setup modal. When on, Fluxer uploads a still image of the stream so people can see it before watching.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share a preview image"
+msgstr "प्रीव्यू तस्वीर शेयर करें"
+
 #. Button or menu action label in the buttons tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx
 msgid "Share action."
@@ -32937,6 +33017,11 @@ msgstr "शेयर करें।"
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Share and back up"
 msgstr "शेयर करें और बैकअप लें"
+
+#. Switch label in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share audio"
+msgstr "ऑडियो शेयर करें"
 
 #. Plutonium page perk card body about upload size. freeSize is a formatted size such as 25 MB.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -32982,7 +33067,9 @@ msgstr "बताएं कि हमारी टीम को इसका आ
 msgid "Share with a friend"
 msgstr "किसी दोस्त के साथ शेयर करें"
 
+#. Title of the modal shown on web before the browser screen picker opens. The user picks stream quality here first.
 #. Voice control button or tooltip label for starting screen sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Share your screen"
 msgstr "अपनी स्क्रीन शेयर करें"
@@ -33032,8 +33119,8 @@ msgstr "720p पर शार्प टेक्स्ट, 30 FPS तक"
 
 #. Description for the high-tier Screen share streaming preset (Plutonium). Resolution and frame rate are technical tokens.
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
-msgid "Sharp text at up to 4K, up to 15 FPS"
-msgstr "15 FPS पर 4K तक शार्प टेक्स्ट"
+msgid "Sharp text at up to 1080p, 30 FPS"
+msgstr "1080p तक शार्प टेक्स्ट, 30 FPS"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts
@@ -33467,8 +33554,11 @@ msgstr "म्यूट किए गए चैनल दिखाएं"
 msgid "Show my own camera"
 msgstr "मेरा कैमरा दिखाएं"
 
+#. Toggle label in the mobile video settings bottom sheet. Controls whether the local screen share tile is in the call view.
 #. Voice display preference checkbox that controls whether the current user sees their own screen share tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
+#: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx
+#: src/features/voice/components/VoiceSettingsMenus.tsx
 msgid "Show my screen share"
 msgstr "मेरी स्क्रीन शेयर दिखाएं"
 
@@ -34069,7 +34159,7 @@ msgid "Skip this step"
 msgstr "यह चरण छोड़ें"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx
+#: src/app/SkipToContentLink.tsx
 msgid "Skip to content"
 msgstr "सामग्री पर जाएं"
 
@@ -34954,6 +35044,11 @@ msgstr "रिकॉर्डिंग शुरू करें"
 msgid "Start searches with <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> to narrow down results."
 msgstr "परिणाम सीमित करने के लिए खोज <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> से शुरू करें।"
 
+#. Primary button in the web stream setup modal. Opens the browser's screen picker and starts sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Start sharing"
+msgstr "शेयर करना शुरू करें"
+
 #. Native macOS Edit > Speech submenu item that starts reading the selected text aloud. Imperative verb.
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Start speaking"
@@ -35422,11 +35517,6 @@ msgstr "स्ट्रीम बफ़र हो रही है"
 #: src/features/voice/components/voice_participant_tile/shared.ts
 msgid "Stream ended"
 msgstr "स्ट्रीम समाप्त हो गई"
-
-#. Overlay text on a participant tile when the local user hid the remote screen share.
-#: src/features/voice/components/voice_participant_tile/shared.ts
-msgid "Stream hidden"
-msgstr "स्ट्रीम छिपी हुई है"
 
 #. Plutonium page perk card title about stream quality.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -36480,6 +36570,11 @@ msgstr "<0>गोपनीयता नीति</0> और <1>{OPERATOR_PASS_NA
 msgid "The <0>privacy policy</0> explains how we handle your data."
 msgstr "<0>गोपनीयता नीति</0> बताती है कि हम आपके डेटा को कैसे संभालते हैं।"
 
+#. Report flow: body of the final screen after a report was sent, on a self-hosted instance whose own administrators handle reports. The second sentence promises the reported person is not told who reported them.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "The administrators of this instance will review your report. We won't reveal that it came from you."
+msgstr "इस इंस्टेंस के एडमिनिस्ट्रेटर आपकी रिपोर्ट की समीक्षा करेंगे। हम यह नहीं बताएंगे कि यह आपसे आई है।"
+
 #. Error shown when the setup wizard cannot load because the API origin differs from the page origin.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "The API is on a different origin than this page, so setup requests are sent without your session. Check the public origin and port this instance is configured with, then reload."
@@ -36540,6 +36635,10 @@ msgstr "जिस कम्युनिटी से यह आया है, �
 msgid "The community you're looking for may have been deleted or you may not have access to it."
 msgstr "आप जिस कम्युनिटी को ढूंढ रहे हैं, हो सकता है उसे डिलीट कर दिया गया हो या आपके पास उसका एक्सेस न हो।"
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "The connection was not allowed. You can close this tab and try again."
+msgstr "कनेक्शन की अनुमति नहीं दी गई। आप इस टैब को बंद करके फिर से कोशिश कर सकते हैं।"
+
 #. Body of the confirmation dialog before replacing the private link to an Operator certificate page. The certificate is a PDF, and each page has a number and the date and time of payment. The new copy of the page has the new link printed on it.
 #: src/features/premium/components/operator_pass/OperatorPassPurchasesSection.tsx
 msgid "The current link stops working right away, for you and for anyone you've shared it with. We make a new copy of this page with the new link printed on it, with the same number and date."
@@ -36563,6 +36662,11 @@ msgstr "फ़ाइल में वह वेरिफ़िकेशन ट�
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx
 msgid "The file you're trying to upload exceeds the maximum size limit of {maxSizeFormatted}."
 msgstr "आप जिस फ़ाइल को अपलोड करने की कोशिश कर रहे हैं, वह {maxSizeFormatted} की अधिकतम साइज़ सीमा से ज़्यादा है।"
+
+#. Helper text under "Age range from your Apple or Google account" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "The Fluxer app for iPhone, iPad or Android sent us this age range. If it shows that you're 18 or older, you can see 18+ content in the UK and Brazil. It doesn't change your date of birth."
+msgstr "iPhone, iPad या Android के लिए Fluxer ऐप ने हमें यह आयु सीमा भेजी है। अगर इससे पता चलता है कि आपकी उम्र 18 वर्ष या उससे अधिक है, तो आप यूके और ब्राज़ील में 18+ सामग्री देख सकते हैं। इससे आपकी जन्म तिथि नहीं बदलती।"
 
 #. Setup wizard body explaining the push relay.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
@@ -41243,6 +41347,11 @@ msgstr "वेरिफ़िकेशन नहीं हो पाया"
 msgid "Verified & partnered community"
 msgstr "वेरिफ़ाइड और पार्टनर कम्युनिटी"
 
+#. Tooltip on the 2FA-for-moderation switch in the community moderation settings tab when the community is verified or partnered, so the switch stays on and cannot be changed.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Verified and partnered communities always require 2FA for moderators"
+msgstr "सत्यापित और पार्टनर समुदाय मॉडरेटर के लिए हमेशा 2FA ज़रूरी रखते हैं"
+
 #. Short label in the community badge. Keep it concise.
 #: src/features/guild/components/GuildBadge.tsx
 msgid "Verified community"
@@ -42182,10 +42291,20 @@ msgstr "हम उस CSS फ़ाइल को पढ़ नहीं पा�
 msgid "We couldn't read this theme. It may be corrupted or invalid."
 msgstr "हम इस थीम को पढ़ नहीं पाए। हो सकता है यह खराब हो या अमान्य हो।"
 
+#. Error shown when deleting the stored age range fails.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We couldn't remove your age range. Please try again."
+msgstr "हम आपकी आयु सीमा नहीं हटा सके। कृपया फिर से कोशिश करें।"
+
 #. Error message after saving a theme failed in Settings > Themes or the quick CSS editor window.
 #: src/features/theme_settings/utils/ThemeSettingsErrorModal.ts
 msgid "We couldn't save that theme."
 msgstr "हम वह थीम सेव नहीं कर सके।"
+
+#. Body of the confirmation shown before deleting the age range. App Attest is an Apple product name and stays in English.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We delete the age range, the time we got it and the App Attest keys for your Apple devices. In the UK and Brazil, you can't see 18+ content until the app sends an age range again. The app may send it again later if your Apple or Google account still shares it with Fluxer."
+msgstr "हम आयु सीमा, उसे पाने का समय और आपके Apple डिवाइस की App Attest कुंजियां हटा देते हैं। यूके और ब्राज़ील में आप 18+ सामग्री तब तक नहीं देख सकते, जब तक ऐप फिर से आयु सीमा नहीं भेजता। अगर आपका Apple या Google खाता अब भी इसे Fluxer के साथ साझा करता है, तो ऐप बाद में आपकी आयु सीमा फिर से भेज सकता है।"
 
 #. Modal body for existing-subscription block. Directs the user to the billing portal and addresses the just-paid race case. Keep plain and reassuring.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -43130,6 +43249,10 @@ msgstr "इन यूज़र के साथ आपका पहले से
 msgid "You already have lifetime {premiumProductName}"
 msgstr "आपके पास पहले से ही आजीवन {premiumProductName} है"
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "You already have the most connections an account can have. Remove one and try again."
+msgstr "आपके पास पहले से ही एक अकाउंट के लिए अधिकतम कनेक्शन हैं। एक हटाएँ और फिर से कोशिश करें।"
+
 #. Body text in the connection add connection modal.
 #: src/features/connection/components/modals/AddConnectionModal.tsx
 msgid "You already have this connection."
@@ -43244,6 +43367,11 @@ msgstr "आप {date} तक पूर्ण रिफ़ंड प्राप�
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
 msgid "You can get a full refund until {date}. This also ends your subscription right away."
 msgstr "आप {date} तक पूर्ण रिफ़ंड प्राप्त कर सकते हैं। इससे आपकी सदस्यता तुरंत समाप्त हो जाएगी।"
+
+#. Nagbar body telling people that the Fluxer app for Android phones can be installed from Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Keep Fluxer and Android untranslated. Keep the tone calm and plain.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "You can get the Fluxer app for Android on {googlePlay} and chat from your phone."
+msgstr "आप {googlePlay} से Android के लिए Fluxer ऐप डाउनलोड करके अपने फ़ोन से चैट कर सकते हैं।"
 
 #. Line under "Full refund" in the Payments settings. {amount} is the price paid, with currency, and {date} is the last day of the refund window, such as Nov 2, 2026. Both are filled in by code.
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
@@ -44105,6 +44233,11 @@ msgstr "आप पुराने मैसेज देख रहे हैं"
 msgid "You've added more people than a group DM allows. Remove a few and try again."
 msgstr "आपने ग्रुप DM की अनुमत संख्या से ज़्यादा लोगों को जोड़ दिया है। कुछ लोगों को हटाएँ और फिर से कोशिश करें।"
 
+#. Report flow: note on the summary screen when the reporter already reported this community.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "You've already reported this community."
+msgstr "आपने इस कम्युनिटी की पहले ही रिपोर्ट कर दी है।"
+
 #. Report flow: note on the summary screen when the reporter already reported this message.
 #: src/features/moderation/components/report_flow/ReportFlowCopy.ts
 msgid "You've already reported this message."
@@ -44308,6 +44441,11 @@ msgstr "आपके ब्राउज़र ने पासकी को ब�
 #: src/features/auth/utils/PasskeyErrorMessages.ts
 msgid "Your browser blocked the passkey because this page is not on {rpId}, the passkey domain of this instance. Ask the instance owner to check the passkey domain setting."
 msgstr "आपका ब्राउज़र पासकी को ब्लॉक कर रहा है क्योंकि यह पेज {rpId} पर नहीं है, जो इस इंस्टेंस का पासकी डोमेन है। इंस्टेंस मालिक से पासकी डोमेन सेटिंग की जाँच करने के लिए कहें।"
+
+#. Description under the "Share audio" switch in the web stream setup modal. The browser picker owns the final audio choice.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your browser lets you choose whether to include audio when you pick what to share."
+msgstr "क्या शेयर करना है, यह चुनते समय आपका ब्राउज़र आपको ऑडियो शामिल करने या न करने का विकल्प देता है।"
 
 #. Body of the browser-audio-required modal explaining why the user must click before audio can play.
 #: src/features/voice/components/modals/AudioPlaybackPermissionModal.tsx
@@ -44720,6 +44858,11 @@ msgstr "आपका सहेजा गया {savedResolution} {savedFrameRate
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "आपका स्क्रीन शेयर किसी कम्पैटिबल वीडियो कोडेक के साथ पब्लिश नहीं हो सका, इसलिए इसे रोक दिया गया। फिर से शेयर करने की कोशिश करें।"
+
+#. Footer summary under the preset name in the web stream setup modal when the Source resolution is picked. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your screen's resolution at {fps} FPS"
+msgstr "{fps} FPS पर आपकी स्क्रीन का रेज़ोल्यूशन"
 
 #. Alert on the setup token screen when the token was refused while creating the account.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx

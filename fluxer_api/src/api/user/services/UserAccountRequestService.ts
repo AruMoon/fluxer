@@ -3,7 +3,7 @@
 import * as AuthEmailRevert from '@app/api/auth/AuthEmailRevert';
 import {requireSudoMode, type SudoVerificationResult} from '@app/api/auth/services/SudoVerificationService';
 import {createChannelID, createGuildID, type UserID} from '@app/api/BrandedTypes';
-import type {UserConnectionRow} from '@app/api/database/types/ConnectionTypes';
+import {mapConnectionsToResponse} from '@app/api/connection/ConnectionMappers';
 import type {ThreadViewer} from '@app/api/experiment/ChannelThreadsGate';
 import {emitActivity} from '@app/api/infrastructure/activity/ActivityEvents';
 import {isBlockedEmailDomain} from '@app/api/infrastructure/activity/SharedLists';
@@ -57,7 +57,6 @@ import {getCurrentTimeZoneOffsetMinutes} from '@fluxer/date_utils/src/TimeZoneUt
 import {UseClaimRouteError} from '@fluxer/errors/src/domains/auth/UseClaimRouteError';
 import {InputValidationError} from '@fluxer/errors/src/domains/core/InputValidationError';
 import {UnauthorizedError} from '@fluxer/errors/src/domains/core/UnauthorizedError';
-import type {ConnectionResponse} from '@fluxer/schema/src/domains/connection/ConnectionSchemas';
 import type {
 	ProfileBadgePreviewRequest,
 	ProfileBadgePreviewResponse,
@@ -412,13 +411,14 @@ export class UserAccountRequestService {
 				)
 			: undefined;
 		const connectedAccounts =
-			profile.connections && !hidden ? this.mapConnectionsToResponse(profile.connections) : undefined;
+			profile.connections && !hidden ? await mapConnectionsToResponse(profile.connections) : undefined;
 		const operatorPassSince = operatorPassState
 			? profileOperatorPassSince({
 					user: profileUser,
 					state: operatorPassState,
 					viewerId: params.currentUserId,
 					restrictProfile,
+					hidden,
 				})
 			: null;
 		const viewerIsSelf = params.currentUserId === profileUser.id;
@@ -519,7 +519,7 @@ export class UserAccountRequestService {
 		response.premium_grace_ends_at = null;
 		response.premium_discriminator = false;
 		response.last_voice_activity_sharing_change_at = null;
-		response.age_verified_adult = undefined;
+		response.mature_content_unlocked = undefined;
 		response.terms_agreed_at = null;
 		response.privacy_agreed_at = null;
 		response.claimed = undefined;
@@ -527,6 +527,7 @@ export class UserAccountRequestService {
 		response.verification_need = undefined;
 		response.has_password = undefined;
 		response.date_of_birth_required = undefined;
+		response.has_age_range = undefined;
 		response.profile_restricted = undefined;
 		response.mfa_enabled = false;
 		response.authenticator_types = undefined;
@@ -563,18 +564,5 @@ export class UserAccountRequestService {
 			return !isInteractionTierEnforced() && (usernameChanged || discriminatorChanged);
 		}
 		return usernameChanged || discriminatorChanged || emailTokenProvided || emailChanged || newPasswordProvided;
-	}
-
-	private mapConnectionsToResponse(connections: Array<UserConnectionRow>): Array<ConnectionResponse> {
-		return connections
-			.sort((a, b) => a.sort_order - b.sort_order)
-			.map((connection) => ({
-				id: connection.connection_id,
-				type: connection.connection_type,
-				name: connection.name,
-				verified: connection.verified,
-				visibility_flags: connection.visibility_flags,
-				sort_order: connection.sort_order,
-			}));
 	}
 }

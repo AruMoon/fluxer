@@ -2,14 +2,17 @@
 
 import type {GuildID, UserID} from '@app/api/BrandedTypes';
 import {Config} from '@app/api/Config';
+import {isConnectionAvailable} from '@app/api/connection/ConnectionMappers';
 import type {ConnectionRepository} from '@app/api/connection/ConnectionRepository';
 import type {UserConnectionRow} from '@app/api/database/types/ConnectionTypes';
 import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository';
 import type {GuildService} from '@app/api/guild/services/GuildService';
 import type {DiscriminatorService} from '@app/api/infrastructure/DiscriminatorService';
 import type {RequestCache} from '@app/api/middleware/RequestCacheMiddleware';
+import {getInstanceConfigRepository} from '@app/api/middleware/ServiceSingletons';
 import type {GuildMember} from '@app/api/models/GuildMember';
 import type {User} from '@app/api/models/User';
+import {isProfileHidden} from '@app/api/user/ProfileVisibility';
 import {applyPremiumBadgeMasking} from '@app/api/user/profile_badges/PremiumBadgeMasking';
 import type {UserRepository} from '@app/api/user/repositories/UserRepository';
 import {isUsernameTaken} from '@app/api/user/UniqueUsernames';
@@ -76,6 +79,7 @@ export class UserAccountLookupService {
 			await this.validateProfileAccess(userId, targetId, user);
 		}
 		const restrictProfile = await this.shouldRestrictProfile(userId, targetId, user);
+		const hiddenFromViewer = userId !== targetId && isProfileHidden(user);
 		let guildMember: GuildMemberResponse | null = null;
 		let guildMemberDomain: GuildMember | null = null;
 		if (guildId != null) {
@@ -96,13 +100,14 @@ export class UserAccountLookupService {
 			premiumFlags: user.premiumFlags,
 			hidden: user.hiddenProfileBadges,
 			selfHosted: Config.instance.selfHosted,
-			restricted: restrictProfile,
+			restricted: restrictProfile || hiddenFromViewer,
 		});
 		const profileFieldPrivacyContext = restrictProfile
 			? null
 			: await this.getProfileFieldPrivacyContext(userId, targetId);
 		const timezoneVisible =
 			!restrictProfile &&
+			!hiddenFromViewer &&
 			user.timezone != null &&
 			profileFieldPrivacyContext != null &&
 			this.canViewProfileField(user.timezonePrivacyFlags, profileFieldPrivacyContext);
@@ -276,9 +281,16 @@ export class UserAccountLookupService {
 		targetId: UserID,
 		privacyContext: ProfileFieldPrivacyContext,
 	): Promise<Array<UserConnectionRow>> {
-		const connections = await this.deps.connectionRepository.findByUserId(targetId);
-		const verified = connections.filter((connection) => connection.verified);
-		return verified.filter((connection) => this.canViewProfileField(connection.visibility_flags, privacyContext));
+		const [connections, providers] = await Promise.all([
+			this.deps.connectionRepository.findByUserId(targetId),
+			getInstanceConfigRepository().getConnectionProviderIndex(),
+		]);
+		return connections.filter(
+			(connection) =>
+				connection.verified &&
+				isConnectionAvailable(connection, providers) &&
+				this.canViewProfileField(connection.visibility_flags, privacyContext),
+		);
 	}
 
 	private async getProfileFieldPrivacyContext(viewerId: UserID, targetId: UserID): Promise<ProfileFieldPrivacyContext> {

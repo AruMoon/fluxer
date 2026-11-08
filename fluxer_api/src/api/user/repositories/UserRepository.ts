@@ -59,7 +59,7 @@ import {
 	type PrivateChannelSummary,
 	UserChannelRepository,
 } from '@app/api/user/repositories/UserChannelRepository';
-import {UserRelationshipRepository} from '@app/api/user/repositories/UserRelationshipRepository';
+import {type RelationshipKey, UserRelationshipRepository} from '@app/api/user/repositories/UserRelationshipRepository';
 import {UserSettingsRepository} from '@app/api/user/repositories/UserSettingsRepository';
 import {VisionarySlotRepository} from '@app/api/user/repositories/VisionarySlotRepository';
 import type {IKVProvider} from '@pkgs/kv_client/src/IKVProvider';
@@ -101,6 +101,10 @@ export class UserRepository {
 
 	async compareAndSetFlags(user: User, flags: bigint): Promise<User | null> {
 		return this.accountRepo.compareAndSetFlags(user, flags);
+	}
+
+	async compareAndClearSuspension(user: User, flags: bigint): Promise<User | null> {
+		return this.accountRepo.compareAndClearSuspension(user, flags);
 	}
 
 	async moveLegacyBadgeHideBits(userId: UserID, options: {mergeIntoHiddenList: boolean}): Promise<User | null> {
@@ -444,6 +448,10 @@ export class UserRepository {
 		return this.relationshipRepo.listBlockedUserIds(sourceUserId);
 	}
 
+	async listUserIdsBlockingTarget(targetUserId: UserID, sourceUserIds: Array<UserID>): Promise<Set<UserID>> {
+		return this.relationshipRepo.listUserIdsBlockingTarget(targetUserId, sourceUserIds);
+	}
+
 	async hasReachedRelationshipLimit(sourceUserId: UserID, limit: number): Promise<boolean> {
 		return this.relationshipRepo.hasReachedRelationshipLimit(sourceUserId, limit);
 	}
@@ -454,6 +462,13 @@ export class UserRepository {
 
 	async upsertRelationship(relationship: RelationshipRow): Promise<Relationship> {
 		return this.relationshipRepo.upsertRelationship(relationship);
+	}
+
+	async writeRelationships(changes: {
+		upserts?: ReadonlyArray<RelationshipRow>;
+		deletes?: ReadonlyArray<RelationshipKey>;
+	}): Promise<Array<Relationship>> {
+		return this.relationshipRepo.writeRelationships(changes);
 	}
 
 	async bulkUpdateFriendShareVoiceActivity(sourceUserId: UserID, value: boolean): Promise<Array<Relationship>> {
@@ -734,7 +749,7 @@ export class UserRepository {
 		return this.visionarySlotRepository.expandVisionarySlots(byCount);
 	}
 
-	async reserveVisionarySlot(slotIndex: number, userId: UserID): Promise<void> {
+	async reserveVisionarySlot(slotIndex: number, userId: UserID): Promise<boolean> {
 		return this.visionarySlotRepository.reserveVisionarySlot(slotIndex, userId);
 	}
 

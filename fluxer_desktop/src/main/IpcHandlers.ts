@@ -62,6 +62,7 @@ import {
 	isPrivilegedRendererDocumentSender,
 	requirePrivilegedRendererDocumentSender,
 } from '@electron/main/PrivilegedRendererDocuments';
+import {saveDialogFilters, withDefaultExtension} from '@electron/main/SaveDialogFileType';
 import {getDesktopSelectedInstanceClient} from '@electron/main/SelectedInstanceFetch';
 import {getStreamerModeCaptureAppStatus} from '@electron/main/StreamerModeProcessDetection';
 import {
@@ -444,12 +445,14 @@ export function registerIpcHandlers(): void {
 			try {
 				const result = await dialog.showSaveDialog(win, {
 					defaultPath: options.defaultPath,
+					filters: saveDialogFilters(options.defaultPath),
 				});
 				if (result.canceled || !result.filePath) {
 					return {success: false, canceled: true};
 				}
-				await downloadFile(options.url, result.filePath, {sha256: options.sha256});
-				return {success: true, path: result.filePath};
+				const filePath = withDefaultExtension(result.filePath, options.defaultPath);
+				await downloadFile(options.url, filePath, {sha256: options.sha256});
+				return {success: true, path: filePath};
 			} catch (error) {
 				if (error instanceof DownloadChecksumError) {
 					return {success: false, checksumMismatch: true, error: error.message};
@@ -462,9 +465,6 @@ export function registerIpcHandlers(): void {
 		if (process.platform !== 'darwin') {
 			return 'granted';
 		}
-		if (type === 'audio-capture') {
-			return 'not-determined';
-		}
 		if (type === 'screen') {
 			return refreshTccStatus('screen-recording');
 		}
@@ -473,9 +473,6 @@ export function registerIpcHandlers(): void {
 	ipcMain.handle('request-media-access', async (_event, type: MediaAccessType): Promise<boolean> => {
 		if (process.platform !== 'darwin') {
 			return true;
-		}
-		if (type === 'audio-capture') {
-			return false;
 		}
 		if (type === 'screen') {
 			return (await refreshTccStatus('screen-recording')) === 'granted';
@@ -490,7 +487,6 @@ export function registerIpcHandlers(): void {
 			microphone: 'Privacy_Microphone',
 			camera: 'Privacy_Camera',
 			screen: 'Privacy_ScreenCapture',
-			'audio-capture': 'Privacy_AudioCapture',
 		};
 		await shell.openExternal(`x-apple.systempreferences:com.apple.preference.security?${privacyKeys[type]}`);
 	});

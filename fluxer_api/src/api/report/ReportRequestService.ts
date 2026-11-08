@@ -11,8 +11,13 @@ import {
 	resolveReportFlowAnswers,
 	resolveReportFlowLocale,
 } from '@app/api/report/flows/ReportFlowRegistry';
-import {reasonSkipsReporterCaps} from '@app/api/report/flows/ReportReasonCatalog';
-import {admitLimitedReport, isLimitedReporter, type LimitedReportTarget} from '@app/api/report/LimitedReporterPolicy';
+import {isUrgentLegacyCategory} from '@app/api/report/flows/ReportReasonCatalog';
+import {
+	admitLimitedReport,
+	isLimitedReporter,
+	type LimitedReportTarget,
+	releaseLimitedReport,
+} from '@app/api/report/LimitedReporterPolicy';
 import {ReportStatus, reportStatusToString} from '@app/api/report/ReportModels';
 import type {ReportFlowRecord, ReportService} from '@app/api/report/ReportService';
 import {assertTierAllows, getAccountTier, NO_TIER_CONTEXT} from '@app/api/user/AccountTier';
@@ -81,40 +86,40 @@ export class ReportRequestService {
 		data,
 		request,
 	}: ReportUserRequestContext<ReportMessageRequest> & {viewer: ThreadViewer}): Promise<ReportResponse> {
-		const admission = await this.admitReporter(user, request, {type: 'message', id: BigInt(data.message_id)});
-		if (admission) return admission;
-		const report = await this.reportService.reportMessage(
-			this.createReporter(user),
-			viewer,
-			createChannelID(data.channel_id),
-			createMessageID(data.message_id),
-			data.category,
+		const urgent = isUrgentLegacyCategory('message', data.category);
+		return this.admitAndStore(user, request, {type: 'message', id: BigInt(data.message_id)}, urgent, () =>
+			this.reportService.reportMessage(
+				this.createReporter(user, urgent),
+				viewer,
+				createChannelID(data.channel_id),
+				createMessageID(data.message_id),
+				data.category,
+			),
 		);
-		return this.toReportResponse(report);
 	}
 
 	async reportUser({user, data, request}: ReportUserRequestContext<ReportUserRequest>): Promise<ReportResponse> {
-		const admission = await this.admitReporter(user, request, {type: 'user', id: BigInt(data.user_id)});
-		if (admission) return admission;
-		const report = await this.reportService.reportUser(
-			this.createReporter(user),
-			createUserID(data.user_id),
-			data.category,
-			data.guild_id ? createGuildID(data.guild_id) : undefined,
+		const urgent = isUrgentLegacyCategory('user', data.category);
+		return this.admitAndStore(user, request, {type: 'user', id: BigInt(data.user_id)}, urgent, () =>
+			this.reportService.reportUser(
+				this.createReporter(user, urgent),
+				createUserID(data.user_id),
+				data.category,
+				data.guild_id ? createGuildID(data.guild_id) : undefined,
+			),
 		);
-		return this.toReportResponse(report);
 	}
 
 	async reportGuild({user, data, request}: ReportUserRequestContext<ReportGuildRequest>): Promise<ReportResponse> {
-		const admission = await this.admitReporter(user, request, {type: 'guild', id: BigInt(data.guild_id)});
-		if (admission) return admission;
-		const report = await this.reportService.reportGuild(
-			this.createReporter(user),
-			createGuildID(data.guild_id),
-			data.category,
-			data.invite_code ? createInviteCode(data.invite_code) : undefined,
+		const urgent = isUrgentLegacyCategory('guild', data.category);
+		return this.admitAndStore(user, request, {type: 'guild', id: BigInt(data.guild_id)}, urgent, () =>
+			this.reportService.reportGuild(
+				this.createReporter(user, urgent),
+				createGuildID(data.guild_id),
+				data.category,
+				data.invite_code ? createInviteCode(data.invite_code) : undefined,
+			),
 		);
-		return this.toReportResponse(report);
 	}
 
 	getReportFlow(params: {
@@ -134,24 +139,17 @@ export class ReportRequestService {
 	}: ReportFlowSubmissionContext<ReportFlowMessageSubmissionRequest> & {
 		viewer: ThreadViewer;
 	}): Promise<ReportResponse> {
-		const capExempt = this.isCapExemptWalk('message', data);
-		const admission = await this.admitReporter(
-			user,
-			request,
-			{type: 'message', id: BigInt(data.message_id)},
-			capExempt,
+		const flow = this.resolveInAppFlow(user, 'message', data, locale);
+		return this.admitAndStore(user, request, {type: 'message', id: BigInt(data.message_id)}, flow.urgent, () =>
+			this.reportService.reportMessage(
+				this.createReporter(user, flow.urgent),
+				viewer,
+				createChannelID(data.channel_id),
+				createMessageID(data.message_id),
+				flow.category,
+				flow.record,
+			),
 		);
-		if (admission) return admission;
-		const flow = this.resolveInAppFlow('message', data, locale);
-		const report = await this.reportService.reportMessage(
-			this.createReporter(user, capExempt),
-			viewer,
-			createChannelID(data.channel_id),
-			createMessageID(data.message_id),
-			flow.category,
-			flow.record,
-		);
-		return this.toReportResponse(report);
 	}
 
 	async submitUserReportFlow({
@@ -160,18 +158,16 @@ export class ReportRequestService {
 		locale,
 		request,
 	}: ReportFlowSubmissionContext<ReportFlowUserSubmissionRequest>): Promise<ReportResponse> {
-		const capExempt = this.isCapExemptWalk('user', data);
-		const admission = await this.admitReporter(user, request, {type: 'user', id: BigInt(data.user_id)}, capExempt);
-		if (admission) return admission;
-		const flow = this.resolveInAppFlow('user', data, locale);
-		const report = await this.reportService.reportUser(
-			this.createReporter(user, capExempt),
-			createUserID(data.user_id),
-			flow.category,
-			data.guild_id ? createGuildID(data.guild_id) : undefined,
-			flow.record,
+		const flow = this.resolveInAppFlow(user, 'user', data, locale);
+		return this.admitAndStore(user, request, {type: 'user', id: BigInt(data.user_id)}, flow.urgent, () =>
+			this.reportService.reportUser(
+				this.createReporter(user, flow.urgent),
+				createUserID(data.user_id),
+				flow.category,
+				data.guild_id ? createGuildID(data.guild_id) : undefined,
+				flow.record,
+			),
 		);
-		return this.toReportResponse(report);
 	}
 
 	async submitGuildReportFlow({
@@ -180,18 +176,16 @@ export class ReportRequestService {
 		locale,
 		request,
 	}: ReportFlowSubmissionContext<ReportFlowGuildSubmissionRequest>): Promise<ReportResponse> {
-		const capExempt = this.isCapExemptWalk('guild', data);
-		const admission = await this.admitReporter(user, request, {type: 'guild', id: BigInt(data.guild_id)}, capExempt);
-		if (admission) return admission;
-		const flow = this.resolveInAppFlow('guild', data, locale);
-		const report = await this.reportService.reportGuild(
-			this.createReporter(user, capExempt),
-			createGuildID(data.guild_id),
-			flow.category,
-			data.invite_code ? createInviteCode(data.invite_code) : undefined,
-			flow.record,
+		const flow = this.resolveInAppFlow(user, 'guild', data, locale);
+		return this.admitAndStore(user, request, {type: 'guild', id: BigInt(data.guild_id)}, flow.urgent, () =>
+			this.reportService.reportGuild(
+				this.createReporter(user, flow.urgent),
+				createGuildID(data.guild_id),
+				flow.category,
+				data.invite_code ? createInviteCode(data.invite_code) : undefined,
+				flow.record,
+			),
 		);
-		return this.toReportResponse(report);
 	}
 
 	async sendDsaReportVerificationEmail({
@@ -212,16 +206,23 @@ export class ReportRequestService {
 	}
 
 	private resolveInAppFlow(
+		user: User,
 		target: ReportFlowTargetType,
 		data: ReportFlowAnswersInput,
 		locale: string | null,
-	): {category: string; record: ReportFlowRecord} {
-		const answers = resolveReportFlowAnswers({
-			target,
-			surface: 'in_app',
-			revisionHash: data.revision_hash,
-			steps: data.steps,
-		});
+	): {category: string; record: ReportFlowRecord; urgent: boolean} {
+		let answers: ReturnType<typeof resolveReportFlowAnswers>;
+		try {
+			answers = resolveReportFlowAnswers({
+				target,
+				surface: 'in_app',
+				revisionHash: data.revision_hash,
+				steps: data.steps,
+			});
+		} catch (error) {
+			if (!isLimitedReporter(user)) assertTierAllows(user, TierGatedActions.REPORT, NO_TIER_CONTEXT);
+			throw error;
+		}
 		if (!answers.isCurrentRevision) {
 			Logger.warn(
 				{clientRevision: data.revision_hash, currentRevision: answers.currentRevisionHash, target},
@@ -230,6 +231,7 @@ export class ReportRequestService {
 		}
 		return {
 			category: answers.legacyCategory,
+			urgent: answers.urgent,
 			record: {
 				reason: answers.reason,
 				revisionHash: data.revision_hash,
@@ -240,36 +242,33 @@ export class ReportRequestService {
 		};
 	}
 
-	private isCapExemptWalk(target: ReportFlowTargetType, data: ReportFlowAnswersInput): boolean {
-		try {
-			const {reason} = resolveReportFlowAnswers({
-				target,
-				surface: 'in_app',
-				revisionHash: data.revision_hash,
-				steps: data.steps,
-			});
-			return reasonSkipsReporterCaps(reason);
-		} catch {
-			return false;
-		}
-	}
-
-	private async admitReporter(
+	private async admitAndStore(
 		user: User,
 		request: Request,
 		target: LimitedReportTarget,
-		capExempt = false,
-	): Promise<ReportResponse | null> {
-		if (!isLimitedReporter(user, capExempt)) {
+		urgent: boolean,
+		store: () => Promise<ReportRecord>,
+	): Promise<ReportResponse> {
+		if (urgent) {
+			return this.toReportResponse(await store());
+		}
+		if (!isLimitedReporter(user)) {
 			assertTierAllows(user, TierGatedActions.REPORT, NO_TIER_CONTEXT);
-			return null;
+			return this.toReportResponse(await store());
 		}
 		const clientIp = requireClientIp(request, {
 			trustClientIpHeader: Config.proxy.trust_client_ip_header,
 			clientIpHeaderName: Config.proxy.client_ip_header,
 		});
 		const env = budgetEnvFor(this.budgetServices, request);
-		if ((await admitLimitedReport(env, {user, clientIp, target})) === 'store') return null;
+		if ((await admitLimitedReport(env, {user, clientIp, target})) === 'store') {
+			try {
+				return this.toReportResponse(await store());
+			} catch (error) {
+				await releaseLimitedReport(env, clientIp, target);
+				throw error;
+			}
+		}
 		const now = Date.now();
 		return {
 			report_id: createSnowflakeFromTimestamp(now).toString(),
@@ -278,14 +277,14 @@ export class ReportRequestService {
 		};
 	}
 
-	private createReporter(user: User, capExempt = false) {
+	private createReporter(user: User, urgent = false) {
 		return {
 			id: user.id,
 			email: user.email,
 			fullLegalName: null,
 			countryOfResidence: null,
 			tier: getAccountTier(user),
-			capExempt,
+			urgent,
 		};
 	}
 

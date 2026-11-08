@@ -53,6 +53,28 @@ const GET_REPORT_QUERY = IARSubmissions.select({
 	where: IARSubmissions.where.eq('report_id'),
 	limit: 1,
 });
+const FIND_MESSAGE_REPORT_BY_REPORTER_QUERY = MessageReportSubmissionsByReporter.select({
+	where: [
+		MessageReportSubmissionsByReporter.where.eq('reporter_id'),
+		MessageReportSubmissionsByReporter.where.eq('channel_id'),
+		MessageReportSubmissionsByReporter.where.eq('message_id'),
+	],
+	limit: 1,
+});
+const FIND_USER_REPORT_BY_REPORTER_QUERY = UserReportSubmissionsByReporter.select({
+	where: [
+		UserReportSubmissionsByReporter.where.eq('reporter_id'),
+		UserReportSubmissionsByReporter.where.eq('reported_user_id'),
+	],
+	limit: 1,
+});
+const FIND_GUILD_REPORT_BY_REPORTER_QUERY = GuildReportSubmissionsByReporter.select({
+	where: [
+		GuildReportSubmissionsByReporter.where.eq('reporter_id'),
+		GuildReportSubmissionsByReporter.where.eq('reported_guild_id'),
+	],
+	limit: 1,
+});
 const LIST_NOTES_QUERY = IARReportNotes.select({
 	where: IARReportNotes.where.eq('report_id'),
 	orderBy: {col: 'note_id', direction: 'ASC'},
@@ -127,6 +149,31 @@ export class ReportRepository {
 		);
 	}
 
+	async findMessageReportByReporter(key: {
+		reporter_id: UserID;
+		channel_id: MessageReportSubmissionByReporterRow['channel_id'];
+		message_id: MessageReportSubmissionByReporterRow['message_id'];
+	}): Promise<IARSubmission | null> {
+		const row = await fetchOne<MessageReportSubmissionByReporterRow>(FIND_MESSAGE_REPORT_BY_REPORTER_QUERY.bind(key));
+		return row ? this.getReport(createReportID(row.report_id)) : null;
+	}
+
+	async findUserReportByReporter(key: {
+		reporter_id: UserID;
+		reported_user_id: UserReportSubmissionByReporterRow['reported_user_id'];
+	}): Promise<IARSubmission | null> {
+		const row = await fetchOne<UserReportSubmissionByReporterRow>(FIND_USER_REPORT_BY_REPORTER_QUERY.bind(key));
+		return row ? this.getReport(createReportID(row.report_id)) : null;
+	}
+
+	async findGuildReportByReporter(key: {
+		reporter_id: UserID;
+		reported_guild_id: GuildReportSubmissionByReporterRow['reported_guild_id'];
+	}): Promise<IARSubmission | null> {
+		const row = await fetchOne<GuildReportSubmissionByReporterRow>(FIND_GUILD_REPORT_BY_REPORTER_QUERY.bind(key));
+		return row ? this.getReport(createReportID(row.report_id)) : null;
+	}
+
 	async getReport(reportId: ReportID): Promise<IARSubmission | null> {
 		const row = await fetchOne<IARSubmissionRow>(GET_REPORT_QUERY.bind({report_id: reportId}));
 		return row ? this.mapRowToSubmission(row) : null;
@@ -198,16 +245,35 @@ export class ReportRepository {
 		return {...report, legalHoldUntil, legalHoldReason};
 	}
 
-	async clearCopiedContext(reportId: ReportID, reportType: number): Promise<boolean> {
-		return executeConditional(
+	async clearCopiedContext(report: IARSubmission): Promise<IARSubmissionRow | null> {
+		const row = await fetchOne<IARSubmissionRow>(GET_REPORT_QUERY.bind({report_id: report.reportId}));
+		if (!row) {
+			return null;
+		}
+		const cleared = await executeConditional(
 			IARSubmissions.conditionalPatchByPk(
-				{report_id: reportId},
+				{report_id: report.reportId},
 				{
 					message_context: Db.set(null),
 					reported_profile_snapshot: Db.set(null),
 					additional_info: Db.set(null),
 				},
-				{report_type: reportType},
+				{report_type: report.reportType, legal_hold_until: report.legalHoldUntil ?? null},
+			),
+		);
+		return cleared ? row : null;
+	}
+
+	async restoreCopiedContext(row: IARSubmissionRow): Promise<void> {
+		await executeConditional(
+			IARSubmissions.conditionalPatchByPk(
+				{report_id: row.report_id},
+				{
+					message_context: Db.set(row.message_context),
+					reported_profile_snapshot: Db.set(row.reported_profile_snapshot ?? null),
+					additional_info: Db.set(row.additional_info),
+				},
+				{report_type: row.report_type},
 			),
 		);
 	}
@@ -222,16 +288,27 @@ export class ReportRepository {
 		);
 	}
 
-	async deleteReport(reportId: ReportID): Promise<void> {
-		const report = await this.getReport(reportId);
-		if (!report) {
-			return;
+	async deleteReport(report: IARSubmission): Promise<IARSubmissionRow | null> {
+		const row = await fetchOne<IARSubmissionRow>(GET_REPORT_QUERY.bind({report_id: report.reportId}));
+		if (!row) {
+			return null;
 		}
-		await this.releaseReporterReservation(report);
-		await deleteOneOrMany(IARReportNotes.deletePartition({report_id: reportId}));
-		await executeConditional(
-			IARSubmissions.conditionalDeleteByPk({report_id: reportId}, {report_type: report.reportType}),
+		const deleted = await executeConditional(
+			IARSubmissions.conditionalDeleteByPk(
+				{report_id: report.reportId},
+				{report_type: report.reportType, legal_hold_until: report.legalHoldUntil ?? null},
+			),
 		);
+		return deleted ? row : null;
+	}
+
+	async restoreReport(row: IARSubmissionRow): Promise<void> {
+		await executeConditional(IARSubmissions.insertIfNotExists(row));
+	}
+
+	async releaseDeletedReport(report: IARSubmission): Promise<void> {
+		await this.releaseReporterReservation(report);
+		await deleteOneOrMany(IARReportNotes.deletePartition({report_id: report.reportId}));
 	}
 
 	async addNote(note: IARReportNoteRow): Promise<void> {

@@ -41,6 +41,7 @@ import {
 	UnblockUserMenuItem,
 } from '@app/features/ui/action_menu/items/RelationshipMenuItems';
 import {ReportMessageMenuItem} from '@app/features/ui/action_menu/items/ReportMessageMenuItem';
+import {ReportUserProfileMenuItem} from '@app/features/ui/action_menu/items/ReportUserProfileMenuItem';
 import {shouldShowSpammerOverrideMenuItems} from '@app/features/ui/action_menu/items/SpammerOverrideMenuItems';
 import {StaffDeveloperUserControlsMenuItem} from '@app/features/ui/action_menu/items/StaffDeveloperUserControlsMenuItem';
 import {shouldShowStaffUserControlsMenuItems} from '@app/features/ui/action_menu/items/StaffUserControlsMenuItems';
@@ -69,8 +70,8 @@ import UserSettings from '@app/features/user/state/UserSettings';
 import Users from '@app/features/user/state/Users';
 import * as NicknameUtils from '@app/features/user/utils/NicknameUtils';
 import * as VoiceSettingsCommands from '@app/features/voice/commands/VoiceSettingsCommands';
-import {CameraPreviewModalInRoom} from '@app/features/voice/components/modals/CameraPreviewModal';
-import MediaEngine from '@app/features/voice/engine/MediaEngineFacade';
+import {LazyCameraPreviewModalInRoom} from '@app/features/voice/components/LazyVoiceComponents';
+import VoiceRuntime from '@app/features/voice/engine/VoiceRuntime';
 import CallState from '@app/features/voice/state/CallState';
 import PopoutWindowManager, {isVoicePopoutSupported} from '@app/features/voice/state/PopoutWindowManager';
 import VoiceSettings from '@app/features/voice/state/VoiceSettings';
@@ -214,7 +215,7 @@ export const UserContextMenu: React.FC<UserContextMenuProps> = observer(
 		const renderSelfPrivateCallControls = () => {
 			if (!privateCallContext?.isConnected || !isCurrentUser) return null;
 			const isDeviceSpecific = Boolean(
-				privateCallContext.connectionId && privateCallContext.connectionId !== MediaEngine.connectionId,
+				privateCallContext.connectionId && privateCallContext.connectionId !== VoiceRuntime.connectionId,
 			);
 			const previewCameraItem =
 				privateCallContext.visualSource === 'user' ? (
@@ -226,7 +227,7 @@ export const UserContextMenu: React.FC<UserContextMenuProps> = observer(
 							ModalCommands.pushAfterBottomSheetClose(
 								onClose,
 								modal(() => (
-									<CameraPreviewModalInRoom data-flx="ui.action-menu.user-context-menu.render-self-private-call-controls.camera-preview-modal-in-room" />
+									<LazyCameraPreviewModalInRoom data-flx="ui.action-menu.user-context-menu.render-self-private-call-controls.camera-preview-modal-in-room" />
 								)),
 							);
 						}}
@@ -268,6 +269,12 @@ export const UserContextMenu: React.FC<UserContextMenuProps> = observer(
 							data-flx="ui.action-menu.user-context-menu.render-report-actions.report-message-menu-item"
 						/>
 					)}
+					<ReportUserProfileMenuItem
+						user={user}
+						guildId={guildId}
+						onClose={onClose}
+						data-flx="ui.action-menu.user-context-menu.render-report-actions.report-user-profile-menu-item"
+					/>
 					{relationshipType === RelationshipTypes.BLOCKED ? (
 						<UnblockUserMenuItem
 							user={user}

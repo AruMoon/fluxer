@@ -20,11 +20,13 @@ import (
 	"time"
 
 	"github.com/docker/cli/cli/command"
+	"github.com/docker/cli/cli/context/docker"
 	"github.com/docker/cli/cli/flags"
 	"github.com/docker/compose/v5/pkg/api"
 	"github.com/docker/compose/v5/pkg/compose"
 	"github.com/moby/moby/client"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
 )
 
 const probeTimeout = 5 * time.Second
@@ -263,7 +265,7 @@ func dial(ctx context.Context, host string) (*Engine, *conn, error) {
 	if err != nil {
 		return nil, nil, &Error{Op: "connect", Class: ClassUnreachable, Err: err}
 	}
-	if err := cli.Initialize(&flags.ClientOptions{Hosts: []string{host}}); err != nil {
+	if err := cli.Initialize(clientOptions(host)); err != nil {
 		return nil, nil, &Error{Op: "connect", Class: ClassUnreachable, Err: err}
 	}
 	c := &conn{cli: cli}
@@ -308,6 +310,15 @@ func dial(ctx context.Context, host string) (*Engine, *conn, error) {
 	}
 	if _, local := socketPath(host); local && runtime.GOOS == "linux" && e.Desktop == "" {
 		e.DataRoot = info.Info.DockerRootDir
+		e.ImageRoot = e.DataRoot
+		if e.Kind == Docker && e.DataRoot != "" && containerdStore(info.Info.DriverStatus) {
+			var address string
+			if info.Info.Containerd != nil {
+				address = info.Info.Containerd.Address
+			}
+			conf, _ := os.ReadFile(ContainerdConfig)
+			e.ImageRoot = containerdImageRoot(e.DataRoot, address, conf, exists)
+		}
 	}
 	if e.Kind == Podman {
 		sum := sha256.Sum256([]byte(info.Info.Name + "\n" + info.Info.DockerRootDir))
@@ -315,6 +326,55 @@ func dial(ctx context.Context, host string) (*Engine, *conn, error) {
 	}
 	return e, c, nil
 }
+
+func clientOptions(host string) *flags.ClientOptions {
+	if !strings.HasPrefix(host, "tcp://") {
+		return &flags.ClientOptions{Hosts: []string{host}}
+	}
+	if name := contextFor(host); name != "" {
+		return &flags.ClientOptions{Context: name}
+	}
+	env := flags.NewClientOptions()
+	fs := pflag.NewFlagSet("docker", pflag.ContinueOnError)
+	env.InstallFlags(fs)
+	env.SetDefaultOptions(fs)
+	return &flags.ClientOptions{Hosts: []string{host}, TLS: env.TLS, TLSVerify: env.TLSVerify, TLSOptions: env.TLSOptions}
+}
+
+func contextFor(host string) string {
+	if os.Getenv("DOCKER_HOST") == host {
+		return ""
+	}
+	cli, err := command.NewDockerCli(command.WithOutputStream(io.Discard), command.WithErrorStream(io.Discard))
+	if err != nil {
+		return ""
+	}
+	if err := cli.Initialize(flags.NewClientOptions()); err != nil {
+		return ""
+	}
+	s := cli.ContextStore()
+	names := []string{cli.CurrentContext()}
+	if list, err := s.List(); err == nil {
+		for _, m := range list {
+			names = append(names, m.Name)
+		}
+	}
+	for _, name := range names {
+		if name == command.DefaultContextName {
+			continue
+		}
+		meta, err := s.GetMetadata(name)
+		if err != nil {
+			continue
+		}
+		if ep, err := docker.EndpointFromContext(meta); err == nil && ep.Host == host {
+			return name
+		}
+	}
+	return ""
+}
+
+func HostPlatform() string { return platform(runtime.GOARCH) }
 
 func platform(arch string) string {
 	switch strings.ToLower(arch) {

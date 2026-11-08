@@ -292,6 +292,14 @@ Whether the API accepts a voice server joining with an endpoint that resolves to
 
 How often each API node checks every active voice server, in milliseconds. A server that fails two checks in a row gets no new calls until a check passes. Set it to `0` to turn the checks off. When it's empty, the API checks every 15 seconds. With rexctl, use `rexctl config set FLUXER_VOICE_HEALTH_INTERVAL_MS`.
 
+### `FLUXER_VOICE_PARTICIPANT_SWEEP_ENABLED`
+
+Whether a worker compares each voice server's call participants with the gateway's call state every minute and disconnects connections the gateway has not known for two minutes. Use `true` or `false`. When it's empty, the check runs. With rexctl, use `rexctl config set FLUXER_VOICE_PARTICIPANT_SWEEP_ENABLED`.
+
+### `FLUXER_VOICE_PARTICIPANT_SWEEP_DRY_RUN`
+
+Whether the voice participant check from `FLUXER_VOICE_PARTICIPANT_SWEEP_ENABLED` only logs the connections it would disconnect. Use `true` or `false`. When it's empty, the check only logs them. With rexctl, use `rexctl config set FLUXER_VOICE_PARTICIPANT_SWEEP_DRY_RUN`.
+
 ### `FLUXER_LIVEKIT_TCP_PORT`
 
 The TCP port for voice and video. The default is `7881`. With rexctl, use `rexctl config set voice.tcp_port`.
@@ -1264,14 +1272,6 @@ The URL of the incident history on your status page. The apps don't use it yet. 
 
 Whether a new instance starts as already set up. Use `true` or `false`. With `true`, the setup wizard is skipped and registration opens without making the first account an admin. Once a setup state is saved, this has no effect. When it's empty, Fluxer uses `false`. With rexctl, use `rexctl config set FLUXER_INSTANCE_SETUP_CONFIGURED`.
 
-### `FLUXER_APP_ATTEST_APP_IDS`
-
-The iOS apps whose age reports the users service accepts through Apple App Attest, separated by commas. Each entry is a team ID, a dot and a bundle ID, such as `ABCDE12345.com.example.app`. When it's empty, App Attest is off and its API endpoints respond that the feature isn't available. The users service doesn't start when an entry isn't in that form. With rexctl, use `rexctl config set FLUXER_APP_ATTEST_APP_IDS`.
-
-### `FLUXER_APP_ATTEST_ALLOW_DEVELOPMENT`
-
-Whether the users service also accepts App Attest keys from development builds of the apps in `FLUXER_APP_ATTEST_APP_IDS`. Use `true` or `false`. When it's empty, it uses `false`, so only App Store, TestFlight and other production builds are accepted. With rexctl, use `rexctl config set FLUXER_APP_ATTEST_ALLOW_DEVELOPMENT`.
-
 ### `FLUXER_ACCOUNT_IDENTITY`
 
 How people sign in on a new instance. Use `username` or `email`. Fluxer uses it only on the first start with no saved sign-in method. When it's empty, Fluxer uses `email` if email delivery is set up and `username` otherwise. When `FLUXER_INSTANCE_SETUP_CONFIGURED` is `true` or any account exists, Fluxer uses email sign-in with random tags and ignores this. Otherwise the setup wizard asks again, and its answer replaces this value. With rexctl, use `rexctl config set FLUXER_ACCOUNT_IDENTITY`.
@@ -1306,11 +1306,11 @@ Whether the report retention job only counts what it would delete and changes no
 
 ### `FLUXER_AGE_POLICY_ENABLED`
 
-Whether the apps need an age check before they show mature content to people in the regions in `FLUXER_AGE_POLICY_RESTRICTED_REGIONS`. Use `true` or `false`. When it's empty, the age check is on only when `FLUXER_AGE_POLICY_RESTRICTED_REGIONS` is set. With rexctl, use `rexctl config set FLUXER_AGE_POLICY_ENABLED`.
+Whether a date of birth typed in is not enough for mature content in the regions in `FLUXER_AGE_POLICY_RESTRICTED_REGIONS`. Use `true` or `false`. When it's empty, this is on only when `FLUXER_AGE_POLICY_RESTRICTED_REGIONS` is set. With rexctl, use `rexctl config set FLUXER_AGE_POLICY_ENABLED`.
 
 ### `FLUXER_AGE_POLICY_RESTRICTED_REGIONS`
 
-The regions where the apps need an age check before they show mature content, separated by commas. Use a country code such as `GB` or a country and region code such as `US-MS`. When it's empty and `FLUXER_AGE_POLICY_ENABLED` is `true`, Fluxer uses `GB` and `BR`. With rexctl, use `rexctl config set FLUXER_AGE_POLICY_RESTRICTED_REGIONS`.
+The regions where a date of birth typed in is not enough for mature content, separated by commas. Use a country code such as `GB` or a country and region code such as `US-MS`. When it's empty and `FLUXER_AGE_POLICY_ENABLED` is `true`, Fluxer uses `GB` and `BR`. With rexctl, use `rexctl config set FLUXER_AGE_POLICY_RESTRICTED_REGIONS`.
 
 ## Billing
 
@@ -1884,7 +1884,7 @@ The image the meilisearch container runs. The default is `getmeili/meilisearch:v
 
 ### `FLUXER_SEAWEEDFS_IMAGE`
 
-The image the seaweedfs and seaweedfs-init containers run. The default is `chrislusf/seaweedfs:4.47`. With rexctl, use `rexctl config set images.seaweedfs`.
+The image the seaweedfs and seaweedfs-init containers run. The default is `chrislusf/seaweedfs:4.52`. With rexctl, use `rexctl config set images.seaweedfs`.
 
 ### `FLUXER_LIVEKIT_IMAGE`
 

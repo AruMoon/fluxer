@@ -2185,6 +2185,10 @@ msgstr "{productName} nebus atnaujinamas paleidžiant. Kai bus pasiekiama naujin
 msgid "{productName} wordmark"
 msgstr "{productName} pavadinimo logotipas"
 
+#: src/features/connection/components/modals/AddConnectionModal.tsx
+msgid "{providerName} opens in your browser. Sign in there to connect your account."
+msgstr "„{providerName}“ atsidaro jūsų naršyklėje. Prisijunkite ten, kad susietumėte savo paskyrą."
+
 #. Reaction tooltip. Preserve {emojiName}, {reactors}; they are inserted by code. {reactorCount} is how many people reacted, for verb agreement. Order the parts so the emoji never reads as the one doing the reacting.
 #: src/features/messaging/utils/ReactionUtils.ts
 msgid "{reactorCount, plural, one {{emojiName} reacted by {reactors}} other {{emojiName} reacted by {reactors}}}"
@@ -2234,6 +2238,11 @@ msgstr "Nepavyko paleisti {requestedLabel}. Vietoj jo naudojamas {effectiveLabel
 #: src/features/voice/components/StreamInfoPill.tsx
 msgid "{resolution} {fps} FPS"
 msgstr "{resolution} {fps} FPS"
+
+#. Footer summary under the preset name in the web stream setup modal. {resolution} is a technical token like 1080p. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "{resolution} at {fps} FPS"
+msgstr "{resolution} su {fps} FPS"
 
 #. Short label in the channel display name state. Keep it concise. Preserve {resolvedName}; it is inserted by code.
 #: src/features/channel/state/ChannelDisplayName.ts
@@ -3334,10 +3343,10 @@ msgstr "Pridėkite \";\" šios eilutės pabaigoje."
 msgid "Add \":\" between the property and its value."
 msgstr "Pridėkite \":\" tarp savybės ir jos reikšmės."
 
-#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {blueskyProviderName}; it is inserted by code.
+#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {providerName}; it is the provider name, inserted by code.
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Add {blueskyProviderName} connection"
-msgstr "Pridėti {blueskyProviderName} ryšį"
+msgid "Add {providerName} connection"
+msgstr "Pridėti {providerName} ryšį"
 
 #. OAuth scope description shown on the consent screen for the bot scope.
 #: src/features/app/constants/AppConstants.ts
@@ -4126,6 +4135,11 @@ msgstr "Prisijungęs pabandyk veiksmą dar kartą."
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Ištrynus paskyrą, išsiųstų žinučių ištrinti nebegalėsite"
 
+#. Label in the sensitive content settings, shown when the Fluxer app for iPhone, iPad or Android has sent the age range that the Apple or Google account shares with apps.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Age range from your Apple or Google account"
+msgstr "Amžiaus grupė iš jūsų „Apple“ arba „Google“ paskyros"
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -4741,6 +4755,11 @@ msgstr "įkeltas vaizdo įrašas"
 #: src/features/guild/components/modals/GuildOwnershipWarningModal.tsx
 msgid "and {remainingCount} more"
 msgstr "ir dar {remainingCount}"
+
+#. Developer / debug surface — keep terse and technical. Label in the developer Nagbar controls panel for the Android app on Google Play banner.
+#: src/features/devtools/components/NagbarControls.ts
+msgid "Android app nagbar"
+msgstr "Android programėlės pranešimų juosta"
 
 #. Short label in the animation tab. Keep it concise.
 #: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
@@ -9517,6 +9536,11 @@ msgstr "Bendruomenė atnaujinta"
 msgid "Community voice"
 msgstr "Bendruomenės balso kanalai"
 
+#. Report flow: section heading above the card of the community being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Community you're reporting"
+msgstr "Bendruomenė, apie kurią pranešate"
+
 #. Permission category for permissions that affect the whole community.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts
 msgid "Community-wide"
@@ -11319,10 +11343,10 @@ msgstr "Nepavyko išsiųsti patvirtinimo el. laiško"
 msgid "Couldn't sign you in"
 msgstr "Nepavyko prisijungti"
 
-#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {blueskyProviderName}; it is inserted by code and must appear verbatim in the translation.
+#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {providerName}; it is the provider name, inserted by code, and must appear verbatim in the translation.
 #: src/features/connection/commands/ConnectionCommands.ts
-msgid "Couldn't start {blueskyProviderName} authorization"
-msgstr "Nepavyko pradėti „{blueskyProviderName}“ autorizavimo"
+msgid "Couldn't start {providerName} authorization"
+msgstr "Nepavyko pradėti „{providerName}“ autorizavimo"
 
 #. Title of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -17322,9 +17346,11 @@ msgid "Frame"
 msgstr "Rėmelis"
 
 #. Section header in the stream settings menu for frame rate options.
+#. Section label in the web stream setup modal for the stream frame rate options, in frames per second.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Frame rate"
 msgstr "Kadrų dažnis"
@@ -17799,6 +17825,11 @@ msgstr "Gauk animuotą avataro ir reklaminės juostos, prenumeratoriaus ženkliu
 #: src/features/premium/components/operator_pass/OperatorPassHoldingsSection.tsx
 msgid "Get another pass"
 msgstr "Gauti dar vieną Operator Pass leidimą"
+
+#. Button in the Android app nagbar that opens the Fluxer listing on Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Use the wording Google Play uses for its own "Get it on Google Play" badge in this language when one exists. Keep it short.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "Get it on {googlePlay}"
+msgstr "Atsisiųskite iš „{googlePlay}“"
 
 #. Secondary Plutonium page button that starts a monthly subscription checkout.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -20033,11 +20064,6 @@ msgstr "Netinkama autorizacijos užklausa"
 msgid "Invalid bot permissions."
 msgstr "Netinkami boto leidimai."
 
-#. Title of the error modal shown when a custom emoji name fails validation.
-#: src/features/emoji/components/emojis/EmojiListItem.tsx
-msgid "Invalid emoji name"
-msgstr "Neteisingas jaustuko pavadinimas"
-
 #. Gift redemption error modal title for an invalid or already used code.
 #: src/features/gift/commands/GiftCommands.tsx
 msgid "Invalid gift code"
@@ -21464,8 +21490,8 @@ msgid "Link warnings"
 msgstr "Nuorodų įspėjimai"
 
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Link your {BLUESKY_PROVIDER_NAME} account or verify domain ownership to display them on your profile."
-msgstr "Susiekite savo „{BLUESKY_PROVIDER_NAME}“ paskyrą arba patvirtinkite domeno nuosavybę, kad jie būtų rodomi jūsų profilyje."
+msgid "Link your accounts or verify domain ownership to display them on your profile."
+msgstr "Susiekite savo paskyras arba patvirtinkite domeno nuosavybę, kad jie būtų rodomi jūsų profilyje."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/LinkedAccountsIndex.ts
@@ -24653,6 +24679,11 @@ msgstr "Nenurodyta jokių vietinių failų"
 msgid "No logs yet"
 msgstr "Kol kas nėra žurnalų"
 
+#. Label for a linked account whose provider this instance removed or turned off. The account is hidden from the profile.
+#: src/features/connection/components/ConnectionIcon.tsx
+msgid "No longer available"
+msgstr "Nebepasiekiama"
+
 #: src/features/app/components/dialogs/shared/AddOverridePopout.tsx
 msgid "No matches"
 msgstr "Nėra atitikmenų"
@@ -25718,6 +25749,11 @@ msgstr "Tik CSS tekstas sinchronizuojamas visuose įrenginiuose. Įkelti ištekl
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Only the CSS text is synced. Uploaded assets and local file references stay on this device."
 msgstr "Sinchronizuojamas tik CSS tekstas. Įkelti ištekliai ir vietinių failų nuorodos lieka šiame įrenginyje."
+
+#. Notice under the search results pagination when a search has more pages than can be shown. maxPages is a number.
+#: src/features/channel/components/channel_search_results/ChannelSearchResultsShared.tsx
+msgid "Only the first {maxPages} pages of results can be shown. Try a more specific search."
+msgstr "Galima rodyti tik pirmuosius {maxPages} rezultatų puslapius. Pabandykite tikslesnę paiešką."
 
 #. Shown for a watched theme folder in Settings > Themes when it has more than 200 CSS files.
 #: src/features/theme_settings/components/YourThemesSection.tsx
@@ -27131,6 +27167,11 @@ msgstr "Žmonės gali kurti savo bendruomenes ir prisijungti prie tiek, kiek nor
 msgid "People can only talk in communities."
 msgstr "Žmonės gali kalbėtis tik bendruomenėse."
 
+#. Description under the "Share a preview image" switch in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "People can see a still image of what you share before they start watching."
+msgstr "Kiti gali matyti nejudantį vaizdą to, ką bendrini, prieš pradėdami žiūrėti."
+
 #. Description of allowing direct messages in the setup wizard.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
 msgid "People can send friend requests and direct messages."
@@ -27324,6 +27365,11 @@ msgstr "Leidimai"
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx
 msgid "Permissions for {0}"
 msgstr "{0} leidimai"
+
+#. Report flow: section heading above the card of the person being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Person you're reporting"
+msgstr "Asmuo, apie kurį pranešate"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/utils/UserMessageDescriptors.ts
@@ -27928,6 +27974,11 @@ msgstr "Ruošiama"
 msgid "Presence"
 msgstr "Buvimas prisijungus"
 
+#. Section label in the web stream setup modal. Picks the Gaming preset (motion), the Screen share preset (sharp text) or custom numbers.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Preset"
+msgstr "Išankstinis nustatymas"
+
 #. Shown in the "Quick CSS" section in Settings > Themes. {shortcut} is a keyboard shortcut such as Ctrl+Alt+Shift+T.
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Press {shortcut} anywhere in the app to open the editor."
@@ -28328,11 +28379,6 @@ msgstr "Profilio tipas"
 #: src/features/user/components/modals/tabs/MyProfileTab.tsx
 msgid "Profile updated"
 msgstr "Profilis atnaujintas"
-
-#. Report flow: section heading above the card of the user whose profile is being reported.
-#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
-msgid "Profile you're reporting"
-msgstr "Profilis, apie kurį pranešate"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
@@ -29316,6 +29362,7 @@ msgstr "Prisiminti lango dydį ir padėtį"
 #. Button or menu action label in the channel and chat message reactions sheet. Keep it concise. Keep the tone plain and specific.
 #. Button that clears the default reaction or deletes a tag in forum settings.
 #. Button that removes a branding image in the setup wizard.
+#. Confirm button in the dialog that deletes the stored age range.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the shared app saved message missing card. Keep the tone plain and specific.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
@@ -29330,6 +29377,7 @@ msgstr "Prisiminti lango dydį ir padėtį"
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx
 #: src/features/ui/action_menu/GroupDMContextMenu.tsx
 #: src/features/ui/action_menu/UserContextMenu.tsx
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Remove"
@@ -29366,6 +29414,11 @@ msgstr "Pašalinti „{userName}“ iš grupės?"
 #: src/features/relationship/utils/RelationshipActionUtils.tsx
 msgid "Remove {userName} from your friends?"
 msgstr "Pašalinti „{userName}“ iš draugų?"
+
+#. Button in the sensitive content settings that opens a confirmation to delete the stored age range.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove age range"
+msgstr "Pašalinti amžiaus grupę"
 
 #. Confirm button label on the remove-all-reactions alert. Destructive.
 #: src/features/channel/components/MessageActionUtils.tsx
@@ -29573,6 +29626,11 @@ msgstr "Pašalinti vertėją"
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
 msgid "Remove when you first bought {premiumProductName} from your badge"
 msgstr "Pašalinti iš ženklelio, kada pirmą kartą įsigijote „{premiumProductName}“"
+
+#. Title of the confirmation shown before deleting the age range from an Apple or Google account.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove your age range?"
+msgstr "Pašalinti jūsų amžiaus grupę?"
 
 #. Status badge for the application to Explore, shown in the "Explore" tab in community settings. The community was removed from Explore.
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
@@ -29943,6 +30001,11 @@ msgstr "Atsakant į {replyAuthorName} žinutę, {authorName} parašė: {formatte
 msgid "Replying to <0>{authorNickname}</0>"
 msgstr "Atsakoma į <0>{authorNickname}</0>"
 
+#. Voice and call participant menu action that reports this person to the safety team, for example for something they said or showed in the call.
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx
+msgid "Report"
+msgstr "Pranešti"
+
 #. Report flow target option. Selects reporting an entire community (server). Use the localized term for community, not server.
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a community"
@@ -29957,6 +30020,11 @@ msgstr "Pranešti apie žinutę"
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a user profile"
 msgstr "Pranešti apie naudotojo profilį"
+
+#. Action label in community menus, on invites and in Explore, and the title of the report window it opens. Reports a whole community to the safety team.
+#: src/features/moderation/utils/ModerationMessageDescriptors.ts
+msgid "Report community"
+msgstr "Pranešti apie bendruomenę"
 
 #: src/features/moderation/components/report/ReportStepDetails.tsx
 msgid "Report details"
@@ -29978,7 +30046,12 @@ msgstr "Pranešti apie problemą"
 msgid "Report message"
 msgstr "Pranešti apie žinutę"
 
-#. Action label in the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
+#. Action in a forum post's menu. Reports the post's opening message to the safety team. A post is a topic thread in a forum channel.
+#: src/features/forum/utils/ForumMessageDescriptors.ts
+msgid "Report post"
+msgstr "Pranešti apie įrašą"
+
+#. Action label in user right-click menus and the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
 #: src/features/moderation/utils/ModerationMessageDescriptors.ts
 msgid "Report profile"
 msgstr "Pranešti apie profilį"
@@ -30492,8 +30565,10 @@ msgid "Resizing, maximizing, and window snapping depend on the compositor. Wayla
 msgstr "Langų dydžio keitimas, maksimalus išplėtimas ir prilipdymas priklauso nuo kompozitoriaus. „Wayland“ be kliento pusės dekoracijų gali nepateikti rankenėlių. Paleiskite su --ozone-platform=x11, jei langas atrodo užstrigęs."
 
 #. Section header in the stream settings menu for resolution options.
+#. Section label in the web stream setup modal for the stream resolution options.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Resolution"
 msgstr "Raiška"
@@ -32929,6 +33004,11 @@ msgstr "Keli žmonės rašo..."
 msgid "Share"
 msgstr "Bendrinti"
 
+#. Switch label in the web stream setup modal. When on, Fluxer uploads a still image of the stream so people can see it before watching.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share a preview image"
+msgstr "Bendrinti peržiūros vaizdą"
+
 #. Button or menu action label in the buttons tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx
 msgid "Share action."
@@ -32938,6 +33018,11 @@ msgstr "Bendrinti veiksmą."
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Share and back up"
 msgstr "Dalintis ir kurti atsargines kopijas"
+
+#. Switch label in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share audio"
+msgstr "Bendrinti garsą"
 
 #. Plutonium page perk card body about upload size. freeSize is a formatted size such as 25 MB.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -32983,7 +33068,9 @@ msgstr "Pateikite tai, ko mūsų komandai reikia šiam atvejui įvertinti."
 msgid "Share with a friend"
 msgstr "Bendrinti su draugu"
 
+#. Title of the modal shown on web before the browser screen picker opens. The user picks stream quality here first.
 #. Voice control button or tooltip label for starting screen sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Share your screen"
 msgstr "Bendrinti ekraną"
@@ -33033,8 +33120,8 @@ msgstr "Aukštos kokybės tekstas 720p raiška, iki 30 FPS"
 
 #. Description for the high-tier Screen share streaming preset (Plutonium). Resolution and frame rate are technical tokens.
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
-msgid "Sharp text at up to 4K, up to 15 FPS"
-msgstr "Aukštos kokybės vaizdas iki 4K, iki 15 FPS"
+msgid "Sharp text at up to 1080p, 30 FPS"
+msgstr "Aiškus tekstas iki 1080p, 30 FPS"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts
@@ -33468,8 +33555,11 @@ msgstr "Rodyti nutildytus kanalus"
 msgid "Show my own camera"
 msgstr "Rodyti mano kamerą"
 
+#. Toggle label in the mobile video settings bottom sheet. Controls whether the local screen share tile is in the call view.
 #. Voice display preference checkbox that controls whether the current user sees their own screen share tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
+#: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx
+#: src/features/voice/components/VoiceSettingsMenus.tsx
 msgid "Show my screen share"
 msgstr "Rodyti mano ekrano bendrinimą"
 
@@ -34070,7 +34160,7 @@ msgid "Skip this step"
 msgstr "Praleisti šį žingsnį"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx
+#: src/app/SkipToContentLink.tsx
 msgid "Skip to content"
 msgstr "Pereiti prie turinio"
 
@@ -34955,6 +35045,11 @@ msgstr "Pradėti įrašymą"
 msgid "Start searches with <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> to narrow down results."
 msgstr "Pradėkite paiešką nuo <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3>, kad susiaurintumėte rezultatus."
 
+#. Primary button in the web stream setup modal. Opens the browser's screen picker and starts sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Start sharing"
+msgstr "Pradėti bendrinti"
+
 #. Native macOS Edit > Speech submenu item that starts reading the selected text aloud. Imperative verb.
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Start speaking"
@@ -35423,11 +35518,6 @@ msgstr "Srautas buferizuojamas"
 #: src/features/voice/components/voice_participant_tile/shared.ts
 msgid "Stream ended"
 msgstr "Transliacija baigėsi"
-
-#. Overlay text on a participant tile when the local user hid the remote screen share.
-#: src/features/voice/components/voice_participant_tile/shared.ts
-msgid "Stream hidden"
-msgstr "Srautas paslėptas"
 
 #. Plutonium page perk card title about stream quality.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -36481,6 +36571,11 @@ msgstr "<0>Privatumo politikoje</0> ir <1>{OPERATOR_PASS_NAME} privatumo praneš
 msgid "The <0>privacy policy</0> explains how we handle your data."
 msgstr "<0>Privatumo politikoje</0> paaiškinta, kaip tvarkome jūsų duomenis."
 
+#. Report flow: body of the final screen after a report was sent, on a self-hosted instance whose own administrators handle reports. The second sentence promises the reported person is not told who reported them.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "The administrators of this instance will review your report. We won't reveal that it came from you."
+msgstr "Šios instancijos administratoriai peržiūrės jūsų pranešimą. Mes neatskleisime, kad jį pateikėte jūs."
+
 #. Error shown when the setup wizard cannot load because the API origin differs from the page origin.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "The API is on a different origin than this page, so setup requests are sent without your session. Check the public origin and port this instance is configured with, then reload."
@@ -36541,6 +36636,10 @@ msgstr "Bendruomenė, iš kurios tai gauta, išjungė klonavimą, todėl to nuko
 msgid "The community you're looking for may have been deleted or you may not have access to it."
 msgstr "Bendruomenė, kurios ieškote, galėjo būti ištrinta arba neturite prieigos prie jos."
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "The connection was not allowed. You can close this tab and try again."
+msgstr "Ryšys nebuvo leistas. Galite uždaryti šį skirtuką ir bandyti dar kartą."
+
 #. Body of the confirmation dialog before replacing the private link to an Operator certificate page. The certificate is a PDF, and each page has a number and the date and time of payment. The new copy of the page has the new link printed on it.
 #: src/features/premium/components/operator_pass/OperatorPassPurchasesSection.tsx
 msgid "The current link stops working right away, for you and for anyone you've shared it with. We make a new copy of this page with the new link printed on it, with the same number and date."
@@ -36564,6 +36663,11 @@ msgstr "Faile yra patvirtinimo žetonas, kurį gausime iš <0>{dnsUrl}</0>."
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx
 msgid "The file you're trying to upload exceeds the maximum size limit of {maxSizeFormatted}."
 msgstr "Failas, kurį bandote įkelti, viršija didžiausią leidžiamą {maxSizeFormatted} dydį."
+
+#. Helper text under "Age range from your Apple or Google account" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "The Fluxer app for iPhone, iPad or Android sent us this age range. If it shows that you're 18 or older, you can see 18+ content in the UK and Brazil. It doesn't change your date of birth."
+msgstr "Šią amžiaus grupę mums atsiuntė „Fluxer“ programa, skirta „iPhone“, „iPad“ arba „Android“. Jei ji rodo, kad jums yra 18 metų ar daugiau, Jungtinėje Karalystėje ir Brazilijoje galite matyti 18+ turinį. Ji nekeičia jūsų gimimo datos."
 
 #. Setup wizard body explaining the push relay.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
@@ -41244,6 +41348,11 @@ msgstr "Patvirtinimas nepavyko"
 msgid "Verified & partnered community"
 msgstr "Patvirtinta ir partnerių bendruomenė"
 
+#. Tooltip on the 2FA-for-moderation switch in the community moderation settings tab when the community is verified or partnered, so the switch stays on and cannot be changed.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Verified and partnered communities always require 2FA for moderators"
+msgstr "Patvirtintos ir partnerių bendruomenės visada reikalauja moderatorių 2FA"
+
 #. Short label in the community badge. Keep it concise.
 #: src/features/guild/components/GuildBadge.tsx
 msgid "Verified community"
@@ -42183,10 +42292,20 @@ msgstr "Nepavyko perskaityti to CSS failo."
 msgid "We couldn't read this theme. It may be corrupted or invalid."
 msgstr "Nepavyko nuskaityti šios temos. Ji gali būti sugadinta arba netinkama."
 
+#. Error shown when deleting the stored age range fails.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We couldn't remove your age range. Please try again."
+msgstr "Nepavyko pašalinti jūsų amžiaus grupės. Bandykite dar kartą."
+
 #. Error message after saving a theme failed in Settings > Themes or the quick CSS editor window.
 #: src/features/theme_settings/utils/ThemeSettingsErrorModal.ts
 msgid "We couldn't save that theme."
 msgstr "Nepavyko išsaugoti temos."
+
+#. Body of the confirmation shown before deleting the age range. App Attest is an Apple product name and stays in English.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We delete the age range, the time we got it and the App Attest keys for your Apple devices. In the UK and Brazil, you can't see 18+ content until the app sends an age range again. The app may send it again later if your Apple or Google account still shares it with Fluxer."
+msgstr "Ištriname amžiaus grupę, laiką, kada ją gavome, ir jūsų „Apple“ įrenginių „App Attest“ raktus. Jungtinėje Karalystėje ir Brazilijoje negalėsite matyti 18+ turinio, kol programa vėl neatsiųs amžiaus grupės. Programa vėliau gali vėl atsiųsti jūsų amžiaus grupę, jei jūsų „Apple“ arba „Google“ paskyra vis dar ja dalijasi su „Fluxer“."
 
 #. Modal body for existing-subscription block. Directs the user to the billing portal and addresses the just-paid race case. Keep plain and reassuring.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -43131,6 +43250,10 @@ msgstr "Jau turite grupę su šiais naudotojais. Ar tikrai norite sukurti naują
 msgid "You already have lifetime {premiumProductName}"
 msgstr "Jau turite {premiumProductName} visam laikui"
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "You already have the most connections an account can have. Remove one and try again."
+msgstr "Jau turite didžiausią ryšių skaičių, kurį gali turėti paskyra. Pašalinkite vieną ir bandykite dar kartą."
+
 #. Body text in the connection add connection modal.
 #: src/features/connection/components/modals/AddConnectionModal.tsx
 msgid "You already have this connection."
@@ -43245,6 +43368,11 @@ msgstr "Galite atgauti visus pinigus iki {date} imtinai."
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
 msgid "You can get a full refund until {date}. This also ends your subscription right away."
 msgstr "Galite atgauti visus pinigus iki {date} imtinai. Tai taip pat iš karto nutrauks jūsų prenumeratą."
+
+#. Nagbar body telling people that the Fluxer app for Android phones can be installed from Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Keep Fluxer and Android untranslated. Keep the tone calm and plain.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "You can get the Fluxer app for Android on {googlePlay} and chat from your phone."
+msgstr "Fluxer programėlę Android įrenginiams galite atsisiųsti iš „{googlePlay}“ ir susirašinėti telefonu."
 
 #. Line under "Full refund" in the Payments settings. {amount} is the price paid, with currency, and {date} is the last day of the refund window, such as Nov 2, 2026. Both are filled in by code.
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
@@ -44106,6 +44234,11 @@ msgstr "Peržiūrite senesnes žinutes"
 msgid "You've added more people than a group DM allows. Remove a few and try again."
 msgstr "Pridėjote daugiau žmonių, nei leidžia grupės DM. Pašalinkite kelis ir bandykite dar kartą."
 
+#. Report flow: note on the summary screen when the reporter already reported this community.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "You've already reported this community."
+msgstr "Jau pranešėte apie šią bendruomenę."
+
 #. Report flow: note on the summary screen when the reporter already reported this message.
 #: src/features/moderation/components/report_flow/ReportFlowCopy.ts
 msgid "You've already reported this message."
@@ -44309,6 +44442,11 @@ msgstr "Jūsų naršyklė užblokavo slaptažodį, nes šis puslapio adresas nea
 #: src/features/auth/utils/PasskeyErrorMessages.ts
 msgid "Your browser blocked the passkey because this page is not on {rpId}, the passkey domain of this instance. Ask the instance owner to check the passkey domain setting."
 msgstr "Jūsų naršyklė užblokavo slaptafaktą, nes šis puslapis nėra {rpId} – šios instancijos slaptafaktų domene. Paprašykite instancijos savininko patikrinti slaptafaktų domeno nustatymą."
+
+#. Description under the "Share audio" switch in the web stream setup modal. The browser picker owns the final audio choice.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your browser lets you choose whether to include audio when you pick what to share."
+msgstr "Naršyklė leidžia pasirinkti, ar įtraukti garsą, kai renkiesi, ką bendrinti."
 
 #. Body of the browser-audio-required modal explaining why the user must click before audio can play.
 #: src/features/voice/components/modals/AudioPlaybackPermissionModal.tsx
@@ -44721,6 +44859,11 @@ msgstr "Jūsų išsaugotas vaizdo įrašas {savedResolution} su {savedFrameRate}
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "Jūsų ekrano bendrinimas negalėjo būti paskelbtas naudojant suderinamą vaizdo kodeką, todėl jis buvo sustabdytas. Pabandykite bendrinti dar kartą."
+
+#. Footer summary under the preset name in the web stream setup modal when the Source resolution is picked. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your screen's resolution at {fps} FPS"
+msgstr "Tavo ekrano raiška su {fps} FPS"
 
 #. Alert on the setup token screen when the token was refused while creating the account.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx

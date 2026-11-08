@@ -254,6 +254,7 @@ Check `services.gif_enabled` before you show a GIF picker.
 | gif_enabled | boolean | Whether the GIF picker is available |
 | youtube_enabled | boolean | Whether YouTube link previews are available |
 | bluesky_enabled | boolean | Whether Bluesky [connections](/http-api/connections/) are available |
+| connection_providers | array[object] | Providers people can [connect](/http-api/connections/#start-provider-authorization), each with `id`, `name` and a nullable media proxy `icon_url` |
 
 ## Push configuration object
 
@@ -353,7 +354,7 @@ A `feature_` key is `1` when the feature is available and `0` when it isn't. The
 | guild_visit_history_days_unverified | Days of history an unverified account sees while [visiting](/http-api/guilds/#visiting-guilds) a guild (user) |
 | max_attachment_file_size | Maximum size of each attachment in bytes (user and guild) |
 | max_attachments_per_message | Maximum attachments per message (user and guild) |
-| max_bio_length | Maximum characters in a bio, at most 320 (user) |
+| max_bio_length | Maximum characters in a bio, 320 by default and at most 1000 (user) |
 | max_bookmarks | Maximum bookmarked messages (user) |
 | max_bot_attachment_file_size | Maximum size of each attachment a bot uploads in bytes, 52428800 by default. A bot gets the lower of this and `max_attachment_file_size` (user and guild) |
 | max_channels_per_category | Maximum channels per category (guild) |
@@ -488,11 +489,11 @@ What a client needs before anyone signs in.
 | --- | --- | --- |
 | country_code | string | The ISO 3166-1 alpha-2 country code |
 | region_code | ?string | The ISO 3166-2 subdivision code, or null for the whole country |
-| action | string | `restrict` to need an age check, or `block` to refuse access |
+| action | string | `restrict` when a date of birth typed in is not enough for mature content, or `block` to refuse access |
 
 ## Geolocation object
 
-The approximate location of the request, and the places where mature content needs an age check or isn't available.
+The approximate location of the request, the places where a date of birth typed in is not enough for mature content, and the places where mature content isn't available.
 
 ### Structure
 
@@ -502,7 +503,7 @@ The approximate location of the request, and the places where mature content nee
 | regionCode | ?string | The upper-case ISO 3166-2 subdivision code, or null |
 | latitude | ?string | The approximate latitude as a decimal string, or null |
 | longitude | ?string | The approximate longitude as a decimal string, or null |
-| ageRestrictedGeos | array[[geo entry](#geo-entry-object) object] | Places where mature content needs an age check |
+| ageRestrictedGeos | array[[geo entry](#geo-entry-object) object] | Places where a date of birth typed in is not enough for mature content |
 | ageBlockedGeos | array[[geo entry](#geo-entry-object) object] | Places where mature content isn't available |
 
 When the location is unknown, all four location fields are null. Match `countryCode` and `regionCode` against the geo lists yourself.

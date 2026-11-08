@@ -35,7 +35,7 @@ import {DeletionReasons} from '@fluxer/constants/src/Core';
 import {UserFlags} from '@fluxer/constants/src/UserConstants';
 import {MockKVProvider} from '@pkgs/kv_client/src/testing/MockKVProvider';
 import {ms} from 'itty-time';
-import {afterAll, beforeAll, beforeEach, describe, expect, test} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, test, vi} from 'vitest';
 
 describe('Enforcement suspensions', () => {
 	let harness: ApiTestHarness;
@@ -156,6 +156,20 @@ describe('Enforcement suspensions', () => {
 		expect(ids.map(BigInt)).toContain(user.enforcementDecisionId);
 		const decisions = await listDecisions(harness, staff, target.userId);
 		expect(decisions.filter((decision) => !decision.replaced)).toHaveLength(1);
+	});
+
+	test('a session revocation that fails once still leaves no session behind the suspension', async () => {
+		const target = await createTestAccount(harness);
+		const users = getUserRepository();
+		const userId = createUserID(BigInt(target.userId));
+		expect(await users.listAuthSessions(userId)).not.toHaveLength(0);
+		const spy = vi.spyOn(users, 'deleteAllAuthSessions').mockRejectedValueOnce(new Error('Cassandra timeout'));
+		try {
+			await suspend(harness, staff, target.userId);
+		} finally {
+			spy.mockRestore();
+		}
+		expect(await users.listAuthSessions(userId)).toHaveLength(0);
 	});
 
 	test('a closed account cannot be suspended', async () => {
@@ -573,6 +587,34 @@ describe('Enforcement suspensions', () => {
 			expect(after.enforcementDecisionId).toBe(BigInt(currentId));
 			expect(await getDecision(harness, staff, currentId)).toMatchObject({status: 'active', end_outcome: null});
 			expect(await getDecision(harness, staff, expiredId)).toMatchObject({status: 'active', replaced: true});
+		});
+
+		test('keeps a suspension applied while the expired decision is being ended', async () => {
+			const target = await createTestAccount(harness);
+			await suspend(harness, staff, target.userId);
+			await expire(target);
+			const repository = new EnforcementDecisionRepository();
+			let currentId: string | null = null;
+			const expiry = await clearExpiredSuspension(
+				{
+					users: getUserRepository(),
+					repository: {
+						get: async (id) => {
+							const row = await repository.get(id);
+							currentId = await suspend(harness, staff, target.userId);
+							return row;
+						},
+						endIfActive: (id, end) => repository.endIfActive(id, end),
+					},
+				},
+				await loadUser(target),
+			);
+			expect(expiry).toBeNull();
+			const after = await loadUser(target);
+			expect(after.flags & UserFlags.DISABLED).toBe(UserFlags.DISABLED);
+			expect(after.tempBannedUntil!.getTime()).toBeGreaterThan(Date.now());
+			expect(after.enforcementDecisionId).toBe(BigInt(currentId!));
+			expect(await getDecision(harness, staff, currentId!)).toMatchObject({status: 'active', end_outcome: null});
 		});
 
 		test('keeps a reversal made between reading and ending the decision', async () => {

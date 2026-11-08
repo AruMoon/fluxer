@@ -19,6 +19,10 @@ import type {GuildRepository} from '@app/api/guild/repositories/GuildRepository'
 import {assertNotBannedFromGuild} from '@app/api/guild/services/GuildBanChecks';
 import {getGuildAuth} from '@app/api/guild/services/GuildMfaEnforcement';
 import type {GuildMemberEventService} from '@app/api/guild/services/member/GuildMemberEventService';
+import {
+	type GuildMemberRoleWriteLocks,
+	withGuildMemberRoleWriteLock,
+} from '@app/api/guild/services/member/GuildMemberRoleWriteLock';
 import type {GuildMemberSearchIndexService} from '@app/api/guild/services/member/GuildMemberSearchIndexService';
 import type {GuildMemberValidationService} from '@app/api/guild/services/member/GuildMemberValidationService';
 import {endGuildVisit} from '@app/api/guild/visits/GuildVisitLifecycle';
@@ -170,6 +174,7 @@ export class GuildMemberOperationsService {
 		private readonly guildAuditLogService: GuildAuditLogService,
 		private readonly limitConfigService: LimitConfigService,
 		private readonly searchIndexService: GuildMemberSearchIndexService,
+		private readonly cacheService: GuildMemberRoleWriteLocks,
 	) {}
 
 	async getMembers(params: {
@@ -349,18 +354,34 @@ export class GuildMemberOperationsService {
 			auditLogReason: params.auditLogReason,
 		});
 		const isAssigningRoles = updateData.role_ids !== undefined && updateData.role_ids.size > 0;
-		const shouldRemoveTemporaryStatus = targetMember.isTemporary && isAssigningRoles;
-		const updatedMemberData = this.buildMemberUpdateRow({targetMember, updateData, shouldRemoveTemporaryStatus});
-		let updatedMember: GuildMember;
+		let commitStarted = false;
+		let committed: {updatedMember: GuildMember; shouldRemoveTemporaryStatus: boolean};
 		try {
-			updatedMember = await this.guildRepository.upsertMember(updatedMemberData);
+			committed = await withGuildMemberRoleWriteLock(this.cacheService, guildId, targetId, async () => {
+				const currentMember = await this.guildRepository.getMember(guildId, targetId);
+				if (!currentMember) throw new UnknownGuildMemberError();
+				const shouldRemoveTemporaryStatus = currentMember.isTemporary && isAssigningRoles;
+				const updatedMemberData = this.buildMemberUpdateRow({
+					targetMember: currentMember,
+					updateData,
+					shouldRemoveTemporaryStatus,
+				});
+				commitStarted = true;
+				const updatedMember = await this.guildRepository.upsertMember(updatedMemberData, currentMember.toRow());
+				return {updatedMember, shouldRemoveTemporaryStatus};
+			});
 		} catch (error) {
+			if (!commitStarted) {
+				await this.rollbackPreparedAssets(preparedAssets);
+				throw error;
+			}
 			Logger.error(
 				{error, guildId, userId: targetId},
 				'Guild member update failed with unknown commit status; retaining uploaded assets',
 			);
 			throw error;
 		}
+		const {updatedMember, shouldRemoveTemporaryStatus} = committed;
 		await this.entityAssetService.commitAssetChanges([preparedAssets.avatar, preparedAssets.banner]);
 		if (shouldRemoveTemporaryStatus) {
 			await this.gatewayService.removeTemporaryGuild({userId: targetId, guildId});
@@ -400,15 +421,8 @@ export class GuildMemberOperationsService {
 	private async deleteKickedMember(targetMember: GuildMember, actorId: UserID): Promise<void> {
 		const {guildId, userId: targetId} = targetMember;
 		await this.snapshotMembershipMetadata(targetMember);
-		const guild = await this.guildRepository.findUnique(guildId);
 		await this.guildRepository.deleteMember(guildId, targetId);
-		if (guild) {
-			await this.guildRepository.upsertPartial(
-				guildId,
-				{member_count: Math.max(0, guild.memberCount - 1)},
-				guild.toRow(),
-			);
-		}
+		await this.guildRepository.syncMemberCount(guildId);
 		await this.gatewayService.leaveGuild({userId: targetId, guildId});
 		await emitGuildMemberRemoved({guildId, userId: targetId, actorId, kind: 'kicked'});
 	}
@@ -420,6 +434,7 @@ export class GuildMemberOperationsService {
 			sendJoinMessage?: boolean;
 			skipGuildLimitCheck?: boolean;
 			skipBanCheck?: boolean;
+			ip?: string | null;
 			skipAccountLimitCheck?: boolean;
 			isTemporary?: boolean;
 			joinSourceType?: JoinSourceType;
@@ -461,7 +476,7 @@ export class GuildMemberOperationsService {
 			assertTierAllows(user, TierGatedActions.GUILD_JOIN, params.tierContext);
 		}
 		if (!skipBanCheck) {
-			await assertNotBannedFromGuild(this.guildRepository, this.userRepository, {userId, guildId});
+			await assertNotBannedFromGuild(this.guildRepository, this.userRepository, {userId, guildId, ip: params.ip});
 		}
 		const userGuildsCount = await this.guildRepository.countUserGuilds(userId);
 		if (!skipGuildLimitCheck) {
@@ -504,7 +519,7 @@ export class GuildMemberOperationsService {
 			mention_flags: null,
 			version: 1,
 		});
-		await this.guildRepository.upsertPartial(guildId, {member_count: guild.memberCount + 1}, guild.toRow());
+		const syncedGuild = await this.guildRepository.syncMemberCount(guildId);
 		if (visit) {
 			await endGuildVisit({userId, guildId, reason: GuildVisitEndReasons.JOINED, notify: false});
 		}
@@ -521,7 +536,7 @@ export class GuildMemberOperationsService {
 		void emitActivity('guild_joined', userId.toString(), {
 			user_id: userId.toString(),
 			guild_id: guildId.toString(),
-			member_count: guild.memberCount + 1,
+			member_count: syncedGuild?.memberCount ?? guild.memberCount + 1,
 			discoverable: guild.features.has(GuildFeatures.DISCOVERABLE),
 			invite_code: sourceInviteCode,
 			inviter_id: inviterId ? inviterId.toString() : null,
@@ -550,16 +565,12 @@ export class GuildMemberOperationsService {
 			throw InputValidationError.fromCode('guild_id', ValidationErrorCodes.CANNOT_LEAVE_GUILD_AS_OWNER);
 		}
 		const user = await this.userRepository.findUnique(userId);
-		const guild = await this.guildRepository.findUnique(guildId);
 		const leavingMember = await this.guildRepository.getMember(guildId, userId);
 		if (leavingMember) {
 			await this.snapshotMembershipMetadata(leavingMember);
 		}
 		await this.guildRepository.deleteMember(guildId, userId);
-		if (guild) {
-			const newMemberCount = Math.max(0, guild.memberCount - 1);
-			await this.guildRepository.upsertPartial(guildId, {member_count: newMemberCount}, guild.toRow());
-		}
+		await this.guildRepository.syncMemberCount(guildId);
 		if (user && !user.isBot) {
 			await removeGuildFromUserFolders({
 				userId,
@@ -823,6 +834,17 @@ export class GuildMemberOperationsService {
 				if (!bioRateLimit.allowed) {
 					const minutes = Math.ceil((bioRateLimit.retryAfter || 0) / 60);
 					throw InputValidationError.fromCode('bio', ValidationErrorCodes.BIO_CHANGED_TOO_MANY_TIMES, {minutes});
+				}
+				const maxBioLength = resolveLimitSafe(
+					this.limitConfigService.getConfigSnapshot(),
+					createLimitMatchContext({user: targetUser}),
+					'max_bio_length',
+					DEFAULT_STOCK_LIMITS.max_bio_length,
+				);
+				if (data.bio && data.bio.length > maxBioLength) {
+					throw InputValidationError.fromCode('bio', ValidationErrorCodes.CONTENT_EXCEEDS_MAX_LENGTH, {
+						maxLength: maxBioLength,
+					});
 				}
 				this.enforceProfileSubstringBlocklist(targetUser, 'bio', data.bio);
 				updateData.bio = data.bio;

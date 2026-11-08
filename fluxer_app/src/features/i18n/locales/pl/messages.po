@@ -2185,6 +2185,10 @@ msgstr "{productName} nie będzie się aktualizować podczas uruchamiania. Gdy a
 msgid "{productName} wordmark"
 msgstr "Logotyp {productName}"
 
+#: src/features/connection/components/modals/AddConnectionModal.tsx
+msgid "{providerName} opens in your browser. Sign in there to connect your account."
+msgstr "{providerName} otworzy się w Twojej przeglądarce. Zaloguj się tam, aby połączyć swoje konto."
+
 #. Reaction tooltip. Preserve {emojiName}, {reactors}; they are inserted by code. {reactorCount} is how many people reacted, for verb agreement. Order the parts so the emoji never reads as the one doing the reacting.
 #: src/features/messaging/utils/ReactionUtils.ts
 msgid "{reactorCount, plural, one {{emojiName} reacted by {reactors}} other {{emojiName} reacted by {reactors}}}"
@@ -2234,6 +2238,11 @@ msgstr "Nie udało się uruchomić {requestedLabel}. Zamiast tego używany jest 
 #: src/features/voice/components/StreamInfoPill.tsx
 msgid "{resolution} {fps} FPS"
 msgstr "{resolution} {fps} FPS"
+
+#. Footer summary under the preset name in the web stream setup modal. {resolution} is a technical token like 1080p. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "{resolution} at {fps} FPS"
+msgstr "{resolution} przy {fps} kl./s"
 
 #. Short label in the channel display name state. Keep it concise. Preserve {resolvedName}; it is inserted by code.
 #: src/features/channel/state/ChannelDisplayName.ts
@@ -3334,10 +3343,10 @@ msgstr "Dodaj \";\" na końcu tej linii."
 msgid "Add \":\" between the property and its value."
 msgstr "Dodaj \":\" między właściwością a jej wartością."
 
-#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {blueskyProviderName}; it is inserted by code.
+#. Button or menu action label in the linked accounts tab. Keep it concise. Preserve {providerName}; it is the provider name, inserted by code.
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Add {blueskyProviderName} connection"
-msgstr "Dodaj połączenie z {blueskyProviderName}"
+msgid "Add {providerName} connection"
+msgstr "Dodaj połączenie z {providerName}"
 
 #. OAuth scope description shown on the consent screen for the bot scope.
 #: src/features/app/constants/AppConstants.ts
@@ -4126,6 +4135,11 @@ msgstr "Po zalogowaniu spróbuj ponownie wykonać tę czynność."
 msgid "After your account is deleted, you will not be able to delete the messages you sent"
 msgstr "Po usunięciu konta nie będzie można usunąć wysłanych wiadomości"
 
+#. Label in the sensitive content settings, shown when the Fluxer app for iPhone, iPad or Android has sent the age range that the Apple or Google account shares with apps.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Age range from your Apple or Google account"
+msgstr "Przedział wiekowy z Twojego konta Apple lub Google"
+
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
@@ -4741,6 +4755,11 @@ msgstr "przesłany plik wideo"
 #: src/features/guild/components/modals/GuildOwnershipWarningModal.tsx
 msgid "and {remainingCount} more"
 msgstr "i jeszcze {remainingCount}"
+
+#. Developer / debug surface — keep terse and technical. Label in the developer Nagbar controls panel for the Android app on Google Play banner.
+#: src/features/devtools/components/NagbarControls.ts
+msgid "Android app nagbar"
+msgstr "Pasek aplikacji na system Android"
 
 #. Short label in the animation tab. Keep it concise.
 #: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
@@ -9517,6 +9536,11 @@ msgstr "Społeczność zaktualizowana"
 msgid "Community voice"
 msgstr "Rozmowy głosowe w społeczności"
 
+#. Report flow: section heading above the card of the community being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Community you're reporting"
+msgstr "Społeczność, którą zgłaszasz"
+
 #. Permission category for permissions that affect the whole community.
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts
 msgid "Community-wide"
@@ -11319,10 +11343,10 @@ msgstr "Nie udało się wysłać e-maila weryfikacyjnego"
 msgid "Couldn't sign you in"
 msgstr "Nie udało się Cię zalogować"
 
-#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {blueskyProviderName}; it is inserted by code and must appear verbatim in the translation.
+#. Toast error shown when starting the OAuth flow for a connection provider fails. Preserve {providerName}; it is the provider name, inserted by code, and must appear verbatim in the translation.
 #: src/features/connection/commands/ConnectionCommands.ts
-msgid "Couldn't start {blueskyProviderName} authorization"
-msgstr "Nie udało się rozpocząć autoryzacji {blueskyProviderName}"
+msgid "Couldn't start {providerName} authorization"
+msgstr "Nie udało się rozpocząć autoryzacji {providerName}"
 
 #. Title of the generic fallback error modal shown when creating a checkout session fails unexpectedly.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -17322,9 +17346,11 @@ msgid "Frame"
 msgstr "Ramka"
 
 #. Section header in the stream settings menu for frame rate options.
+#. Section label in the web stream setup modal for the stream frame rate options, in frames per second.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/modals/tabs/UserVideoTab.tsx
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Frame rate"
 msgstr "Liczba klatek na sekundę"
@@ -17799,6 +17825,11 @@ msgstr "Uzyskaj animowany awatar i baner, odznakę subskrybenta, czterocyfrowy t
 #: src/features/premium/components/operator_pass/OperatorPassHoldingsSection.tsx
 msgid "Get another pass"
 msgstr "Uzyskaj kolejną przepustkę Operator Pass"
+
+#. Button in the Android app nagbar that opens the Fluxer listing on Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Use the wording Google Play uses for its own "Get it on Google Play" badge in this language when one exists. Keep it short.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "Get it on {googlePlay}"
+msgstr "Pobierz z {googlePlay}"
 
 #. Secondary Plutonium page button that starts a monthly subscription checkout.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -20032,11 +20063,6 @@ msgstr "Nieprawidłowe żądanie autoryzacji"
 msgid "Invalid bot permissions."
 msgstr "Nieprawidłowe uprawnienia bota."
 
-#. Title of the error modal shown when a custom emoji name fails validation.
-#: src/features/emoji/components/emojis/EmojiListItem.tsx
-msgid "Invalid emoji name"
-msgstr "Nieprawidłowa nazwa emoji"
-
 #. Gift redemption error modal title for an invalid or already used code.
 #: src/features/gift/commands/GiftCommands.tsx
 msgid "Invalid gift code"
@@ -21463,8 +21489,8 @@ msgid "Link warnings"
 msgstr "Ostrzeżenia o linkach"
 
 #: src/features/user/components/modals/tabs/LinkedAccountsTab.tsx
-msgid "Link your {BLUESKY_PROVIDER_NAME} account or verify domain ownership to display them on your profile."
-msgstr "Połącz swoje konto {BLUESKY_PROVIDER_NAME} lub zweryfikuj własność domeny, aby wyświetlić je w swoim profilu."
+msgid "Link your accounts or verify domain ownership to display them on your profile."
+msgstr "Połącz swoje konta lub zweryfikuj własność domeny, aby wyświetlić je w swoim profilu."
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/LinkedAccountsIndex.ts
@@ -24652,6 +24678,11 @@ msgstr "Brak odniesień do plików lokalnych"
 msgid "No logs yet"
 msgstr "Brak logów"
 
+#. Label for a linked account whose provider this instance removed or turned off. The account is hidden from the profile.
+#: src/features/connection/components/ConnectionIcon.tsx
+msgid "No longer available"
+msgstr "Już niedostępne"
+
 #: src/features/app/components/dialogs/shared/AddOverridePopout.tsx
 msgid "No matches"
 msgstr "Brak wyników"
@@ -25717,6 +25748,11 @@ msgstr "Tylko tekst CSS jest synchronizowany między urządzeniami. Przesłane z
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Only the CSS text is synced. Uploaded assets and local file references stay on this device."
 msgstr "Synchronizowany jest tylko tekst CSS. Przesłane zasoby i odwołania do plików lokalnych pozostają na tym urządzeniu."
+
+#. Notice under the search results pagination when a search has more pages than can be shown. maxPages is a number.
+#: src/features/channel/components/channel_search_results/ChannelSearchResultsShared.tsx
+msgid "Only the first {maxPages} pages of results can be shown. Try a more specific search."
+msgstr "Można wyświetlić tylko pierwsze {maxPages} stron wyników. Spróbuj bardziej szczegółowego wyszukiwania."
 
 #. Shown for a watched theme folder in Settings > Themes when it has more than 200 CSS files.
 #: src/features/theme_settings/components/YourThemesSection.tsx
@@ -27130,6 +27166,11 @@ msgstr "Ludzie mogą tworzyć własne społeczności i dołączać do dowolnie w
 msgid "People can only talk in communities."
 msgstr "Ludzie mogą rozmawiać tylko w społecznościach."
 
+#. Description under the "Share a preview image" switch in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "People can see a still image of what you share before they start watching."
+msgstr "Inni widzą nieruchomy obraz tego, co udostępniasz, zanim zaczną oglądać."
+
 #. Description of allowing direct messages in the setup wizard.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
 msgid "People can send friend requests and direct messages."
@@ -27323,6 +27364,11 @@ msgstr "Uprawnienia"
 #: src/features/user/components/modals/tabs/AuthorizedAppsTab.tsx
 msgid "Permissions for {0}"
 msgstr "Uprawnienia dla {0}"
+
+#. Report flow: section heading above the card of the person being reported.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "Person you're reporting"
+msgstr "Osoba, którą zgłaszasz"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/utils/UserMessageDescriptors.ts
@@ -27927,6 +27973,11 @@ msgstr "Przygotowywanie"
 msgid "Presence"
 msgstr "Obecność"
 
+#. Section label in the web stream setup modal. Picks the Gaming preset (motion), the Screen share preset (sharp text) or custom numbers.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Preset"
+msgstr "Ustawienie wstępne"
+
 #. Shown in the "Quick CSS" section in Settings > Themes. {shortcut} is a keyboard shortcut such as Ctrl+Alt+Shift+T.
 #: src/features/theme_settings/components/QuickCssSection.tsx
 msgid "Press {shortcut} anywhere in the app to open the editor."
@@ -28327,11 +28378,6 @@ msgstr "Typ profilu"
 #: src/features/user/components/modals/tabs/MyProfileTab.tsx
 msgid "Profile updated"
 msgstr "Profil zaktualizowany"
-
-#. Report flow: section heading above the card of the user whose profile is being reported.
-#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
-msgid "Profile you're reporting"
-msgstr "Profil, który zgłaszasz"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
@@ -29315,6 +29361,7 @@ msgstr "Zapamiętaj rozmiar i położenie okna"
 #. Button or menu action label in the channel and chat message reactions sheet. Keep it concise. Keep the tone plain and specific.
 #. Button that clears the default reaction or deletes a tag in forum settings.
 #. Button that removes a branding image in the setup wizard.
+#. Confirm button in the dialog that deletes the stored age range.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #. Short label in the shared app saved message missing card. Keep the tone plain and specific.
 #: src/features/app/components/setup/SetupBrandingAssetField.tsx
@@ -29329,6 +29376,7 @@ msgstr "Zapamiętaj rozmiar i położenie okna"
 #: src/features/guild/components/modals/guild_tabs/GuildVanityURLTab.tsx
 #: src/features/ui/action_menu/GroupDMContextMenu.tsx
 #: src/features/ui/action_menu/UserContextMenu.tsx
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
 #: src/features/webhook/components/WebhookListItem.tsx
 msgid "Remove"
@@ -29365,6 +29413,11 @@ msgstr "Usunąć użytkownika {userName} z grupy?"
 #: src/features/relationship/utils/RelationshipActionUtils.tsx
 msgid "Remove {userName} from your friends?"
 msgstr "Usunąć {userName} ze znajomych?"
+
+#. Button in the sensitive content settings that opens a confirmation to delete the stored age range.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove age range"
+msgstr "Usuń przedział wiekowy"
 
 #. Confirm button label on the remove-all-reactions alert. Destructive.
 #: src/features/channel/components/MessageActionUtils.tsx
@@ -29572,6 +29625,11 @@ msgstr "Usuń translator"
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
 msgid "Remove when you first bought {premiumProductName} from your badge"
 msgstr "Usuń datę pierwszego zakupu {premiumProductName} ze swojej odznaki"
+
+#. Title of the confirmation shown before deleting the age range from an Apple or Google account.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "Remove your age range?"
+msgstr "Usunąć Twój przedział wiekowy?"
 
 #. Status badge for the application to Explore, shown in the "Explore" tab in community settings. The community was removed from Explore.
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
@@ -29942,6 +30000,11 @@ msgstr "W odpowiedzi użytkownikowi {replyAuthorName}, {authorName} mówi: {form
 msgid "Replying to <0>{authorNickname}</0>"
 msgstr "Odpowiadasz użytkownikowi <0>{authorNickname}</0>"
 
+#. Voice and call participant menu action that reports this person to the safety team, for example for something they said or showed in the call.
+#: src/features/ui/action_menu/items/VoiceParticipantMenuData.tsx
+msgid "Report"
+msgstr "Zgłoś"
+
 #. Report flow target option. Selects reporting an entire community (server). Use the localized term for community, not server.
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a community"
@@ -29956,6 +30019,11 @@ msgstr "Zgłoś wiadomość"
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Report a user profile"
 msgstr "Zgłoś profil użytkownika"
+
+#. Action label in community menus, on invites and in Explore, and the title of the report window it opens. Reports a whole community to the safety team.
+#: src/features/moderation/utils/ModerationMessageDescriptors.ts
+msgid "Report community"
+msgstr "Zgłoś społeczność"
 
 #: src/features/moderation/components/report/ReportStepDetails.tsx
 msgid "Report details"
@@ -29977,7 +30045,12 @@ msgstr "Zgłoś problem"
 msgid "Report message"
 msgstr "Zgłoś wiadomość"
 
-#. Action label in the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
+#. Action in a forum post's menu. Reports the post's opening message to the safety team. A post is a topic thread in a forum channel.
+#: src/features/forum/utils/ForumMessageDescriptors.ts
+msgid "Report post"
+msgstr "Zgłoś post"
+
+#. Action label in user right-click menus and the full user profile's overflow menu, and the title of the report window it opens. Reports the user's profile: their photo, name or bio.
 #: src/features/moderation/utils/ModerationMessageDescriptors.ts
 msgid "Report profile"
 msgstr "Zgłoś profil"
@@ -30491,8 +30564,10 @@ msgid "Resizing, maximizing, and window snapping depend on the compositor. Wayla
 msgstr "Zmiana rozmiaru, maksymalizacja i przyciąganie okien zależą od kompozytora. Wayland bez dekoracji po stronie klienta może nie zapewniać uchwytów. Uruchom z --ozone-platform=x11, jeśli okno wydaje się zablokowane."
 
 #. Section header in the stream settings menu for resolution options.
+#. Section label in the web stream setup modal for the stream resolution options.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
 msgid "Resolution"
 msgstr "Rozdzielczość"
@@ -32928,6 +33003,11 @@ msgstr "Kilka osób pisze…"
 msgid "Share"
 msgstr "Udostępnij"
 
+#. Switch label in the web stream setup modal. When on, Fluxer uploads a still image of the stream so people can see it before watching.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share a preview image"
+msgstr "Udostępnij obraz podglądu"
+
 #. Button or menu action label in the buttons tab. Keep it concise.
 #: src/features/user/components/modals/tabs/component_gallery_tab/ComponentGalleryTabButtonsTab.tsx
 msgid "Share action."
@@ -32937,6 +33017,11 @@ msgstr "Akcja udostępniania."
 #: src/features/user/components/settings_utils/section_registry/ThemesSections.ts
 msgid "Share and back up"
 msgstr "Udostępnij i wykonaj kopię zapasową"
+
+#. Switch label in the web stream setup modal.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Share audio"
+msgstr "Udostępnij dźwięk"
 
 #. Plutonium page perk card body about upload size. freeSize is a formatted size such as 25 MB.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -32982,7 +33067,9 @@ msgstr "Podaj szczegóły, które pomogą naszemu zespołowi ocenić zgłoszenie
 msgid "Share with a friend"
 msgstr "Udostępnij znajomemu"
 
+#. Title of the modal shown on web before the browser screen picker opens. The user picks stream quality here first.
 #. Voice control button or tooltip label for starting screen sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Share your screen"
 msgstr "Udostępnij ekran"
@@ -33032,8 +33119,8 @@ msgstr "Ostre tekst w 720p, do 30 kl./s"
 
 #. Description for the high-tier Screen share streaming preset (Plutonium). Resolution and frame rate are technical tokens.
 #: src/features/voice/components/StreamSettingsMenuContent.tsx
-msgid "Sharp text at up to 4K, up to 15 FPS"
-msgstr "Ostre obrazy w rozdzielczości do 4K, do 15 kl./s"
+msgid "Sharp text at up to 1080p, 30 FPS"
+msgstr "Ostry tekst w maks. 1080p, 30 kl./s"
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts
@@ -33467,8 +33554,11 @@ msgstr "Pokaż wyciszone kanały"
 msgid "Show my own camera"
 msgstr "Pokaż moją kamerę"
 
+#. Toggle label in the mobile video settings bottom sheet. Controls whether the local screen share tile is in the call view.
 #. Voice display preference checkbox that controls whether the current user sees their own screen share tile.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
+#: src/features/voice/components/bottomsheets/VoiceSettingsBottomSheets.tsx
+#: src/features/voice/components/VoiceSettingsMenus.tsx
 msgid "Show my screen share"
 msgstr "Pokaż mój udostępniony ekran"
 
@@ -34069,7 +34159,7 @@ msgid "Skip this step"
 msgstr "Pomiń ten krok"
 
 #. Accessible skip-link label for keyboard users.
-#: src/app/App.tsx
+#: src/app/SkipToContentLink.tsx
 msgid "Skip to content"
 msgstr "Przejdź do treści"
 
@@ -34954,6 +35044,11 @@ msgstr "Rozpocznij nagrywanie"
 msgid "Start searches with <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3> to narrow down results."
 msgstr "Zacznij wyszukiwanie od <0>{peoplePrefix}</0> <1>{textChannelPrefix}</1> <2>{voiceChannelPrefix}</2> <3>{communityPrefix}</3>, aby zawęzić wyniki."
 
+#. Primary button in the web stream setup modal. Opens the browser's screen picker and starts sharing.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Start sharing"
+msgstr "Zacznij udostępniać"
+
 #. Native macOS Edit > Speech submenu item that starts reading the selected text aloud. Imperative verb.
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Start speaking"
@@ -35422,11 +35517,6 @@ msgstr "Buforowanie transmisji"
 #: src/features/voice/components/voice_participant_tile/shared.ts
 msgid "Stream ended"
 msgstr "Transmisja zakończona"
-
-#. Overlay text on a participant tile when the local user hid the remote screen share.
-#: src/features/voice/components/voice_participant_tile/shared.ts
-msgid "Stream hidden"
-msgstr "Transmisja ukryta"
 
 #. Plutonium page perk card title about stream quality.
 #: src/features/premium/components/plutonium_page/PlutoniumPageMessages.ts
@@ -36480,6 +36570,11 @@ msgstr "<0>Polityka prywatności</0> i <1>informacja o prywatności {OPERATOR_PA
 msgid "The <0>privacy policy</0> explains how we handle your data."
 msgstr "<0>Polityka prywatności</0> wyjaśnia, jak postępujemy z Twoimi danymi."
 
+#. Report flow: body of the final screen after a report was sent, on a self-hosted instance whose own administrators handle reports. The second sentence promises the reported person is not told who reported them.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "The administrators of this instance will review your report. We won't reveal that it came from you."
+msgstr "Administratorzy tej instancji przeanalizują Twoje zgłoszenie. Nie ujawnimy, że pochodziło od Ciebie."
+
 #. Error shown when the setup wizard cannot load because the API origin differs from the page origin.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx
 msgid "The API is on a different origin than this page, so setup requests are sent without your session. Check the public origin and port this instance is configured with, then reload."
@@ -36540,6 +36635,10 @@ msgstr "Społeczność, z której pochodzi ta treść, wyłączyła klonowanie, 
 msgid "The community you're looking for may have been deleted or you may not have access to it."
 msgstr "Społeczność, której szukasz, mogła zostać usunięta lub możesz nie mieć do niej dostępu."
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "The connection was not allowed. You can close this tab and try again."
+msgstr "Połączenie nie zostało dozwolone. Możesz zamknąć tę kartę i spróbować ponownie."
+
 #. Body of the confirmation dialog before replacing the private link to an Operator certificate page. The certificate is a PDF, and each page has a number and the date and time of payment. The new copy of the page has the new link printed on it.
 #: src/features/premium/components/operator_pass/OperatorPassPurchasesSection.tsx
 msgid "The current link stops working right away, for you and for anyone you've shared it with. We make a new copy of this page with the new link printed on it, with the same number and date."
@@ -36563,6 +36662,11 @@ msgstr "Plik zawiera token weryfikacyjny, który pobierzemy z <0>{dnsUrl}</0>."
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx
 msgid "The file you're trying to upload exceeds the maximum size limit of {maxSizeFormatted}."
 msgstr "Plik, który próbujesz wysłać, przekracza maksymalny rozmiar wynoszący {maxSizeFormatted}."
+
+#. Helper text under "Age range from your Apple or Google account" in the sensitive content settings.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "The Fluxer app for iPhone, iPad or Android sent us this age range. If it shows that you're 18 or older, you can see 18+ content in the UK and Brazil. It doesn't change your date of birth."
+msgstr "Aplikacja Fluxer na iPhone'a, iPada lub Androida wysłała nam ten przedział wiekowy. Jeśli pokazuje, że masz co najmniej 18 lat, możesz oglądać treści 18+ w Wielkiej Brytanii i Brazylii. Nie zmienia on Twojej daty urodzenia."
 
 #. Setup wizard body explaining the push relay.
 #: src/features/app/components/setup/SetupPolicySteps.tsx
@@ -41243,6 +41347,11 @@ msgstr "Weryfikacja nieudana"
 msgid "Verified & partnered community"
 msgstr "Zweryfikowana społeczność partnerska"
 
+#. Tooltip on the 2FA-for-moderation switch in the community moderation settings tab when the community is verified or partnered, so the switch stays on and cannot be changed.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Verified and partnered communities always require 2FA for moderators"
+msgstr "Zweryfikowane i partnerskie społeczności zawsze wymagają 2FA od moderatorów"
+
 #. Short label in the community badge. Keep it concise.
 #: src/features/guild/components/GuildBadge.tsx
 msgid "Verified community"
@@ -42182,10 +42291,20 @@ msgstr "Nie udało nam się odczytać tego pliku CSS."
 msgid "We couldn't read this theme. It may be corrupted or invalid."
 msgstr "Nie udało nam się odczytać tego motywu. Może być uszkodzony lub nieprawidłowy."
 
+#. Error shown when deleting the stored age range fails.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We couldn't remove your age range. Please try again."
+msgstr "Nie udało się usunąć Twojego przedziału wiekowego. Spróbuj ponownie."
+
 #. Error message after saving a theme failed in Settings > Themes or the quick CSS editor window.
 #: src/features/theme_settings/utils/ThemeSettingsErrorModal.ts
 msgid "We couldn't save that theme."
 msgstr "Nie udało się zapisać tego motywu."
+
+#. Body of the confirmation shown before deleting the age range. App Attest is an Apple product name and stays in English.
+#: src/features/user/components/modals/tabs/privacy_safety_tab/AgeRangeSection.tsx
+msgid "We delete the age range, the time we got it and the App Attest keys for your Apple devices. In the UK and Brazil, you can't see 18+ content until the app sends an age range again. The app may send it again later if your Apple or Google account still shares it with Fluxer."
+msgstr "Usuwamy przedział wiekowy, czas jego otrzymania i klucze App Attest dla Twoich urządzeń Apple. W Wielkiej Brytanii i Brazylii nie zobaczysz treści 18+, dopóki aplikacja ponownie nie wyśle przedziału wiekowego. Aplikacja może później ponownie wysłać Twój przedział wiekowy, jeśli Twoje konto Apple lub Google nadal udostępnia go Fluxerowi."
 
 #. Modal body for existing-subscription block. Directs the user to the billing portal and addresses the just-paid race case. Keep plain and reassuring.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
@@ -43130,6 +43249,10 @@ msgstr "Masz już grupę z tymi użytkownikami. Na pewno chcesz utworzyć nową?
 msgid "You already have lifetime {premiumProductName}"
 msgstr "Masz już dożywotni dostęp do {premiumProductName}"
 
+#: src/features/connection/components/pages/ConnectionCallbackPage.tsx
+msgid "You already have the most connections an account can have. Remove one and try again."
+msgstr "Masz już maksymalną liczbę połączeń dla jednego konta. Usuń jedno i spróbuj ponownie."
+
 #. Body text in the connection add connection modal.
 #: src/features/connection/components/modals/AddConnectionModal.tsx
 msgid "You already have this connection."
@@ -43244,6 +43367,11 @@ msgstr "Możesz uzyskać pełny zwrot do {date} włącznie."
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
 msgid "You can get a full refund until {date}. This also ends your subscription right away."
 msgstr "Możesz uzyskać pełny zwrot do {date} włącznie. To również natychmiast zakończy Twoją subskrypcję."
+
+#. Nagbar body telling people that the Fluxer app for Android phones can be installed from Google Play. {googlePlay} is the store brand name Google Play and must stay as is. Keep Fluxer and Android untranslated. Keep the tone calm and plain.
+#: src/features/app/components/layout/app_layout/nagbars/AndroidAppNagbar.tsx
+msgid "You can get the Fluxer app for Android on {googlePlay} and chat from your phone."
+msgstr "Aplikację Fluxer na system Android możesz pobrać z {googlePlay} i czatować na telefonie."
 
 #. Line under "Full refund" in the Payments settings. {amount} is the price paid, with currency, and {date} is the last day of the refund window, such as Nov 2, 2026. Both are filled in by code.
 #: src/features/app/components/dialogs/components/plutonium/RefundsSection.tsx
@@ -44105,6 +44233,11 @@ msgstr "Wyświetlasz starsze wiadomości"
 msgid "You've added more people than a group DM allows. Remove a few and try again."
 msgstr "Dodano więcej osób, niż pozwala na to limit czatu grupowego. Usuń kilka i spróbuj ponownie."
 
+#. Report flow: note on the summary screen when the reporter already reported this community.
+#: src/features/moderation/components/report_flow/ReportFlowCopy.ts
+msgid "You've already reported this community."
+msgstr "Ta społeczność została już przez Ciebie zgłoszona."
+
 #. Report flow: note on the summary screen when the reporter already reported this message.
 #: src/features/moderation/components/report_flow/ReportFlowCopy.ts
 msgid "You've already reported this message."
@@ -44308,6 +44441,11 @@ msgstr "Twoja przeglądarka zablokowała klucz dostępu, ponieważ adres tej str
 #: src/features/auth/utils/PasskeyErrorMessages.ts
 msgid "Your browser blocked the passkey because this page is not on {rpId}, the passkey domain of this instance. Ask the instance owner to check the passkey domain setting."
 msgstr "Twoja przeglądarka zablokowała klucz dostępu, ponieważ ta strona nie znajduje się na stronie {rpId}, domenie klucza dostępu tej instancji. Poproś właściciela instancji o sprawdzenie ustawienia domeny klucza dostępu."
+
+#. Description under the "Share audio" switch in the web stream setup modal. The browser picker owns the final audio choice.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your browser lets you choose whether to include audio when you pick what to share."
+msgstr "Przeglądarka pozwala ci wybrać, czy dołączyć dźwięk, gdy wybierasz, co udostępnić."
 
 #. Body of the browser-audio-required modal explaining why the user must click before audio can play.
 #: src/features/voice/components/modals/AudioPlaybackPermissionModal.tsx
@@ -44720,6 +44858,11 @@ msgstr "Twoje zapisane {savedResolution} przy {savedFrameRate} FPS wymaga {premi
 msgctxt "screen-share"
 msgid "Your screen share could not be published with a compatible video codec, so it was stopped. Try sharing again."
 msgstr "Nie udało się opublikować udostępniania ekranu za pomocą zgodnego kodeka wideo, dlatego zostało ono zatrzymane. Spróbuj udostępnić ponownie."
+
+#. Footer summary under the preset name in the web stream setup modal when the Source resolution is picked. {fps} is a whole number of frames per second, and FPS is a technical token.
+#: src/features/voice/components/modals/screen_share_picker_modal/WebStreamSetupModal.tsx
+msgid "Your screen's resolution at {fps} FPS"
+msgstr "Rozdzielczość twojego ekranu przy {fps} kl./s"
 
 #. Alert on the setup token screen when the token was refused while creating the account.
 #: src/features/app/components/setup/SelfHostedSetupWizardGate.tsx

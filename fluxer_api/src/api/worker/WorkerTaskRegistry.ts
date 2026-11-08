@@ -17,6 +17,7 @@ import bulkDeleteSelfMessagesImmediate from '@app/api/worker/tasks/BulkDeleteSel
 import bulkDeleteUserMessages from '@app/api/worker/tasks/BulkDeleteUserMessages';
 import clearAuthenticatedReporterEmails from '@app/api/worker/tasks/ClearAuthenticatedReporterEmails';
 import closePaymentDisputeAccounts from '@app/api/worker/tasks/ClosePaymentDisputeAccounts';
+import countBulkMessageDeletionTargets from '@app/api/worker/tasks/CountBulkMessageDeletionTargets';
 import crosspostMessage from '@app/api/worker/tasks/CrosspostMessage';
 import crosspostMessageChunk from '@app/api/worker/tasks/CrosspostMessageChunk';
 import deleteUserMessagesInGuildByTime from '@app/api/worker/tasks/DeleteUserMessagesInGuildByTime';
@@ -76,6 +77,7 @@ import seedThreadPermissions from '@app/api/worker/tasks/SeedThreadPermissions';
 import sendBillingEmail from '@app/api/worker/tasks/SendBillingEmail';
 import sendOperatorPassWithdrawalReceipt from '@app/api/worker/tasks/SendOperatorPassWithdrawalReceipt';
 import {sendSystemDm} from '@app/api/worker/tasks/SendSystemDm';
+import sweepVoiceParticipants from '@app/api/worker/tasks/SweepVoiceParticipants';
 import syncCrosspostCopies from '@app/api/worker/tasks/SyncCrosspostCopies';
 import syncCrosspostedMessage from '@app/api/worker/tasks/SyncCrosspostedMessage';
 import syncDiscoveryIndex from '@app/api/worker/tasks/SyncDiscoveryIndex';
@@ -118,6 +120,7 @@ export const workerTasks: Record<WorkerTaskName, WorkerTaskHandler> = {
 	bulkUpdateUserFlags: bulkUpdateUserFlags,
 	clearAuthenticatedReporterEmails,
 	closePaymentDisputeAccounts,
+	countBulkMessageDeletionTargets,
 	crosspostMessage,
 	crosspostMessageChunk,
 	deleteUserMessagesInGuildByTime,
@@ -164,6 +167,7 @@ export const workerTasks: Record<WorkerTaskName, WorkerTaskHandler> = {
 	pollGooglePlayVoidedPurchases,
 	pollAppStoreNotificationHistory,
 	prunePostgresKvTtl,
+	sweepVoiceParticipants,
 	pruneGuildVisits: pruneGuildVisitsTask,
 	refreshSearchIndex,
 	seedThreadPermissions,
