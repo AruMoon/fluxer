@@ -36,6 +36,7 @@ export function canDisconnectSso(user: User): boolean {
 	if (!isSsoLinked(user) || RuntimeConfig.getSnapshot().sso?.enforced === true) return false;
 	if (user.hasPassword) return true;
 	return (
+		RuntimeConfig.getSnapshot().features.identifier_first === true &&
 		!RuntimeConfig.usesUsernameSignIn &&
 		RuntimeConfig.emailsEnabled &&
 		user.email != null &&

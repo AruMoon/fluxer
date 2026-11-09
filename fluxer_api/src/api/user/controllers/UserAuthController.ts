@@ -251,7 +251,9 @@ export function UserAuthController(app: HonoApp) {
 			}
 
 			const hasLocalPassword = user.passwordHash !== null;
+			const {identifierFirst} = await instanceConfig.getSignInFeatures();
 			const hasEmailCodeSignIn =
+				identifierFirst &&
 				(await instanceConfig.getAccountIdentityMode()) === AccountIdentityModes.EMAIL &&
 				user.email !== null &&
 				user.emailVerified &&
