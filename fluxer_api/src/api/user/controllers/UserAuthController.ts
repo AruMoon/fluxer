@@ -237,7 +237,7 @@ export function UserAuthController(app: HonoApp) {
 			security: ['sessionToken'],
 			tags: ['Users'],
 			description:
-				'Disconnect the instance single sign-on provider from the current account. Requires sudo mode verification and an alternative local sign-in method. All authentication sessions are revoked after disconnecting.',
+				'Disconnect the instance single sign-on provider from the current account. Requires sudo mode verification and an alternative local sign-in method.',
 		}),
 		async (ctx) => {
 			const user = ctx.get('user');

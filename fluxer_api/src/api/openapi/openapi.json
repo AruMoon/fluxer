@@ -25009,7 +25009,7 @@
 						"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
 					}
 				},
-				"description": "Disconnect the instance single sign-on provider from the current account. Requires sudo mode verification and an alternative local sign-in method. All authentication sessions are revoked after disconnecting.",
+				"description": "Disconnect the instance single sign-on provider from the current account. Requires sudo mode verification and an alternative local sign-in method.",
 				"security": [{"sessionToken": []}],
 				"requestBody": {
 					"required": false,

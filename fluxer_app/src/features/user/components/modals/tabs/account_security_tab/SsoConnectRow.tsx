@@ -24,12 +24,7 @@ const CONNECT_SSO_FAILED_DESCRIPTOR = msg({
 });
 
 export function canConnectSso(user: User): boolean {
-	return (
-		RuntimeConfig.getSnapshot().sso?.enabled === true &&
-		!isDesktop() &&
-		!user.traits.includes(UserTraits.SSO) &&
-		!user.traits.some((trait) => trait.startsWith('sso_identity:'))
-	);
+	return RuntimeConfig.getSnapshot().sso?.enabled === true && !isDesktop() && !user.traits.includes(UserTraits.SSO);
 }
 
 export const SsoConnectRow = observer(() => {
