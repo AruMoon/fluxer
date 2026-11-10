@@ -4153,6 +4153,11 @@ msgctxt "us-state"
 msgid "Alaska"
 msgstr "Alaska"
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Albanian"
+msgstr ""
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/NotificationsSections.ts
 msgid "Alert sound"
@@ -5082,11 +5087,6 @@ msgstr "Lencana ikon aplikasi"
 #: src/features/app/components/setup/SetupBrandingFields.tsx
 msgid "App icons"
 msgstr "Ikon aplikasi"
-
-#. Label in the language tab. Preserve {format}.
-#: src/features/user/components/modals/tabs/LanguageTab.tsx
-msgid "App language: {format}"
-msgstr "Format waktu bahasa aplikasi: {format}"
 
 #: src/features/user/components/settings_utils/SettingsConstants.tsx
 msgid "App settings"
@@ -6238,6 +6238,11 @@ msgstr "Alasan pemblokiran"
 msgid "Bandwidth"
 msgstr "Bandwidth"
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Bangla"
+msgstr ""
+
 #: src/features/moderation/components/modals/BanMemberModal.tsx
 msgid "Banned {targetUserTag} from the community"
 msgstr "{targetUserTag} diblokir dari komunitas"
@@ -6321,6 +6326,11 @@ msgstr "Jadilah yang pertama memulai percakapan di sini."
 #: src/features/guild/components/modals/guild_tabs/GuildMembersDateRangeModal.tsx
 msgid "Before date"
 msgstr "Sebelum tanggal"
+
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Belarusian"
+msgstr ""
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts
@@ -6751,11 +6761,6 @@ msgstr "Browser: maju"
 msgctxt "keyboard-key-name"
 msgid "Browser home"
 msgstr "Browser: beranda"
-
-#. Label in the language tab. Preserve {format}.
-#: src/features/user/components/modals/tabs/LanguageTab.tsx
-msgid "Browser locale: {format}"
-msgstr "Format waktu browser: {format}"
 
 #. Settings search entry description. One-line summary of what the settings search entry controls.
 #: src/features/user/components/settings_utils/search_index/VoiceVideoIndex.ts
@@ -7354,6 +7359,11 @@ msgstr "Perataan kartu"
 #: src/features/ui/card_alignment_controls/CardAlignmentControls.tsx
 msgid "Card alignment controls"
 msgstr "Kontrol perataan kartu"
+
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Catalan"
+msgstr ""
 
 #. Heading above the category filter list in the Explore search sidebar.
 #: src/features/discovery/discovery/DiscoverySearchFilters.tsx
@@ -8438,6 +8448,11 @@ msgstr "Pilih teman untuk dikirimi pesan."
 msgid "Choose how chat moves after you send a message"
 msgstr "Pilih cara obrolan bergulir setelah kamu mengirim pesan"
 
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "Choose how dates, times and numbers are written"
+msgstr ""
+
 #. Settings section description. One-line summary of what the settings section controls.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts
 msgid "Choose how messages are displayed in chat channels."
@@ -8475,6 +8490,11 @@ msgstr "Pilih sesuatu untuk dibagikan"
 #: src/features/guild/components/modals/guild_tabs/GuildDiscoveryTab.tsx
 msgid "Choose the category that best describes your community. You can change this any time."
 msgstr "Pilih kategori yang paling sesuai dengan komunitasmu. Kamu bisa mengubahnya kapan saja."
+
+#. Settings search entry description. One-line summary of what the settings search entry controls.
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "Choose the order of day, month and year in dates"
+msgstr ""
 
 #. Button on the details step of the DSA report form, shown when the server no longer accepts the chosen reason. Reloads the questions and returns to the reason step.
 #: src/features/moderation/components/report/ReportStepDetails.tsx
@@ -12391,6 +12411,16 @@ msgstr "Tanggal"
 msgid "Date and time"
 msgstr "Tanggal dan waktu"
 
+#. Title of the language settings section that picks a fixed order for numeric dates. Also a settings search entry label.
+#: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
+msgid "Date format"
+msgstr ""
+
+#. Accessible label for the date format choices in the language settings. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Date format selection"
+msgstr ""
+
 #. Short label in the authentication auth minimal register form core. Keep the tone plain and specific.
 #. Short label in the authentication auth register form core. Keep the tone plain and specific.
 #. Short label in the authentication date of birth field. Keep the tone plain and specific.
@@ -12404,6 +12434,11 @@ msgstr "Tanggal lahir"
 msgid "Date options"
 msgstr "Opsi tanggal"
 
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "Date order"
+msgstr ""
+
 #. Accessible label for the date picker dialog.
 #: src/features/ui/components/form/DateTimePickerField.tsx
 msgid "Date picker"
@@ -12416,10 +12451,20 @@ msgstr "Pemilih tanggal"
 msgid "Date posted"
 msgstr "Tanggal diposting"
 
+#. Help text under the regional format picker in the language settings.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Dates, times and numbers follow this format. Prices stay in the currency of your billing country."
+msgstr ""
+
 #. Short label in the authentication date of birth field. Keep the tone plain and specific.
 #: src/features/auth/flow/DateOfBirthField.tsx
 msgid "Day"
 msgstr "Hari"
+
+#. Date format option that writes day/month/year. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Day first"
+msgstr ""
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/AccountSecurityIndex.ts
@@ -16641,6 +16686,11 @@ msgstr "Nama file"
 msgid "Files will be sent immediately without preview."
 msgstr "File akan langsung terkirim tanpa pratinjau."
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Filipino"
+msgstr ""
+
 #. Short label in the authentication submit tooltip. Preserve {fieldList}; it is inserted by code. Keep the tone plain and specific.
 #: src/features/auth/flow/SubmitTooltip.tsx
 msgid "Fill out the following fields: {fieldList}"
@@ -20402,6 +20452,13 @@ msgstr "Irlandia"
 msgid "Is this instance for one community or many?"
 msgstr "Apakah instance ini untuk satu komunitas atau banyak?"
 
+#. Date format option named after the international standard. Keep "ISO 8601" as is.
+#. Settings search synonym for the international date format standard. Keep "ISO 8601" as is.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "ISO 8601"
+msgstr ""
+
 #. Line in the dialog for an Operator Pass someone passed on to you. It is the pass.
 #: src/features/premium/components/operator_pass/OperatorPassOfferModal.tsx
 msgid "It arrives as soon as you accept."
@@ -21030,6 +21087,11 @@ msgstr "Nanti"
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Latvia"
 msgstr "Latvia"
+
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Latvian"
+msgstr ""
 
 #. Settings search entry label. Names the settings search entry in the settings UI.
 #: src/features/user/utils/UserMessageDescriptors.ts
@@ -23283,6 +23345,11 @@ msgstr "Montana"
 msgid "Month"
 msgstr "Bulan"
 
+#. Date format option that writes month/day/year. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Month first"
+msgstr ""
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/PlutoniumIndex.ts
 msgid "Monthly"
@@ -25389,6 +25456,11 @@ msgstr "Num Lock"
 #: src/features/lexical/composer/nodes/SlashSlotNode.ts
 msgid "Number"
 msgstr "Angka"
+
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "Number format"
+msgstr ""
 
 #. Label of the control that sets how many Operator Passes to buy. All of them go to your own account.
 #: src/features/premium/components/operator_pass/checkout/CheckoutChooseStage.tsx
@@ -27831,6 +27903,11 @@ msgstr "Portugal"
 msgid "Portuguese (Brazil)"
 msgstr "Portugis (Brasil)"
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Portuguese (Portugal)"
+msgstr ""
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/DesktopSettingsIndex.ts
 msgid "Position"
@@ -29258,6 +29335,21 @@ msgstr "Membuat ulang akan membatalkan rahasia saat ini. Perbarui kode apa pun y
 #: src/features/user/components/modals/tabs/applications_tab/ApplicationDetail.tsx
 msgid "Regenerating will invalidate the current token. Update any code that uses the old value."
 msgstr "Membuat ulang akan membatalkan token saat ini. Perbarui kode apa pun yang menggunakan nilai lama."
+
+#. Settings search synonym. Used to match this term when the user types it in the settings search bar.
+#: src/features/user/components/settings_utils/search_index/LanguageIndex.ts
+msgid "Region"
+msgstr ""
+
+#. Title of the language settings section that picks how dates, times and numbers are written, separately from the interface language. Also a settings search entry label.
+#: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
+msgid "Regional format"
+msgstr ""
+
+#. Description of the automatic choice in the time format and date format settings. {format} is an example time or date written in the chosen regional format. Preserve {format}.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Regional format: {format}"
+msgstr ""
 
 #. Generic authentication action label for opening or submitting account registration.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
@@ -31044,6 +31136,11 @@ msgstr "Rusia"
 msgid "Safety"
 msgstr "Keamanan"
 
+#. Regional format option that writes dates, times and numbers the way the interface language does. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Same as language"
+msgstr ""
+
 #. Profile timezone difference text. The target user's timezone currently matches the viewer's timezone.
 #: src/features/user/components/popouts/UserProfileShared.tsx
 msgid "Same time as you"
@@ -31582,6 +31679,11 @@ msgstr "Cari apa saja..."
 msgid "Search for channels, people, or communities"
 msgstr "Cari saluran, orang, atau komunitas"
 
+#. Placeholder in the regional format picker in the language settings. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Search formats…"
+msgstr ""
+
 #. Generic search-input placeholder for filtering the current friends list.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Search friends"
@@ -32051,6 +32153,11 @@ msgstr "Pilih bahasa antarmuka"
 #: src/features/theme_settings/components/QuickCssReference.tsx
 msgid "Select one to add a rule for it to your CSS."
 msgstr "Pilih salah satu untuk menambah aturan ke CSS kamu."
+
+#. Accessible label for the regional format picker in the language settings. Keep it concise.
+#: src/features/user/components/modals/tabs/LanguageTab.tsx
+msgid "Select regional format"
+msgstr ""
 
 #. Button or menu action label in the o auth builder section. Keep it concise. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/applications_tab/application_detail/OAuthBuilderSection.tsx
@@ -34212,6 +34319,11 @@ msgstr "Penggeser dengan nilai langkah"
 msgid "Sliders"
 msgstr "Penggeser"
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Slovak"
+msgstr ""
+
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Slovakia"
@@ -34221,6 +34333,11 @@ msgstr "Slowakia"
 #: src/features/moderation/components/report/OptionDescriptors.ts
 msgid "Slovenia"
 msgstr "Slovenia"
+
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Slovenian"
+msgstr ""
 
 #. Modal body shown when an action is blocked by rate limiting. Keep plain.
 #: src/features/app/components/alerts/RateLimitedConfirmModal.tsx
@@ -36081,10 +36198,10 @@ msgstr "DM sistem tidak dapat melakukan panggilan video"
 msgid "System DMs cannot host voice calls"
 msgstr "DM sistem tidak dapat melakukan panggilan suara"
 
-#. Label in the language tab. Preserve {format}.
+#. Regional format option that uses the date, time and number settings of the device or browser. Keep it concise.
 #: src/features/user/components/modals/tabs/LanguageTab.tsx
-msgid "System locale: {format}"
-msgstr "Format waktu sistem: {format}"
+msgid "System format"
+msgstr ""
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
@@ -38748,6 +38865,11 @@ msgstr "Alihkan aktivitas suara"
 msgid "Token"
 msgstr "Token"
 
+#. Short label in the language and locale names. Keep it concise.
+#: src/features/user/utils/LocaleUtils.ts
+msgid "Toki Pona"
+msgstr ""
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/AppearanceSections.ts
 msgid "Tone"
@@ -40745,11 +40867,6 @@ msgstr "Gunakan akun lain"
 msgid "Use autoscrolling"
 msgstr "Gunakan gulir otomatis"
 
-#. Label in the language tab.
-#: src/features/user/components/modals/tabs/LanguageTab.tsx
-msgid "Use browser locale for time format"
-msgstr "Gunakan lokal browser untuk format waktu"
-
 #. Modal secondary button to fall back to standard card checkout instead of an alternative payment method.
 #: src/features/app/components/dialogs/components/plutonium/hooks/useCheckoutActions.tsx
 msgid "Use card"
@@ -40904,11 +41021,6 @@ msgstr "Gunakan stiker dari komunitas lain dengan {premiumProductName}"
 #: src/features/permissions/utils/PermissionLabelDescriptors.ts
 msgid "Use stickers from other communities."
 msgstr "Gunakan stiker dari komunitas lain."
-
-#. Label in the language tab.
-#: src/features/user/components/modals/tabs/LanguageTab.tsx
-msgid "Use system locale for time format"
-msgstr "Gunakan lokal sistem untuk format waktu"
 
 #. Switch label in Settings > Themes on the desktop app, also used as its settings search entry. When on, the account uses the theme shared by every account in the desktop app.
 #: src/features/theme_settings/utils/ThemeSettingsMessageDescriptors.ts
