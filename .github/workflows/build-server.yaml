@@ -10,7 +10,7 @@ on:
         required: false
         default: ""
       app-assets-version:
-        description: "Build version of the fluxer-app-proxy-self-hosted release whose -assets image the server serves"
+        description: "Build version of the fluxer-app-proxy release whose -assets image the server serves"
         type: string
         required: true
 
@@ -39,5 +39,5 @@ jobs:
       dockerfile: fluxer_server/Dockerfile
       build-version: ${{ inputs['build-version'] }}
       build-args: |
-        APP_ASSETS_REF=ghcr.io/${{ github.repository_owner }}/fluxer-app-proxy-self-hosted:${{ inputs['app-assets-version'] }}-assets
+        APP_ASSETS_REF=ghcr.io/${{ github.repository_owner }}/fluxer-app-proxy:${{ inputs['app-assets-version'] }}-assets
         APP_ASSETS_PLATFORM=linux/amd64

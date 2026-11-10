@@ -4,7 +4,7 @@ ARG APP_ASSETS_REF=app-assets-missing
 ARG APP_ASSETS_PLATFORM=$BUILDPLATFORM
 
 FROM alpine:3.24 AS app-assets-missing
-RUN echo "set APP_ASSETS_REF to a fluxer-app-proxy-self-hosted <version>-assets image" >&2 && exit 1
+RUN echo "set APP_ASSETS_REF to a fluxer-app-proxy <version>-assets image" >&2 && exit 1
 
 FROM --platform=${APP_ASSETS_PLATFORM} ${APP_ASSETS_REF} AS app-static
 
