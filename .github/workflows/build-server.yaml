@@ -39,5 +39,5 @@ jobs:
       dockerfile: fluxer_server/Dockerfile
       build-version: ${{ inputs['build-version'] }}
       build-args: |
-        APP_ASSETS_REF=ghcr.io/${{ github.repository_owner }}/fluxer-app-proxy:${{ inputs['app-assets-version'] }}-assets
+        APP_ASSETS_REF=ghcr.io/arumoon/fluxer-app-proxy:${{ inputs['app-assets-version'] }}-assets
         APP_ASSETS_PLATFORM=linux/amd64
