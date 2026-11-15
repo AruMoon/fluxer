@@ -272,12 +272,6 @@ export const AccountTabContent: React.FC<AccountTabProps> = observer(({user, sho
 						/>
 					)
 				)}
-				{isSsoLinked(user) && (
-					<SsoDisconnectRow
-						user={user}
-						data-flx="user.account-security-tab.account-tab.account-tab-content.sso-disconnect-row"
-					/>
-				)}
 			</AccountSecurityCard>
 			{needsEmailConfirmation(user) && (
 				<EmailVerificationAlert data-flx="user.account-security-tab.account-tab.account-tab-content.email-verification-alert" />
