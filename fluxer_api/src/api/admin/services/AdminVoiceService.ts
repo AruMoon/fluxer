@@ -166,6 +166,7 @@ export class AdminVoiceService {
 			latitude: data.latitude,
 			longitude: data.longitude,
 			isDefault: data.is_default ?? false,
+			hidden: data.hidden ?? false,
 			countryCodes: normalizeVoiceCountryCodes(data.country_codes ?? []),
 			restrictions: buildVoiceRestrictions(data),
 		});
@@ -179,6 +180,7 @@ export class AdminVoiceService {
 			metadata: new Map([
 				['region_id', region.id],
 				['name', region.name],
+				['hidden', String(region.hidden)],
 			]),
 		});
 		return {
@@ -198,18 +200,21 @@ export class AdminVoiceService {
 		if (data.latitude !== undefined) updates.latitude = data.latitude;
 		if (data.longitude !== undefined) updates.longitude = data.longitude;
 		if (data.is_default !== undefined) updates.isDefault = data.is_default;
+		if (data.hidden !== undefined) updates.hidden = data.hidden;
 		if (data.country_codes !== undefined) updates.countryCodes = normalizeVoiceCountryCodes(data.country_codes);
 		updates.restrictions = patchVoiceRestrictions(existing.restrictions, data);
 		updates.updatedAt = new Date();
 		await voiceRepository.upsertRegion(updates);
 		await this.publishVoiceConfiguration({type: 'region_updated', regionId: data.id});
+		const metadata = new Map([['region_id', data.id]]);
+		if (data.hidden !== undefined) metadata.set('hidden', String(data.hidden));
 		await this.deps.auditService.createAuditLog({
 			targetId: 0n,
 			adminUserId,
 			targetType: 'voice_region',
 			action: 'update_voice_region',
 			auditLogReason,
-			metadata: new Map([['region_id', data.id]]),
+			metadata,
 		});
 		return {
 			region: this.mapVoiceRegionToAdminResponse(updates),
@@ -385,6 +390,7 @@ export class AdminVoiceService {
 			latitude: region.latitude,
 			longitude: region.longitude,
 			is_default: region.isDefault,
+			hidden: region.hidden,
 			country_codes: region.countryCodes,
 			vip_only: region.restrictions.vipOnly,
 			required_guild_features: Array.from(region.restrictions.requiredGuildFeatures),

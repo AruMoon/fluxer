@@ -40,6 +40,7 @@ export class VoiceDataInitializer {
 					latitude: defaultRegion.latitude,
 					longitude: defaultRegion.longitude,
 					isDefault: true,
+					hidden: false,
 					countryCodes: [],
 					restrictions: {
 						vipOnly: false,

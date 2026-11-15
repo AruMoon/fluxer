@@ -16,6 +16,7 @@ export interface VoiceRegionRecord {
 	latitude: number;
 	longitude: number;
 	isDefault: boolean;
+	hidden: boolean;
 	countryCodes: Array<string>;
 	restrictions: VoiceRestriction;
 	createdAt: Date | null;
@@ -55,6 +56,7 @@ export interface VoiceRegionMetadata {
 	latitude: number;
 	longitude: number;
 	isDefault: boolean;
+	hidden: boolean;
 	vipOnly: boolean;
 	requiredGuildFeatures: Array<string>;
 }

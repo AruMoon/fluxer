@@ -95,6 +95,7 @@ export class VoiceRepository {
 			latitude: region.latitude,
 			longitude: region.longitude,
 			is_default: region.isDefault,
+			hidden: region.hidden,
 			country_codes: new Set(region.countryCodes.map((code) => code.toUpperCase())),
 			vip_only: region.restrictions.vipOnly,
 			required_guild_features: new Set(region.restrictions.requiredGuildFeatures),
@@ -232,6 +233,7 @@ export class VoiceRepository {
 			latitude: row.latitude,
 			longitude: row.longitude,
 			isDefault: row.is_default ?? false,
+			hidden: row.hidden ?? false,
 			countryCodes: Array.from(row.country_codes ?? [])
 				.map((code) => code.toUpperCase())
 				.sort(),

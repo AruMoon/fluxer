@@ -12,6 +12,10 @@ export const UserRateLimitConfigs = {
 		bucket: 'user:profile::target_id',
 		config: {limit: 100, windowMs: ms('10 seconds')},
 	} as RouteRateLimitConfig,
+	USER_ATTACHMENT_TOKEN: {
+		bucket: 'user:attachment_token',
+		config: {limit: 120, windowMs: ms('10 seconds')},
+	} as RouteRateLimitConfig,
 	USER_CHECK_TAG: {
 		bucket: 'user:check_tag',
 		config: {limit: 60, windowMs: ms('10 seconds')},
@@ -82,7 +86,7 @@ export const UserRateLimitConfigs = {
 	} as RouteRateLimitConfig,
 	USER_SSO_UNLINK: {
 		bucket: 'user:sso:unlink',
-		config: {limit: 10, windowMs: ms('10 seconds')},
+		config: {limit: 10, windowMs: ms('1 minute')},
 	} as RouteRateLimitConfig,
 	USER_ACCOUNT_DISABLE: {
 		bucket: 'user:account:disable',

@@ -50,6 +50,9 @@ export const VoiceRegionAdminResponse = z.object({
 	latitude: z.number().describe('Geographic latitude coordinate'),
 	longitude: z.number().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().describe('Whether this is the default region'),
+	hidden: z
+		.boolean()
+		.describe('Whether the region is left out of the region lists clients show, while placement still uses it'),
 	country_codes: z
 		.array(createStringType(2, 2))
 		.max(249)
@@ -111,6 +114,11 @@ export const CreateVoiceRegionRequest = z.object({
 	latitude: z.number().describe('Geographic latitude coordinate'),
 	longitude: z.number().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().optional().default(false).describe('Whether this is the default region'),
+	hidden: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe('Whether to leave the region out of the region lists clients show, while placement still uses it'),
 	country_codes: z
 		.array(createStringType(2, 2))
 		.max(249)
@@ -147,6 +155,10 @@ export const UpdateVoiceRegionRequest = z.object({
 	latitude: z.number().optional().describe('Geographic latitude coordinate'),
 	longitude: z.number().optional().describe('Geographic longitude coordinate'),
 	is_default: z.boolean().optional().describe('Whether this is the default region'),
+	hidden: z
+		.boolean()
+		.optional()
+		.describe('Whether to leave the region out of the region lists clients show, while placement still uses it'),
 	country_codes: z
 		.array(createStringType(2, 2))
 		.max(249)

@@ -2196,6 +2196,11 @@ msgstr "{productName} se během spouštění neaktualizuje. Když bude aktualiza
 msgid "{productName} wordmark"
 msgstr "Textové logo {productName}"
 
+#. Download progress shown under a file name in the downloads panel. {progress} is the formatted percentage downloaded so far, for example 42%. {total} is the formatted size of the whole file, for example 3.2 MB.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "{progress} of {total}"
+msgstr "{progress} z {total}"
+
 #: src/features/connection/components/modals/AddConnectionModal.tsx
 msgid "{providerName} opens in your browser. Sign in there to connect your account."
 msgstr "{providerName} se otevře ve vašem prohlížeči. Přihlaste se tam a propojte svůj účet."
@@ -3399,15 +3404,30 @@ msgstr "Přidejte si přítele a začněte."
 msgid "Add a keybind"
 msgstr "Přidat zkratku"
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Add a local sign-in method before disconnecting {providerName}."
-msgstr "Před odpojením {providerName} přidejte metodu místního přihlášení."
-
 #. Body of the optional, dismissible offer to add a passkey.
 #: src/features/auth/components/modals/AuthenticatorOfferModal.tsx
 msgid "Add a passkey to sign in with your fingerprint, face or screen lock. You can also do this later in settings."
 msgstr "Přidejte si přístupový klíč pro přihlašování pomocí otisku prstu, obličeje nebo zámku obrazovky. Můžete to také provést později v nastavení."
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey to your account before you disconnect {providerName}."
+msgstr "Než odpojíš {providerName}, přidej ke svému účtu heslo nebo přístupový klíč."
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey to your account before you disconnect single sign-on."
+msgstr "Než odpojíš jednotné přihlášení, přidej ke svému účtu heslo nebo přístupový klíč."
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in and the instance allows sign-in with codes sent by email. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey, or confirm your email address to sign in with emailed codes, before you disconnect {providerName}."
+msgstr "Než odpojíš {providerName}, přidej heslo nebo přístupový klíč, nebo potvrď svou e-mailovou adresu pro přihlašování kódy z e-mailu."
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in, the instance allows sign-in with codes sent by email and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey, or confirm your email address to sign in with emailed codes, before you disconnect single sign-on."
+msgstr "Než odpojíš jednotné přihlášení, přidej heslo nebo přístupový klíč, nebo potvrď svou e-mailovou adresu pro přihlašování kódy z e-mailu."
 
 #. Form placeholder for the tag input on an expression form.
 #: src/features/expressions/components/modals/TagListField.tsx
@@ -7250,6 +7270,11 @@ msgstr "Sem nelze nahrávat soubory"
 msgid "Cancel"
 msgstr "Zrušit"
 
+#. Stops an in-progress download and deletes the partial file.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Cancel download"
+msgstr "Zrušit stahování"
+
 #. Button or menu action label in the channel and chat edit bar. Keep it concise.
 #: src/features/channel/components/ChannelEditBar.tsx
 msgid "Cancel editing message"
@@ -7325,6 +7350,11 @@ msgstr "Zrušit žádost o přátelství pro uživatele {displayName}?"
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
 msgid "Cancellation"
 msgstr "Potlačení ozvěny"
+
+#. Status shown under a file name in the downloads panel after the user cancels the download. The part of the file that had already downloaded is deleted.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Cancelled. The partial file was deleted."
+msgstr "Zrušeno. Částečně stažený soubor byl smazán."
 
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionDescription.tsx
 msgid "Cancels on <0>{cancelDate}</0>. <1/> remain active until then."
@@ -7941,7 +7971,7 @@ msgid "Channel access"
 msgstr "Přístup k kanálu"
 
 #. Title of the alert shown when clicking a message link the user does not have permission to view.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Channel access denied"
 msgstr "Přístup k tomuto kanálu odepřen"
 
@@ -8780,6 +8810,11 @@ msgstr "Smazat všechny reakce z této zprávy?"
 msgid "Clear friends search"
 msgstr "Vymazat hledání přátel"
 
+#. Removes finished downloads from the downloads panel. Downloaded files stay on disk and in-progress downloads stay in the list.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Clear list"
+msgstr "Vymazat seznam"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
 msgid "Clear message text"
@@ -9615,6 +9650,11 @@ msgstr "Porovnání"
 msgid "Complete payment"
 msgstr "Dokončit platbu"
 
+#. Status shown under a file name in the downloads panel once the file has finished downloading. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Completed"
+msgstr "Dokončeno"
+
 #: src/features/auth/components/pages/SignInLinkPage.tsx
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
 msgid "Completing sign-in…"
@@ -10052,16 +10092,16 @@ msgstr "Připojeno k hovoru"
 msgid "Connected to voice"
 msgstr "Připojeno k hlasovému hovoru"
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Connected. You can disconnect this sign-in method."
-msgstr "Připojeno. Tuto metodu přihlášení můžete odpojit."
-
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
 msgid "Connecticut"
 msgstr "Connecticut"
+
+#. Heading on the SSO callback page while connecting single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Connecting single sign-on…"
+msgstr "Propojování jednotného přihlášení…"
 
 #. Auth status shown while connecting to an instance, when the instance selector resolves it or when sign-in waits for the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -10944,6 +10984,8 @@ msgid "Couldn't complete sign-in. Try again."
 msgstr "Přihlášení se nepodařilo dokončit. Zkuste to znovu."
 
 #. Error title shown when starting to connect single sign-on from account settings fails.
+#. Heading on the SSO callback page when connecting single sign-on from account settings failed.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Couldn't connect single sign-on"
 msgstr "Jednotné přihlášení se nepodařilo propojit"
@@ -13373,13 +13415,13 @@ msgstr "Stav pro vývojáře"
 #. Short label in the channel and chat utility buttons. Keep it concise.
 #. Title of the info alert shown when clicking an internal developer-tools deep link.
 #: src/features/channel/components/channel_header_components/UtilityButtons.tsx
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 #: src/features/ui/action_menu/items/StaffDeveloperUserControlsMenuItem.tsx
 msgid "Developer tools"
 msgstr "Nástroje pro vývojáře"
 
 #. Body of the developer-tools info alert. Refers to the staff badge button in the channel header.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Developer tools are available from the staff badge in the channel header."
 msgstr "Nástroje pro vývojáře jsou dostupné z odznaku pro zaměstnance v záhlaví kanálu."
 
@@ -13531,6 +13573,7 @@ msgstr "Náhledy přímých zpráv"
 #. Review row label for direct messages.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
 #: src/features/channel/components/direct_message/DirectMessageList.tsx
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 #: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx
 msgid "Direct messages"
@@ -13772,14 +13815,18 @@ msgstr "Zahodit příspěvek"
 msgid "Discard voice message"
 msgstr "Zahodit hlasovou zprávu"
 
-#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "Odpojit"
 
-#. Confirmation title when disconnecting the current account from the instance's single sign-on provider.
+#. Button that disconnects the account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgctxt "sso"
+msgid "Disconnect"
+msgstr "Odpojit"
+
+#. Confirmation title when disconnecting the current account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Disconnect {providerName}?"
 msgstr "Odpojit {providerName}?"
@@ -13805,6 +13852,11 @@ msgstr "Odpojit od {channel}"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "Odpojit se od hlasového hovoru"
+
+#. Confirmation title when disconnecting the current account from single sign-on and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "Odpojit jednotné přihlášení?"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -14287,6 +14339,11 @@ msgstr "Stáhněte si novou verzi a aktualizujte {appName}."
 #: src/features/ui/action_menu/items/MediaMenuData.tsx
 msgid "Download video"
 msgstr "Stáhnout video"
+
+#. Heading of the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Downloads"
+msgstr "Stažené soubory"
 
 #. Short heading in the keyboard shortcuts cheatsheet.
 #. Short label in the keybinds tab. Keep it concise.
@@ -16229,6 +16286,11 @@ msgstr "Simulovat chyby při načítání zpráv"
 msgid "Fail message sends"
 msgstr "Simulovat chyby při odesílání zpráv"
 
+#. Status shown under a file name in the downloads panel when the download did not finish. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Failed"
+msgstr "Selhalo"
+
 #: src/features/moderation/components/modals/BanMemberModal.tsx
 msgid "Failed to ban member. Try again."
 msgstr "Člena se nepodařilo zabanovat. Zkuste to znovu."
@@ -17581,6 +17643,11 @@ msgstr "Přátelé vám mohou vždy posílat zprávy."
 msgid "Friends can always message you. These settings cover people and bots you only share a community with."
 msgstr "Přátelé vám mohou vždy poslat zprávu. Tato nastavení se týkají lidí a botů, se kterými sdílíte pouze komunitu."
 
+#. Help text under the switch that turns off direct messages between community members who are not friends, in the community moderation settings tab.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Friends can still DM each other, and so can members who share another community. Bots aren't affected."
+msgstr "Přátelé si stále mohou posílat soukromé zprávy, stejně jako členové, kteří sdílejí jinou komunitu. Botů se to netýká."
+
 #. Privacy option label for people connected through mutual friends.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Friends of friends"
@@ -18768,6 +18835,11 @@ msgstr "Skrýt aplikaci {appName}"
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
 msgid "Hide {premiumProductName} purchase date"
 msgstr "Skrýt datum nákupu {premiumProductName}"
+
+#. Context menu item on the Plutonium button in the direct messages list. Hides the button. productName is the premium product name, Plutonium on fluxer.com.
+#: src/features/channel/components/direct_message/DirectMessageList.tsx
+msgid "Hide {productName} button"
+msgstr ""
 
 #. Accessible label for the button that collapses the other accounts section in the inbox.
 #: src/features/messaging/components/popouts/inbox/OtherAccountsInboxSection.tsx
@@ -21549,7 +21621,7 @@ msgid "Link styling"
 msgstr "Styl odkazů"
 
 #. Title of the alert shown when clicking an internal link that is not available to the current account.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Link unavailable"
 msgstr "Odkaz není k dispozici"
 
@@ -21939,6 +22011,11 @@ msgstr "Údržba je naplánována na {localizedTime}. Předpokládaná doba trv�
 #: src/features/ui/action_menu/GroupDMContextMenu.tsx
 msgid "Make {userName} the group owner? You'll lose owner privileges."
 msgstr "Chcete, aby se uživatel {userName} stal vlastníkem skupiny? Ztratíte oprávnění vlastníka."
+
+#. Description of the community ownership transfer section in community settings.
+#: src/features/guild/components/modals/guild_tabs/guild_overview_tab/sections/OwnerTransferSection.tsx
+msgid "Make another member the owner of this community. You cannot undo this."
+msgstr "Udělejte z jiného člena vlastníka této komunity. Tuto akci nelze vrátit zpět."
 
 #. Group DM action that transfers ownership of the group to the selected member.
 #. Group DM action that transfers ownership of the group to the selected member.
@@ -26277,6 +26354,11 @@ msgstr "Znovu otevřít platební stránku"
 msgid "Open popup"
 msgstr "Otevřít vyskakovací okno"
 
+#. Tooltip on the media viewer button that closes the viewer and opens the media channel post the media belongs to.
+#: src/features/messaging/components/modals/media_modal/shared.ts
+msgid "Open post"
+msgstr "Otevřít příspěvek"
+
 #. Accessible label for the avatar button in the channel header of a DM. Opens the recipient user profile.
 #: src/features/channel/components/channel_header/shared.ts
 msgid "Open profile for {directMessageName}"
@@ -27859,6 +27941,11 @@ msgstr "Počkejte chvíli a zkuste smazání znovu."
 #: src/features/emoji/components/emojis/EmojiListItem.tsx
 msgid "Please wait a moment and try renaming again."
 msgstr "Počkejte chvíli a zkuste přejmenování znovu."
+
+#. Settings search entry description. One-line summary of what the setting controls. Plutonium is the product name.
+#: src/features/user/components/settings_utils/search_index/AppearanceIndex.ts
+msgid "Plutonium button in the direct messages list"
+msgstr ""
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts
@@ -29637,6 +29724,11 @@ msgstr "Odebrat z oblíbených"
 #: src/features/ui/action_menu/UserContextMenu.tsx
 msgid "Remove from group"
 msgstr "Odebrat ze skupiny"
+
+#. Removes a finished download from the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Remove from list"
+msgstr "Odebrat ze seznamu"
 
 #. Context menu item that removes a self-hosted instance from the authentication instance picker history.
 #: src/features/auth/flow/instance_selector/InstancePickerRows.tsx
@@ -31762,6 +31854,11 @@ msgstr "Hledat kód jazyka…"
 msgid "Search languages…"
 msgstr "Hledat jazyky…"
 
+#. Placeholder of the member search in the community ownership transfer section.
+#: src/features/guild/components/modals/guild_tabs/guild_overview_tab/sections/OwnerTransferSection.tsx
+msgid "Search members"
+msgstr "Hledat členy"
+
 #. Placeholder of the search box in the add members or roles step of the create channel modal.
 #: src/features/channel/components/modals/ChannelCreateAccessStep.tsx
 msgid "Search members or roles"
@@ -33611,6 +33708,11 @@ msgstr "Zobrazit ikonu po sbalení"
 msgid "Show in all communities"
 msgstr "Zobrazit ve všech komunitách"
 
+#. Opens the folder containing a downloaded file.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Show in folder"
+msgstr "Zobrazit ve složce"
+
 #. Setting label that shows a badge for incoming friend requests.
 #: src/features/ui/action_menu/FluxerButtonContextMenu.tsx
 msgid "Show incoming friend request count"
@@ -33777,6 +33879,11 @@ msgstr "Zobrazit heslo"
 #: src/features/user/components/settings_utils/search_index/VoiceVideoIndex.ts
 msgid "Show per-device participant volume sliders in voice menus"
 msgstr "Zobrazit posuvníky hlasitosti účastníků pro každé zařízení v nabídkách hlasu"
+
+#. Toggle label and settings search entry for showing the Plutonium button in the direct messages list. Plutonium is the product name.
+#: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
+msgid "Show Plutonium button"
+msgstr ""
 
 #. Row in the quick CSS editor shortcuts dialog.
 #: src/features/theme_settings/components/QuickCssShortcutsModal.tsx
@@ -34247,12 +34354,10 @@ msgstr "Jedna vrstva"
 msgid "Single line"
 msgstr "Jeden řádek"
 
-#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
-#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
+#. Label of the account settings row for single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "Jednotné přihlášení"
 
@@ -35255,6 +35360,11 @@ msgstr "Zahájeno uživatelem {name}"
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogRoleMessages.ts
 msgid "Started displaying members with this role separately"
 msgstr "Zapnuto oddělené zobrazení členů s touto rolí"
+
+#. Status shown under a file name in the downloads panel while the download is starting and no data has arrived yet. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Starting"
+msgstr "Zahajuje se"
 
 #. SMTP encryption option that upgrades only when the mail server offers STARTTLS.
 #: src/features/app/components/setup/SetupEmailSteps.tsx
@@ -36815,6 +36925,11 @@ msgstr "Emoji nahrál {user}"
 msgid "The file contains the verification token we will fetch from <0>{dnsUrl}</0>."
 msgstr "Soubor obsahuje ověřovací token, který načteme z <0>{dnsUrl}</0>."
 
+#. Status shown under a file name in the downloads panel when the download finished but the file is no longer where it was saved.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "The file was moved or deleted."
+msgstr "Soubor byl přesunut nebo smazán."
+
 #. Body of the file-too-large alert when a single file exceeds the per-file size limit.
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx
 msgid "The file you're trying to upload exceeds the maximum size limit of {maxSizeFormatted}."
@@ -37648,6 +37763,11 @@ msgstr "Tato komunita pozastavila pozvánky."
 msgid "This community has paused invites. You can try again later."
 msgstr "Tato komunita pozastavila pozvánky. Můžete to zkusit později."
 
+#. Shown in the community privacy modal under the direct messages switch when the community admins have turned off direct messages between members who are not friends, so the personal switch has no effect.
+#: src/features/guild/components/modals/GuildPrivacySettingsModal.tsx
+msgid "This community has turned off DMs between members who aren't friends"
+msgstr "Tato komunita vypnula soukromé zprávy mezi členy, kteří nejsou přátelé"
+
 #. Description text in the guild at capacity modal.
 #: src/features/guild/components/alerts/GuildAtCapacityModal.tsx
 msgid "This community is at its member limit and isn't accepting new members right now."
@@ -37931,12 +38051,17 @@ msgstr "Tato instance nepoužívá HTTPS"
 #. Explanation shown in place of the single sign-on description when the instance offers no SSO provider.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
-msgstr "Tato instance ještě nedokončila nastavení jednotného přihlašování. Požádejte administrátora o jeho povolení."
+msgstr "Tato instance ještě nedokončila nastavení jednotného přihlášení. Požádejte administrátora o jeho povolení."
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#. Description of the account settings row for single sign-on when the instance requires it. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "This instance requires {providerName}."
-msgstr "Tato instance vyžaduje {providerName}."
+msgid "This instance requires you to sign in with {providerName}."
+msgstr "Tato instance vyžaduje přihlášení přes {providerName}."
+
+#. Description of the account settings row for single sign-on when the instance requires it and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires you to sign in with single sign-on."
+msgstr "Tato instance vyžaduje jednotné přihlášení."
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -38086,7 +38211,7 @@ msgid "This link has expired"
 msgstr "Tento odkaz vypršel"
 
 #. Body of the link-unavailable alert.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "This link is not available for your account."
 msgstr "Tento odkaz není pro váš účet dostupný."
 
@@ -38765,6 +38890,11 @@ msgstr "Chcete-li vytvořit webhook, otevřete <0>{channelWebhooksSettingsPath}<
 msgid "To let people in, make a registration link in the admin panel."
 msgstr "Chcete-li lidi pustit dovnitř, vytvořte v administraci registrační odkaz."
 
+#. Description of the account settings row for single sign-on in the desktop app, which cannot connect it. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "To sign in to this account with {providerName}, connect it in the web app in a browser."
+msgstr "Pokud se chceš k tomuto účtu přihlašovat přes {providerName}, propoj ho ve webové aplikaci v prohlížeči."
+
 #: src/features/guild/components/modals/GuildOwnershipWarningModal.tsx
 msgid "To transfer ownership, go to {generalSettingsPath} and use the transfer ownership option."
 msgstr "Chcete-li převést vlastnictví, přejděte do {generalSettingsPath} a použijte možnost převést vlastnictví."
@@ -38852,6 +38982,11 @@ msgstr "Zobrazit nebo skrýt uložená média"
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx
 msgid "Toggle switches on and off to see state changes."
 msgstr "Zapínejte a vypínejte přepínače a sledujte změny jejich stavu."
+
+#. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
+#: src/features/input/state/input_keybind/shared.ts
+msgid "Toggle the downloads panel"
+msgstr "Zobrazit nebo skrýt panel stahování"
 
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts
@@ -38993,8 +39128,8 @@ msgstr "Sledování"
 msgid "Tracking parameters"
 msgstr "Parametry sledování"
 
-#. Short label in the transfer ownership modal. Keep it concise.
-#: src/features/guild/components/modals/TransferOwnershipModal.tsx
+#. Title of the community ownership transfer section in community settings and of its confirmation modal.
+#: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Transfer community ownership"
 msgstr "Převést vlastnictví komunity"
 
@@ -39004,10 +39139,14 @@ msgid "Transfer group ownership to {userName}?"
 msgstr "Předat vlastnictví skupiny uživateli {userName}?"
 
 #. Action label in community settings that hands ownership of the community to another member.
-#: src/features/guild/components/modals/TransferOwnershipModal.tsx
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Transfer ownership"
 msgstr "Převést vlastnictví"
+
+#. Disabled confirm button in the transfer ownership modal. The number is a countdown in seconds until the button can be pressed.
+#: src/features/guild/components/modals/TransferOwnershipModal.tsx
+msgid "Transfer ownership ({secondsRemaining})"
+msgstr "Převést vlastnictví ({secondsRemaining})"
 
 #. Activity log detail line under a community settings update, shown when the community got a new owner. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person. {user} is the new owner, shown as a clickable user chip.
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
@@ -39364,6 +39503,11 @@ msgstr "Vypnout kameru zařízení"
 msgid "Turn off device stream"
 msgstr "Vypnout stream zařízení"
 
+#. Switch label in the community moderation settings tab. When on, members of this community who are not friends cannot start or continue direct messages through this community.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Turn off DMs between members who aren't friends"
+msgstr "Vypnout soukromé zprávy mezi členy, kteří nejsou přátelé"
+
 #. Voice menu action that ends the current user screen share.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
 msgid "Turn off stream"
@@ -39436,6 +39580,16 @@ msgstr "Převádět textové emotikony na emoji"
 #: src/features/theme_settings/components/QuickCssFiles.tsx
 msgid "Turn this theme on to see your changes in the app."
 msgstr "Zapněte tento motiv, abyste viděli změny v aplikaci."
+
+#. Activity log detail line under a community settings update, shown when the setting that stops direct messages between community members who are not friends was turned off again. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
+#: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
+msgid "Turned DMs between members who aren't friends back on"
+msgstr "Znovu zapnuty soukromé zprávy mezi členy, kteří nejsou přátelé"
+
+#. Activity log detail line under a community settings update, shown when the setting that stops direct messages between community members who are not friends was turned on. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
+#: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
+msgid "Turned off DMs between members who aren't friends"
+msgstr "Vypnuty soukromé zprávy mezi členy, kteří nejsou přátelé"
 
 #. Activity log detail line under a community settings update, shown when the Mature content setting of the community was turned off. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
@@ -41803,6 +41957,16 @@ msgstr "Zobrazit podrobnosti"
 msgid "View devices that are signed in to your account"
 msgstr "Zobrazit zařízení přihlášená k vašemu účtu"
 
+#. Button in the app layout native titlebar that opens the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "View downloads"
+msgstr "Zobrazit stažené soubory"
+
+#. Screen reader label of the titlebar button that opens the downloads panel, used while downloads are running. {count} is the number of downloads in progress.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "View downloads. {count, plural, one {# download in progress} other {# downloads in progress}}"
+msgstr "Zobrazit stažené soubory. {count, plural, one {Probíhá # stahování} few {Probíhají # stahování} many {Probíhá # stahování} other {Probíhá # stahování}}"
+
 #: src/features/user/components/popouts/UserProfileShared.tsx
 msgid "View full profile"
 msgstr "Zobrazit celý profil"
@@ -43436,10 +43600,11 @@ msgstr "Toto propojení už máte."
 msgid "You are about to leave {productName}"
 msgstr "Chystáte se opustit aplikaci {productName}"
 
+#. Warning in the ownership transfer confirmation. {0} is the new owner's display name and targetUserId is their numeric user ID, shown in brackets after the name.
 #. placeholder {0}: NicknameUtils.getNickname(targetUser, guildId)
 #: src/features/guild/components/modals/TransferOwnershipModal.tsx
-msgid "You are about to transfer ownership of this community to <0>{0}</0>. This action is <1>irreversible</1> and you will lose all owner privileges."
-msgstr "Chystáte se převést vlastnictví této komunity na uživatele <0>{0}</0>. Tato akce je <1>nevratná</1> a ztratíte všechna oprávnění vlastníka."
+msgid "You are about to transfer ownership of this community to <0>{0}</0> ({targetUserId}). This action is <1>irreversible</1> and you will lose all owner privileges."
+msgstr "Chystáte se převést vlastnictví této komunity na uživatele <0>{0}</0> ({targetUserId}). Tato akce je <1>nevratná</1> a ztratíte všechna oprávnění vlastníka."
 
 #. Error message in the user banned from guild modal. Keep the tone plain and specific.
 #: src/features/invite/commands/InviteCommands.tsx
@@ -43607,6 +43772,16 @@ msgstr "Oprávnění <0>{readMessageHistoryPermissionLabel}</0> můžete odebrat
 #: src/features/auth/components/accounts/AccountSwitcherModal.tsx
 msgid "You can sign back in at any time."
 msgstr "Kdykoli se můžete znovu přihlásit."
+
+#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You can sign in to this account with {providerName}."
+msgstr "K tomuto účtu se můžeš přihlásit přes {providerName}."
+
+#. Description of the account settings row that disconnects the account from single sign-on when the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You can sign in to this account with single sign-on."
+msgstr "K tomuto účtu se můžeš přihlásit přes jednotné přihlášení."
 
 #. Cooldown notice in the new thread pane when the parent channel has slowmode. seconds is the wait time.
 #: src/features/threads/utils/ThreadMessageDescriptors.ts
@@ -43868,7 +44043,7 @@ msgid "You changed your tag while on {PREMIUM_PRODUCT_NAME}. It will reroll rand
 msgstr "Změnili jste si uživatelskou značku, když jste měli {PREMIUM_PRODUCT_NAME}. Náhodně se změní, až vaše předplatné {PREMIUM_PRODUCT_NAME} vyprší, pokud se neobnoví."
 
 #. Body of the access-denied alert for clicked message links.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "You do not have access to the channel where this message was sent."
 msgstr "Nemáte přístup ke kanálu, ve kterém byla tato zpráva odeslána."
 
@@ -44150,10 +44325,15 @@ msgstr "Moderátoři vám vypnuli zvuk"
 msgid "You will be taken to {redirectHostname} after authorizing."
 msgstr "Po autorizaci budete přesměrováni na {redirectHostname}."
 
-#. Warning shown before disconnecting single sign-on.
+#. Warning shown before disconnecting single sign-on. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "You will disconnect {providerName} from your account. You will be able to sign in to your account using a different method."
-msgstr "Odpojíte {providerName} od svého účtu. Do svého účtu se pak můžete přihlásit pomocí jiného způsobu."
+msgid "You won't be able to sign in with {providerName} anymore. You can still use your other sign-in methods."
+msgstr "Přes {providerName} se už nebudeš moct přihlásit. Své ostatní metody přihlášení můžeš používat dál."
+
+#. Warning shown before disconnecting single sign-on when the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You won't be able to sign in with single sign-on anymore. You can still use your other sign-in methods."
+msgstr "Přes jednotné přihlášení se už nebudeš moct přihlásit. Své ostatní metody přihlášení můžeš používat dál."
 
 #. Security settings: confirmation modal body for turning off passkey-based two-factor authentication when the account also has an authenticator app.
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx
@@ -44837,6 +45017,11 @@ msgstr "Vaše zpráva nemohla být doručena, protože byla označena našimi be
 #: src/features/messaging/state/MessageQueue.tsx
 msgid "Your message could not be delivered because it was flagged by our safety systems. If you believe this is a mistake, please contact the administrators of this instance."
 msgstr "Vaše zpráva nemohla být doručena, protože byla označena našimi bezpečnostními systémy. Pokud se domníváte, že jde o chybu, kontaktujte prosím správce této instance."
+
+#. System message in a DM after a send fails because the only community the two people share has turned off direct messages between members who are not friends.
+#: src/features/messaging/state/MessageQueue.tsx
+msgid "Your message could not be delivered. A community you share with this person has turned off direct messages between members who aren't friends."
+msgstr "Vaši zprávu se nepodařilo doručit. Komunita, kterou s touto osobou sdílíte, vypnula soukromé zprávy mezi členy, kteří nejsou přátelé."
 
 #. Label in the message queue state.
 #: src/features/messaging/state/MessageQueue.tsx

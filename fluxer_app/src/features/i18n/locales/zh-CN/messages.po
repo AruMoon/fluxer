@@ -2196,6 +2196,11 @@ msgstr "{productName} 启动时不会更新。有可用更新时，您可以随�
 msgid "{productName} wordmark"
 msgstr "{productName} 文字标志"
 
+#. Download progress shown under a file name in the downloads panel. {progress} is the formatted percentage downloaded so far, for example 42%. {total} is the formatted size of the whole file, for example 3.2 MB.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "{progress} of {total}"
+msgstr "{progress}，共 {total}"
+
 #: src/features/connection/components/modals/AddConnectionModal.tsx
 msgid "{providerName} opens in your browser. Sign in there to connect your account."
 msgstr "{providerName} 会在你的浏览器中打开。在那里登录即可连接你的账号。"
@@ -3399,15 +3404,30 @@ msgstr "添加好友以开始聊天。"
 msgid "Add a keybind"
 msgstr "添加快捷键"
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Add a local sign-in method before disconnecting {providerName}."
-msgstr "在断开 {providerName} 之前，请添加本地登录方式。"
-
 #. Body of the optional, dismissible offer to add a passkey.
 #: src/features/auth/components/modals/AuthenticatorOfferModal.tsx
 msgid "Add a passkey to sign in with your fingerprint, face or screen lock. You can also do this later in settings."
 msgstr "添加通行密钥，即可通过指纹、面部或屏幕锁定登录。你也可以稍后在设置中添加。"
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey to your account before you disconnect {providerName}."
+msgstr "在断开 {providerName} 之前，请为你的账号添加密码或通行密钥。"
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey to your account before you disconnect single sign-on."
+msgstr "在断开单点登录之前，请为你的账号添加密码或通行密钥。"
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in and the instance allows sign-in with codes sent by email. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey, or confirm your email address to sign in with emailed codes, before you disconnect {providerName}."
+msgstr "在断开 {providerName} 之前，请添加密码或通行密钥，或确认你的邮箱以便使用邮件验证码登录。"
+
+#. Description of the account settings row for single sign-on when the account has no other way to sign in, the instance allows sign-in with codes sent by email and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Add a password or passkey, or confirm your email address to sign in with emailed codes, before you disconnect single sign-on."
+msgstr "在断开单点登录之前，请添加密码或通行密钥，或确认你的邮箱以便使用邮件验证码登录。"
 
 #. Form placeholder for the tag input on an expression form.
 #: src/features/expressions/components/modals/TagListField.tsx
@@ -7250,6 +7270,11 @@ msgstr "无法在此上传文件"
 msgid "Cancel"
 msgstr "取消"
 
+#. Stops an in-progress download and deletes the partial file.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Cancel download"
+msgstr "取消下载"
+
 #. Button or menu action label in the channel and chat edit bar. Keep it concise.
 #: src/features/channel/components/ChannelEditBar.tsx
 msgid "Cancel editing message"
@@ -7325,6 +7350,11 @@ msgstr "取消向 {displayName} 发送的好友请求？"
 #: src/features/user/components/settings_utils/section_registry/VoiceVideoSections.ts
 msgid "Cancellation"
 msgstr "回声消除"
+
+#. Status shown under a file name in the downloads panel after the user cancels the download. The part of the file that had already downloaded is deleted.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Cancelled. The partial file was deleted."
+msgstr "已取消。未下载完的文件已删除。"
 
 #: src/features/app/components/dialogs/components/plutonium/SubscriptionDescription.tsx
 msgid "Cancels on <0>{cancelDate}</0>. <1/> remain active until then."
@@ -7941,7 +7971,7 @@ msgid "Channel access"
 msgstr "频道访问"
 
 #. Title of the alert shown when clicking a message link the user does not have permission to view.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Channel access denied"
 msgstr "无法访问频道"
 
@@ -8780,6 +8810,11 @@ msgstr "要清除此消息的所有反应吗？"
 msgid "Clear friends search"
 msgstr "清除好友搜索"
 
+#. Removes finished downloads from the downloads panel. Downloaded files stay on disk and in-progress downloads stay in the list.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Clear list"
+msgstr "清空列表"
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/ChatSettingsIndex.ts
 msgid "Clear message text"
@@ -9615,6 +9650,11 @@ msgstr "比较"
 msgid "Complete payment"
 msgstr "完成支付"
 
+#. Status shown under a file name in the downloads panel once the file has finished downloading. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Completed"
+msgstr "已完成"
+
 #: src/features/auth/components/pages/SignInLinkPage.tsx
 #: src/features/auth/components/pages/SsoCallbackPage.tsx
 msgid "Completing sign-in…"
@@ -10052,16 +10092,16 @@ msgstr "已接入通话"
 msgid "Connected to voice"
 msgstr "已连接语音"
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "Connected. You can disconnect this sign-in method."
-msgstr "已连接。您可以断开此登录方式。"
-
 #. US state name, shown next to the country name in the mature content gate.
 #: src/features/user/utils/UserGeo.ts
 msgctxt "us-state"
 msgid "Connecticut"
 msgstr "康涅狄格州"
+
+#. Heading on the SSO callback page while connecting single sign-on from account settings.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
+msgid "Connecting single sign-on…"
+msgstr "正在关联单点登录…"
 
 #. Auth status shown while connecting to an instance, when the instance selector resolves it or when sign-in waits for the live connection. Domain is interpolated.
 #: src/features/auth/flow/instance_selector/InstanceDiscoveryFailure.ts
@@ -10944,6 +10984,8 @@ msgid "Couldn't complete sign-in. Try again."
 msgstr "无法完成登录。请重试。"
 
 #. Error title shown when starting to connect single sign-on from account settings fails.
+#. Heading on the SSO callback page when connecting single sign-on from account settings failed.
+#: src/features/auth/components/pages/SsoCallbackPage.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
 msgid "Couldn't connect single sign-on"
 msgstr "无法关联单点登录"
@@ -13373,13 +13415,13 @@ msgstr "开发者状态"
 #. Short label in the channel and chat utility buttons. Keep it concise.
 #. Title of the info alert shown when clicking an internal developer-tools deep link.
 #: src/features/channel/components/channel_header_components/UtilityButtons.tsx
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 #: src/features/ui/action_menu/items/StaffDeveloperUserControlsMenuItem.tsx
 msgid "Developer tools"
 msgstr "开发者工具"
 
 #. Body of the developer-tools info alert. Refers to the staff badge button in the channel header.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Developer tools are available from the staff badge in the channel header."
 msgstr "在频道标题栏中点击员工徽章即可使用开发者工具。"
 
@@ -13531,6 +13573,7 @@ msgstr "私信预览"
 #. Review row label for direct messages.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
 #: src/features/channel/components/direct_message/DirectMessageList.tsx
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 #: src/features/user/components/modals/tabs/privacy_safety_tab/ConnectionsTab.tsx
 msgid "Direct messages"
@@ -13772,14 +13815,18 @@ msgstr "放弃帖子"
 msgid "Discard voice message"
 msgstr "放弃语音消息"
 
-#. Button to disconnect the account from single sign-on.
 #. Voice action label. Leaves the current voice call or disconnects a user from voice chat.
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 #: src/features/voice/utils/VoiceMessageDescriptors.ts
 msgid "Disconnect"
 msgstr "断开连接"
 
-#. Confirmation title when disconnecting the current account from the instance's single sign-on provider.
+#. Button that disconnects the account from single sign-on.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgctxt "sso"
+msgid "Disconnect"
+msgstr "断开"
+
+#. Confirmation title when disconnecting the current account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Disconnect {providerName}?"
 msgstr "断开 {providerName}？"
@@ -13805,6 +13852,11 @@ msgstr "从 {channel} 断开连接"
 #: src/features/platform/utils/DesktopLocaleBridge.ts
 msgid "Disconnect from voice"
 msgstr "断开语音连接"
+
+#. Confirmation title when disconnecting the current account from single sign-on and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "Disconnect single sign-on?"
+msgstr "断开单点登录？"
 
 #: src/features/channel/components/channel_header_components/developer_tools/ToolsMenu.tsx
 msgid "Disconnect socket"
@@ -14287,6 +14339,11 @@ msgstr "下载新版本以更新 {appName}。"
 #: src/features/ui/action_menu/items/MediaMenuData.tsx
 msgid "Download video"
 msgstr "下载视频"
+
+#. Heading of the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Downloads"
+msgstr "下载"
 
 #. Short heading in the keyboard shortcuts cheatsheet.
 #. Short label in the keybinds tab. Keep it concise.
@@ -16229,6 +16286,11 @@ msgstr "加载消息失败"
 msgid "Fail message sends"
 msgstr "发送消息失败"
 
+#. Status shown under a file name in the downloads panel when the download did not finish. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Failed"
+msgstr "失败"
+
 #: src/features/moderation/components/modals/BanMemberModal.tsx
 msgid "Failed to ban member. Try again."
 msgstr "封禁成员失败。请重试。"
@@ -17581,6 +17643,11 @@ msgstr "好友始终可以给你发消息。"
 msgid "Friends can always message you. These settings cover people and bots you only share a community with."
 msgstr "好友始终可以给你发消息。这些设置适用于你仅与其共享某个社群的人员和机器人。"
 
+#. Help text under the switch that turns off direct messages between community members who are not friends, in the community moderation settings tab.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Friends can still DM each other, and so can members who share another community. Bots aren't affected."
+msgstr "好友之间仍可互发私信，同在另一个社区的成员之间也可以。机器人不受影响。"
+
 #. Privacy option label for people connected through mutual friends.
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Friends of friends"
@@ -18768,6 +18835,11 @@ msgstr "隐藏 {appName}"
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
 msgid "Hide {premiumProductName} purchase date"
 msgstr "隐藏 {premiumProductName} 购买日期"
+
+#. Context menu item on the Plutonium button in the direct messages list. Hides the button. productName is the premium product name, Plutonium on fluxer.com.
+#: src/features/channel/components/direct_message/DirectMessageList.tsx
+msgid "Hide {productName} button"
+msgstr ""
 
 #. Accessible label for the button that collapses the other accounts section in the inbox.
 #: src/features/messaging/components/popouts/inbox/OtherAccountsInboxSection.tsx
@@ -21549,7 +21621,7 @@ msgid "Link styling"
 msgstr "链接样式"
 
 #. Title of the alert shown when clicking an internal link that is not available to the current account.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "Link unavailable"
 msgstr "链接无法打开"
 
@@ -21939,6 +22011,11 @@ msgstr "维护计划于 {localizedTime} 进行。预计持续时间：{duration}
 #: src/features/ui/action_menu/GroupDMContextMenu.tsx
 msgid "Make {userName} the group owner? You'll lose owner privileges."
 msgstr "将 {userName} 设为群主？你将失去群主权限。"
+
+#. Description of the community ownership transfer section in community settings.
+#: src/features/guild/components/modals/guild_tabs/guild_overview_tab/sections/OwnerTransferSection.tsx
+msgid "Make another member the owner of this community. You cannot undo this."
+msgstr "将另一位成员设为此社区的所有者。此操作无法撤销。"
 
 #. Group DM action that transfers ownership of the group to the selected member.
 #. Group DM action that transfers ownership of the group to the selected member.
@@ -26277,6 +26354,11 @@ msgstr "再次打开付款页面"
 msgid "Open popup"
 msgstr "打开弹出窗口"
 
+#. Tooltip on the media viewer button that closes the viewer and opens the media channel post the media belongs to.
+#: src/features/messaging/components/modals/media_modal/shared.ts
+msgid "Open post"
+msgstr "打开帖子"
+
 #. Accessible label for the avatar button in the channel header of a DM. Opens the recipient user profile.
 #: src/features/channel/components/channel_header/shared.ts
 msgid "Open profile for {directMessageName}"
@@ -27859,6 +27941,11 @@ msgstr "请稍候片刻，然后再次尝试删除。"
 #: src/features/emoji/components/emojis/EmojiListItem.tsx
 msgid "Please wait a moment and try renaming again."
 msgstr "请稍候片刻，然后再次尝试重命名。"
+
+#. Settings search entry description. One-line summary of what the setting controls. Plutonium is the product name.
+#: src/features/user/components/settings_utils/search_index/AppearanceIndex.ts
+msgid "Plutonium button in the direct messages list"
+msgstr ""
 
 #. Country name. EU member state in the illegal-content report country dropdown.
 #: src/features/moderation/components/report/OptionDescriptors.ts
@@ -29637,6 +29724,11 @@ msgstr "从收藏夹中移除"
 #: src/features/ui/action_menu/UserContextMenu.tsx
 msgid "Remove from group"
 msgstr "移出群聊"
+
+#. Removes a finished download from the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Remove from list"
+msgstr "从列表中移除"
 
 #. Context menu item that removes a self-hosted instance from the authentication instance picker history.
 #: src/features/auth/flow/instance_selector/InstancePickerRows.tsx
@@ -31762,6 +31854,11 @@ msgstr "搜索语言代码…"
 msgid "Search languages…"
 msgstr "搜索语言…"
 
+#. Placeholder of the member search in the community ownership transfer section.
+#: src/features/guild/components/modals/guild_tabs/guild_overview_tab/sections/OwnerTransferSection.tsx
+msgid "Search members"
+msgstr "搜索成员"
+
 #. Placeholder of the search box in the add members or roles step of the create channel modal.
 #: src/features/channel/components/modals/ChannelCreateAccessStep.tsx
 msgid "Search members or roles"
@@ -33611,6 +33708,11 @@ msgstr "折叠时显示图标"
 msgid "Show in all communities"
 msgstr "在所有社区中显示"
 
+#. Opens the folder containing a downloaded file.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Show in folder"
+msgstr "在文件夹中显示"
+
 #. Setting label that shows a badge for incoming friend requests.
 #: src/features/ui/action_menu/FluxerButtonContextMenu.tsx
 msgid "Show incoming friend request count"
@@ -33777,6 +33879,11 @@ msgstr "显示密码"
 #: src/features/user/components/settings_utils/search_index/VoiceVideoIndex.ts
 msgid "Show per-device participant volume sliders in voice menus"
 msgstr "在语音菜单中显示每个设备的参与者音量滑块"
+
+#. Toggle label and settings search entry for showing the Plutonium button in the direct messages list. Plutonium is the product name.
+#: src/features/user/components/settings_utils/section_registry/SharedDescriptors.ts
+msgid "Show Plutonium button"
+msgstr ""
 
 #. Row in the quick CSS editor shortcuts dialog.
 #: src/features/theme_settings/components/QuickCssShortcutsModal.tsx
@@ -34247,12 +34354,10 @@ msgstr "单层"
 msgid "Single line"
 msgstr "单行"
 
-#. Fallback label for the SSO provider in account security when no display name is configured.
 #. Heading of the single sign-on panel when the admin has not given the sign-in provider a name.
-#. Label of the account settings row for connecting single sign-on when the admin has not given the provider a name.
+#. Label of the account settings row for single sign-on when the admin has not given the provider a name.
 #: src/features/auth/flow/AuthSsoPanel.tsx
 #: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
-#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
 msgid "Single sign-on"
 msgstr "单点登录"
 
@@ -35255,6 +35360,11 @@ msgstr "{name} 发起"
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogRoleMessages.ts
 msgid "Started displaying members with this role separately"
 msgstr "开始单独显示拥有此身份组的成员"
+
+#. Status shown under a file name in the downloads panel while the download is starting and no data has arrived yet. Keep it short.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "Starting"
+msgstr "正在开始"
 
 #. SMTP encryption option that upgrades only when the mail server offers STARTTLS.
 #: src/features/app/components/setup/SetupEmailSteps.tsx
@@ -36815,6 +36925,11 @@ msgstr "表情由 {user} 上传"
 msgid "The file contains the verification token we will fetch from <0>{dnsUrl}</0>."
 msgstr "此文件包含我们将从 <0>{dnsUrl}</0> 获取的验证令牌。"
 
+#. Status shown under a file name in the downloads panel when the download finished but the file is no longer where it was saved.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "The file was moved or deleted."
+msgstr "文件已被移动或删除。"
+
 #. Body of the file-too-large alert when a single file exceeds the per-file size limit.
 #: src/features/messaging/components/alerts/FileSizeTooLargeModal.tsx
 msgid "The file you're trying to upload exceeds the maximum size limit of {maxSizeFormatted}."
@@ -37648,6 +37763,11 @@ msgstr "该社区已暂停邀请。"
 msgid "This community has paused invites. You can try again later."
 msgstr "该社区已暂停邀请。请稍后重试。"
 
+#. Shown in the community privacy modal under the direct messages switch when the community admins have turned off direct messages between members who are not friends, so the personal switch has no effect.
+#: src/features/guild/components/modals/GuildPrivacySettingsModal.tsx
+msgid "This community has turned off DMs between members who aren't friends"
+msgstr "此社区已关闭非好友成员之间的私信"
+
 #. Description text in the guild at capacity modal.
 #: src/features/guild/components/alerts/GuildAtCapacityModal.tsx
 msgid "This community is at its member limit and isn't accepting new members right now."
@@ -37933,10 +38053,15 @@ msgstr "此实例未使用 HTTPS"
 msgid "This instance has not finished setting up single sign-on. Ask an administrator to enable it."
 msgstr "此实例尚未完成单点登录设置。请管理员启用它。"
 
-#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#. Description of the account settings row for single sign-on when the instance requires it. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "This instance requires {providerName}."
-msgstr "此实例需要 {providerName}。"
+msgid "This instance requires you to sign in with {providerName}."
+msgstr "此实例要求你使用 {providerName} 登录。"
+
+#. Description of the account settings row for single sign-on when the instance requires it and the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "This instance requires you to sign in with single sign-on."
+msgstr "此实例要求你使用单点登录。"
 
 #. Setup wizard explanation of why the sign-in method is fixed: the instance is older than username sign-in.
 #: src/features/app/components/setup/SetupWizardSteps.tsx
@@ -38086,7 +38211,7 @@ msgid "This link has expired"
 msgstr "此链接已过期"
 
 #. Body of the link-unavailable alert.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "This link is not available for your account."
 msgstr "你的账号无法使用此链接。"
 
@@ -38765,6 +38890,11 @@ msgstr "要创建 Webhook，请打开<0>{channelWebhooksSettingsPath}</0>。你�
 msgid "To let people in, make a registration link in the admin panel."
 msgstr "要让大家加入，请在管理面板中创建注册链接。"
 
+#. Description of the account settings row for single sign-on in the desktop app, which cannot connect it. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoConnectRow.tsx
+msgid "To sign in to this account with {providerName}, connect it in the web app in a browser."
+msgstr "如需使用 {providerName} 登录此账号，请在浏览器中通过网页应用关联。"
+
 #: src/features/guild/components/modals/GuildOwnershipWarningModal.tsx
 msgid "To transfer ownership, go to {generalSettingsPath} and use the transfer ownership option."
 msgstr "要转移所有权，请前往{generalSettingsPath}并使用转移所有权选项。"
@@ -38852,6 +38982,11 @@ msgstr "切换已保存媒体"
 #: src/features/user/components/modals/tabs/component_gallery_tab/SelectionsTab.tsx
 msgid "Toggle switches on and off to see state changes."
 msgstr "开关切换，查看状态变化。"
+
+#. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
+#: src/features/input/state/input_keybind/shared.ts
+msgid "Toggle the downloads panel"
+msgstr "切换下载面板"
 
 #. Keyboard shortcut action label shown in the shortcuts list and keybind editor. Keep short, sentence case.
 #: src/features/input/state/input_keybind/shared.ts
@@ -38993,8 +39128,8 @@ msgstr "跟踪"
 msgid "Tracking parameters"
 msgstr "跟踪参数"
 
-#. Short label in the transfer ownership modal. Keep it concise.
-#: src/features/guild/components/modals/TransferOwnershipModal.tsx
+#. Title of the community ownership transfer section in community settings and of its confirmation modal.
+#: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Transfer community ownership"
 msgstr "转让社区所有权"
 
@@ -39004,10 +39139,14 @@ msgid "Transfer group ownership to {userName}?"
 msgstr "要将群聊所有权转让给 {userName} 吗？"
 
 #. Action label in community settings that hands ownership of the community to another member.
-#: src/features/guild/components/modals/TransferOwnershipModal.tsx
 #: src/features/i18n/utils/CommonMessageDescriptors.ts
 msgid "Transfer ownership"
 msgstr "转让所有权"
+
+#. Disabled confirm button in the transfer ownership modal. The number is a countdown in seconds until the button can be pressed.
+#: src/features/guild/components/modals/TransferOwnershipModal.tsx
+msgid "Transfer ownership ({secondsRemaining})"
+msgstr "转让所有权（{secondsRemaining}）"
 
 #. Activity log detail line under a community settings update, shown when the community got a new owner. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person. {user} is the new owner, shown as a clickable user chip.
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
@@ -39364,6 +39503,11 @@ msgstr "关闭设备摄像头"
 msgid "Turn off device stream"
 msgstr "关闭设备直播"
 
+#. Switch label in the community moderation settings tab. When on, members of this community who are not friends cannot start or continue direct messages through this community.
+#: src/features/guild/components/modals/guild_tabs/GuildModerationTab.tsx
+msgid "Turn off DMs between members who aren't friends"
+msgstr "关闭非好友成员之间的私信"
+
 #. Voice menu action that ends the current user screen share.
 #: src/features/ui/action_menu/items/voice_participant_menu_data/shared.ts
 msgid "Turn off stream"
@@ -39436,6 +39580,16 @@ msgstr "将颜文字转换为表情"
 #: src/features/theme_settings/components/QuickCssFiles.tsx
 msgid "Turn this theme on to see your changes in the app."
 msgstr "开启此主题后可在应用中看到你的更改。"
+
+#. Activity log detail line under a community settings update, shown when the setting that stops direct messages between community members who are not friends was turned off again. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
+#: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
+msgid "Turned DMs between members who aren't friends back on"
+msgstr "重新开启了非好友成员之间的私信"
+
+#. Activity log detail line under a community settings update, shown when the setting that stops direct messages between community members who are not friends was turned on. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
+#: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
+msgid "Turned off DMs between members who aren't friends"
+msgstr "关闭了非好友成员之间的私信"
 
 #. Activity log detail line under a community settings update, shown when the Mature content setting of the community was turned off. It continues the entry summary, so it has no subject. It is a past tense record of a change the actor in the summary already made, never an instruction to the reader. Do not write it as a command, a button label or in first or second person.
 #: src/features/guild/utils/guild_tabs/audit_log/AuditLogGuildMessages.ts
@@ -41803,6 +41957,16 @@ msgstr "查看详情"
 msgid "View devices that are signed in to your account"
 msgstr "查看已登录你账号的设备"
 
+#. Button in the app layout native titlebar that opens the downloads panel.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "View downloads"
+msgstr "查看下载"
+
+#. Screen reader label of the titlebar button that opens the downloads panel, used while downloads are running. {count} is the number of downloads in progress.
+#: src/features/app/components/layout/NativeDownloads.tsx
+msgid "View downloads. {count, plural, one {# download in progress} other {# downloads in progress}}"
+msgstr "查看下载。{count, plural, other {# 个下载正在进行}}"
+
 #: src/features/user/components/popouts/UserProfileShared.tsx
 msgid "View full profile"
 msgstr "查看完整个人资料"
@@ -43436,10 +43600,11 @@ msgstr "你已添加此连接。"
 msgid "You are about to leave {productName}"
 msgstr "你即将离开 {productName}"
 
+#. Warning in the ownership transfer confirmation. {0} is the new owner's display name and targetUserId is their numeric user ID, shown in brackets after the name.
 #. placeholder {0}: NicknameUtils.getNickname(targetUser, guildId)
 #: src/features/guild/components/modals/TransferOwnershipModal.tsx
-msgid "You are about to transfer ownership of this community to <0>{0}</0>. This action is <1>irreversible</1> and you will lose all owner privileges."
-msgstr "你即将把此社区的所有权转让给<0>{0}</0>。此操作<1>不可撤销</1>，你将失去全部所有者权限。"
+msgid "You are about to transfer ownership of this community to <0>{0}</0> ({targetUserId}). This action is <1>irreversible</1> and you will lose all owner privileges."
+msgstr "你即将把此社区的所有权转让给<0>{0}</0>（{targetUserId}）。此操作<1>不可撤销</1>，你将失去全部所有者权限。"
 
 #. Error message in the user banned from guild modal. Keep the tone plain and specific.
 #: src/features/invite/commands/InviteCommands.tsx
@@ -43607,6 +43772,16 @@ msgstr "你可以从<1>{EVERYONE_MENTION}</1>身份组中移除<0>{readMessageHi
 #: src/features/auth/components/accounts/AccountSwitcherModal.tsx
 msgid "You can sign back in at any time."
 msgstr "你可以随时重新登录。"
+
+#. Description of the account settings row that disconnects the account from the instance's single sign-on provider. providerName is the provider name typed by the admin.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You can sign in to this account with {providerName}."
+msgstr "你可以使用 {providerName} 登录此账号。"
+
+#. Description of the account settings row that disconnects the account from single sign-on when the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You can sign in to this account with single sign-on."
+msgstr "你可以使用单点登录登录此账号。"
 
 #. Cooldown notice in the new thread pane when the parent channel has slowmode. seconds is the wait time.
 #: src/features/threads/utils/ThreadMessageDescriptors.ts
@@ -43868,7 +44043,7 @@ msgid "You changed your tag while on {PREMIUM_PRODUCT_NAME}. It will reroll rand
 msgstr "你在 {PREMIUM_PRODUCT_NAME} 期间更改了标签。除非续订，否则你的 {PREMIUM_PRODUCT_NAME} 到期后，标签将随机重新生成。"
 
 #. Body of the access-denied alert for clicked message links.
-#: src/features/messaging/components/markdown/renderers/LinkRenderer.tsx
+#: src/features/messaging/utils/InAppLinkUtils.tsx
 msgid "You do not have access to the channel where this message was sent."
 msgstr "你无权访问发送此消息的频道。"
 
@@ -44150,10 +44325,15 @@ msgstr "你已被管理员设为拒听"
 msgid "You will be taken to {redirectHostname} after authorizing."
 msgstr "授权后，你将跳转到 {redirectHostname}。"
 
-#. Warning shown before disconnecting single sign-on.
+#. Warning shown before disconnecting single sign-on. providerName is the provider name typed by the admin.
 #: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
-msgid "You will disconnect {providerName} from your account. You will be able to sign in to your account using a different method."
-msgstr "您将从账户中断开 {providerName}。您将能够使用其他方式登录您的账户。"
+msgid "You won't be able to sign in with {providerName} anymore. You can still use your other sign-in methods."
+msgstr "你将无法再使用 {providerName} 登录。你仍可以使用其他登录方式。"
+
+#. Warning shown before disconnecting single sign-on when the admin has not given the provider a name.
+#: src/features/user/components/modals/tabs/account_security_tab/SsoDisconnectRow.tsx
+msgid "You won't be able to sign in with single sign-on anymore. You can still use your other sign-in methods."
+msgstr "你将无法再使用单点登录。你仍可以使用其他登录方式。"
 
 #. Security settings: confirmation modal body for turning off passkey-based two-factor authentication when the account also has an authenticator app.
 #: src/features/user/components/modals/tabs/account_security_tab/SecurityTab.tsx
@@ -44837,6 +45017,11 @@ msgstr "你的消息未能送达，因为它被我们的安全系统标记了。
 #: src/features/messaging/state/MessageQueue.tsx
 msgid "Your message could not be delivered because it was flagged by our safety systems. If you believe this is a mistake, please contact the administrators of this instance."
 msgstr "你的消息未能送达，因为它被我们的安全系统标记了。如果你认为这是误判，请联系此实例的管理员。"
+
+#. System message in a DM after a send fails because the only community the two people share has turned off direct messages between members who are not friends.
+#: src/features/messaging/state/MessageQueue.tsx
+msgid "Your message could not be delivered. A community you share with this person has turned off direct messages between members who aren't friends."
+msgstr "你的消息未能送达。你与此人共同所在的某个社区已关闭非好友成员之间的私信。"
 
 #. Label in the message queue state.
 #: src/features/messaging/state/MessageQueue.tsx
