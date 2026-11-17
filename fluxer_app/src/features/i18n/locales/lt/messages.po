@@ -2277,6 +2277,11 @@ msgstr "{resultCount, plural, one {Yra # rezultatas} few {Yra # rezultatai} many
 msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr "{resultCount, plural, one {# rezultatas} few {# rezultatai} many {# rezultato} other {# rezultatų}}"
 
+#. OAuth authorize page error shown when the authorization link asks for a scope this app does not offer. Preserve {scope}, it is the technical scope name inserted by code.
+#: src/features/auth/components/pages/oauth_authorize_page/state/useAuthorizeFlow.ts
+msgid "{scope} is not a supported scope."
+msgstr ""
+
 #. AFK timeout label for a stored custom duration shown in the idle settings section.
 #. Generic duration label for a whole number of seconds.
 #: src/features/guild/components/modals/guild_tabs/guild_overview_tab/sections/IdleSettingsSection.tsx
@@ -3466,7 +3471,9 @@ msgstr "Pridėti paskyrą"
 msgid "Add action."
 msgstr "Pridėti veiksmą."
 
+#. Button on the startup screen shown when the current account's instance is offline or not responding. Restarts the app signed out so the person can sign in to an account on any instance. The current account stays saved.
 #. Last tile in the account switcher grid, and the title of the step it opens, where another saved account is added by signing in or registering.
+#: src/features/app/components/BootstrapErrorScreen.tsx
 #: src/features/auth/components/accounts/account_switcher_modal/AccountSwitcherAuthFlow.tsx
 msgid "Add an account"
 msgstr "Pridėti paskyrą"
@@ -6214,6 +6221,11 @@ msgstr "Atsarginiai kodai sugeneruoti iš naujo"
 msgid "Badge and wall count: {count}"
 msgstr "Ženklelio ir sienos skaičius: {count}"
 
+#. Desktop setting toggle label on Linux. Controls whether unread messages without mentions put a badge on the app icon in the taskbar or dock.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Badge the app icon for unread messages"
+msgstr ""
+
 #. Title of the profile settings section that lists the badges you hold and lets you hide each one.
 #. Title of the window that lists every badge of a person or community.
 #: src/features/user/components/modals/BadgeListModal.tsx
@@ -6447,6 +6459,11 @@ msgstr "Biometriniai duomenys"
 #: src/features/user/utils/UserMessageDescriptors.ts
 msgid "Bitrate"
 msgstr "Bitų srautas"
+
+#. Tray icon color option for a black monochrome tray icon, for light taskbars and panels.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Black"
+msgstr ""
 
 #. Generic destructive action label that blocks a user.
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
@@ -21690,6 +21707,11 @@ msgstr "„Linux“ programa"
 msgid "Linux default"
 msgstr "„Linux“ numatytasis įrenginys"
 
+#. Desktop setting description under the Linux unread app icon badge toggle.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Linux taskbars can only show a number, so unread messages without mentions show as 1. Mentions always show their count."
+msgstr ""
+
 #. Forum layout name shown inside an activity log row.
 #. Forum layout option that shows posts as rows.
 #: src/features/forum/utils/ForumMessageDescriptors.ts
@@ -22367,6 +22389,11 @@ msgstr "Pagrindinis garsumas"
 msgctxt "code-editor"
 msgid "Match case"
 msgstr "Skirti didžiąsias ir mažąsias"
+
+#. Tray icon color option. The app picks white or black from the taskbar or panel color.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Match the taskbar"
+msgstr ""
 
 #: src/features/channel/components/MatureContentChannelGate.tsx
 msgid "Mature category"
@@ -27695,6 +27722,11 @@ msgstr "Pasirinkite, kurie mygtukai rodomi žinutės įvesties lauke"
 #: src/features/user/components/modals/tabs/privacy_safety_tab/data_request_modal/DataRequestModal.tsx
 msgid "Pick which kinds of conversations to clean up."
 msgstr "Pasirinkite, kokių tipų pokalbius išvalyti."
+
+#. Description under the automatic tray icon color option.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Pick white or black from the color of your taskbar or panel."
+msgstr ""
 
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/search_index/MyProfileIndex.ts
@@ -39210,6 +39242,11 @@ msgstr "Dėklo piktograma"
 msgid "Tray icon changes only apply after a restart on Linux because the system tray protocol doesn't reliably let apps add or remove icons at runtime. Restart now to apply your change."
 msgstr "Dėklo piktogramos pakeitimai „Linux“ sistemoje įsigalioja tik iš naujo paleidus, nes sistemos dėklo protokolas neleidžia programoms patikimai pridėti ar pašalinti piktogramų vykdymo metu. Paleiskite iš naujo dabar, kad pritaikytumėte pakeitimą."
 
+#. Desktop settings section title on Windows and Linux for choosing the color of the monochrome system tray icon.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Tray icon color"
+msgstr ""
+
 #. Short label in the channel and chat gif picker grid. Keep it concise.
 #. Short label in the channel and chat gif picker header. Keep it concise.
 #: src/features/channel/components/pickers/gif/GifPickerGrid.tsx
@@ -39518,6 +39555,11 @@ msgstr "Išjungti srautą"
 #: src/features/streamer_mode/components/StreamerModeGate.tsx
 msgid "Turn off streaming privacy before viewing login or account security details."
 msgstr "Išjunkite srautinio perdavimo privatumą prieš peržiūrėdami prisijungimo ar paskyros saugos duomenis."
+
+#. Section description shown when the colored tray icon is on, so the monochrome color choice has no effect.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "Turn off the colored tray icon to choose a color here."
+msgstr ""
 
 #. Button that turns on the Operator Pass that comes with Visionary, in profile settings and at the bottom of its dialog. Nothing is bought.
 #. Nagbar button that applies quick CSS and saved themes again.
@@ -43194,6 +43236,11 @@ msgstr "Kol šis ženklelis paslėptas arba rodomas kaip prenumerata, „{labsNa
 msgid "While this badge is hidden, {labsName} shows you without the Operator role, and you keep #operators."
 msgstr "Kol šis ženklelis paslėptas, „{labsName}“ rodo jus be Operator vaidmens, o #operators jums lieka."
 
+#. Tray icon color option for a white monochrome tray icon, for dark taskbars and panels.
+#: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
+msgid "White"
+msgstr ""
+
 #. Settings search synonym. Used to match this term when the user types it in the settings search bar.
 #: src/features/user/components/settings_utils/section_registry/PrivacySafetySections.ts
 msgid "Who can add"
@@ -44931,6 +44978,11 @@ msgstr "Jūsų eksportas nuo {requestedAt} paruoštas. Atsisiuntimas baigiasi {e
 #: src/features/user/components/modals/tabs/components/EntranceSoundSection.tsx
 msgid "Your fallback entrance sound for all communities and direct messages. More specific settings override it."
 msgstr "Jūsų atsarginis įėjimo garsas visoms bendruomenėms ir tiesioginėms žinutėms. Konkretesni nustatymai jį pakeičia."
+
+#. Shown in the invite modal when every friend is already a member of this community.
+#: src/features/invite/components/modals/InviteModal.tsx
+msgid "Your friends are already in this community."
+msgstr ""
 
 #. Empty state title in the friends list Online tab when no friends are online. Tone can be friendly.
 #: src/features/channel/components/friends/views/FriendsList.tsx
