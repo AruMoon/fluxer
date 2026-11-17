@@ -25,7 +25,7 @@ use std::ptr;
 
 const MAX_NSFW_SAMPLE_FRAMES: usize = 3;
 const NSFW_FRAME_SEED_BYTES: usize = 4 * 1024;
-const NSFW_FRAME_MAX_DIMENSION: u32 = 512;
+const NSFW_FRAME_MAX_DIMENSION: u32 = 1024;
 
 pub(super) struct NSFWScanSource<'a> {
     pub(super) media_limits: &'a MediaLimits,
