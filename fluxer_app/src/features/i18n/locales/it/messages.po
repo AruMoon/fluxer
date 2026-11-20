@@ -8238,10 +8238,6 @@ msgstr "Controlla aggiornamenti"
 msgid "Check for updates..."
 msgstr "Verifica aggiornamenti..."
 
-#: src/features/app/components/BootstrapErrorScreen.tsx
-msgid "Check our <0>{BLUESKY_PROVIDER_NAME} ({FLUXER_BLUESKY_HANDLE})</0> for status updates."
-msgstr "Controlla il nostro <0>{BLUESKY_PROVIDER_NAME} ({FLUXER_BLUESKY_HANDLE})</0> per aggiornamenti sullo stato."
-
 #. Description text in the share theme modal.
 #: src/features/theme/components/modals/ShareThemeModal.tsx
 msgid "Check out my custom theme!"
@@ -13016,10 +13012,8 @@ msgstr "Richiesta di conferma dell’eliminazione"
 msgid "Delete redirect URI"
 msgstr "Elimina URI di reindirizzamento"
 
-#. Danger action in the channel permissions overwrite context menu that removes a role permission override from the channel.
 #. Destructive button in the role editor that removes the selected role. Removes the role from every member; keep tone plain.
 #. Destructive context menu action in the community roles settings tab that immediately removes the right-clicked role from every member. Keep it short.
-#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx
 #: src/features/guild/components/modals/guild_tabs/guild_roles_tab/RoleEditor.tsx
 #: src/features/guild/components/modals/guild_tabs/GuildRolesTab.tsx
 #: src/features/ui/action_menu/RoleContextMenu.tsx
@@ -13082,11 +13076,6 @@ msgstr "Eliminare questo messaggio? Non sarà possibile annullare l'operazione. 
 #: src/features/threads/utils/ThreadMessageDescriptors.ts
 msgid "Delete thread"
 msgstr "Elimina thread"
-
-#. Danger action in the channel permissions overwrite context menu that removes a member permission override from the channel.
-#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx
-msgid "Delete user"
-msgstr "Elimina utente"
 
 #. Danger button label that deletes a webhook.
 #: src/features/webhook/components/WebhookListItem.tsx
@@ -27904,6 +27893,11 @@ msgstr "Riproduci"
 msgid "Play animated emojis"
 msgstr "Riproduci emoji animate"
 
+#. Short label for a toggle in the animation tab. Keep it concise.
+#: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
+msgid "Play GIFs in the GIF picker"
+msgstr "Riproduci le GIF nel selettore di GIF"
+
 #. Short label in the accessibility tab. Keep it concise.
 #: src/features/user/components/modals/tabs/AccessibilityTab.tsx
 msgid "Play sample"
@@ -29836,6 +29830,11 @@ msgstr "Rimuovi reazioni"
 msgid "Remove reverse image search"
 msgstr "Rimuovi ricerca inversa immagini"
 
+#. Danger action in the channel permissions overwrite context menu that removes a role permission override from the channel.
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx
+msgid "Remove role"
+msgstr "Rimuovi ruolo"
+
 #. Button or menu action label in the community role management. Keep it concise. Preserve {roleName}; it is inserted by code. Keep the tone plain and specific.
 #: src/features/guild/components/RoleManagement.tsx
 msgid "Remove role {roleName}"
@@ -29881,6 +29880,11 @@ msgstr "Rimuovi timeout"
 #: src/features/user/components/modals/tabs/chat_settings_tab/SearchEnginesTab.tsx
 msgid "Remove translator"
 msgstr "Rimuovi traduttore"
+
+#. Danger action in the channel permissions overwrite context menu that removes a member permission override from the channel.
+#: src/features/channel/components/modals/channel_tabs/channel_permissions_tab/OverwriteContextMenu.tsx
+msgid "Remove user"
+msgstr "Rimuovi utente"
 
 #. Description of the switch that hides the purchase date, under the premium badge row in the "Badges" profile settings. Preserve {premiumProductName}; it is inserted by code. Keep the tone plain and specific.
 #: src/features/user/components/modals/tabs/my_profile_tab/ProfileBadgeSettings.tsx
@@ -43155,6 +43159,16 @@ msgstr "All'avvio al login, avvia nel menu in alto invece di aprire la finestra"
 #: src/features/user/components/modals/tabs/DesktopSettingsTab.tsx
 msgid "When launched at login, start in the system tray instead of opening the window"
 msgstr "All'avvio al login, avvia nella barra di sistema invece di aprire la finestra"
+
+#. Description for the GIF picker animation toggle in the animation tab on desktop.
+#: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
+msgid "When off, GIFs in the picker show a still frame until you hover over them."
+msgstr "Se disattivato, le GIF nel selettore mostrano un fotogramma fisso finché non ci passi sopra con il mouse."
+
+#. Description for the GIF picker animation toggle in the animation tab on mobile.
+#: src/features/user/components/modals/tabs/accessibility_tab/AnimationTab.tsx
+msgid "When off, GIFs in the picker show a still frame."
+msgstr "Se disattivato, le GIF nel selettore mostrano un fotogramma fisso."
 
 #. Label in the display tab.
 #: src/features/user/components/modals/tabs/chat_settings_tab/DisplayTab.tsx
